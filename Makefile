@@ -73,6 +73,13 @@ all:				$(NAME)
 
 $(NAME):			# $(OBJ_DIRS)
 					cd typescript && npx tsc
+# 					mkdir -p babylon && cd babylon
+					npm install --save-dev @babylonjs/core
+					npm install --save-dev @babylonjs/inspector
+					tsc --init
+					npm install --save-dev webpack ts-loader webpack-cli
+					npm install --save-dev html-webpack-plugin
+					npm install --save-dev webpack-dev-server
 
 # $(OBJ_DIRS):
 # 					mkdir -p $(OBJ_DIRS)

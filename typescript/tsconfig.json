@@ -8,14 +8,28 @@
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
-    "module": "nodenext",
-    "target": "esnext",
+    // "module": "nodenext",
+    // "target": "esnext",
     "types": [],
+
+    
+    // For babylon.js
+    "target": "es6",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "noResolve": false,
+    "noImplicitAny": false,
+    "preserveConstEnums":true,
+    "lib": [
+      "dom",
+      "es6"
+    ],
+    
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],
     // and npm install -D @types/node
-
+    
     // Other Outputs
     "sourceMap": true,
     "declaration": true,
