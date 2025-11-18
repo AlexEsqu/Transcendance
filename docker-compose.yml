@@ -1,0 +1,10 @@
+services:
+  fastify:
+    build: ./Backend
+    ports:
+      - 3000:3000
+    volumes :
+      - backend:/usr/src/app
+
+volumes:
+  backend:
