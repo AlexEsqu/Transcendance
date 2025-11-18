@@ -1,10 +1,14 @@
 services:
   fastify:
     build: ./Backend
+    container_name: fastify
     ports:
-      - 3000:3000
-    volumes :
-      - backend:/usr/src/app
+      - "3000:3000"
+    volumes:
+      - ./Backend:/app
+      - sqlite:/app/data
+    environment:
+      SQLITE_PATH=/app/data/database.db
 
 volumes:
-  backend:
+  sqlite:
