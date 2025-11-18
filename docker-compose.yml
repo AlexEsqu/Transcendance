@@ -7,8 +7,6 @@ services:
     volumes:
       - ./Backend:/app
       - sqlite:/app/data
-    environment:
-      SQLITE_PATH=/app/data/database.db
 
 volumes:
   sqlite:
