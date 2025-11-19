@@ -6,6 +6,7 @@
     "noResolve": false,
     "noImplicitAny": false,
     "sourceMap": true,
+	"allowJs": true,
     "preserveConstEnums":true,
     "lib": [
         "dom",
