@@ -1,20 +1,28 @@
+USER := $(shell whoami)
+BACKEND_DIR := /home/$(USER)/transcendence/data/Backend
+
 all: build up
 
-build: 
-	mkdir -p /home/${USER}/transcendence/data/Backend
+dev:
+	mkdir -p $(BACKEND_DIR)
+	docker compose -f ./docker-compose.dev.yml build
+	docker compose -f ./docker-compose.dev.yml up
+
+build:
+	mkdir -p $(BACKEND_DIR)
 	docker compose -f ./docker-compose.yml build
 
 up:
 	docker compose -f ./docker-compose.yml up
 
-down:	
+down:
 	docker compose -f ./docker-compose.yml down -v
 
-clean: 
+clean:
 	docker volume rm backend -f
 
 fclean:
 	docker system prune -af
-	sudo rm /home/${USER}/transcendence/data/Backend -rf
-	
-re : fclean build up
+	sudo rm -rf $(BACKEND_DIR)
+
+re: fclean build up
