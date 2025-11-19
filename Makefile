@@ -23,6 +23,6 @@ clean:
 
 fclean:
 	docker system prune -af
-	sudo rm -rf $(BACKEND_DIR)
+	rm -rf $(BACKEND_DIR)
 
 re: fclean build up
