@@ -18,4 +18,4 @@ ENV ADDRESS=0.0.0.0
 ENV PORT=3000
 ENV SQLITE_PATH=/app/data/database.db
 
-CMD ["npm", "start"]
+ENTRYPOINT ["npm", "run"]

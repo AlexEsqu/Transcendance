@@ -4,7 +4,7 @@ services:
     container_name: fastify
     ports:
       - "3000:3000"
-    command: start
+    command: dev
     volumes:
       - ./Backend:/app
       - sqlite:/app/data
