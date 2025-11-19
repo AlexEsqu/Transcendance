@@ -1,0 +1,13 @@
+services:
+  fastify:
+    build: ./Backend
+    container_name: fastify
+    ports:
+      - "3000:3000"
+    command: start
+    volumes:
+      - ./Backend:/app
+      - sqlite:/app/data
+
+volumes:
+  sqlite:
