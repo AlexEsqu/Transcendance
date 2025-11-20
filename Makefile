@@ -30,11 +30,13 @@ down:
 	docker compose -f ./docker-compose.yml down -v
 
 clean:
+	docker compose -f ./docker-compose.yml down --volume --remove-orphans
 	docker volume rm backend -f
-	
+
 
 fclean:
 	docker system prune -af
+	docker volume prune -f
 	sudo rm -rf $(BACKEND_DIR)
 
 re: fclean build up
