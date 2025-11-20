@@ -12,8 +12,6 @@ COPY . .
 # Create a folder for the SQLite database file
 RUN mkdir -p /app/data
 
-EXPOSE 3000
-
 ENV ADDRESS=0.0.0.0
 ENV PORT=3000
 ENV SQLITE_PATH=/app/data/database.db
