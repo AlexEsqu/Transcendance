@@ -1,13 +1,11 @@
 // ESM
-import Fastify from "fastify";
-
+import Fastify from 'fastify'
+import root from './routes/root.js'
 const fastify = Fastify({
 	logger: true,
 });
 
-fastify.get("/", async (request, reply) => {
-	return { hello: "world" };
-});
+fastify.register(root);
 
 /**
  * Run the server!
