@@ -9,5 +9,16 @@ services:
       - ./Backend:/app
       - sqlite:/app/data
 
+  typescript:
+    build: ./Frontend
+    container_name: typescript
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./Frontend:/app
+      - /app/node_modules
+    depends_on:
+      - fastify
+
 volumes:
   sqlite:

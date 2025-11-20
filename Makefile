@@ -1,3 +1,14 @@
+# **************************************************************************** #
+#		General variables													   #
+# **************************************************************************** #
+
+NAME				=	Transcendence
+
+SRC_DIR				=	src
+OBJ_DIR				=	obj
+INC_DIR				=	inc
+WEB_DIR				=	pages
+
 USER := $(shell whoami)
 BACKEND_DIR := /home/$(USER)/transcendence/data/Backend
 
@@ -20,6 +31,7 @@ down:
 
 clean:
 	docker volume rm backend -f
+	
 
 fclean:
 	docker system prune -af
