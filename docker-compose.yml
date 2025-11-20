@@ -8,6 +8,8 @@ services:
     volumes:
       - ./Backend:/app
       - sqlite:/app/data
+    require:
+      fastify
 
   typescript:
     build: ./Frontend
