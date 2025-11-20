@@ -17,8 +17,7 @@ services:
     volumes:
       - ./Frontend:/app
       - /app/node_modules
-    depends_on:
-      - fastify
+
 
 volumes:
   sqlite:
