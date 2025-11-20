@@ -8,6 +8,24 @@ services:
     volumes:
       - ./Backend:/app
       - sqlite:/app/data
+    require:
+      fastify
+
+  typescript:
+    build: ./Frontend
+    container_name: typescript
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./Frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      # to allow for reloading (website update as code change)
+      # setting the docker to check the file as written in the src/ folder
+      # at determinate intervals
+      - CHOKIDAR_USEPOLLING=true
+      - CHOKIDAR_INTERVAL=200
 
 volumes:
   sqlite:

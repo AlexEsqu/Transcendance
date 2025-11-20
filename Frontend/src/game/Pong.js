@@ -18,8 +18,8 @@ export class Pong {
 
 	startGame() {
 		this.canvas.style.width = '100%';
-		this.canvas.style.height = '100%';
-		
+		this.canvas.style.height = '120%';
+
 		// Create and init the game scene
 		this.createScene();
 		// Resize the game with the window
@@ -39,13 +39,13 @@ export class Pong {
         });
 		// Rendering loop
 		this.engine.runRenderLoop(() => {
-			// 
+			//
 			this.scene.render();
 		});
 	}
 
 	createScene() {
-		// Scene settings 
+		// Scene settings
 		this.scene = new Scene(this.engine);
 		this.scene.createDefaultLight();
 
