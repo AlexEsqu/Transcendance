@@ -2,8 +2,7 @@ import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
 import { Engine, Scene, ArcRotateCamera, MeshBuilder, Vector3, HemisphericLight } from '@babylonjs/core';
-import { Ball } from "./Ball";
-import { Paddle } from "./Paddle";
+// import { Ball } from "./Ball";
 
 // Initialize engine, scene, camera, light
 // Create 3D objects : ball, paddles, ground
@@ -11,31 +10,25 @@ import { Paddle } from "./Paddle";
 // Monitoring, update
 
 export class Pong {
-	constructor(canvasId, user1, user2) {
+	constructor(canvasId) {
 		this.canvas = document.getElementById(canvasId);
-		this.canvas.style.width = '100%';
-        this.canvas.style.height = '50%';
 		this.engine = new Engine(this.canvas, true);
 		this.scene = null;
-		this.ball = null;
-		// check if args are undefined ?
-		this.player1 = { score: 0, paddle: null, name: user1};
-		this.player2 = { score: 0, paddle: null, name: user2};
-		this.groundBounding = { min: null, max: null };
-		this.paddleBounding = { min: null, max: null };
 	}
 
 	startGame() {
+		this.canvas.style.width = '100%';
+        this.canvas.style.height = '50%';
+
 		// Create and init the game scene
 		this.createScene();
 		// Resize the game with the window
 		window.addEventListener('resize', () => {
 			this.engine.resize();
 		})
-		const keys = {};
-
+		// Hide/show the Inspector
         window.addEventListener("keydown", (ev) => {
-            // Shift+Ctrl+Alt+I == Hide/show the Inspector
+            // Shift+Ctrl+Alt+I
             if (ev.shiftKey && ev.ctrlKey && ev.altKey && (ev.key === "I" || ev.key === "i")) {
                 if (scene.debugLayer.isVisible()) {
                     scene.debugLayer.hide();
@@ -44,33 +37,19 @@ export class Pong {
                 }
             }
         });
-		window.addEventListener("keydown", (evt) => {
-			keys[evt.key] = true;
-		});
-		window.addEventListener("keyup", (evt) => {
-			keys[evt.key] = false;
-		});
-		this.scene.registerBeforeRender(() => {
-			if (keys["ArrowDown"]) this.player2.paddle.move("down", this.groundBounding.max);
-			if (keys["ArrowUp"]) this.player2.paddle.move("up", this.groundBounding.min);
-			if (this.ball) this.ball.update();
-		});
 		// Rendering loop
 		this.engine.runRenderLoop(() => {
-			if (this.scene) this.scene.render();
+			if (this.scene)
+				this.scene.render();
 		});
 	}
 
-	/**
-	 * Creates and init the main scene and the objects linked to it :
-	 * 	- camera, light, ground, ball and 2 paddles
-	 */
 	createScene() {
-		//	Create and configure the main scene
+		// Scene settings
 		this.scene = new Scene(this.engine);
 		this.scene.createDefaultLight();
 
-		//	Create and configure the camera
+		// Camera settings
 		const camera = new ArcRotateCamera(
 			'arCamera',
 			-Math.PI / 2, // alpha
@@ -79,10 +58,10 @@ export class Pong {
 			Vector3.Zero(), // target
 			this.scene
 		);
-		//	Allow to move the camera -> uncomment for debug
-		// camera.attachControl(this.canvas, true);
+		// Allow to move the camera -> uncomment for debug
+		// camera.attachControl(this.canvas, true);w
 
-		//	Create and configure the light
+		// Light settings
 		const light = new HemisphericLight(
 			'light',
 			new Vector3(0, 1, 0),
@@ -90,27 +69,24 @@ export class Pong {
 		);
 		light.intensity = 0.8;
 
-		//	Create and configure the ground
-		const ground = MeshBuilder.CreateGround(
+		// Set ground
+		MeshBuilder.CreateGround(
 			'ground',
-			{ width: 10, height: 6 },
+			{
+				width: 10,
+				height: 6,
+			},
 			this.scene
 		);
-		// const gBounding = ground.getBoundingInfo();
-		// this.groundBounding.min = gBounding.boundingBox.minimumWorld; // bottom-left-back
-		// this.groundBounding.max = gBounding.boundingBox.maximumWorld; // top-right-front
-		this.groundBounding.min = 6 / 2; // bottom-left-back
-		this.groundBounding.max = -(6 / 2); // top-right-front
 
-		//	Create the ball
-		this.ball = new Ball(this.scene);
+		// Set Ball
+		// this.ball = new Ball();
+
 		// Set a gizmo for debug
 		// const gizmoManager = new GizmoManager(scene);
 		// gizmoManager.positionGizmoEnabled = true;
 		// gizmoManager.attachToMesh(ball);
 
-		//	Creates 2 paddles, one for each players
-		this.player1.paddle = new Paddle(this.scene, this.player1.name, true);
-		this.player2.paddle = new Paddle(this.scene, this.player2.name, false);
+		// Set Paddles
 	}
 }
