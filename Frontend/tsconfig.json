@@ -7,6 +7,7 @@
     "noImplicitAny": false,
     "sourceMap": true,
     "preserveConstEnums":true,
+	"outDir": "dist",
     "lib": [
         "dom",
         "es6"

@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "build": "webpack",
-    "start": "webpack-dev-server --mode development --host 0.0.0.0 --port 8080"
+    "build": "tsc",
+    "watch:ts": "tsc -w --preserveWatchOutput",
+    "serve": "live-server dist --port=8080 --host=0.0.0.0 --no-browser",
+    "dev": "concurrently \"npm run watch:ts\" \"npm run serve\""
   },
   "keywords": [],
   "author": "",
@@ -12,12 +14,10 @@
   "devDependencies": {
     "@babylonjs/core": "^8.37.0",
     "@babylonjs/inspector": "^8.37.0",
-    "html-webpack-plugin": "^5.6.4",
+    "concurrently": "^9.2.1",
+    "live-server": "^1.2.2",
     "ts-loader": "^9.5.4",
-    "typescript": "^5.9.3",
-    "webpack": "^5.102.1",
-    "webpack-cli": "^6.0.1",
-    "webpack-dev-server": "^5.2.2"
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "babylonjs-gltf2interface": "^8.37.0",
