@@ -9,7 +9,6 @@ WORKDIR /app
 COPY ./package.json ./package.json
 COPY ./src/ ./src/
 COPY ./tsconfig.json ./tsconfig.json
-# COPY ./webpack.config.js ./webpack.config.js
 
 RUN npm install
 
@@ -19,5 +18,5 @@ RUN chmod 777 /usr/bin/start.sh
 
 EXPOSE 8080
 
-# access at localhost:8080
-CMD ["start.sh"]
+# set the basis on which the Dockercompose command will be run
+ENTRYPOINT ["npm", "run"]
