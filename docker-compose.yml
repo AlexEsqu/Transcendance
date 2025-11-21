@@ -14,7 +14,6 @@ services:
     container_name: typescript
     ports:
       - "8080:8080"
-    command: serve
     volumes:
       - ./Frontend:/app
       - /app/node_modules
