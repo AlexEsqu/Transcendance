@@ -1,14 +1,20 @@
-FROM debian:bookworm
+# FROM debian:bookworm
+FROM node:22
 
 RUN	apt update
 
 # Set up a working directory to avoid a "idealTree" error
 WORKDIR /app
 
+COPY ./package.json ./package.json
+COPY ./src/ ./src/
+COPY ./tsconfig.json ./tsconfig.json
+COPY ./webpack.config.js ./webpack.config.js
+
 # install Javascript package manager, with -y flag to skip the questionnaire
 # uses the package.json file in the volume to install required package
-RUN apt install npm -y
-
+# RUN apt install npm -y
+RUN npm install
 
 # full install without a package.json (obsolete since we now have one !)
 
