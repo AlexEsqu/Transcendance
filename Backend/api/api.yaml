@@ -206,12 +206,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /user/{user_id}/matches:
+  /user/{user_id}/games:
     get:
       tags:
-        - Matches
-      summary: Get list of user matches
-      description: Get list of user matches
+        - user
+      summary: Get list of user games
+      description: Get list of user games
       operationId: getUserNatches
       parameters:
         - name: user_id
@@ -228,8 +228,8 @@ paths:
               schema:
                 type: array
                 items:
-                  type: object
-                  $ref: "#/components/schemas/Match"
+                  $ref: "#/components/schemas/Game"
+
         "400":
           description: Invalid username supplied
         "404":
@@ -240,7 +240,71 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-
+  /games/{game_id}:
+    get:
+      tags:
+        - games
+      summary: Get game by game id.
+      description: Get game detail based on game id.
+      operationId: getGameByGameId
+      parameters:
+        - name: game_id
+          in: path
+          description: The game id that needs to be fetched.
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Game"
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/Game"
+        "400":  
+          description: Invalid username supplied
+        "404":
+          description: Game not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      tags:
+        - games
+      summary: Create game.
+      description: This can only be done by the logged in user.
+      operationId: createGame
+      requestBody:
+        description: Created game object
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Game"
+          application/xml:
+            schema:
+              $ref: "#/components/schemas/Game"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/Game"
+      responses:
+        "200":
+          description: successful operation
+        "400":
+          description: Invalid username supplied
+        "404":
+          description: User not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 components:
   schemas:
     Category:
@@ -275,7 +339,7 @@ components:
           example: 1
       xml:
         name: user
-    Match:
+    Game:
       type: object
       properties:
         id:
@@ -292,8 +356,7 @@ components:
         loser_id:
           type: integer
           format: int64
-          example: 85574
-        
+          example: 85574           
     Tag:
       type: object
       properties:
