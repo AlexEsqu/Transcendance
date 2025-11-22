@@ -1,23 +1,29 @@
 // ESM
 import Fastify from 'fastify'
+import fs from "fs";
 import root from './routes/root.js'
-const fastify = Fastify({
-	logger: true,
+const app = Fastify({
+  logger: true,
+  https: {
+    key: fs.readFileSync("/tmp/certs/server.key"),
+    cert: fs.readFileSync("/tmp/certs/server.crt")
+  }
 });
 
-fastify.register(root);
+
+app.register(root);
 
 /**
  * Run the server!
  */
 const start = async () => {
 	try {
-		await fastify.listen({
-			port: process.env.PORT || 3000,
-			host: process.env.ADDRESS || "0.0.0.0",
+		await app.listen({
+			port: process.env.PORT,
+			host: process.env.ADDRESS ,
 		});
 	} catch (err) {
-		fastify.log.error(err);
+		app.log.error(err);
 		process.exit(1);
 	}
 };

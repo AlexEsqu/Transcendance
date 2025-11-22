@@ -3,7 +3,7 @@ services:
     build: ./Backend
     container_name: fastify
     ports:
-      - "3000:3000"
+      - "8443:8443"
     command: start
     volumes:
       - ./Backend:/app
