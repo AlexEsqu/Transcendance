@@ -1,24 +1,21 @@
-// Contains every data about a paddle
-// Handle position et movement, respects collision
-// Handle input with keyboard
-
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
 import { Engine, Scene, ArcRotateCamera, MeshBuilder, Vector3, GizmoManager, HemisphericLight } from '@babylonjs/core';
 
-const paddSpeed = 0.5;
+const paddSpeed = 0.111;
 
 export class Paddle {
 	constructor(scene, player, left) {
 		this.scene = scene;
 		this.name = player;
+		this.meshSize = { width: 2, height: 0.2, depth: 0.5 };
 		this.mesh = MeshBuilder.CreateBox(
 			'paddle',
 			{
-				height: 0.2,
-				width: 2,
-				depth: 0.5
+				width: this.meshSize.width,
+				height: this.meshSize.height,
+				depth: this.meshSize.depth
 			},
 			scene
 		);
@@ -33,18 +30,14 @@ export class Paddle {
 		// gizmoManager.positionGizmoEnabled = true;
 		// gizmoManager.rotationGizmoEnabled = true;
 		// gizmoManager.attachToMesh(this.mesh);
-		// console.log(player);
-
 	}
 
 	move(direction, posLimit) {
-		console.log(direction);
-		console.log("posLimit Z " + posLimit);
-		console.log("pos.z + speed " + (this.mesh.position.z + paddSpeed));
-		console.log("pos.z - speed " + (this.mesh.position.z - paddSpeed));
-		if (direction == "up" && (this.mesh.position.z + paddSpeed) <= posLimit)
+		const meshEdgePos = this.mesh.position.z + (this.meshSize.width / 2);
+		const meshEdgeNeg = this.mesh.position.z - (this.meshSize.width / 2);
+		if (direction == "up" && (meshEdgePos + paddSpeed) <= posLimit / 2)
 			this.mesh.position.z += paddSpeed;
-		else if (direction == "down" && (this.mesh.position.z - paddSpeed) <= posLimit)
+		else if (direction == "down" && (meshEdgeNeg - paddSpeed) >= -(posLimit / 2))
 			this.mesh.position.z -= paddSpeed;
 	}
 }

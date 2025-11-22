@@ -18,11 +18,10 @@ export class Pong {
 		this.engine = new Engine(this.canvas, true);
 		this.scene = null;
 		this.ball = null;
+		this.groundSize = { width: 10, height: 6 };
 		// check if args are undefined ?
 		this.player1 = { score: 0, paddle: null, name: user1};
 		this.player2 = { score: 0, paddle: null, name: user2};
-		this.groundBounding = { min: null, max: null };
-		this.paddleBounding = { min: null, max: null };
 	}
 
 	startGame() {
@@ -51,8 +50,10 @@ export class Pong {
 			keys[evt.key] = false;
 		});
 		this.scene.registerBeforeRender(() => {
-			if (keys["ArrowDown"]) this.player2.paddle.move("down", this.groundBounding.max);
-			if (keys["ArrowUp"]) this.player2.paddle.move("up", this.groundBounding.min);
+			if (keys["ArrowDown"]) this.player2.paddle.move("down", this.groundSize.height);
+			if (keys["ArrowUp"]) this.player2.paddle.move("up", this.groundSize.height);
+			if (keys["s"]) this.player1.paddle.move("down", this.groundSize.height);
+			if (keys["w"]) this.player1.paddle.move("up", this.groundSize.height);
 			if (this.ball) this.ball.update();
 		});
 		// Rendering loop
@@ -93,14 +94,9 @@ export class Pong {
 		//	Create and configure the ground
 		const ground = MeshBuilder.CreateGround(
 			'ground',
-			{ width: 10, height: 6 },
+			{ width: this.groundSize.width, height: this.groundSize.height },
 			this.scene
 		);
-		// const gBounding = ground.getBoundingInfo();
-		// this.groundBounding.min = gBounding.boundingBox.minimumWorld; // bottom-left-back
-		// this.groundBounding.max = gBounding.boundingBox.maximumWorld; // top-right-front
-		this.groundBounding.min = 6 / 2; // bottom-left-back
-		this.groundBounding.max = -(6 / 2); // top-right-front
 
 		//	Create the ball
 		this.ball = new Ball(this.scene);
