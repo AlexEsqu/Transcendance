@@ -1,8 +1,8 @@
 
 import { createAttachElement } from "./utils";
-import { displayGameWindow } from "./gameWindow";
+import { displayGameWindow } from "./game";
 
-export { displayGreeting, displayAliasQuery }
+export { displayGreeting, displayAliasQuery, displayAliasDelete }
 
 const submitAliasButtonText = "Submit";
 const submitAliasTitleText = "Who are you ?";
@@ -25,22 +25,6 @@ function displayGreeting(name)
 	// creating a title
 	let greetingTitle = createAttachElement("h1", aliasPage, id, null);
 	greetingTitle.appendChild(document.createTextNode(greetingTitleText(name)));
-
-	// creating a label for the delete data button
-	let greetingLabel = createAttachElement("label", aliasPage, id, null);
-	greetingLabel.appendChild(document.createTextNode(greetingLabelText));
-
-	// creating a button
-	let greetingButton = createAttachElement("button", aliasPage, id, null);
-	greetingButton.appendChild(document.createTextNode(greetingButtonText));
-
-	// adding a callback function to the delete data function
-	greetingButton.addEventListener("click", function ()
-	{
-		console.log("clicking delete button");
-		localStorage.removeItem(localStorageKeyForAlias);
-		displayAliasQuery();
-	})
 }
 
 function displayAliasQuery()
@@ -75,8 +59,29 @@ function displayAliasQuery()
 		{
 			localStorage.setItem(localStorageKeyForAlias, alias);
 			displayGreeting(alias);
-			displayGameWindow();
 		}
 	})
+}
 
+function displayAliasDelete()
+{
+	const id = "delete-alias";
+
+	const gameWindow = createAttachElement("div", document.body, id, null);
+
+	// creating a label for the delete data button
+	let greetingLabel = createAttachElement("label", gameWindow, id, null);
+	greetingLabel.appendChild(document.createTextNode(greetingLabelText));
+
+	// creating a button
+	let greetingButton = createAttachElement("button", gameWindow, id, null);
+	greetingButton.appendChild(document.createTextNode(greetingButtonText));
+
+	// adding a callback function to the delete data function
+	greetingButton.addEventListener("click", function ()
+	{
+		console.log("clicking delete button");
+		localStorage.removeItem(localStorageKeyForAlias);
+		displayAliasQuery();
+	})
 }

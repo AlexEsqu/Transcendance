@@ -1,17 +1,15 @@
-import { Pong } from "./game/Pong"
 
-import { displayGreeting, displayAliasQuery } from "./landing/alias"
+import { displayGreeting, displayAliasQuery, displayAliasDelete } from "./landing/alias"
+import { displayGameWindow } from "./landing/game";
 
-import { displayGameWindow } from "./landing/gameWindow";
-
-const aliasPage = document.getElementById("alias-div");
+// checking if the user has an alias, not diplaying the game until they do
 let alias = localStorage.getItem("PongAlias");
-
 
 if (alias)
 {
 	displayGreeting(alias);
 	displayGameWindow();
+	displayAliasDelete();
 }
 else
 	displayAliasQuery();

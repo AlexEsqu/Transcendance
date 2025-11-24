@@ -20,9 +20,6 @@ class App {
 
 function displayGameWindow()
 {
-	if (!localStorage.getItem("PongAlias"))
-		return;
-	
 	const gameWindow = createAttachElement("div", document.body, "game", "game");
 
 	new App(gameWindow);
