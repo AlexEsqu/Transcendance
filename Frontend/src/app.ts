@@ -14,19 +14,56 @@ class App {
 // new App();
 
 const aliasPage = document.getElementById("alias-div");
-const aliasInput = document.getElementById("alias-input") as HTMLInputElement;
-const aliasButton = document.getElementById("alias-btn");
+let name = localStorage.getItem("PongAlias");
 
-aliasButton.addEventListener("click", function () {
-	const name = aliasInput.value;
-	aliasInput.value = "";
-	console.log(name);
-	localStorage.setItem("PongAlias", name);
-	displayName(name);
-})
+if (name)
+{
+	displayGreeting(name);
+}
+else
+{
+	displayAliasQuery();
+}
 
-function displayName(name) {
+function displayGreeting(name)
+{
 	aliasPage.innerHTML = `
-	<h1>Welcome, ${localStorage.getItem("PongAlias")}!<\h1>
+	<h1>Welcome, ${name}!</h1>
+	<div id="alias-container">
+		<label>To delete your alias, click here: </label>
+		<button id="delete-btn">DELETE</button>
+	</div>
 	`
+	const deleteButton = document.getElementById("delete-btn");
+	deleteButton.addEventListener("click", function ()
+	{
+		console.log("clicking delete button");
+		localStorage.removeItem("PongAlias");
+		displayAliasQuery();
+	})
+}
+
+function displayAliasQuery() {
+	aliasPage.innerHTML = `
+	<h1>Who Are You ?</h1>
+	<div id="alias-container">
+		<label>To access the game, please input an alias: </label>
+		<input id="alias-input"></input>
+		<button id="alias-btn">INPUT</button>
+	</div>
+	`
+	const aliasButton = document.getElementById("alias-btn");
+	aliasButton.addEventListener("click", function ()
+	{
+		console.log("clicking submit alias button");
+		const aliasInput = document.getElementById("alias-input") as HTMLInputElement;
+		const name = aliasInput.value;
+		aliasInput.value = "";
+		console.log(name);
+		if (name)
+		{
+			localStorage.setItem("PongAlias", name);
+			displayGreeting(name);
+		}
+	})
 }
