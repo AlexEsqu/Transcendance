@@ -11,4 +11,22 @@ class App {
 		pong.startGame();
     }
 }
-new App();
+// new App();
+
+const aliasPage = document.getElementById("alias-div");
+const aliasInput = document.getElementById("alias-input") as HTMLInputElement;
+const aliasButton = document.getElementById("alias-btn");
+
+aliasButton.addEventListener("click", function () {
+	const name = aliasInput.value;
+	aliasInput.value = "";
+	console.log(name);
+	localStorage.setItem("PongAlias", name);
+	displayName(name);
+})
+
+function displayName(name) {
+	aliasPage.innerHTML = `
+	<h1>Welcome, ${localStorage.getItem("PongAlias")}!<\h1>
+	`
+}
