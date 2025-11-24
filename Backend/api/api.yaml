@@ -42,7 +42,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /user/{user_id}:
+  /users/{user_id}:
     get:
       tags:
         - user
