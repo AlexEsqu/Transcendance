@@ -1,5 +1,10 @@
 import { Pong } from "./game/Pong"
 
+const submitAliasButtonText = "Submit";
+const submitAliasTitleText = "Who are you ?"
+const submitAliasLabelText = "Submit a username to start playing."
+
+
 class App {
     constructor() {
 		const canvas = document.createElement("canvas");
@@ -27,6 +32,7 @@ else
 
 function displayGreeting(name)
 {
+
 	aliasPage.innerHTML = `
 	<h1>Welcome, ${name}!</h1>
 	<div id="alias-container">
@@ -43,22 +49,46 @@ function displayGreeting(name)
 	})
 }
 
+function createAttachElement(type: string, container : HTMLElement, id : string, className : string)
+{
+	let element = document.createElement(type);
+
+	if (id)
+		element.setAttribute("id", `${id}-${type}`);
+	if (className)
+		element.setAttribute("className", className);
+
+	container.appendChild(element);
+
+	return element;
+}
+
+
 function displayAliasQuery() {
-	aliasPage.innerHTML = `
-	<h1>Who Are You ?</h1>
-	<div id="alias-container">
-		<label>To access the game, please input an alias: </label>
-		<input id="alias-input"></input>
-		<button id="alias-btn">INPUT</button>
-	</div>
-	`
-	const aliasButton = document.getElementById("alias-btn");
-	aliasButton.addEventListener("click", function ()
+	aliasPage.innerHTML = "";
+	const id = "alias-query";
+
+	// creating a title
+	let submitAliasTitle = createAttachElement("h1", aliasPage, id, null);
+	submitAliasTitle.appendChild(document.createTextNode(submitAliasTitleText));
+
+	// creating a label for the username input field
+	let submitAliasLabel = createAttachElement("label", aliasPage, id, null);
+	submitAliasLabel.appendChild(document.createTextNode(submitAliasLabelText));
+
+	// creating an input field, as HTML input element for typescript to allow to read from it
+	let submitAliasInput = createAttachElement("input", aliasPage, id, null) as HTMLInputElement;
+
+	// creating a button
+	let submitAliasButton = createAttachElement("button", aliasPage, id, null);
+	submitAliasButton.appendChild(document.createTextNode(submitAliasButtonText));
+
+	// attaching a callback function to the button being clicked
+	submitAliasButton.addEventListener("click", function ()
 	{
 		console.log("clicking submit alias button");
-		const aliasInput = document.getElementById("alias-input") as HTMLInputElement;
-		const name = aliasInput.value;
-		aliasInput.value = "";
+		const name = submitAliasInput.value;
+		submitAliasInput.value = "";
 		console.log(name);
 		if (name)
 		{
@@ -66,4 +96,5 @@ function displayAliasQuery() {
 			displayGreeting(name);
 		}
 	})
+
 }
