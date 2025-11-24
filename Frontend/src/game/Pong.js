@@ -59,7 +59,7 @@ export class Pong {
 		// Rendering loop
 		this.engine.runRenderLoop(() => {
 			this.time = Date.now();
-			if (this.ball) this.ball.update(this.time, this.groundSize, this.player1.paddle.meshSize);
+			if (this.ball) this.ball.update(this.time, this.groundSize, this.player1.paddle, this.player2.paddle);
 			if (this.scene) this.scene.render();
 		});
 	}
