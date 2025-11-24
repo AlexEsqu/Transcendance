@@ -1,5 +1,11 @@
-import Database from 'better-qlite3'
+import Database from 'better-sqlite3'
 
-const db = new Database('database.db', {
+//create new connection to Database
+const db = new Database('/app/src/data/database.db', {
 	verbose: console.log
 })
+// Enable WAL mode for performance
+db.pragma('journal_mode = WAL');
+//creates the USER table if it does not exist
+
+export default db;
