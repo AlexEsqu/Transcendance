@@ -22,6 +22,7 @@ export class Pong {
 		// check if args are undefined ?
 		this.player1 = { score: 0, paddle: null, name: user1};
 		this.player2 = { score: 0, paddle: null, name: user2};
+		this.time = 0;
 	}
 
 	startGame() {
@@ -54,10 +55,11 @@ export class Pong {
 			if (keys["ArrowUp"]) this.player2.paddle.move("up", this.groundSize.height);
 			if (keys["s"]) this.player1.paddle.move("down", this.groundSize.height);
 			if (keys["w"]) this.player1.paddle.move("up", this.groundSize.height);
-			if (this.ball) this.ball.update();
 		});
 		// Rendering loop
 		this.engine.runRenderLoop(() => {
+			this.time = Date.now();
+			if (this.ball) this.ball.update(this.time, this.groundSize, this.player1.paddle.meshSize);
 			if (this.scene) this.scene.render();
 		});
 	}
@@ -74,12 +76,13 @@ export class Pong {
 		//	Create and configure the camera
 		const camera = new ArcRotateCamera(
 			'arCamera',
-			-Math.PI / 2, // alpha
-			Math.PI / 3, // beta
+			Math.PI / 2, // alpha
+			0, // beta
 			10, // radius
 			Vector3.Zero(), // target
 			this.scene
 		);
+		//	Set with persepctive view : alpha(-Math.PI / 2), beta(Math.PI / 3)
 		//	Allow to move the camera -> uncomment for debug
 		// camera.attachControl(this.canvas, true);
 
@@ -89,7 +92,7 @@ export class Pong {
 			new Vector3(0, 1, 0),
 			this.scene
 		);
-		light.intensity = 0.8;
+		light.intensity = 0.2;
 
 		//	Create and configure the ground
 		const ground = MeshBuilder.CreateGround(
@@ -106,7 +109,9 @@ export class Pong {
 		// gizmoManager.attachToMesh(ball);
 
 		//	Creates 2 paddles, one for each players
-		this.player1.paddle = new Paddle(this.scene, this.player1.name, true);
-		this.player2.paddle = new Paddle(this.scene, this.player2.name, false);
+		this.player1.paddle = new Paddle(this.scene, this.player1.name, "left");
+		this.player2.paddle = new Paddle(this.scene, this.player2.name, "right");
+
+		this.ball.launch();
 	}
 }

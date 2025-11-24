@@ -6,7 +6,7 @@ import { Engine, Scene, ArcRotateCamera, MeshBuilder, Vector3, GizmoManager, Hem
 const paddSpeed = 0.111;
 
 export class Paddle {
-	constructor(scene, player, left) {
+	constructor(scene, player, side) {
 		this.scene = scene;
 		this.name = player;
 		this.meshSize = { width: 2, height: 0.2, depth: 0.5 };
@@ -21,9 +21,9 @@ export class Paddle {
 		);
 		this.mesh.rotation.y = Math.PI / 2;
 		this.mesh.position.y = 0.1;
-		if (left === true)
+		if (side == "right")
 			this.mesh.position.x = -5;
-		else
+		else if (side == "left")
 			this.mesh.position.x = 5;
 		// Set a gizmo for debug
 		// const gizmoManager = new GizmoManager(scene);

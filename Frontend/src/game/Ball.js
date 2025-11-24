@@ -3,44 +3,51 @@ import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
 import { Engine, Scene, ArcRotateCamera, MeshBuilder, Vector3, HemisphericLight } from '@babylonjs/core';
 
-// Contains every data about the ball
-// Handle position, velocity, direction
-// Detects collision with walls and paddles
-// Reset postion after a user wins
 
-// take reference from the scene
-// set constant values like speed
 // set lastHitPaddle
-// Create mesh, material
+// Create material
 // function to launch or stop the ball
-// function to update position of the ball according to delta time, collision etc
-// reset values function
-// collision detection function
 
 export class Ball {
 	constructor(scene) {
 		this.scene = scene;
-		this.mesh = MeshBuilder.CreateSphere('ball', { diameter: 0.5 }, scene);
-		this.mesh.position = new Vector3(0, 1, 0);
+		this.meshSize = { radius: 0.5 };
+		this.mesh = MeshBuilder.CreateSphere('ball', { diameter: this.meshSize.radius }, scene);
+		this.mesh.position = new Vector3(0, 0.3, 0);
+		this.velocity = { x: 0.1, z: 0.1};
 	}
 
-	update() {
-		// const speed = 5;
-		// this.mesh.position.x += 0.1;
-		// if (this.mesh.position.x >= 6)
-		// 	this.mesh.position.x = 0;
-		// const targetPos = this.mesh.position.add(Vector3(1, 1, 1));
-		// check for collisions detection
-		// this.animate(targetPos, 2);
+	update(lastFrameTime, groundSize, paddle) {
+		// const deltaTime = (Date.now() - lastFrameTime) / 1000;
+		// this.velocity.x += deltaTime;
+		// this.velocity.z += deltaTime;
+		const groundHeight = groundSize.height / 2;
+		const groundWidth = groundSize.width / 2;
+		const diam = this.meshSize.radius / 2;
+		const posX = this.mesh.position.x;
+		const posZ = this.mesh.position.z;
+		if (posZ + diam >= groundHeight || posZ - diam <= -(groundHeight))
+			this.velocity.z = -(this.velocity.z);
+		if (posX + diam >= groundWidth || posX - diam <= -(groundWidth))
+			this.velocity.x = -(this.velocity.x);
+
+		this.mesh.position.x += this.velocity.x;
+		this.mesh.position.z += this.velocity.z;
+		
+		// const paddleMiddle = paddle.position.z;
+		// const paddleLeft;
+		// const paddleRight;
+		// check if paddle or empty
+		// if (ballEdgeX)
+
 	}
 
 	/**
-	 * Should have 2 options :
-	 * 	- launch from the last winner paddle
-	 * 	- launch in random direction from the middle of the ground
+	 * Should launch in random direction from the middle of the ground
 	 */
 	launch() {
-
+		// this.mesh.position.z += 0.5;
+		// this.mesh.position.x += 0.5;
 	}
 
 	/**
