@@ -6,17 +6,19 @@ html, body {
 
 body {
 	background-color: black;
-	color: rgb(161, 207, 245);
+	color:white;
 	font-family: 'Courier New', Courier, monospace;
 	display: flex;
+	flex-direction: column;
 	justify-content: center;
 	align-items: center;
 	box-sizing: border-box;
+	margin: 10px;
 }
 
 body > div {
 	border-width: 2px;
-	border-color: aqua;
+	border-color: white;
 	border-style: double;
 	border-radius: 6px;
 	border-style: solid;
@@ -27,18 +29,24 @@ body > div {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-
 }
 
-#alias-container {
+#alias-div {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-between;
 	flex-direction: column;
-	align-items: center;
+	align-items: space-between;
 }
 
-#alias-container > label {
+#game-div {
+	background-color: #33334D;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+#alias-div > label {
 	padding: 10px;
 }
 
@@ -49,7 +57,7 @@ h1 {
 
 input {
 	background-color: rgb(51, 51, 51);
-	color: azure;
+	color: white;
 	border-style: solid;
 	border-color: rgb(255, 158, 47);
 	border-radius: 6px;
@@ -61,7 +69,7 @@ button {
 	padding: 5px 20px;
 	margin: 5px;
 	background-color:  rgb(51, 51, 51);
-	color: azure;
+	color: white;
 	border-style: solid;
 	border-radius: 6px;
 	border-color: rgb(255, 158, 47);

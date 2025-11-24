@@ -1,5 +1,6 @@
 
 import { createAttachElement } from "./utils";
+import { displayGameWindow } from "./gameWindow";
 
 export { displayGreeting, displayAliasQuery }
 
@@ -74,6 +75,7 @@ function displayAliasQuery()
 		{
 			localStorage.setItem(localStorageKeyForAlias, alias);
 			displayGreeting(alias);
+			displayGameWindow();
 		}
 	})
 

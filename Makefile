@@ -20,7 +20,7 @@ all: build up
 dev:
 	mkdir -p $(BACKEND_DIR)
 	docker compose -f ./docker-compose.dev.yml build
-	docker compose -f ./docker-compose.dev.yml up
+	docker
 
 build:
 	mkdir -p $(BACKEND_DIR)
@@ -40,8 +40,14 @@ front:
 	docker compose -f ./docker-compose.dev.yml build ${FRONT_SERVICES}
 	docker compose -f ./docker-compose.dev.yml up ${FRONT_SERVICES}
 
+front_up:
+	docker compose -f ./docker-compose.dev.yml up ${FRONT_SERVICES}
+
 back:
 	docker compose -f ./docker-compose.dev.yml build ${BACK_SERVICES}
+	docker compose -f ./docker-compose.dev.yml up ${BACK_SERVICES}
+
+back_up:
 	docker compose -f ./docker-compose.dev.yml up ${BACK_SERVICES}
 
 fclean:
