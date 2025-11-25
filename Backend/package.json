@@ -6,15 +6,20 @@
 	"type": "module",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"dev": "node --watch src/server.js",
+		"dev": "nodemon src/server.js",
 		"start": "node src/server.js"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
+		"@fastify/formbody": "^8.0.2",
+		"@fastify/multipart": "^9.3.0",
 		"better-sqlite3": "^12.4.6",
 		"fastify": "^5.6.2",
 		"fs": "^0.0.1-security"
+	},
+	"devDependencies": {
+		"nodemon": "^3.1.11"
 	}
 }

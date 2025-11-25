@@ -1,9 +1,10 @@
 // ESM
 import Fastify from 'fastify'
 import fs from "fs";
-import db from './database.js';
-import getUsers from './routes/get/getUsers.js';
-import postUser from './routes/get/post/postUser.js';
+import fastifyFormBody from '@fastify/formbody'
+import fastifyMultiPart from '@fastify/multipart'
+import {getUsers, getUser} from './routes/get/getUsers.js';
+import postUser from './routes/post/postUser.js';
 
 export const server = Fastify({
   https: {
@@ -12,8 +13,10 @@ export const server = Fastify({
   }
 });
 
-
+server.register(fastifyFormBody);
+server.register(fastifyMultiPart);
 server.register(getUsers, { prefix: "/api" });
+server.register(getUser, { prefix: "/api" });
 server.register(postUser, { prefix: "/api" });
 
 /**
