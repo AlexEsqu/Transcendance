@@ -1,5 +1,4 @@
 import db from "../../database.js";
-import bcrypt from "bcrypt";
 //Schema that serves an user
 
 const singleUserSchema = {
