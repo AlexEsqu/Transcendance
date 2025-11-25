@@ -43,12 +43,18 @@ front:
 front_up:
 	docker compose -f ./docker-compose.dev.yml up ${FRONT_SERVICES}
 
+front_down:
+	docker compose -f ./docker-compose.dev.yml down ${FRONT_SERVICES}
+
 back:
 	docker compose -f ./docker-compose.dev.yml build ${BACK_SERVICES}
 	docker compose -f ./docker-compose.dev.yml up ${BACK_SERVICES}
 
 back_up:
 	docker compose -f ./docker-compose.dev.yml up ${BACK_SERVICES}
+
+back_down:
+	docker compose -f ./docker-compose.dev.yml down ${BACK_SERVICES}
 
 fclean:
 	docker system prune -af
