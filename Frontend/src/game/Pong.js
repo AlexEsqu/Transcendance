@@ -44,11 +44,13 @@ export class Pong {
 		this.engine.runRenderLoop(() => {
 			this.time = Date.now();
 			if (this.ball) {
-				this.ball.update(this.player1, this.player2, this.groundSize);
-				this.ball.move(this.time);
+				this.ball.update(this.player1, this.player2, this.groundSize, this.time);
+				// this.ball.move();
 			}
 			if (this.scene) this.scene.render();
 			if (this.player1.score >= maxScore || this.player2.score >= maxScore) {
+				console.log("Score player1: " + this.player1.score);
+				console.log("Score player2: " + this.player2.score);
 				console.log("Game STATE: end");
 				this.engine.stopRenderLoop();
 			}
@@ -91,8 +93,8 @@ export class Pong {
 		this.ball = new Ball(this.scene);
 
 		//	Creates 2 paddles, one for each players
-		this.player1.paddle = new Paddle(this.scene, this.player1.name, "left");
-		this.player2.paddle = new Paddle(this.scene, this.player2.name, "right");
+		this.player1.paddle = new Paddle(this.scene, this.player1.name, "left", this.groundSize.width);
+		this.player2.paddle = new Paddle(this.scene, this.player2.name, "right", this.groundSize.width);
 	}
 
 	handleInput(keys) {
