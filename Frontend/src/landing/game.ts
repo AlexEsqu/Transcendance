@@ -1,10 +1,9 @@
 
 import { Pong } from "../game/Pong"
 
-import { displayGreeting, displayAliasQuery } from "./alias"
 import { createAttachElement } from "./utils";
 
-export { displayGameWindow }
+export { displayGame }
 
 class App {
 	constructor(container : HTMLElement) {
@@ -18,9 +17,7 @@ class App {
 	}
 }
 
-function displayGameWindow()
-{
-	const gameWindow = createAttachElement("div", document.body, "game", "game");
-
+function displayGame() : void {
+	const gameWindow = createAttachElement("main", document.body, "game", "game");
 	new App(gameWindow);
 }

@@ -16,7 +16,7 @@ body {
 	margin: 10px;
 }
 
-body > div {
+main {
 	border-width: 2px;
 	border-color: white;
 	border-style: double;
@@ -31,7 +31,7 @@ body > div {
 	align-items: center;
 }
 
-#alias-div {
+#alias-main {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-between;
@@ -39,14 +39,14 @@ body > div {
 	align-items: space-between;
 }
 
-#game-div {
+#game-main {
 	background-color: #33334D;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 }
 
-#alias-div > label {
+#alias-main > label {
 	padding: 10px;
 }
 

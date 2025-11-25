@@ -1,87 +1,99 @@
 
 import { createAttachElement } from "./utils";
-import { displayGameWindow } from "./game";
+import { displayGamePage } from "../app";
 
-export { displayGreeting, displayAliasQuery, displayAliasDelete }
+export { displayGreetingHeader, displayAliasQueryPage, displayAliasDelete }
 
-const submitAliasButtonText = "Submit";
-const submitAliasTitleText = "Who are you ?";
-const submitAliasLabelText = "Submit a username to start playing.";
 
-const greetingTitleText = (alias: string) => `Welcome, ${alias}!`;
-const greetingLabelText = "If you want to delete your alias, click here:";
-const greetingButtonText = "Delete Alias";
+// Test content of sections to be edited here
 
-const localStorageKeyForAlias = "PongAlias"
+const submitAliasButtonText : string = "Submit";
+const submitAliasTitleText : string = "Who are you ?";
+const submitAliasLabelText : string = "Submit a username to start playing.";
 
-const aliasPage = document.getElementById("alias-div");
+const greetingTitleText = (alias: string) : string => `Welcome, ${alias}!`;
 
-function displayGreeting(name)
+const deleteAliasLabelText : string = "If you want to delete your alias, click here:";
+const deleteAliasButtonText : string = "Delete Alias";
+
+const localStorageKeyForAlias : string = "PongAlias"
+
+const mainContainer : HTMLElement = document.getElementById("main");
+
+
+// function deplaying the pages
+
+function displayGreetingHeader(name : string) : void
 {
-	// wiping previously available page
-	aliasPage.innerHTML = "";
-	const id = "greeting";
+	const id : string  = "greeting";
+
+	// creating a semantic container for our page
+	let headerContainer : HTMLElement = createAttachElement("header", document.body, id, null);
 
 	// creating a title
-	let greetingTitle = createAttachElement("h1", aliasPage, id, null);
+	let greetingTitle : HTMLElement = createAttachElement("h1", headerContainer, id, null);
 	greetingTitle.appendChild(document.createTextNode(greetingTitleText(name)));
 }
 
-function displayAliasQuery()
+function displayAliasQueryPage() : void
 {
-	// wiping previously available page
-	aliasPage.innerHTML = "";
-	const id = "alias-query";
+	document.body.innerHTML = "";
+
+	const id : string = "alias-query";
+
+	// creating a container for our page (preferring semantic "main" instead of div, might change my mind)
+	const mainContainer : HTMLElement = createAttachElement("main", document.body, id, null);
 
 	// creating a title
-	let submitAliasTitle = createAttachElement("h1", aliasPage, id, null);
+	let submitAliasTitle : HTMLElement = createAttachElement("h1", mainContainer, id, null);
 	submitAliasTitle.appendChild(document.createTextNode(submitAliasTitleText));
 
 	// creating a label for the username input field
-	let submitAliasLabel = createAttachElement("label", aliasPage, id, null);
+	let submitAliasLabel : HTMLElement = createAttachElement("label", mainContainer, id, null);
 	submitAliasLabel.appendChild(document.createTextNode(submitAliasLabelText));
 
 	// creating an input field, as HTML input element for typescript to allow to read from it
-	let submitAliasInput = createAttachElement("input", aliasPage, id, null) as HTMLInputElement;
+	let submitAliasInput : HTMLInputElement = createAttachElement("input", mainContainer, id, null) as HTMLInputElement;
 
 	// creating a button
-	let submitAliasButton = createAttachElement("button", aliasPage, id, null);
+	let submitAliasButton : HTMLButtonElement = createAttachElement("button", mainContainer, id, null) as HTMLButtonElement;
 	submitAliasButton.appendChild(document.createTextNode(submitAliasButtonText));
 
 	// attaching a callback function to the button being clicked
 	submitAliasButton.addEventListener("click", function ()
 	{
 		console.log("clicking submit alias button");
-		const alias = submitAliasInput.value;
+		const alias : string = submitAliasInput.value;
 		submitAliasInput.value = "";
 		console.log(alias);
 		if (alias)
 		{
 			localStorage.setItem(localStorageKeyForAlias, alias);
-			displayGreeting(alias);
+			displayGamePage();
 		}
 	})
 }
 
-function displayAliasDelete()
+function displayAliasDelete() : void
 {
-	const id = "delete-alias";
+	const id : string = "delete-alias";
 
-	const gameWindow = createAttachElement("div", document.body, id, null);
+	// creating a semantic container for our page
+	const footerContainer : HTMLElement = createAttachElement("footer", document.body, id, null);
 
 	// creating a label for the delete data button
-	let greetingLabel = createAttachElement("label", gameWindow, id, null);
-	greetingLabel.appendChild(document.createTextNode(greetingLabelText));
+	const deleteAliasLabel : HTMLElement = createAttachElement("label", footerContainer, id, null);
+	deleteAliasLabel.appendChild(document.createTextNode(deleteAliasLabelText));
 
 	// creating a button
-	let greetingButton = createAttachElement("button", gameWindow, id, null);
-	greetingButton.appendChild(document.createTextNode(greetingButtonText));
+	let deleteAliasButton : HTMLButtonElement = createAttachElement("button", footerContainer, id, null) as HTMLButtonElement;
+	deleteAliasButton.appendChild(document.createTextNode(deleteAliasButtonText));
 
 	// adding a callback function to the delete data function
-	greetingButton.addEventListener("click", function ()
+	deleteAliasButton.addEventListener("click", function ()
 	{
 		console.log("clicking delete button");
 		localStorage.removeItem(localStorageKeyForAlias);
-		displayAliasQuery();
+		displayAliasQueryPage();
 	})
 }

@@ -1,8 +1,8 @@
 export {createAttachElement};
 
-function createAttachElement(type: string, container : HTMLElement, id : string, className : string)
+function createAttachElement(type: string, container : HTMLElement, id : string, className : string) : HTMLElement
 {
-	let element = document.createElement(type);
+	let element : HTMLElement = document.createElement(type);
 
 	if (id)
 		element.setAttribute("id", `${id}-${type}`);
