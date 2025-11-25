@@ -7,7 +7,35 @@ servers:
   - url: https://localhost:8080.fr/v1
     description: Une description du serveur (optionnelle)
 paths:
-  /user:
+  /users:
+    get:
+      tags:
+        - user
+      summary: Get all users.
+      description: Get all user.
+      operationId: getUsers
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Invalid username supplied
+        "404":
+          description: User not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
     post:
       tags:
         - user
@@ -42,7 +70,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /users/{user_id}:
+  /users/{id}:
     get:
       tags:
         - user
@@ -50,7 +78,7 @@ paths:
       description: Get user detail based on user id.
       operationId: getUserByUserId
       parameters:
-        - name: user_id
+        - name: id
           in: path
           description: The user id that needs to be fetched.
           required: true
@@ -63,35 +91,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/User"
-        "400":
-          description: Invalid username supplied
-        "404":
-          description: User not found
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-  /users:
-    get:
-      tags:
-        - user
-      summary: Get all users.
-      description: Get all user.
-      operationId: getUsers
-      responses:
-        "200":
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/User"
             application/xml:
               schema:
                 $ref: "#/components/schemas/User"
@@ -178,7 +177,7 @@ paths:
       description: This can only be done by the logged in user.
       operationId: updateUser
       parameters:
-        - name: user_id
+        - name: id
           in: path
           description: The user id that needs to be fetched.
           required: true
@@ -216,7 +215,7 @@ paths:
       description: This can only be done by the logged in user.
       operationId: deleteUser
       parameters:
-        - name: user_id
+        - name: id
           in: path
           description: The user id that needs to be fetched.
           required: true
@@ -235,7 +234,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /user/{user_id}/games:
+  /user/{id}/games:
     get:
       tags:
         - user
@@ -243,7 +242,7 @@ paths:
       description: Get list of user games
       operationId: getUserNatches
       parameters:
-        - name: user_id
+        - name: id
           in: path
           description: The user id that needs to be fetched.
           required: true
