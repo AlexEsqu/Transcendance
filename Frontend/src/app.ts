@@ -5,7 +5,7 @@ import { displayGame } from "./landing/game";
 export { displayGamePage }
 
 // checking if the user has an alias, not diplaying the game until they do
-let alias : string = localStorage.getItem("PongAlias");
+let alias : string | null = localStorage.getItem("PongAlias");
 
 function displayGamePage() : void
 {
