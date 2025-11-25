@@ -2,7 +2,7 @@
 import { createAttachElement } from "./utils";
 import { displayGamePage } from "../app";
 
-export { displayGreetingHeader, displayAliasQueryPage, displayAliasDelete }
+export { displayGreetingHeader, displayAliasQueryPage, displayAliasDeleteFooter }
 
 
 // Test content of sections to be edited here
@@ -21,17 +21,17 @@ const localStorageKeyForAlias : string = "PongAlias"
 const mainContainer : HTMLElement = document.getElementById("main");
 
 
-// function deplaying the pages
+// function displaying the pages
 
 function displayGreetingHeader(name : string) : void
 {
-	const id : string  = "greeting";
+	const grouping : string  = "greeting";
 
 	// creating a semantic container for our page
-	let headerContainer : HTMLElement = createAttachElement("header", document.body, id, null);
+	let headerContainer : HTMLElement = createAttachElement("header", document.body, grouping, grouping);
 
 	// creating a title
-	let greetingTitle : HTMLElement = createAttachElement("h1", headerContainer, id, null);
+	let greetingTitle : HTMLElement = createAttachElement("h1", headerContainer, grouping, grouping);
 	greetingTitle.appendChild(document.createTextNode(greetingTitleText(name)));
 }
 
@@ -39,24 +39,24 @@ function displayAliasQueryPage() : void
 {
 	document.body.innerHTML = "";
 
-	const id : string = "alias-query";
+	const grouping : string = "alias-query";
 
 	// creating a container for our page (preferring semantic "main" instead of div, might change my mind)
-	const mainContainer : HTMLElement = createAttachElement("main", document.body, id, null);
+	const mainContainer : HTMLElement = createAttachElement("main", document.body, grouping, grouping);
 
 	// creating a title
-	let submitAliasTitle : HTMLElement = createAttachElement("h1", mainContainer, id, null);
+	let submitAliasTitle : HTMLElement = createAttachElement("h1", mainContainer, grouping, grouping);
 	submitAliasTitle.appendChild(document.createTextNode(submitAliasTitleText));
 
 	// creating a label for the username input field
-	let submitAliasLabel : HTMLElement = createAttachElement("label", mainContainer, id, null);
+	let submitAliasLabel : HTMLElement = createAttachElement("label", mainContainer, grouping, grouping);
 	submitAliasLabel.appendChild(document.createTextNode(submitAliasLabelText));
 
 	// creating an input field, as HTML input element for typescript to allow to read from it
-	let submitAliasInput : HTMLInputElement = createAttachElement("input", mainContainer, id, null) as HTMLInputElement;
+	let submitAliasInput : HTMLInputElement = createAttachElement("input", mainContainer, grouping, grouping) as HTMLInputElement;
 
 	// creating a button
-	let submitAliasButton : HTMLButtonElement = createAttachElement("button", mainContainer, id, null) as HTMLButtonElement;
+	let submitAliasButton : HTMLButtonElement = createAttachElement("button", mainContainer, grouping, grouping) as HTMLButtonElement;
 	submitAliasButton.appendChild(document.createTextNode(submitAliasButtonText));
 
 	// attaching a callback function to the button being clicked
@@ -74,19 +74,19 @@ function displayAliasQueryPage() : void
 	})
 }
 
-function displayAliasDelete() : void
+function displayAliasDeleteFooter() : void
 {
-	const id : string = "delete-alias";
+	const grouping : string = "delete-alias";
 
 	// creating a semantic container for our page
-	const footerContainer : HTMLElement = createAttachElement("footer", document.body, id, null);
+	const footerContainer : HTMLElement = createAttachElement("footer", document.body, grouping, grouping);
 
 	// creating a label for the delete data button
-	const deleteAliasLabel : HTMLElement = createAttachElement("label", footerContainer, id, null);
+	const deleteAliasLabel : HTMLElement = createAttachElement("label", footerContainer, grouping, grouping);
 	deleteAliasLabel.appendChild(document.createTextNode(deleteAliasLabelText));
 
 	// creating a button
-	let deleteAliasButton : HTMLButtonElement = createAttachElement("button", footerContainer, id, null) as HTMLButtonElement;
+	let deleteAliasButton : HTMLButtonElement = createAttachElement("button", footerContainer, grouping, grouping) as HTMLButtonElement;
 	deleteAliasButton.appendChild(document.createTextNode(deleteAliasButtonText));
 
 	// adding a callback function to the delete data function

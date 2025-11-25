@@ -1,5 +1,5 @@
 
-import { displayGreetingHeader, displayAliasQueryPage, displayAliasDelete } from "./landing/alias"
+import { displayGreetingHeader, displayAliasQueryPage, displayAliasDeleteFooter } from "./landing/alias"
 import { displayGame } from "./landing/game";
 
 export { displayGamePage }
@@ -13,7 +13,7 @@ function displayGamePage() : void
 	let alias : string | null = localStorage.getItem("PongAlias");
 	displayGreetingHeader(alias);
 	displayGame();
-	displayAliasDelete();
+	displayAliasDeleteFooter();
 }
 
 if (alias)
