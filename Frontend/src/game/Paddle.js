@@ -21,23 +21,19 @@ export class Paddle {
 		);
 		this.mesh.rotation.y = Math.PI / 2;
 		this.mesh.position.y = 0.1;
-		if (side == "right")
+		if (side === "left")
 			this.mesh.position.x = -5;
-		else if (side == "left")
+		else if (side === "right")
 			this.mesh.position.x = 5;
-		// Set a gizmo for debug
-		// const gizmoManager = new GizmoManager(scene);
-		// gizmoManager.positionGizmoEnabled = true;
-		// gizmoManager.rotationGizmoEnabled = true;
-		// gizmoManager.attachToMesh(this.mesh);
 	}
 
 	move(direction, posLimit) {
-		const meshEdgePos = this.mesh.position.z + (this.meshSize.width / 2);
-		const meshEdgeNeg = this.mesh.position.z - (this.meshSize.width / 2);
-		if (direction == "up" && (meshEdgePos + paddSpeed) <= posLimit / 2)
+		const meshTopPos = this.mesh.position.z + (this.meshSize.width / 2);
+		const meshBottomPos = this.mesh.position.z - (this.meshSize.width / 2);
+
+		if (direction === "up" && (meshTopPos + paddSpeed) <= posLimit)
 			this.mesh.position.z += paddSpeed;
-		else if (direction == "down" && (meshEdgeNeg - paddSpeed) >= -(posLimit / 2))
+		else if (direction === "down" && (meshBottomPos - paddSpeed) >= -posLimit)
 			this.mesh.position.z -= paddSpeed;
 	}
 }

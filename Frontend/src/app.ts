@@ -7,7 +7,7 @@ class App {
         canvas.style.width = "100%";
         canvas.style.height = "100%";
         document.body.appendChild(canvas);
-		const pong = new Pong("gameCanvas", "Popol", "Gaya");
+		const pong = new Pong("gameCanvas", "Popol", "Gaga");
 		pong.startGame();
     }
 }
