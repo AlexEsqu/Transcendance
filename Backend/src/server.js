@@ -3,7 +3,6 @@ import Fastify from 'fastify'
 import fs from "fs";
 import db from './database.js';
 import getUsers from './routes/get/getUsers.js';
-import getUser from './routes/get/getUser.js';
 import postUser from './routes/get/post/postUser.js';
 
 export const server = Fastify({
@@ -15,7 +14,6 @@ export const server = Fastify({
 
 
 server.register(getUsers, { prefix: "/api" });
-server.register(getUser, { prefix: "/api" });
 server.register(postUser, { prefix: "/api" });
 
 /**
