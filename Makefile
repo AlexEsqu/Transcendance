@@ -9,8 +9,11 @@ OBJ_DIR				=	obj
 INC_DIR				=	inc
 WEB_DIR				=	pages
 
+FRONT_SERVICES		=	typescript
+BACK_SERVICES		=	fastify
+
 USER := $(shell whoami)
-BACKEND_DIR := /home/$(USER)/transcendence/data/Backend
+BACKEND_DIR := ./data/Backend
 
 all: build up
 
@@ -33,6 +36,13 @@ clean:
 	docker compose -f ./docker-compose.yml down --volume --remove-orphans
 	docker volume rm backend -f
 
+front:
+	docker compose -f ./docker-compose.dev.yml build ${FRONT_SERVICES}
+	docker compose -f ./docker-compose.dev.yml up ${FRONT_SERVICES}
+
+back:
+	docker compose -f ./docker-compose.dev.yml build ${BACK_SERVICES}
+	docker compose -f ./docker-compose.dev.yml up ${BACK_SERVICES}
 
 fclean:
 	docker system prune -af
