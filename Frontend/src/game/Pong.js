@@ -131,22 +131,22 @@ export class Pong {
 		const text = new TextBlock();
 		text.text = "|	Score	|";
 		text.color = "black";
-		text.fontSize = 24;
-		text.top = "-170px";
+		text.fontSize = 32;
+		text.top = "-250px";
 		text.left = "0px";
 		this.advancedTexture.addControl(text);
 		this.player1.text = new TextBlock();
 		this.player1.text.text = "0";
 		this.player1.text.color = "black";
-		this.player1.text.fontSize = 24;
-		this.player1.text.top = "-170px";
+		this.player1.text.fontSize = 32;
+		this.player1.text.top = "-250px";
 		this.player1.text.left = "-100px";
 		this.advancedTexture.addControl(this.player1.text);
 		this.player2.text = new TextBlock();
 		this.player2.text.text = "0";
 		this.player2.text.color = "black";
-		this.player2.text.fontSize = 24;
-		this.player2.text.top = "-170px";
+		this.player2.text.fontSize = 32;
+		this.player2.text.top = "-250px";
 		this.player2.text.left = "100px";
 		this.advancedTexture.addControl(this.player2.text);
 	}
@@ -172,6 +172,8 @@ export class Pong {
         });
 		//	Detect when a user presses or releases a key to play the game
 		window.addEventListener("keydown", (evt) => {
+			if (evt.key === "ArrowDown" || evt.key === "ArrowUp")
+				evt.preventDefault();
 			keys[evt.key] = true;
 		});
 		window.addEventListener("keyup", (evt) => {

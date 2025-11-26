@@ -13,7 +13,8 @@ class App {
 		canvas.style.height = "600px";
 		container.appendChild(canvas);
 		const pong = new Pong("gameCanvas", "Popol", "Gaya");
-		pong.startGame();
+		pong.loadGame();
+		pong.startPlay();
 	}
 }
 
