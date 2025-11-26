@@ -1,14 +1,24 @@
-import { Pong } from "./game/Pong"
 
-class App {
-    constructor() {
-		const canvas = document.createElement("canvas");
-        canvas.id = "gameCanvas";
-        canvas.style.width = "100%";
-        canvas.style.height = "100%";
-        document.body.appendChild(canvas);
-		const pong = new Pong("gameCanvas");
-		pong.startGame();
-    }
+import { displayGreetingHeader, displayAliasQueryPage, displayAliasDeleteFooter } from "./landing/alias"
+import { displayGame } from "./landing/game";
+
+export { displayGamePage }
+
+// checking if the user has an alias, not diplaying the game until they do
+let alias : string | null = localStorage.getItem("PongAlias");
+
+function displayGamePage() : void
+{
+	document.body.innerHTML = "";
+	let alias : string | null = localStorage.getItem("PongAlias");
+	displayGreetingHeader(alias);
+	displayGame();
+	displayAliasDeleteFooter();
 }
-new App();
+
+if (alias)
+	displayGamePage();
+else
+	displayAliasQueryPage();
+
+
