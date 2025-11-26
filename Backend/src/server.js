@@ -1,23 +1,35 @@
 // ESM
 import Fastify from 'fastify'
-import root from './routes/root.js'
-const fastify = Fastify({
-	logger: true,
+import fs from "fs";
+import fastifyFormBody from '@fastify/formbody'
+import fastifyMultiPart from '@fastify/multipart'
+import {getUsers, getUser} from './routes/get/getUsers.js';
+import postUser from './routes/post/postUser.js';
+
+export const server = Fastify({
+  https: {
+    key: fs.readFileSync("/tmp/certs/server.key"),
+    cert: fs.readFileSync("/tmp/certs/server.crt")
+  }
 });
 
-fastify.register(root);
+server.register(fastifyFormBody);
+server.register(fastifyMultiPart);
+server.register(getUsers, { prefix: "/api" });
+server.register(getUser, { prefix: "/api" });
+server.register(postUser, { prefix: "/api" });
 
 /**
  * Run the server!
  */
 const start = async () => {
 	try {
-		await fastify.listen({
-			port: process.env.PORT || 3000,
-			host: process.env.ADDRESS || "0.0.0.0",
+		server.listen({
+			port: process.env.PORT,
+			host: process.env.ADDRESS ,
 		});
 	} catch (err) {
-		fastify.log.error(err);
+		server.log.error(err);
 		process.exit(1);
 	}
 };

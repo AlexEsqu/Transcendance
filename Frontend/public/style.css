@@ -1,0 +1,78 @@
+html, body {
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+	background-color: black;
+	color:white;
+	font-family: 'Courier New', Courier, monospace;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	box-sizing: border-box;
+	margin: 10px;
+}
+
+main {
+	border-width: 2px;
+	border-color: white;
+	border-style: double;
+	border-radius: 6px;
+	border-style: solid;
+	margin: 10px;
+	width: 100%;
+	box-sizing: border-box;
+	padding: 20px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+#alias-main {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	flex-direction: column;
+	align-items: space-between;
+}
+
+#game-main {
+	background-color: #33334D;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+#alias-main > label {
+	padding: 10px;
+}
+
+h1 {
+	margin:	0;
+	padding: 0;
+}
+
+input {
+	background-color: rgb(51, 51, 51);
+	color: white;
+	border-style: solid;
+	border-color: rgb(255, 158, 47);
+	border-radius: 6px;
+	padding: 10px;
+	font-family: 'Courier New', Courier, monospace;
+}
+
+button {
+	padding: 5px 20px;
+	margin: 5px;
+	background-color:  rgb(51, 51, 51);
+	color: white;
+	border-style: solid;
+	border-radius: 6px;
+	border-color: rgb(255, 158, 47);
+	font-family: 'Courier New', Courier, monospace;
+	font-weight: bold;
+}

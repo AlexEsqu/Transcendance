@@ -104,7 +104,7 @@ export class Ball {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Launch the ball in a random direction 
 	 */
