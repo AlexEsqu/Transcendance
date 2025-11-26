@@ -5,6 +5,7 @@ import { handleSQLiteError } from "../../errors/sqliteErrors.js";
 function userSignup(server) {
 	const opts = {
 		schema: {
+			tags: ["auth"],
 			body: {
 				type: "object",
 				required: ["username", "password"],
@@ -28,18 +29,8 @@ function userSignup(server) {
 			try {
 				let saltRounds = 10;
 				const hash = await bcrypt.hash(password, saltRounds);
-
 				const addUser = db.prepare(`INSERT INTO users(username, password_hash) VALUES (?, ?)`);
-				const result = addUser.run(username, hash);
-
-				const token = server.jwt.sign(
-					{
-						id: result.lastInsertRowid,
-						username: username,
-					},
-					{ expiresIn: "1h" } //TODO: auth/refresh
-				);
-				reply.send({ token });
+				addUser.run(username, hash);
 			} catch (dbErr) {
 				handleSQLiteError(dbErr, reply);
 			}
