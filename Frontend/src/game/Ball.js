@@ -1,8 +1,9 @@
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
-import { Engine, Scene, ArcRotateCamera, MeshBuilder, Vector3, HemisphericLight } from '@babylonjs/core';
+import { Scene, MeshBuilder, Vector3 } from '@babylonjs/core';
 import { Paddle } from "./Paddle";
+import { Pong } from "./Pong";
 
 export class Ball {
 	static START_SPEED = 0.05;
@@ -24,8 +25,8 @@ export class Ball {
 		this.mesh.position.z += this.velocity.z;
 	}
 
-	update(player1, player2, groundSize) {
-		if (player1 == undefined || player2 == undefined || groundSize == undefined)
+	update(player1, player2) {
+		if (player1 === undefined || player2 === undefined)
 			return ;
 
 		this.move();
@@ -40,19 +41,18 @@ export class Ball {
 		else if (this.isBallHittingPadd(player2, "right") == true)
 			return ;
 
-		const heightLimit = groundSize.height / 2;
-		const widthLimit = groundSize.width / 2;
+		const heightLimit = Pong.MAP_HEIGHT / 2;
+		const widthLimit = Pong.MAP_WIDTH / 2;
 
 		if (this.isBallHittingWall(this.ball.minZ, this.ball.maxZ, heightLimit) === true)
 			this.velocity.z = -(this.velocity.z);
 		if (this.isBallOutofBounds(this.ball.minX, this.ball.maxX, widthLimit) === true) {
-			//	Last Hit Paddle == WINNER
 			if (this.mesh.position.x < 0) {
-				player1.score += 1;
-				console.log("Game STATE: +1 point for " + player1.name);
-			} else {
 				player2.score += 1;
-				console.log("Game STATE: +1 point for " + player2.name);
+				// console.log("Game STATE: +1 point for " + player2.name);
+			} else {
+				player1.score += 1;
+				// console.log("Game STATE: +1 point for " + player1.name);
 			}
 			this.reset();
 		}
@@ -106,7 +106,7 @@ export class Ball {
 	}
 	
 	/**
-	 * Should launch in a random direction 
+	 * Launch the ball in a random direction 
 	 */
 	launch() {
 		if (Math.round(Math.random()) == 1)
@@ -123,12 +123,11 @@ export class Ball {
 	}
 
 	/**
-	 * Reset position of the ball
+	 * Reset position and velocity
 	 */
 	reset() {
 		this.mesh.position.x = 0.0;
 		this.mesh.position.z = 0.0;
-		this.lastHitPadd = "";
 		this.speed = Ball.START_SPEED;
 		this.launch();
 	}
