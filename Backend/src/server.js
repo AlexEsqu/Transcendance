@@ -3,8 +3,8 @@ import Fastify from 'fastify'
 import fs from "fs";
 import fastifyFormBody from '@fastify/formbody'
 import fastifyMultiPart from '@fastify/multipart'
-import {getUsers, getUser} from './routes/get/getUsers.js';
-import postUser from './routes/post/postUser.js';
+import {getUsers, getUser} from './routes/users/getUsers.js';
+import postUser from './routes/users/postUser.js';
 
 export const server = Fastify({
   https: {
