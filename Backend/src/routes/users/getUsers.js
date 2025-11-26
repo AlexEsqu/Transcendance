@@ -3,6 +3,7 @@ import db from "../../database.js";
 
 const singleUserSchema = {
 	schema: {
+		tags: ["user"],
 		params: {
 			type: "object",
 			properties: {
@@ -16,7 +17,7 @@ const singleUserSchema = {
 				properties: {
 					id: { type: "integer" },
 					username: { type: "string" },
-					profile_image_url: { type: ["string", "null"] },
+					profile_image_url: { type: "string" },
 					is_connected: { type: "boolean" },
 				},
 			},
@@ -40,6 +41,7 @@ export function getUser(server) {
 //Schema that serves an array of users
 const allUsersSchema = {
 	schema: {
+		tags: ["user"],
 		response: {
 			200: {
 				type: "array",
@@ -48,7 +50,7 @@ const allUsersSchema = {
 					properties: {
 						id: { type: "integer" },
 						username: { type: "string" },
-						profile_image_url: { type: ["string", "null"] },
+						profile_image_url: { type: "string" },
 						is_connected: { type: "boolean" },
 					},
 				},
@@ -64,4 +66,3 @@ export function getUsers(server) {
 		res.send(users);
 	});
 }
-
