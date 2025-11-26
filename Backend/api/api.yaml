@@ -23,9 +23,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/User"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/User"
         "400":
           description: Invalid username supplied
         "404":
@@ -36,6 +33,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /users/signup:
     post:
       tags:
         - user
@@ -48,20 +46,11 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/User"
-          application/xml:
-            schema:
-              $ref: "#/components/schemas/User"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/User"
       responses:
         "200":
           description: successful operation
           content:
             application/json:
-              schema:
-                $ref: "#/components/schemas/User"
-            application/xml:
               schema:
                 $ref: "#/components/schemas/User"
         default:
@@ -91,9 +80,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/User"
         "400":
           description: Invalid username supplied
         "404":
@@ -104,10 +90,102 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /user/login:
+    put:
+      tags:
+        - user
+      summary: Update user resource.
+      description: This can only be done by the logged in user.
+      operationId: updateUser
+      parameters:
+        - name: id
+          in: path
+          description: The user id that needs to be fetched.
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Update an existent user in the store
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "200":
+          description: successful operation
+        "400":
+          description: bad request
+        "404":
+          description: user not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      tags:
+        - user
+      summary: Delete user resource.
+      description: This can only be done by the logged in user.
+      operationId: deleteUser
+      parameters:
+        - name: id
+          in: path
+          description: The user id that needs to be fetched.
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User deleted
+        "400":
+          description: Invalid username supplied
+        "404":
+          description: User not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /users/{id}/games:
     get:
       tags:
         - user
+      summary: Get list of user games
+      description: Get list of user games
+      operationId: getUserNatches
+      parameters:
+        - name: id
+          in: path
+          description: The user id that needs to be fetched.
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Game"
+
+        "400":
+          description: Invalid username supplied
+        "404":
+          description: User not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /auth/login:
+    post:
+      tags:
+        - auth
       summary: Logs user into the system.
       description: Log into the system.
       operationId: loginUser
@@ -153,10 +231,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /user/logout:
-    get:
+  /auth/logout:
+    post:
       tags:
-        - user
+        - auth
       summary: Logs out current logged in user session.
       description: Log user out of the system.
       operationId: logoutUser
@@ -164,104 +242,6 @@ paths:
       responses:
         "200":
           description: successful operation
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-    put:
-      tags:
-        - user
-      summary: Update user resource.
-      description: This can only be done by the logged in user.
-      operationId: updateUser
-      parameters:
-        - name: id
-          in: path
-          description: The user id that needs to be fetched.
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        description: Update an existent user in the store
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/User"
-          application/xml:
-            schema:
-              $ref: "#/components/schemas/User"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/User"
-      responses:
-        "200":
-          description: successful operation
-        "400":
-          description: bad request
-        "404":
-          description: user not found
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-    delete:
-      tags:
-        - user
-      summary: Delete user resource.
-      description: This can only be done by the logged in user.
-      operationId: deleteUser
-      parameters:
-        - name: id
-          in: path
-          description: The user id that needs to be fetched.
-          required: true
-          schema:
-            type: integer
-      responses:
-        "200":
-          description: User deleted
-        "400":
-          description: Invalid username supplied
-        "404":
-          description: User not found
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-  /user/{id}/games:
-    get:
-      tags:
-        - user
-      summary: Get list of user games
-      description: Get list of user games
-      operationId: getUserNatches
-      parameters:
-        - name: id
-          in: path
-          description: The user id that needs to be fetched.
-          required: true
-          schema:
-            type: integer
-      responses:
-        "200":
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Game"
-
-        "400":
-          description: Invalid username supplied
-        "404":
-          description: User not found
         default:
           description: Unexpected error
           content:
