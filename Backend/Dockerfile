@@ -16,5 +16,4 @@ RUN openssl req -nodes -x509 -newkey rsa:4096 -days 365 -keyout /tmp/certs/serve
 ENV ADDRESS=0.0.0.0
 ENV PORT=8443
 ENV SQLITE_PATH=/app/data/database.db
-ENV JWT_SECRET=${JWT_SECRET}
 ENTRYPOINT ["npm", "run"]
