@@ -14,10 +14,12 @@
 	"license": "ISC",
 	"dependencies": {
 		"@fastify/formbody": "^8.0.2",
+		"@fastify/jwt": "^10.0.0",
 		"@fastify/multipart": "^9.3.0",
 		"bcrypt": "^6.0.0",
 		"better-sqlite3": "^12.4.6",
 		"fastify": "^5.6.2",
+		"fastify-plugin": "^5.1.0",
 		"fs": "^0.0.1-security"
 	},
 	"devDependencies": {
