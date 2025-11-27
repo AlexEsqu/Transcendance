@@ -15,6 +15,10 @@ import login from "./routes/auth/login.js";
 import refresh from "./routes/auth/refresh.js";
 import logout from "./routes/auth/logout.js";
 import deleteUser from "./routes/users/deleteUser.js";
+import patchUserPassword from "./routes/users/patchUserPassword.js";
+import patchUserInfo from "./routes/users/patchUserInfo.js";
+
+
 export const server = Fastify({
 	https: {
 		key: fs.readFileSync("/tmp/certs/server.key"),
@@ -70,6 +74,8 @@ server.register(login, { prefix: "/api" });
 server.register(refresh, { prefix: "/api" });
 server.register(logout, { prefix: "/api" });
 server.register(deleteUser, { prefix: "/api" });
+server.register(patchUserPassword, { prefix: "/api" });
+server.register(patchUserInfo, { prefix: "/api" });
 
 /**
  * Run the server!
