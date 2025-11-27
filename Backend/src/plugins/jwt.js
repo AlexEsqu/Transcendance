@@ -2,15 +2,13 @@ import fp from "fastify-plugin";
 import jwt from "@fastify/jwt";
 
 export default fp(async function (server, opts) {
-	// Register JWT plugin
 	server.register(jwt, {
 		secret: process.env.JWT_SECRET,
 	});
 
-	// Decorate Fastify instance with 'authenticate' method
-	server.decorate("authenticate", async function (request, reply) {
+	server.decorate("authenticate", async function (req, reply) {
 		try {
-			await request.jwtVerify();
+			await req.jwtVerify();
 		} catch (err) {
 			reply.send(err);
 		}
