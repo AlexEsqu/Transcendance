@@ -14,15 +14,6 @@ function userSignup(server) {
 					password: { type: "string", minLength: 8 },
 				},
 			},
-			response: {
-				200: {
-					type: "object",
-					properties: {
-						token: { type: "string" },
-					},
-					required: ["token"],
-				},
-			},
 		},
 		handler: async (request, reply) => {
 			const { username, password } = request.body;
@@ -32,8 +23,10 @@ function userSignup(server) {
 				const addUser = db.prepare(`INSERT INTO users(username, password_hash) VALUES (?, ?)`);
 				addUser.run(username, hash);
 			} catch (dbErr) {
+				console.log(dbErr)
 				handleSQLiteError(dbErr, reply);
 			}
+			reply.status(200).send({ success: true, message: "Signed up successfully" })
 		},
 	};
 	server.post("/users/signup", opts);
