@@ -1,4 +1,6 @@
 import { server } from "../server.js";
+import bcrypt from "bcrypt";
+
 export function createAccessToken(id, username) {
 	const token = server.jwt.sign(
 		{
@@ -10,20 +12,13 @@ export function createAccessToken(id, username) {
 	return token;
 }
 
-export async function createRefreshToken(id, username) {
-	const refreshToken = await reply.jwtSign(
-		{
-			id: id,
-			username: username,
-		},
+export function createRefreshToken(id, username) {
+	return server.jwt.sign(
+		{ id, username },
 		{ expiresIn: "7d" }
 	);
-	reply.setCookie("refreshToken", refreshToken, {
-		httpOnly: true,
-		secure: true,
-		sameSite: "strict",
-		path: "/api/auth/refresh",
-		maxAge: 60 * 60 * 24 * 7, // 7 days
-	});
-	return refreshToken;
+}
+
+export async function hashRefreshToken(token) {
+	return bcrypt.hash(token, 10);
 }
