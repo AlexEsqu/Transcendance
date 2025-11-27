@@ -18,7 +18,6 @@ const singleUserSchema = {
 					id: { type: "integer" },
 					username: { type: "string" },
 					profile_image_url: { type: "string" },
-					is_connected: { type: "boolean" },
 				},
 			},
 		},
@@ -29,7 +28,7 @@ export function getUser(server) {
 	server.get("/users/:id", singleUserSchema, (req, res) => {
 		const { id } = req.params;
 		console.log(id);
-		const user = db.prepare(`SELECT id, username, profile_image_url, is_connected FROM users WHERE id = ?`).get(id);
+		const user = db.prepare(`SELECT id, username, profile_image_url,  FROM users WHERE id = ?`).get(id);
 		if (!user) {
 			return res.status(404).send({ error: "User not found" });
 		}
@@ -51,7 +50,6 @@ const allUsersSchema = {
 						id: { type: "integer" },
 						username: { type: "string" },
 						profile_image_url: { type: "string" },
-						is_connected: { type: "boolean" },
 					},
 				},
 			},
@@ -61,7 +59,7 @@ const allUsersSchema = {
 
 export function getUsers(server) {
 	server.get("/users", allUsersSchema, (req, res) => {
-		const users = db.prepare(`SELECT id, username, profile_image_url, is_connected FROM users`).all();
+		const users = db.prepare(`SELECT id, username, profile_image_url FROM users`).all();
 		console.log(users);
 		res.send(users);
 	});

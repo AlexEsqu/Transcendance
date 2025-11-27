@@ -9,10 +9,11 @@ import swaggerUI from "@fastify/swagger-ui";
 import fastifyCookie from "@fastify/cookie";
 
 import { getUsers, getUser } from "./routes/users/getUsers.js";
-import postUser from "./routes/users/userSignup.js";
+import postUser from "./routes/users/signup.js";
 import login from "./routes/auth/login.js";
 import refresh from "./routes/auth/refresh.js";
 import logout from "./routes/auth/logout.js";
+import deleteUser from "./routes/users/deleteUser.js";
 export const server = Fastify({
 	https: {
 		key: fs.readFileSync("/tmp/certs/server.key"),
@@ -55,7 +56,6 @@ server.register(swaggerUI, {
 	routePrefix: "/docs",
 	swagger: { url: "/docs/json" },
 	uiConfig: {
-		docExpansion: "full",
 		deepLinking: false,
 	},
 	staticCSP: true,
@@ -68,7 +68,7 @@ server.register(postUser, { prefix: "/api" });
 server.register(login, { prefix: "/api" });
 server.register(refresh, { prefix: "/api" });
 server.register(logout, { prefix: "/api" });
-
+server.register(deleteUser, { prefix: "/api" })
 /**
  * Run the server!
  */

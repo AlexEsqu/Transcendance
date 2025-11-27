@@ -59,7 +59,6 @@ function login(server) {
 					maxAge: 60 * 60 * 24 * 7, // 7 days
 				});
 				reply.send({ accessToken });
-				// const update = db.prepare(`UPDATE users SET is_connected = 1 WHERE id = ?`).get(user.user_id);
 			}
 		} catch (err) {
 			console.log(err);
