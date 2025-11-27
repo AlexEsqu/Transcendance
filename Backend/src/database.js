@@ -17,7 +17,7 @@ const createTable = db.prepare(`
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT NOT NULL UNIQUE,
         password_hash TEXT NOT NULL,
-		is_connected BOOLEAN DEFAULT 0,
+		refresh_token_hash TEXT,
         profile_image_url TEXT
     );
 `);
