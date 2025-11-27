@@ -1,10 +1,11 @@
 import { createPaddle } from "./Graphics"
+import { Ball } from "./Ball"
 
 export class Paddle {
 	static WIDTH = 2.0;
 	static HEIGHT = 0.2;
 	static DEPTH = 0.5;
-	static SPEED = 0.15;
+	static SPEED = 0.25;
 
 	constructor(scene, side, mapWidth) {
 		this.mesh = createPaddle(scene);
@@ -24,5 +25,16 @@ export class Paddle {
 			this.mesh.position.z += Paddle.SPEED;
 		else if (direction === "down" && (meshBottomPos - Paddle.SPEED) >= -posLimit)
 			this.mesh.position.z -= Paddle.SPEED;
+	}
+
+	autoMove(ballPosZ, ballPosX, posLimit) {
+		//	Avoid the robot to always move perfectly : 1/3 chance to miss the target
+		if (Math.floor(Math.random() * 3) == 1) return ;
+		if (ballPosZ == this.mesh.position.z) return ;
+		if (ballPosX >= 0) return ;
+		if (ballPosZ > this.mesh.position.z)
+			this.move("up", posLimit);
+		else
+			this.move("down", posLimit);
 	}
 }

@@ -12,7 +12,7 @@ function createMaterial(scene) {
 	meshMaterial.emissiveColor = new Color3(0.78, 0.78, 0.78);
 	meshMaterial.disableLighting = true;
 	//	Set transparency between 0 & 1
-	meshMaterial.alpha = 0.7;
+	meshMaterial.alpha = 0.5;
 
 	return meshMaterial;
 }

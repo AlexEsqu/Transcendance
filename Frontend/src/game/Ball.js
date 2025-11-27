@@ -4,7 +4,7 @@ import { Pong } from "./Pong";
 import { createBall } from "./Graphics"
 
 export class Ball {
-	static START_SPEED = 0.15;
+	static START_SPEED = 0.2;
 	static MAX_SPEED = 0.50;
 	static RADIUS = 0.25;
 	static Y = 0.3;
@@ -92,7 +92,6 @@ export class Ball {
 			const direction = this.velocity.normalize();
 			this.speed = Math.min(Ball.MAX_SPEED, this.speed * 1.05);
 			this.velocity = direction.scale(this.speed);
-
 			return true;
 		}
 		return false;
@@ -102,11 +101,11 @@ export class Ball {
 	 * Launch the ball in a random direction 
 	 */
 	launch() {
-		if (Math.round(Math.random()) == 1)
+		if (Math.floor(Math.random() * 2) == 1)
 			this.velocity.x = 1;
 		else
 			this.velocity.x = -1;
-		if (Math.round(Math.random()) == 1)
+		if (Math.floor(Math.random() * 2) == 1)
 			this.velocity.z = 1;
 		else
 			this.velocity.z = -1;

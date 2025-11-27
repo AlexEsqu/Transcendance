@@ -11,15 +11,15 @@ export class Pong {
 	static MAP_HEIGHT = 6;
 	static MAX_SCORE = 10;
 
-	constructor(canvasId, user1, user2) {
+	constructor(canvasId, user1, user2, robot) {
 		this.canvas = document.getElementById(canvasId);
 		this.engine = new Engine(this.canvas, true);
 		this.scene = null;
 		this.ball = null;
-		if (user1 === undefined)
-			user1 = "Anonymous1";
-		if (user2 === undefined)
-			user2 = "Anonymous2"
+		this.robot = true;
+		if (!robot || robot === undefined) this.robot = false;
+		if (user1 === undefined) user1 = "Anonymous1";
+		if (user2 === undefined) user2 = "Anonymous2"
 		this.player1 = { score: 0, paddle: null, text: "0", name: user1};
 		this.player2 = { score: 0, paddle: null, text: "0", name: user2};
 	}
@@ -39,8 +39,8 @@ export class Pong {
 
 		//	Create a glow layer to add a bloom effect around meshes
 		const glowLayer = new GlowLayer("glow", this.scene, { mainTextureRatio: 0.2 });
-		glowLayer.intensity = 0.8;
-		glowLayer.blurKernelSize = 18;
+		glowLayer.intensity = 0.5;
+		glowLayer.blurKernelSize = 9;
 
 		const map = createMap(this.scene);
 
@@ -64,6 +64,10 @@ export class Pong {
 	 * 	- Manage user input and render the scene
 	 */
 	startPlay() {
+		if (!this.scene || !this.ball || !this.player1.paddle || !this.player2.paddle) {
+			console.log("Error: while loading 'Pong' game");
+			return ;
+		}
 		//	Should add a start start button --> TO DO ?
 		console.log("Game STATE: started");
 		this.ball.launch();
@@ -72,24 +76,32 @@ export class Pong {
 		const keys = {};
 		this.handleInput(keys);
 		this.scene.registerBeforeRender(() => {
-			if (keys["ArrowDown"]) this.player2.paddle.move("down", (Pong.MAP_HEIGHT / 2));
-			if (keys["ArrowUp"]) this.player2.paddle.move("up", (Pong.MAP_HEIGHT / 2));
-			if (keys["s"]) this.player1.paddle.move("down", (Pong.MAP_HEIGHT / 2));
-			if (keys["w"]) this.player1.paddle.move("up", (Pong.MAP_HEIGHT / 2));
-			if (this.ball) this.ball.update(this.player1, this.player2);
+			this.update(keys);
 		});
 
 		//	Rendering loop
 		this.engine.runRenderLoop(() => {
-			//	Update visual-score in the scene
-			this.player1.text.text = this.player1.score.toString();
-			this.player2.text.text = this.player2.score.toString();
 			if (this.scene) this.scene.render();
 			if (this.monitoringScore() == false) {
 				console.log("Game STATE: ended ");
 				this.engine.stopRenderLoop();
 			}
 		});
+	}
+
+	update(keys) {
+		if (this.robot === false) {
+			if (keys["s"]) this.player1.paddle.move("down", (Pong.MAP_HEIGHT / 2));
+			if (keys["w"]) this.player1.paddle.move("up", (Pong.MAP_HEIGHT / 2));
+		}
+		else
+			this.player1.paddle.autoMove(this.ball.mesh.position.z, this.ball.mesh.position.x, (Pong.MAP_HEIGHT / 2));
+		if (keys["ArrowDown"]) this.player2.paddle.move("down", (Pong.MAP_HEIGHT / 2));
+		if (keys["ArrowUp"]) this.player2.paddle.move("up", (Pong.MAP_HEIGHT / 2));
+		if (this.ball) this.ball.update(this.player1, this.player2);
+		//	Update visual-score in the scene
+		this.player1.text.text = this.player1.score.toString();
+		this.player2.text.text = this.player2.score.toString();
 	}
 
 	/**
