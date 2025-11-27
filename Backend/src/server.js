@@ -11,6 +11,8 @@ import fastifyCookie from "@fastify/cookie";
 import { getUsers, getUser } from "./routes/users/getUsers.js";
 import postUser from "./routes/users/userSignup.js";
 import login from "./routes/auth/login.js";
+import refresh from "./routes/auth/refresh.js";
+import logout from "./routes/auth/logout.js";
 export const server = Fastify({
 	https: {
 		key: fs.readFileSync("/tmp/certs/server.key"),
@@ -26,37 +28,46 @@ server.register(fastifyCookie);
 
 server.register(swagger, {
 	openapi: {
-		info: {
-			title: "My API",
-			description: "API documentation for my Fastify app",
-			version: "1.0.0",
+		info: { title: "My API", version: "1.0.0" },
+		components: {
+			securitySchemes: {
+				BearerAuth: {
+					type: "http",
+					scheme: "bearer",
+					bearerFormat: "JWT",
+				},
+				cookieAuth: {
+					type: "apiKey",
+					in: "cookie",
+					name: "refreshToken",
+				},
+			},
 		},
 		tags: [
-			{ name: "user", description: "User related end-points" },
-			{ name: "auth", description: "Auth related end-points" },
-			{ name: "games", description: "Game related end-points" },
+			{ name: "auth", description: "Auth endpoints" },
+			{ name: "user", description: "User endpoints" },
 		],
 	},
+	exposeRoute: true,
 });
 
 server.register(swaggerUI, {
-	routePrefix: "/docs", // Swagger UI available at https://localhost:8443/docs
-	swagger: {
-		info: {
-			title: "My API",
-			version: "1.0.0",
-		},
-	},
+	routePrefix: "/docs",
+	swagger: { url: "/docs/json" },
 	uiConfig: {
 		docExpansion: "full",
+		deepLinking: false,
 	},
 	staticCSP: true,
 });
+
 //ROUTES
 server.register(getUsers, { prefix: "/api" });
 server.register(getUser, { prefix: "/api" });
 server.register(postUser, { prefix: "/api" });
 server.register(login, { prefix: "/api" });
+server.register(refresh, { prefix: "/api" });
+server.register(logout, { prefix: "/api" });
 
 /**
  * Run the server!
