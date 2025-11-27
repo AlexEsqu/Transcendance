@@ -10,8 +10,11 @@ COPY . .
 
 # Create a folder for the SQLite database file
 RUN mkdir -p /tmp/certs
+RUN mkdir -p /app/data
 
 RUN openssl req -nodes -x509 -newkey rsa:4096 -days 365 -keyout /tmp/certs/server.key -out  /tmp/certs/server.crt -subj "/C=FR/ST=Ile de France/L=Paris/O=42Paris/OU=Education/CN=lasablon.42.fr/emailAddress=lasablon@student.42.fr"
+# Initialize DB at build time
+RUN node scripts/init-db.js
 
 ENV ADDRESS=0.0.0.0
 ENV PORT=8443
