@@ -1,10 +1,11 @@
+import { server } from "../server.js";
 export function createAccessToken(id, username) {
 	const token = server.jwt.sign(
 		{
 			id: id,
 			username: username,
 		},
-		{ expiresIn: "1h" }
+		{ expiresIn: "3m" }
 	);
 	return token;
 }
