@@ -1,19 +1,16 @@
-import "@babylonjs/core/Debug/debugLayer";
-import "@babylonjs/inspector";
-import "@babylonjs/loaders/glTF";
-import { Scene, MeshBuilder, Vector3 } from '@babylonjs/core';
+import { Vector3 } from '@babylonjs/core';
 import { Paddle } from "./Paddle";
 import { Pong } from "./Pong";
+import { createBall } from "./Graphics"
 
 export class Ball {
-	static START_SPEED = 0.05;
-	static MAX_SPEED = 0.1;
+	static START_SPEED = 0.15;
+	static MAX_SPEED = 0.50;
 	static RADIUS = 0.25;
 	static Y = 0.3;
 
 	constructor(scene) {
-		this.scene = scene;
-		this.mesh = MeshBuilder.CreateSphere('ball', { diameter: Ball.RADIUS * 2 }, scene);
+		this.mesh = createBall(scene);
 		this.mesh.position = new Vector3(0.0, Ball.Y, 0.0);
 		this.velocity = new Vector3(0.0, 0.0, 0.0);
 		this.ball = { minX: 0.0, maxX: 0.0, minZ: 0.0, maxZ: 0.0 };
@@ -47,13 +44,10 @@ export class Ball {
 		if (this.isBallHittingWall(this.ball.minZ, this.ball.maxZ, heightLimit) === true)
 			this.velocity.z = -(this.velocity.z);
 		if (this.isBallOutofBounds(this.ball.minX, this.ball.maxX, widthLimit) === true) {
-			if (this.mesh.position.x < 0) {
+			if (this.mesh.position.x < 0)
 				player2.score += 1;
-				// console.log("Game STATE: +1 point for " + player2.name);
-			} else {
+			else
 				player1.score += 1;
-				// console.log("Game STATE: +1 point for " + player1.name);
-			}
 			this.reset();
 		}
 	}
@@ -84,7 +78,7 @@ export class Ball {
 			return false;
 
 		//	Check if the ball fits in the paddle position (Z-axis) range
-		if (this.ball.maxZ < paddMaxZ && this.ball.minZ > paddMinZ) {
+		if (this.ball.maxZ < paddMaxZ + Ball.RADIUS && this.ball.minZ > paddMinZ - Ball.RADIUS) {
 			//	Invert X direction
 			this.velocity.x = -(this.velocity.x);
 			if (side === "right")
@@ -92,9 +86,8 @@ export class Ball {
 			else
 				this.mesh.position.x = this.ball.maxX + Ball.RADIUS - 0.001;
 			//	Avoiding repeating trajectories : randomize Z
-			const zRandom = (Math.random() - 0.4) * 0.02;
+			const zRandom = (Math.random() - 0.4) * 0.03;
 			this.velocity.z += zRandom;
-			// this.velocity.z = -(this.velocity.z);
 			//	Sightly rendering : normalize velocity
 			const direction = this.velocity.normalize();
 			this.speed = Math.min(Ball.MAX_SPEED, this.speed * 1.05);
@@ -117,6 +110,7 @@ export class Ball {
 			this.velocity.z = 1;
 		else
 			this.velocity.z = -1;
+
 		const direction = this.velocity.normalize();
 		this.speed = Math.min(Ball.MAX_SPEED, this.speed * 1.05);
 		this.velocity = direction.scale(this.speed);
