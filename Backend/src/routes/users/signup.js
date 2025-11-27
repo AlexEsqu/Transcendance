@@ -18,8 +18,7 @@ function signup(server) {
 		handler: async (request, reply) => {
 			const { username, password } = request.body;
 			try {
-				let saltRounds = 10;
-				const hash = await bcrypt.hash(password, saltRounds);
+				const hash = await bcrypt.hash(password, await bcrypt.genSalt(10));
 				const addUser = db.prepare(`INSERT INTO users(username, password_hash) VALUES (?, ?)`);
 				addUser.run(username, hash);
 			} catch (dbErr) {

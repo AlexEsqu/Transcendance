@@ -7,7 +7,7 @@ export function createAccessToken(id, username) {
 			id: id,
 			username: username,
 		},
-		{ expiresIn: "3m" }
+		{ expiresIn: "10m" }
 	);
 	return token;
 }
@@ -20,5 +20,5 @@ export function createRefreshToken(id, username) {
 }
 
 export async function hashRefreshToken(token) {
-	return bcrypt.hash(token, 10);
+	return await bcrypt.hash(token, await bcrypt.genSalt(10));
 }
