@@ -7,6 +7,7 @@ import authPlugin from "./plugins/jwt.js";
 import swagger from "@fastify/swagger";
 import swaggerUI from "@fastify/swagger-ui";
 import fastifyCookie from "@fastify/cookie";
+import yaml from "yaml";
 
 import { getUsers, getUser } from "./routes/users/getUsers.js";
 import postUser from "./routes/users/signup.js";
@@ -68,7 +69,8 @@ server.register(postUser, { prefix: "/api" });
 server.register(login, { prefix: "/api" });
 server.register(refresh, { prefix: "/api" });
 server.register(logout, { prefix: "/api" });
-server.register(deleteUser, { prefix: "/api" })
+server.register(deleteUser, { prefix: "/api" });
+
 /**
  * Run the server!
  */
@@ -84,3 +86,19 @@ const start = async () => {
 	}
 };
 start();
+//write the api as yaml
+
+
+// server.ready((err) => {
+// 	if (err) throw err;
+
+// 	const openapiObject = server.swagger();
+
+// 	// Convert JSON -> YAML
+// 	const yamlString = yaml.stringify(openapiObject);
+
+// 	// Write file
+// 	fs.writeFileSync("/app/docs/api.yaml", yamlString);
+
+// 	console.log("📄 OpenAPI YAML file generated at docs/openapi.yaml");
+// });
