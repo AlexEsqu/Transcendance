@@ -2,10 +2,11 @@ import db from "/app/src/database.js";
 import bcrypt from "bcrypt";
 import { handleSQLiteError } from "../../errors/sqliteErrors.js";
 import { server } from "../../server.js";
-import { createAccessToken, createRefreshToken } from "../../services/authServices.js";
+import { createAccessToken, createRefreshToken, hashRefreshToken } from "../../services/authServices.js";
 
 const opts = {
 	schema: {
+		description: "Logs in user",
 		tags: ["auth"],
 		body: {
 			type: "object",
@@ -44,12 +45,24 @@ function login(server) {
 				return reply.status(401).send({ error: "Invalid credentials" });
 			} else {
 				const accessToken = createAccessToken(user.id, username);
-				createRefreshToken(user.id, username)
+				const refreshToken = createRefreshToken(user.id, username);
 
+				const refreshTokenHash = await hashRefreshToken(refreshToken);
+				const addRefreshToken = db.prepare(`UPDATE users SET refresh_token_hash = ? WHERE id = ?`);
+				addRefreshToken.run(refreshTokenHash, user.id);
+				// set cookie
+				reply.setCookie("refreshToken", refreshToken, {
+					httpOnly: true,
+					secure: true,
+					sameSite: "strict",
+					path: "/",
+					maxAge: 60 * 60 * 24 * 7, // 7 days
+				});
 				reply.send({ accessToken });
 				// const update = db.prepare(`UPDATE users SET is_connected = 1 WHERE id = ?`).get(user.user_id);
 			}
 		} catch (err) {
+			console.log(err);
 			return reply.status(500).send({ error: "Internal server error" });
 		}
 	});
