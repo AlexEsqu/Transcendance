@@ -1,7 +1,5 @@
 import db from "/app/src/database.js";
 import bcrypt from "bcrypt";
-import { handleSQLiteError } from "../../errors/sqliteErrors.js";
-import { server } from "../../server.js";
 import { createAccessToken, createRefreshToken, hashRefreshToken } from "../../services/authServices.js";
 
 const opts = {
