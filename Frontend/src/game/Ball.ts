@@ -1,6 +1,6 @@
-import { Vector3 } from '@babylonjs/core';
+import { Scene, Vector3, Mesh } from '@babylonjs/core';
 import { Paddle } from "./Paddle";
-import { Pong } from "./Pong";
+import { Pong, Player } from "./Pong";
 import { createBall } from "./Graphics"
 
 export class Ball {
@@ -8,7 +8,12 @@ export class Ball {
 	static MAX_SPEED = 8;
 	static RADIUS = 0.15;
 
-	constructor(scene) {
+    mesh: Mesh;
+    direction: Vector3;
+    ball: { minX: number; maxX: number; minZ: number; maxZ: number };
+    speed: number;
+
+	constructor(scene: Scene) {
 		this.mesh = createBall(scene);
 		this.mesh.position = new Vector3(0.0, 0.2, 0.0);
 		this.direction = new Vector3(0.5, 0.0, 0.0).normalize();
@@ -16,15 +21,14 @@ export class Ball {
 		this.speed = Ball.START_SPEED;
 	}
 
-	move(lastFrameTime) {
+	move(lastFrameTime: number): void {
 		const deltaTime = (Date.now() - lastFrameTime) / 1000;
 		const velocity = this.direction.scale(this.speed * deltaTime);
 		this.mesh.position.addInPlace(velocity);
 	}
 
-	update(player1, player2) {
-		if (player1 === undefined || player2 === undefined)
-			return ;
+	update(player1: Player | undefined, player2: Player | undefined): void {
+		if (!player1 || !player2) return ;
 
 		this.ball.minX = this.mesh.position.x - Ball.RADIUS;
 		this.ball.maxX = this.mesh.position.x + Ball.RADIUS;
@@ -55,19 +59,19 @@ export class Ball {
 		}
 	}
 
-	isBallHittingWall(minZ, maxZ, limit) {
+	isBallHittingWall(minZ: number, maxZ: number, limit: number): boolean {
 		if (minZ <= -(limit) || maxZ >= limit)
 			return true;
 		return false;
 	}
 
-	isBallOutofBounds(minX, maxX, limit) {
+	isBallOutofBounds(minX: number, maxX: number, limit: number) {
 		if (minX < -(limit) || maxX > (limit))
 			return true;
 		return false;
 	}
 
-	isBallHittingPadd(player, side) {
+	isBallHittingPadd(player: Player, side: string): boolean {
 		const paddle = player.paddle;
 		if (!paddle || !paddle.mesh || side == undefined) return false;
 
@@ -105,7 +109,7 @@ export class Ball {
 	/**
 	 * Launch the ball in a random direction (X-axis)
 	 */
-	launch() {
+	launch(): void {
         this.speed = Ball.START_SPEED;
 		if (Math.floor(Math.random() * 2) == 1)
 			this.direction.x = 1;
@@ -116,7 +120,7 @@ export class Ball {
 	/**
 	 * Reset position and direction
 	 */
-	reset() {
+	reset(): void {
 		this.mesh.position.x = 0.0;
 		// this.mesh.position.z = 0.0;
 		this.speed = Ball.START_SPEED;

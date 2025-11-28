@@ -1,27 +1,41 @@
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
-import { Engine, Scene, Color3 } from '@babylonjs/core';
+import { Engine, Scene, Color4 } from '@babylonjs/core';
 import { createCamera, createVisualScoring, createMap, createLight } from "./Graphics"
 import { Ball } from "./Ball";
 import { Paddle } from "./Paddle";
+
+export interface Player {
+    score: number;
+    paddle: Paddle | null;
+    name?: string;
+    text?: any;
+}
 
 export class Pong {
 	static MAP_WIDTH = 8.5;
 	static MAP_HEIGHT = 6;
 	static MAX_SCORE = 11;
 
-	constructor(canvasId, user1, user2, robot) {
-		this.canvas = document.getElementById(canvasId);
+	canvas: HTMLCanvasElement;
+	engine: Engine;
+	scene: Scene;
+	ball: Ball;
+	robot: boolean;
+	player1: Player;
+	player2: Player;
+	time: number;
+
+	constructor(canvasId: string, user1?: string, user2?: string, robot?: boolean) {
+		this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
 		this.engine = new Engine(this.canvas, true);
 		this.scene = null;
 		this.ball = null;
 		this.robot = true;
 		if (!robot || robot === undefined) this.robot = false;
-		if (user1 === undefined) user1 = "Anonymous1";
-		if (user2 === undefined) user2 = "Anonymous2"
-		this.player1 = { score: 0, paddle: null, text: "0", name: user1};
-		this.player2 = { score: 0, paddle: null, text: "0", name: user2};
+		this.player1 = { score: 0, paddle: null, text: "0", name: user1 ?? "Anonymous1"};
+		this.player2 = { score: 0, paddle: null, text: "0", name: user2 ?? "Anonymous2"};
 		this.time = Date.now();
 	}
 
@@ -29,7 +43,7 @@ export class Pong {
 	 * 	- Create environment and objects of the game
 	 * 	- Camera, light, map, ball, paddles and visual-scoring
 	 */
-	loadGame() {
+	loadGame(): void {
 		if (!this.engine) return ;
 
 		this.scene = new Scene(this.engine);
@@ -37,7 +51,7 @@ export class Pong {
 		createLight(this.scene);
 
 		//	Remove default background color
-		this.scene.clearColor = new Color3(0.004, 0.004, 0.012);
+		this.scene.clearColor = new Color4(0.004, 0.004, 0.012);
 
 		//	Create a glow layer to add a bloom effect around meshes
 		// const glowLayer = new GlowLayer("glow", this.scene, { mainTextureRatio: 0.6 });
@@ -65,7 +79,7 @@ export class Pong {
 	 * 	- Start the game by launching the ball and monitoring the score
 	 * 	- Manage user input and render the scene
 	 */
-	startPlay() {
+	startPlay(): void {
 		if (!this.scene || !this.ball || !this.player1.paddle || !this.player2.paddle) {
 			console.log("Error: while loading 'Pong' game");
 			return ;
@@ -92,7 +106,7 @@ export class Pong {
 		});
 	}
 
-	update(keys) {
+	update(keys: {}): void {
 		if (this.ball) {
 			this.ball.update(this.player1, this.player2);
 			this.ball.move(this.time);
@@ -113,7 +127,7 @@ export class Pong {
 	/**
 	 * 	- Check if any of the players have reached the maximum score
 	 */
-	monitoringScore() {
+	monitoringScore(): boolean {
 		//	Create a scene that displays the winner name -> TO DO
 		if (this.player1.score == Pong.MAX_SCORE) {
 			console.log("Game STATE: the winner is " + this.player1.name);
@@ -129,7 +143,7 @@ export class Pong {
 	 * 	- Listens to window inputs for each frame.
 	 * 	- Saves keys status (on/off) to update scene objects accordingly.
 	 */
-	handleInput(keys) {
+	handleInput(keys: {}): void {
 		//	Resize the game with the window
 		window.addEventListener('resize', () => {
 			this.engine.resize();
@@ -137,10 +151,10 @@ export class Pong {
 		//	Shift+Ctrl+Alt+I == Hide/show the Inspector
 		window.addEventListener("keydown", (ev) => {
             if (ev.shiftKey && ev.ctrlKey && ev.altKey && (ev.key === "I" || ev.key === "i")) {
-                if (scene.debugLayer.isVisible()) {
-                    scene.debugLayer.hide();
+                if (this.scene.debugLayer.isVisible()) {
+                    this.scene.debugLayer.hide();
                 } else {
-                    scene.debugLayer.show();
+                    this.scene.debugLayer.show();
                 }
             }
         });

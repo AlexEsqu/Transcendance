@@ -1,4 +1,4 @@
-import { Vector3 } from '@babylonjs/core';
+import { Vector3, Mesh } from '@babylonjs/core';
 import { createPaddle } from "./Graphics"
 import { Ball } from "./Ball"
 
@@ -9,6 +9,8 @@ export class Paddle {
 	static SPEED = 15.0;
 	static RESPONSIVENESS = -19.0
 
+	mesh: Mesh;
+
 	constructor(scene, side, mapWidth) {
 		this.mesh = createPaddle(scene);
 		this.mesh.rotation.y = Math.PI / 2;
@@ -17,7 +19,7 @@ export class Paddle {
 			this.mesh.position.x = -(mapWidth / 2);
 	}
 
-	move(direction, posLimit, lastFrameTime) {
+	move(direction: string, posLimit: number, lastFrameTime: number): void {
 		const meshTopPos = this.mesh.position.z + (Paddle.WIDTH / 2);
 		const meshBottomPos = this.mesh.position.z - (Paddle.WIDTH / 2);
 		const deltaTime = (Date.now() - lastFrameTime) / 1000;
@@ -32,7 +34,7 @@ export class Paddle {
 			this.mesh.position.z -= step;
 	}
 
-	autoMove(ballPosZ, ballPosX, posLimit, lastFrameTime) {
+	autoMove(ballPosZ: number, ballPosX: number, posLimit: number, lastFrameTime: number): void {
 		//	Avoid the robot to always move perfectly : 1/3 chance to miss the target
 		if (Math.floor(Math.random() * 4) == 1) return ;
 		if (ballPosZ == this.mesh.position.z) return ;
