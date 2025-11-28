@@ -6,9 +6,9 @@ function logout(server) {
 		schema: {
 			tags: ["auth"],
 			description: "Will log out the user",
-			security: [{ BearerAuth: [], cookieAuth: [] }], // access token required
+			security: server.security.UserAndSession,
 		},
-		onRequest: [server.authenticate],
+		onRequest: [server.authenticateUser],
 	};
 	server.post("/auth/logout", opts, async (req, reply) => {
 		//Clear the refresh token from db

@@ -7,7 +7,7 @@ function refresh(server) {
 		schema: {
 			tags: ["auth"],
 			description: "Send refresh token in HttpOnly cookie called `refreshToken`",
-			security: [{ BearerAuth: [] , cookieAuth: []}], 
+			security: server.security.UserAndSession, 
 			parameters: [
 				{
 					name: "refreshToken",

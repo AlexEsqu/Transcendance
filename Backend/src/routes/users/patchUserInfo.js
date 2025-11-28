@@ -4,7 +4,7 @@ export default function patchUserInfo(server) {
 	const opts = {
 		schema: {
 			tags: ["user"],
-			security: [{ BearerAuth: [] }],
+			security: server.security.UserAuth,
 			body: {
 				type: "object",
 				properties: {
@@ -21,7 +21,7 @@ export default function patchUserInfo(server) {
 				},
 			},
 		},
-		onRequest: [server.authenticate],
+		onRequest: [server.authenticateUser],
 	};
 	server.patch("/users/me", opts, async (req, reply) => {
 		try {

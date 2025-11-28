@@ -1,30 +1,33 @@
 import db from "../../database.js";
 //Schema that serves an user
 
-const singleUserSchema = {
-	schema: {
-		tags: ["user"],
-		params: {
-			type: "object",
-			properties: {
-				id: { type: "integer", minimum: 1 },
-			},
-			required: ["id"],
-		},
-		response: {
-			200: {
+export function getUser(server) {
+	const singleUserSchema = {
+		schema: {
+			tags: ["user"],
+			security: server.security.AppAuth,
+			params: {
 				type: "object",
 				properties: {
-					id: { type: "integer" },
-					username: { type: "string" },
-					profile_image_url: { type: "string" },
+					id: { type: "integer", minimum: 1 },
+				},
+				required: ["id"],
+			},
+
+			response: {
+				200: {
+					type: "object",
+					properties: {
+						id: { type: "integer" },
+						username: { type: "string" },
+						profile_image_url: { type: "string" },
+					},
 				},
 			},
 		},
-	},
-};
+		onRequest: [server.authenticateClient],
+	};
 
-export function getUser(server) {
 	server.get("/users/:id", singleUserSchema, (req, res) => {
 		try {
 			const { id } = req.params;
@@ -41,27 +44,28 @@ export function getUser(server) {
 	});
 }
 
-//Schema that serves an array of users
-const allUsersSchema = {
-	schema: {
-		tags: ["user"],
-		response: {
-			200: {
-				type: "array",
-				items: {
-					type: "object",
-					properties: {
-						id: { type: "integer" },
-						username: { type: "string" },
-						profile_image_url: { type: "string" },
+export function getUsers(server) {
+	const allUsersSchema = {
+		schema: {
+			tags: ["user"],
+			security: server.security.AppAuth,
+
+			response: {
+				200: {
+					type: "array",
+					items: {
+						type: "object",
+						properties: {
+							id: { type: "integer" },
+							username: { type: "string" },
+							profile_image_url: { type: "string" },
+						},
 					},
 				},
 			},
 		},
-	},
-};
-
-export function getUsers(server) {
+		onRequest: [server.authenticateClient],
+	};
 	server.get("/users", allUsersSchema, (req, res) => {
 		const users = db.prepare(`SELECT id, username, profile_image_url FROM users`).all();
 		console.log(users);

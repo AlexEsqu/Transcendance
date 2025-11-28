@@ -6,9 +6,9 @@ function deleteUser(server) {
 		schema: {
 			tags: ["user"],
 			description: "Deletes the user",
-			security: [{ BearerAuth: [] }],
+			security: server.security.UserAuth,
 		},
-		onRequest: [server.authenticate],
+		onRequest: [server.authenticateUser],
 	};
 	server.delete("/users/me", opts, (req, reply) => {
 		const { id } = req.user;
