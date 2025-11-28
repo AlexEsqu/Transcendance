@@ -9,22 +9,31 @@ function createMaterial(scene) {
 
 	const meshMaterial = new StandardMaterial("ballMaterial", scene);
 	//	Color/texture of the material as if it were illuminated from within
-	meshMaterial.emissiveColor = new Color3(0.78, 0.78, 0.78);
+	meshMaterial.diffuseColor = new Color3(0, 0, 0);
+	
+	// meshMaterial.emissiveColor = new Color3(0.78, 0.78, 0.78);
+	meshMaterial.emissiveColor = new Color3(0.412, 0.412, 0.412);
 	meshMaterial.disableLighting = true;
 	//	Set transparency between 0 & 1
-	meshMaterial.alpha = 0.5;
+	meshMaterial.alpha = 0.9;
 
 	return meshMaterial;
 }
 
+// { diameter: Ball.RADIUS * 2, segments: 2, updatable: true },
 function createBall(scene) {
 	if (!scene || scene === undefined) return null;
 
 	const mesh = MeshBuilder.CreateSphere(
 		'ball',
-		{ diameter: Ball.RADIUS * 2, segments: 2, updatable: true },
+		{ diameter: Ball.RADIUS * 2 },
 		scene
 	);
+	// const mesh = MeshBuilder.CreateBox(
+	// 	'ball',
+	// 	{ size: Ball.RADIUS * 2 },
+	// 	scene
+	// );
 	mesh.material = createMaterial(scene);
 	return mesh;
 }
@@ -51,13 +60,13 @@ function createCamera(scene, canvas) {
 	const camera = new ArcRotateCamera(
 		'arCamera',
 		-(Math.PI / 2), // alpha
-		Math.PI / 4, // beta
-		12, // radius
+		(Math.PI / 4), // beta
+		10, // radius
 		Vector3.Zero(), // target
 		scene
 	);
 	//	Allow to move the camera -> uncomment for debug
-	// camera.attachControl(canwvas, true);
+	// camera.attachControl(canvas, true);
 }
 
 function create2DText() {

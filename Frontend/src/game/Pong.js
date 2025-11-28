@@ -7,9 +7,9 @@ import { Ball } from "./Ball";
 import { Paddle } from "./Paddle";
 
 export class Pong {
-	static MAP_WIDTH = 10;
+	static MAP_WIDTH = 8;
 	static MAP_HEIGHT = 6;
-	static MAX_SCORE = 10;
+	static MAX_SCORE = 11;
 
 	constructor(canvasId, user1, user2, robot) {
 		this.canvas = document.getElementById(canvasId);
@@ -22,6 +22,7 @@ export class Pong {
 		if (user2 === undefined) user2 = "Anonymous2"
 		this.player1 = { score: 0, paddle: null, text: "0", name: user1};
 		this.player2 = { score: 0, paddle: null, text: "0", name: user2};
+		this.time = Date.now();
 	}
 
 	/**
@@ -38,9 +39,10 @@ export class Pong {
 		this.scene.clearColor = new Color3(0, 0, 0);
 
 		//	Create a glow layer to add a bloom effect around meshes
-		const glowLayer = new GlowLayer("glow", this.scene, { mainTextureRatio: 0.2 });
+		const glowLayer = new GlowLayer("glow", this.scene, { mainTextureRatio: 0.6 });
 		glowLayer.intensity = 0.5;
-		glowLayer.blurKernelSize = 9;
+		glowLayer.blurKernelSize = 16;
+		// const light = new HemisphericLight("light", new Vector3(0, 1, 0), this.scene);
 
 		const map = createMap(this.scene);
 
@@ -77,6 +79,7 @@ export class Pong {
 		this.handleInput(keys);
 		this.scene.registerBeforeRender(() => {
 			this.update(keys);
+			this.time = Date.now();
 		});
 
 		//	Rendering loop
@@ -90,15 +93,18 @@ export class Pong {
 	}
 
 	update(keys) {
+		if (this.ball) {
+			this.ball.update(this.player1, this.player2);
+			this.ball.move(this.time);
+		}
 		if (this.robot === false) {
-			if (keys["s"]) this.player1.paddle.move("down", (Pong.MAP_HEIGHT / 2));
-			if (keys["w"]) this.player1.paddle.move("up", (Pong.MAP_HEIGHT / 2));
+			if (keys["s"]) this.player1.paddle.move("down", (Pong.MAP_HEIGHT / 2), this.time);
+			if (keys["w"]) this.player1.paddle.move("up", (Pong.MAP_HEIGHT / 2), this.time);
 		}
 		else
-			this.player1.paddle.autoMove(this.ball.mesh.position.z, this.ball.mesh.position.x, (Pong.MAP_HEIGHT / 2));
-		if (keys["ArrowDown"]) this.player2.paddle.move("down", (Pong.MAP_HEIGHT / 2));
-		if (keys["ArrowUp"]) this.player2.paddle.move("up", (Pong.MAP_HEIGHT / 2));
-		if (this.ball) this.ball.update(this.player1, this.player2);
+			this.player1.paddle.autoMove(this.ball.mesh.position.z, this.ball.mesh.position.x, (Pong.MAP_HEIGHT / 2), this.time);
+		if (keys["ArrowDown"]) this.player2.paddle.move("down", (Pong.MAP_HEIGHT / 2), this.time);
+		if (keys["ArrowUp"]) this.player2.paddle.move("up", (Pong.MAP_HEIGHT / 2), this.time);
 		//	Update visual-score in the scene
 		this.player1.text.text = this.player1.score.toString();
 		this.player2.text.text = this.player2.score.toString();
