@@ -12,6 +12,10 @@ components:
       type: apiKey
       in: cookie
       name: refreshToken
+    AppClientAuth:
+      type: apiKey
+      in: header
+      name: X-App-Secret
   schemas: {}
 paths:
   /api/users:
@@ -110,9 +114,9 @@ paths:
       tags:
         - auth
       description: Send refresh token in HttpOnly cookie called `refreshToken`
-      security:
+      security: &a1
         - BearerAuth: []
-          cookieAuth: []
+        - cookieAuth: []
       responses:
         "200":
           description: New access token
@@ -137,26 +141,108 @@ paths:
       tags:
         - auth
       description: Will log out the user
-      security:
-        - BearerAuth: []
-          cookieAuth: []
+      security: *a1
       responses:
         "200":
           description: Default Response
-  /api/users/{id}/delete:
+  /api/users/me:
     delete:
       tags:
         - user
       description: Deletes the user
-      parameters:
-        - schema:
-            type: integer
-            minimum: 1
-          in: path
-          name: id
-          required: true
-      security:
+      security: &a2
         - BearerAuth: []
+      responses:
+        "200":
+          description: Default Response
+    patch:
+      tags:
+        - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                profilePictureUrl:
+                  type: string
+              additionalProperties: false
+      security: *a2
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+  /api/users/me/password:
+    patch:
+      tags:
+        - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - oldPassword
+                - newPassword
+              properties:
+                oldPassword:
+                  type: string
+                newPassword:
+                  type: string
+                  minLength: 8
+              additionalProperties: false
+        required: true
+      security: *a2
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+  /api/matches:
+    post:
+      tags:
+        - matches
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - winner_id
+                - loser_id
+                - winner_score
+                - loser_score
+                - date
+              properties:
+                winner_id:
+                  type: integer
+                loser_id:
+                  type: integer
+                winner_score:
+                  type: integer
+                loser_score:
+                  type: integer
+                date:
+                  type: string
+                  format: date-time
+        required: true
+      responses:
+        "200":
+          description: Default Response
+    get:
+      tags:
+        - matches
       responses:
         "200":
           description: Default Response
@@ -165,3 +251,5 @@ tags:
     description: Auth endpoints
   - name: user
     description: User endpoints
+  - name: matches
+    description: Matches endpoints
