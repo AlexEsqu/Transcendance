@@ -4,7 +4,7 @@ import { Pong } from "./Pong";
 import { createBall } from "./Graphics"
 
 export class Ball {
-	static START_SPEED = 6;
+	static START_SPEED = 5;
 	static MAX_SPEED = 8;
 	static RADIUS = 0.15;
 
@@ -42,9 +42,9 @@ export class Ball {
 		if (this.isBallHittingWall(this.ball.minZ, this.ball.maxZ, heightLimit) === true) {
 			this.direction.z = -(this.direction.z);
 			if (this.mesh.position.z >= 0)
-				this.mesh.position.z = heightLimit - Ball.RADIUS;
+				this.mesh.position.z = heightLimit - Ball.RADIUS  - 0.001;
 			else
-				this.mesh.position.z = -(heightLimit) + Ball.RADIUS;
+				this.mesh.position.z = -(heightLimit) + Ball.RADIUS  - 0.001;
 		}
 		if (this.isBallOutofBounds(this.ball.minX, this.ball.maxX, widthLimit) === true) {
 			if (this.mesh.position.x < 0)

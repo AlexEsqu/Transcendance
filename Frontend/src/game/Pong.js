@@ -1,13 +1,13 @@
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
-import { Engine, Scene, Color3, GlowLayer } from '@babylonjs/core';
-import { createCamera, createVisualScoring, createMap } from "./Graphics"
+import { Engine, Scene, Color3 } from '@babylonjs/core';
+import { createCamera, createVisualScoring, createMap, createLight } from "./Graphics"
 import { Ball } from "./Ball";
 import { Paddle } from "./Paddle";
 
 export class Pong {
-	static MAP_WIDTH = 8;
+	static MAP_WIDTH = 8.5;
 	static MAP_HEIGHT = 6;
 	static MAX_SCORE = 11;
 
@@ -34,20 +34,20 @@ export class Pong {
 
 		this.scene = new Scene(this.engine);
 		createCamera(this.scene, this.canvas);
+		createLight(this.scene);
 
 		//	Remove default background color
-		this.scene.clearColor = new Color3(0, 0, 0);
+		this.scene.clearColor = new Color3(0.004, 0.004, 0.012);
 
 		//	Create a glow layer to add a bloom effect around meshes
-		const glowLayer = new GlowLayer("glow", this.scene, { mainTextureRatio: 0.6 });
-		glowLayer.intensity = 0.5;
-		glowLayer.blurKernelSize = 16;
-		// const light = new HemisphericLight("light", new Vector3(0, 1, 0), this.scene);
+		// const glowLayer = new GlowLayer("glow", this.scene, { mainTextureRatio: 0.6 });
+		// glowLayer.intensity = 0.5;
+		// glowLayer.blurKernelSize = 16;
 
 		const map = createMap(this.scene);
 
 		// Exclude bloom effect on the map
-		glowLayer.addExcludedMesh(map);
+		// glowLayer.addExcludedMesh(map);
 		
 		//	Create the ball
 		this.ball = new Ball(this.scene);

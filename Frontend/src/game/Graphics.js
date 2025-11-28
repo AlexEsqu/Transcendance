@@ -1,18 +1,17 @@
-import { MeshBuilder, Vector3, Color3, StandardMaterial, ArcRotateCamera } from '@babylonjs/core';
+import { MeshBuilder, Vector3, Color3, StandardMaterial, ArcRotateCamera, DirectionalLight } from '@babylonjs/core';
 import { AdvancedDynamicTexture, TextBlock } from "@babylonjs/gui";
 import { Ball } from "./Ball"
 import { Paddle } from './Paddle';
 import { Pong } from './Pong';
 
-function createMaterial(scene) {
+function createMaterial(scene, color) {
 	if (!scene || scene === undefined) return null;
+	if (color === undefined) color = new Color3(0.031, 0.031, 0.141);
 
 	const meshMaterial = new StandardMaterial("ballMaterial", scene);
 	//	Color/texture of the material as if it were illuminated from within
-	meshMaterial.diffuseColor = new Color3(0, 0, 0);
-	
-	// meshMaterial.emissiveColor = new Color3(0.78, 0.78, 0.78);
-	meshMaterial.emissiveColor = new Color3(0.412, 0.412, 0.412);
+	// meshMaterial.diffuseColor = new Color3(0, 0, 0);
+	meshMaterial.emissiveColor = color;
 	meshMaterial.disableLighting = true;
 	//	Set transparency between 0 & 1
 	meshMaterial.alpha = 0.9;
@@ -34,8 +33,17 @@ function createBall(scene) {
 	// 	{ size: Ball.RADIUS * 2 },
 	// 	scene
 	// );
-	mesh.material = createMaterial(scene);
+	mesh.material = createMaterial(scene, new Color3(0.749, 0.749, 0.749));
 	return mesh;
+}
+
+function createLight(scene) {
+	if (!scene || scene === undefined) return ;
+
+	const light = new DirectionalLight("light", new Vector3(0, -1, 0), scene);
+	light.diffuse = new Color3(0.004, 0.004, 0.012);
+	light.specular = new Color3(0.059, 0.059, 0.09);
+	// light.specular = new Color3(0.016, 0.02, 0.271);
 }
 
 function createPaddle(scene) {
@@ -50,7 +58,7 @@ function createPaddle(scene) {
 		},
 		scene
 	);
-	mesh.material = createMaterial(scene);
+	mesh.material = createMaterial(scene, new Color3(0.749, 0.749, 0.749));
 	return mesh;
 }
 
@@ -60,7 +68,7 @@ function createCamera(scene, canvas) {
 	const camera = new ArcRotateCamera(
 		'arCamera',
 		-(Math.PI / 2), // alpha
-		(Math.PI / 4), // beta
+		0, // beta
 		10, // radius
 		Vector3.Zero(), // target
 		scene
@@ -103,10 +111,10 @@ function createMap(scene) {
 		scene
 	);
 	const mapMaterial = new StandardMaterial("mapMaterial", scene);
-	mapMaterial.emissiveColor = new Color3(0.01, 0.01, 0.01);
+	mapMaterial.diffuseColor = new Color3(0.031, 0.031, 0.141);
 	mapMaterial.disableLight = true;
 	map.material = mapMaterial;
 	return map;
 }
 
-export { createBall, createPaddle, createCamera, createVisualScoring, createMap };
+export { createBall, createPaddle, createCamera, createVisualScoring, createMap, createLight };

@@ -6,7 +6,8 @@ export class Paddle {
 	static WIDTH = 1.25;
 	static HEIGHT = 0.25;
 	static DEPTH = 0.25;
-	static SPEED = 10;
+	static SPEED = 15.0;
+	static RESPONSIVENESS = -19.0
 
 	constructor(scene, side, mapWidth) {
 		this.mesh = createPaddle(scene);
@@ -20,7 +21,9 @@ export class Paddle {
 		const meshTopPos = this.mesh.position.z + (Paddle.WIDTH / 2);
 		const meshBottomPos = this.mesh.position.z - (Paddle.WIDTH / 2);
 		const deltaTime = (Date.now() - lastFrameTime) / 1000;
-		const step = Paddle.SPEED * deltaTime;
+        const alpha = 1 - Math.exp(Paddle.RESPONSIVENESS * deltaTime);
+		//	Frame-rate independent smoothing
+		const step = Paddle.SPEED * deltaTime * alpha;
 
 		posLimit += 0.1;
 		if (direction === "up" && (meshTopPos + step) <= posLimit)
