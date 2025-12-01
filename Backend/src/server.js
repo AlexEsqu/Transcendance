@@ -6,9 +6,9 @@ import fastifyMultiPart from "@fastify/multipart";
 import authPlugin from "./plugins/jwt.js";
 import swaggerPlugin from "./plugins/swagger.js";
 import fastifyCookie from "@fastify/cookie";
-import clientAuthPluggin from "./plugins/validateApiKey.js"
+import clientAuthPluggin from "./plugins/validateApiKey.js";
 import { getUsers, getUser } from "./routes/users/getUsers.js";
-import yaml from "yaml"
+import yaml from "yaml";
 import postUser from "./routes/users/signup.js";
 import login from "./routes/auth/login.js";
 import refresh from "./routes/auth/refresh.js";
@@ -18,6 +18,7 @@ import patchUserPassword from "./routes/users/patchUserPassword.js";
 import patchUserInfo from "./routes/users/patchUserInfo.js";
 import postMatches from "./routes/matches/postMatch.js";
 import getMatches from "./routes/matches/getMatches.js";
+import getUserMatches from "./routes/matches/getUserMatches.js";
 
 export const server = Fastify({
 	https: {
@@ -46,6 +47,7 @@ server.register(patchUserPassword, { prefix: "users" });
 server.register(patchUserInfo, { prefix: "users" });
 server.register(postMatches);
 server.register(getMatches);
+server.register(getUserMatches);
 
 /**
  * Run the server!
