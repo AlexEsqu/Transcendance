@@ -13,7 +13,6 @@
     "@babylonjs/core": "^8.37.0",
     "@babylonjs/inspector": "^8.37.0",
     "html-webpack-plugin": "^5.6.4",
-    "tailwindcss": "^4.1.17",
     "ts-loader": "^9.5.4",
     "typescript": "^5.9.3",
     "webpack": "^5.102.1",
@@ -21,7 +20,6 @@
     "webpack-dev-server": "^5.2.2"
   },
   "dependencies": {
-    "@tailwindcss/cli": "^4.1.17",
     "babylonjs-gltf2interface": "^8.37.0",
     "csstype": "^3.2.3"
   },
