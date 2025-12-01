@@ -2,6 +2,8 @@
 import { createAttachElement, injectHTMLPage } from "./utils";
 import { displayGamePage } from "../app";
 
+import welcomeHtml from "./pages/welcome.html";
+
 
 export { displayGreetingHeader, displayAliasQueryPage, displayAliasDeleteFooter }
 
@@ -18,8 +20,6 @@ const deleteAliasLabelText : string = "If you want to delete your alias, click h
 const deleteAliasButtonText : string = "Delete Alias";
 
 const localStorageKeyForAlias : string = "PongAlias"
-
-const mainContainer : HTMLElement = document.getElementById("main");
 
 
 // function displaying the pages
@@ -38,7 +38,7 @@ function displayGreetingHeader(name : string) : void
 
 function displayAliasQueryPage() : void
 {
-	injectHTMLPage('/pages/welcome.html', document.body);
+	document.body.innerHTML = welcomeHtml;
 
 	// const grouping : string = "alias-query";
 

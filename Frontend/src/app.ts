@@ -1,6 +1,7 @@
 
 import { displayGreetingHeader, displayAliasQueryPage, displayAliasDeleteFooter } from "./landing/alias"
 import { displayGame } from "./landing/game";
+import "./input.css";
 
 export { displayGamePage }
 
