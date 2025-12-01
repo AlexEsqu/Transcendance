@@ -51,7 +51,7 @@ export class Pong {
 		createLight(this.scene);
 
 		//	Remove default background color
-		this.scene.clearColor = new Color4(0.004, 0.004, 0.012);
+		this.scene.clearColor = new Color4(0.004, 0.004, 0.102);
 
 		//	Create a glow layer to add a bloom effect around meshes
 		// const glowLayer = new GlowLayer("glow", this.scene, { mainTextureRatio: 0.6 });
@@ -106,6 +106,9 @@ export class Pong {
 		});
 	}
 
+	/**
+	 * 	- Listen to new user input and update game data accordingly
+	 */
 	update(keys: {}): void {
 		if (this.ball) {
 			this.ball.update(this.player1, this.player2);

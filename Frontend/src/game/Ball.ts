@@ -4,8 +4,8 @@ import { Pong, Player } from "./Pong";
 import { createBall } from "./Graphics"
 
 export class Ball {
-	static START_SPEED = 5;
-	static MAX_SPEED = 8;
+	static START_SPEED = 8;
+	static MAX_SPEED = 12;
 	static RADIUS = 0.15;
 
     mesh: Mesh;
@@ -21,12 +21,19 @@ export class Ball {
 		this.speed = Ball.START_SPEED;
 	}
 
+	/**
+	 * 	- Move the ball according to its velocity 
+	 */
 	move(lastFrameTime: number): void {
 		const deltaTime = (Date.now() - lastFrameTime) / 1000;
 		const velocity = this.direction.scale(this.speed * deltaTime);
 		this.mesh.position.addInPlace(velocity);
 	}
 
+	/**
+	 * 	- Update coordinates of the ball and check for collision.
+	 * 	- Depending on what/where the ball hits an object or a limit, its direction is reversed and gain speed
+	 */
 	update(player1: Player | undefined, player2: Player | undefined): void {
 		if (!player1 || !player2) return ;
 
@@ -59,18 +66,28 @@ export class Ball {
 		}
 	}
 
+	/**
+	 * 	- Check if coordinates of the ball hit the top or down of the map
+	 */
 	isBallHittingWall(minZ: number, maxZ: number, limit: number): boolean {
 		if (minZ <= -(limit) || maxZ >= limit)
 			return true;
 		return false;
 	}
 
-	isBallOutofBounds(minX: number, maxX: number, limit: number) {
+	/**
+	 * 	- Check if coordinates of the ball are out of the map limit
+	 */
+	isBallOutofBounds(minX: number, maxX: number, limit: number): boolean {
 		if (minX < -(limit) || maxX > (limit))
 			return true;
 		return false;
 	}
 
+	/**
+	 * 	- If the ball is hitting the paddle, invert its direction and return true,
+	 * 		otherwise do nothing and return false.
+	 */
 	isBallHittingPadd(player: Player, side: string): boolean {
 		const paddle = player.paddle;
 		if (!paddle || !paddle.mesh || side == undefined) return false;
@@ -78,13 +95,13 @@ export class Ball {
 		const paddMaxZ = paddle.mesh.position.z + (Paddle.WIDTH / 2);
 		const paddMinZ = paddle.mesh.position.z - (Paddle.WIDTH / 2);
 		
-		//	Check if the ball touches the paddle edge
+		//	Check if the ball touches the paddle front (X-axis)
 		if (side === "right" && this.ball.maxX <= paddle.mesh.position.x - (Paddle.DEPTH / 2))
 			return false;
 		else if (this.ball.minX >= paddle.mesh.position.x + (Paddle.DEPTH / 2))
 			return false;
 
-		//	Check if the ball fits in the paddle position (Z-axis) range
+		//	Check if the ball fits in the paddle's coordinates range (Z-axis) 
 		if (this.ball.maxZ <= paddMaxZ + Ball.RADIUS && this.ball.minZ >= paddMinZ - Ball.RADIUS) {
 			if (side === "right")
 				this.mesh.position.x = this.ball.minX - Ball.RADIUS - 0.001;

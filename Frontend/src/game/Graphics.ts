@@ -40,8 +40,9 @@ function createBall(scene: Scene): Mesh {
 function createLight(scene: Scene): void {
 	if (!scene || scene === undefined) return ;
 
-	const light = new DirectionalLight("light", new Vector3(0, -1, 0), scene);
-	light.diffuse = new Color3(0.004, 0.004, 0.012);
+	const light = new DirectionalLight("light", new Vector3(0, -100, 0), scene);
+	light.diffuse = new Color3(0.004, 0.004, 0.102);
+	light.specular = new Color3(0.169, 0.169, 0.239);
 	light.specular = new Color3(0.059, 0.059, 0.09);
 	// light.specular = new Color3(0.016, 0.02, 0.271);
 }
@@ -68,7 +69,7 @@ function createCamera(scene: Scene, canvas) {
 	const camera = new ArcRotateCamera(
 		'arCamera',
 		-(Math.PI / 2), // alpha
-		0, // beta
+		-(Math.PI / 2), // beta
 		10, // radius
 		Vector3.Zero(), // target
 		scene

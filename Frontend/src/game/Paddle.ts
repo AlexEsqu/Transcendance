@@ -6,7 +6,7 @@ export class Paddle {
 	static WIDTH = 1.25;
 	static HEIGHT = 0.25;
 	static DEPTH = 0.25;
-	static SPEED = 15.0;
+	static SPEED = 20.0;
 	static RESPONSIVENESS = -19.0
 
 	mesh: Mesh;
@@ -19,6 +19,9 @@ export class Paddle {
 			this.mesh.position.x = -(mapWidth / 2);
 	}
 
+	/**
+	 * 	- Update position in up direction or down
+	 */
 	move(direction: string, posLimit: number, lastFrameTime: number): void {
 		const meshTopPos = this.mesh.position.z + (Paddle.WIDTH / 2);
 		const meshBottomPos = this.mesh.position.z - (Paddle.WIDTH / 2);
@@ -34,6 +37,10 @@ export class Paddle {
 			this.mesh.position.z -= step;
 	}
 
+	/**
+	 * 	- If no user is specified, the paddle is controlled by a robot and moves automatically.
+	 * 	- Do not always move, robot's behave is randomized
+	 */
 	autoMove(ballPosZ: number, ballPosX: number, posLimit: number, lastFrameTime: number): void {
 		//	Avoid the robot to always move perfectly : 1/3 chance to miss the target
 		if (Math.floor(Math.random() * 4) == 1) return ;
