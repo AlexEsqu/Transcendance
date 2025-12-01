@@ -3,10 +3,11 @@ import { createAttachElement, injectHTMLPage } from "./utils";
 import { displayGamePage } from "../app";
 
 import welcomeHtml from "../pages/welcome.html";
-import guestinHtml from "../pages/guestin.html"
+import guestinHtml from "../pages/guestin.html";
+import footerHTML from "../pages/footer.html"
 
 
-export { displayGreetingHeader, displayAliasQueryPage, displayAliasDeleteFooter }
+export { displayGreetingHeader, displayAliasQueryPage, displayFooter }
 
 
 const greetingTitleText = (alias: string) : string => `Welcome, ${alias}!`;
@@ -41,7 +42,7 @@ function displayGuestInPage() : void
 	GuestInButton.addEventListener('click', function ()
 	{
 		const alias = GuestInInput.value;
-		GuestInInput.value = "";
+		GuestInInput.value = ""; // reset input field
 		console.log(alias);
 
 		// checking the alias is not an empty string (a profanity checker would be funny...)
@@ -65,20 +66,11 @@ function displayAliasQueryPage() : void
 	})
 }
 
-function displayAliasDeleteFooter() : void
+function displayFooter() : void
 {
-	const grouping : string = "delete-alias";
+	document.body.innerHTML += footerHTML
 
-	// creating a semantic container for our page
-	const footerContainer : HTMLElement = createAttachElement("footer", document.body, grouping, grouping);
-
-	// creating a label for the delete data button
-	const deleteAliasLabel : HTMLElement = createAttachElement("label", footerContainer, grouping, grouping);
-	deleteAliasLabel.appendChild(document.createTextNode(deleteAliasLabelText));
-
-	// creating a button
-	let deleteAliasButton : HTMLButtonElement = createAttachElement("button", footerContainer, grouping, grouping) as HTMLButtonElement;
-	deleteAliasButton.appendChild(document.createTextNode(deleteAliasButtonText));
+	const deleteAliasButton = document.getElementById('delete-name-btn')
 
 	// adding a callback function to the delete data function
 	deleteAliasButton.addEventListener("click", function ()
