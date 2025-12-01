@@ -20,8 +20,10 @@
     "webpack-dev-server": "^5.2.2"
   },
   "dependencies": {
+    "@tailwindcss/cli": "^4.1.17",
     "babylonjs-gltf2interface": "^8.37.0",
-    "csstype": "^3.2.3"
+    "csstype": "^3.2.3",
+    "tailwindcss": "^4.1.17"
   },
   "description": ""
 }
