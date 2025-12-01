@@ -4,8 +4,8 @@ import { Pong, Player } from "./Pong";
 import { createBall } from "./Graphics"
 
 export class Ball {
-	static START_SPEED = 8;
-	static MAX_SPEED = 12;
+	static START_SPEED = 7;
+	static MAX_SPEED = 11;
 	static RADIUS = 0.15;
 
     mesh: Mesh;

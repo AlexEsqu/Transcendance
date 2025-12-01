@@ -5,6 +5,7 @@ import { Engine, Scene, Color4 } from '@babylonjs/core';
 import { createCamera, createVisualScoring, createMap, createLight } from "./Graphics"
 import { Ball } from "./Ball";
 import { Paddle } from "./Paddle";
+import { createAttachElement } from "../landing/utils";
 
 export interface Player {
     score: number;
@@ -20,7 +21,9 @@ export class Pong {
 
 	canvas: HTMLCanvasElement;
 	engine: Engine;
-	scene: Scene;
+	gameScene: Scene;
+	menuScene: Scene;
+	endScene: Scene;
 	ball: Ball;
 	robot: boolean;
 	player1: Player;
@@ -30,7 +33,9 @@ export class Pong {
 	constructor(canvasId: string, user1?: string, user2?: string, robot?: boolean) {
 		this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
 		this.engine = new Engine(this.canvas, true);
-		this.scene = null;
+		this.gameScene = null;
+		this.menuScene = null;
+		this.endScene = null;
 		this.ball = null;
 		this.robot = true;
 		if (!robot || robot === undefined) this.robot = false;
@@ -40,39 +45,47 @@ export class Pong {
 	}
 
 	/**
-	 * 	- Create environment and objects of the game
-	 * 	- Camera, light, map, ball, paddles and visual-scoring
+	 * 	- Create all scenes and game elements
 	 */
 	loadGame(): void {
 		if (!this.engine) return ;
 
-		this.scene = new Scene(this.engine);
-		createCamera(this.scene, this.canvas);
-		createLight(this.scene);
+		this.gameScene = new Scene(this.engine);
+		createCamera(this.gameScene, this.canvas);
+		createLight(this.gameScene);
 
 		//	Remove default background color
-		this.scene.clearColor = new Color4(0.004, 0.004, 0.102);
+		this.gameScene.clearColor = new Color4(0.004, 0.004, 0.102);
 
 		//	Create a glow layer to add a bloom effect around meshes
-		// const glowLayer = new GlowLayer("glow", this.scene, { mainTextureRatio: 0.6 });
+		// const glowLayer = new GlowLayer("glow", this.gameScene, { mainTextureRatio: 0.6 });
 		// glowLayer.intensity = 0.5;
 		// glowLayer.blurKernelSize = 16;
 
-		const map = createMap(this.scene);
+		const map = createMap(this.gameScene);
 
 		// Exclude bloom effect on the map
 		// glowLayer.addExcludedMesh(map);
 		
 		//	Create the ball
-		this.ball = new Ball(this.scene);
+		this.ball = new Ball(this.gameScene);
 
 		//	Creates 2 paddles, one for each players and 2DText for visual scoring
-		this.player1.paddle = new Paddle(this.scene, "left", Pong.MAP_WIDTH);
-		this.player2.paddle = new Paddle(this.scene, "right", Pong.MAP_WIDTH);
+		this.player1.paddle = new Paddle(this.gameScene, "left", Pong.MAP_WIDTH);
+		this.player2.paddle = new Paddle(this.gameScene, "right", Pong.MAP_WIDTH);
 		const line = createVisualScoring("|", "white", 32, "-250px", "0px");
 		this.player1.text = createVisualScoring("0", "white", 32, "-250px", "-100px");
 		this.player2.text = createVisualScoring("0", "white", 32, "-250px", "100px");
 		console.log("Game STATE: loaded");
+		
+		this.displayMenu();
+		// if (!this.menuScene || !this.gameScene || !this.endScene)
+			//	Handle error, message. stop processing ?
+	}
+
+	displayMenu() {
+		const test : HTMLElement = createAttachElement("h1", this.canvas, "test", "test");
+		test.appendChild(document.createTextNode("MENU"));
 	}
 
 	/**
@@ -80,7 +93,7 @@ export class Pong {
 	 * 	- Manage user input and render the scene
 	 */
 	startPlay(): void {
-		if (!this.scene || !this.ball || !this.player1.paddle || !this.player2.paddle) {
+		if (!this.gameScene || !this.ball || !this.player1.paddle || !this.player2.paddle) {
 			console.log("Error: while loading 'Pong' game");
 			return ;
 		}
@@ -91,14 +104,14 @@ export class Pong {
 		//	Manage user input
 		const keys = {};
 		this.handleInput(keys);
-		this.scene.registerBeforeRender(() => {
+		this.gameScene.registerBeforeRender(() => {
 			this.update(keys);
 			this.time = Date.now();
 		});
 
 		//	Rendering loop
 		this.engine.runRenderLoop(() => {
-			if (this.scene) this.scene.render();
+			if (this.gameScene) this.gameScene.render();
 			if (this.monitoringScore() == false) {
 				console.log("Game STATE: ended ");
 				this.engine.stopRenderLoop();
@@ -111,20 +124,40 @@ export class Pong {
 	 */
 	update(keys: {}): void {
 		if (this.ball) {
-			this.ball.update(this.player1, this.player2);
 			this.ball.move(this.time);
+			this.ball.update(this.player1, this.player2);
 		}
 		if (this.robot === false) {
 			if (keys["s"]) this.player1.paddle.move("down", (Pong.MAP_HEIGHT / 2), this.time);
 			if (keys["w"]) this.player1.paddle.move("up", (Pong.MAP_HEIGHT / 2), this.time);
 		}
 		else
-			this.player1.paddle.autoMove(this.ball.mesh.position.z, this.ball.mesh.position.x, (Pong.MAP_HEIGHT / 2), this.time);
+			this.player1.paddle.autoMove(this.ball, (Pong.MAP_HEIGHT / 2), this.time);
 		if (keys["ArrowDown"]) this.player2.paddle.move("down", (Pong.MAP_HEIGHT / 2), this.time);
 		if (keys["ArrowUp"]) this.player2.paddle.move("up", (Pong.MAP_HEIGHT / 2), this.time);
 		//	Update visual-score in the scene
 		this.player1.text.text = this.player1.score.toString();
 		this.player2.text.text = this.player2.score.toString();
+	}
+
+	/**
+	 * 	- Create environment and objects of the game
+	 * 	- Camera, light, map, ball, paddles and visual-scoring
+	 */
+	createGameScene(): void {
+		
+	}
+
+	createMenuScene(): void {
+
+		//	Remove default background color
+		// this.gameScene.clearColor = new Color4(0.004, 0.004, 0.102);
+
+		//	Display player's username
+		console.log("Game STATE: menu");
+
+		//	Display rules
+		//	Button click to start
 	}
 
 	/**
@@ -154,10 +187,10 @@ export class Pong {
 		//	Shift+Ctrl+Alt+I == Hide/show the Inspector
 		window.addEventListener("keydown", (ev) => {
             if (ev.shiftKey && ev.ctrlKey && ev.altKey && (ev.key === "I" || ev.key === "i")) {
-                if (this.scene.debugLayer.isVisible()) {
-                    this.scene.debugLayer.hide();
+                if (this.gameScene.debugLayer.isVisible()) {
+                    this.gameScene.debugLayer.hide();
                 } else {
-                    this.scene.debugLayer.show();
+                    this.gameScene.debugLayer.show();
                 }
             }
         });
