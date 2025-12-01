@@ -2,17 +2,12 @@
 import { createAttachElement, injectHTMLPage } from "./utils";
 import { displayGamePage } from "../app";
 
-import welcomeHtml from "./pages/welcome.html";
+import welcomeHtml from "../pages/welcome.html";
+import guestinHtml from "../pages/guestin.html"
 
 
 export { displayGreetingHeader, displayAliasQueryPage, displayAliasDeleteFooter }
 
-
-// Test content of sections to be edited here
-
-const submitAliasButtonText : string = "Submit";
-const submitAliasTitleText : string = "Who are you ?";
-const submitAliasLabelText : string = "Submit a username to start playing.";
 
 const greetingTitleText = (alias: string) : string => `Welcome, ${alias}!`;
 
@@ -36,43 +31,38 @@ function displayGreetingHeader(name : string) : void
 	greetingTitle.appendChild(document.createTextNode(greetingTitleText(name)));
 }
 
+function displayGuestInPage() : void
+{
+	document.body.innerHTML = guestinHtml
+
+	const GuestInInput : HTMLInputElement = document.getElementById('input-alias') as HTMLInputElement;
+	const GuestInButton : HTMLElement = document.getElementById('btn-submitalias')
+
+	GuestInButton.addEventListener('click', function ()
+	{
+		const alias = GuestInInput.value;
+		GuestInInput.value = "";
+		console.log(alias);
+
+		// checking the alias is not an empty string (a profanity checker would be funny...)
+		if (alias)
+		{
+			localStorage.setItem(localStorageKeyForAlias, alias);
+			displayGamePage();
+		}
+	})
+}
+
 function displayAliasQueryPage() : void
 {
 	document.body.innerHTML = welcomeHtml;
 
-	// const grouping : string = "alias-query";
-
-	// // creating a container for our page (preferring semantic "main" instead of div, might change my mind)
-	// const mainContainer : HTMLElement = createAttachElement("main", document.body, grouping, grouping);
-
-	// // creating a title
-	// let submitAliasTitle : HTMLElement = createAttachElement("h1", mainContainer, grouping, grouping);
-	// submitAliasTitle.appendChild(document.createTextNode(submitAliasTitleText));
-
-	// // creating a label for the username input field
-	// let submitAliasLabel : HTMLElement = createAttachElement("label", mainContainer, grouping, grouping);
-	// submitAliasLabel.appendChild(document.createTextNode(submitAliasLabelText));
-
-	// // creating an input field, as HTML input element for typescript to allow to read from it
-	// let submitAliasInput : HTMLInputElement = createAttachElement("input", mainContainer, grouping, grouping) as HTMLInputElement;
-
-	// // creating a button
-	// let submitAliasButton : HTMLButtonElement = createAttachElement("button", mainContainer, grouping, grouping) as HTMLButtonElement;
-	// submitAliasButton.appendChild(document.createTextNode(submitAliasButtonText));
-
-	// // attaching a callback function to the button being clicked
-	// submitAliasButton.addEventListener("click", function ()
-	// {
-	// 	console.log("clicking submit alias button");
-	// 	const alias : string = submitAliasInput.value;
-	// 	submitAliasInput.value = "";
-	// 	console.log(alias);
-	// 	if (alias)
-	// 	{
-	// 		localStorage.setItem(localStorageKeyForAlias, alias);
-	// 		displayGamePage();
-	// 	}
-	// })
+	const GuestInButton = document.getElementById('btn-guestin')
+	GuestInButton.addEventListener("click", function ()
+	{
+		console.log("clicking submit alias button");
+		displayGuestInPage();
+	})
 }
 
 function displayAliasDeleteFooter() : void
