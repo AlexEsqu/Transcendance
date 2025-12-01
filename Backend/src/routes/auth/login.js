@@ -4,7 +4,7 @@ import { createAccessToken, createRefreshToken, hashRefreshToken } from "../../s
 
 const opts = {
 	schema: {
-		description: "Logs in user",
+		description: "Authenticates the user using their username and password. On success, returns a short-lived access token in the response body and sets a long-lived refresh token in the `HttpOnly refreshToken cookie`, which can later be used to obtain new access tokens.",
 		tags: ["auth"],
 		body: {
 			type: "object",

@@ -4,6 +4,7 @@ function postMatches(server) {
 	const opts = {
 		schema: {
 			tags: ["matches"],
+			description: "Records a completed match between two users, including winner, loser, scores, and match date. `This endpoint requires client authentication.`",
 			security: server.security.AppAuth,
 			body: {
 				type: "object",

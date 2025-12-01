@@ -18,10 +18,14 @@ components:
       name: X-App-Secret
   schemas: {}
 paths:
-  /api/users:
+  /users:
     get:
       tags:
         - user
+      description: Returns a list of all registered users. `This endpoint requires
+        client authentication.`
+      security: &a1
+        - AppClientAuth: []
       responses:
         "200":
           description: Default Response
@@ -38,10 +42,12 @@ paths:
                       type: string
                     profile_image_url:
                       type: string
-  /api/users/{id}:
+  /users/{id}:
     get:
       tags:
         - user
+      description: Returns an object of an user using the id passed in parameters.
+        `This endpoint requires client authentication.`
       parameters:
         - schema:
             type: integer
@@ -49,6 +55,7 @@ paths:
           in: path
           name: id
           required: true
+      security: *a1
       responses:
         "200":
           description: Default Response
@@ -63,10 +70,12 @@ paths:
                     type: string
                   profile_image_url:
                     type: string
-  /api/users/signup:
+  /users/signup:
     post:
       tags:
         - auth
+      description: Creates a new user account using a username and password. Does not
+        automatically log in the user.
       requestBody:
         content:
           application/json:
@@ -87,11 +96,14 @@ paths:
       responses:
         "200":
           description: Default Response
-  /api/auth/login:
+  /users/auth/login:
     post:
       tags:
         - auth
-      description: Logs in user
+      description: Authenticates the user using their username and password. On
+        success, returns a short-lived access token in the response body and
+        sets a long-lived refresh token in the `HttpOnly refreshToken cookie`,
+        which can later be used to obtain new access tokens.
       requestBody:
         content:
           application/json:
@@ -109,14 +121,19 @@ paths:
       responses:
         "200":
           description: Default Response
-  /api/auth/refresh:
+  /users/auth/refresh:
     post:
       tags:
         - auth
-      description: Send refresh token in HttpOnly cookie called `refreshToken`
-      security: &a1
+      description: Uses the refresh token to issue a new access token. The endpoint
+        verifies the refresh token, checks that it is not expired or revoked.
+        This endpoint requires `client authentification` AND `user
+        authentification` AND the refresh cookie stored in the `HttpOnly
+        refreshToken cookie`
+      security: &a2
         - BearerAuth: []
         - cookieAuth: []
+        - AppClientAuth: []
       responses:
         "200":
           description: New access token
@@ -136,28 +153,36 @@ paths:
             application/json:
               schema:
                 description: Unauthorized
-  /api/auth/logout:
+  /users/auth/logout:
     post:
       tags:
         - auth
-      description: Will log out the user
-      security: *a1
+      description: Logs the user out by invalidating the refresh token stored in the
+        `HttpOnly refreshToken cookie`. After logout, the user must
+        reauthenticate with their username and password to obtain new tokens.
+        This endpoint requires client authentification AND user authentification
+        AND the refresh cookie stored in the HttpOnly refreshToken cookie
+      security: *a2
       responses:
         "200":
           description: Default Response
-  /api/users/me:
+  /users/me:
     delete:
       tags:
         - user
-      description: Deletes the user
-      security: &a2
+      description: Deletes the user account and all its data. `This endpoint requires
+        client AND user authentication.`
+      security: &a3
         - BearerAuth: []
+        - AppClientAuth: []
       responses:
         "200":
           description: Default Response
     patch:
       tags:
         - user
+      description: Modifies the data of the user. `This endpoint requires client AND
+        user authentication.`
       requestBody:
         content:
           application/json:
@@ -167,7 +192,7 @@ paths:
                 profilePictureUrl:
                   type: string
               additionalProperties: false
-      security: *a2
+      security: *a3
       responses:
         "200":
           description: Default Response
@@ -178,10 +203,12 @@ paths:
                 properties:
                   success:
                     type: boolean
-  /api/users/me/password:
+  /users/me/password:
     patch:
       tags:
         - user
+      description: Modifies the password of the user. `This endpoint requires client
+        AND user authentication.`
       requestBody:
         content:
           application/json:
@@ -198,7 +225,7 @@ paths:
                   minLength: 8
               additionalProperties: false
         required: true
-      security: *a2
+      security: *a3
       responses:
         "200":
           description: Default Response
@@ -209,10 +236,13 @@ paths:
                 properties:
                   success:
                     type: boolean
-  /api/matches:
+  /matches:
     post:
       tags:
         - matches
+      description: Records a completed match between two users, including winner,
+        loser, scores, and match date. `This endpoint requires client
+        authentication.`
       requestBody:
         content:
           application/json:
@@ -237,12 +267,16 @@ paths:
                   type: string
                   format: date-time
         required: true
+      security: *a1
       responses:
         "200":
           description: Default Response
     get:
       tags:
         - matches
+      description: Returns a list of all matches. `This endpoint requires client
+        authentication.`
+      security: *a1
       responses:
         "200":
           description: Default Response

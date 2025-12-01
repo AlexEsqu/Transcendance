@@ -8,6 +8,7 @@ import swaggerPlugin from "./plugins/swagger.js";
 import fastifyCookie from "@fastify/cookie";
 import clientAuthPluggin from "./plugins/validateApiKey.js"
 import { getUsers, getUser } from "./routes/users/getUsers.js";
+import yaml from "yaml"
 import postUser from "./routes/users/signup.js";
 import login from "./routes/auth/login.js";
 import refresh from "./routes/auth/refresh.js";
@@ -34,17 +35,17 @@ server.register(swaggerPlugin);
 server.register(clientAuthPluggin);
 
 //ROUTES
-server.register(getUsers, { prefix: "/api" });
-server.register(getUser, { prefix: "/api" });
-server.register(postUser, { prefix: "/api" });
-server.register(login, { prefix: "/api" });
-server.register(refresh, { prefix: "/api" });
-server.register(logout, { prefix: "/api" });
-server.register(deleteUser, { prefix: "/api" });
-server.register(patchUserPassword, { prefix: "/api" });
-server.register(patchUserInfo, { prefix: "/api" });
-server.register(postMatches, { prefix: "/api" });
-server.register(getMatches, { prefix: "/api" });
+server.register(getUsers);
+server.register(getUser);
+server.register(postUser, { prefix: "users" });
+server.register(login, { prefix: "users" });
+server.register(refresh, { prefix: "users" });
+server.register(logout, { prefix: "users" });
+server.register(deleteUser, { prefix: "users" });
+server.register(patchUserPassword, { prefix: "users" });
+server.register(patchUserInfo, { prefix: "users" });
+server.register(postMatches);
+server.register(getMatches);
 
 /**
  * Run the server!

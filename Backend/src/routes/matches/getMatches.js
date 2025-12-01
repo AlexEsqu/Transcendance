@@ -4,7 +4,7 @@ function getMatches(server) {
 	const opts = {
 		schema: {
 			tags: ["matches"],
-			desciption: "Get matches",
+			description: "Returns a list of all matches. `This endpoint requires client authentication.`",
 			security: server.security.AppAuth,
 		},
 		onRequest: [server.authenticateClient],

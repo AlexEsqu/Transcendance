@@ -5,12 +5,12 @@ import swaggerUI from "@fastify/swagger-ui";
 export default fp(async (server, opts) => {
 	// Security aliases
 	server.decorate("security", {
-		UserAuth: [{ BearerAuth: [] }],
-		SessionAuth: [{ cookieAuth: [] }],
+		UserAuth: [{ BearerAuth: [] },  { AppClientAuth: [] }],
+		SessionAuth: [{ cookieAuth: [] },  { AppClientAuth: [] }],
 		AppAuth: [{ AppClientAuth: [] }],
 		UserAndApp: [{ BearerAuth: [] }, { AppClientAuth: [] }],
 		SessionAndApp: [{ cookieAuth: [] }, { AppClientAuth: [] }],
-		UserAndSession: [{ BearerAuth: [] }, { cookieAuth: [] }],
+		UserAndSession: [{ BearerAuth: [] }, { cookieAuth: [] }, { AppClientAuth: [] }],
 	});
 
 	// Register Swagger

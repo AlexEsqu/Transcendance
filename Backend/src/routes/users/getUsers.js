@@ -5,6 +5,7 @@ export function getUser(server) {
 	const singleUserSchema = {
 		schema: {
 			tags: ["user"],
+			description: "Returns an object of an user using the id passed in parameters. `This endpoint requires client authentication.`",
 			security: server.security.AppAuth,
 			params: {
 				type: "object",
@@ -49,7 +50,8 @@ export function getUsers(server) {
 		schema: {
 			tags: ["user"],
 			security: server.security.AppAuth,
-
+			description: "Returns a list of all registered users. `This endpoint requires client authentication.`",
+			security: server.security.AppAuth,
 			response: {
 				200: {
 					type: "array",

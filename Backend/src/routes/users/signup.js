@@ -6,6 +6,7 @@ function signup(server) {
 	const opts = {
 		schema: {
 			tags: ["auth"],
+			description: "Creates a new user account using a username and password. Does not automatically log in the user.",
 			body: {
 				type: "object",
 				required: ["username", "password"],
@@ -28,6 +29,6 @@ function signup(server) {
 			reply.status(200).send({ success: true, message: "Signed up successfully" })
 		},
 	};
-	server.post("/users/signup", opts);
+	server.post("/signup", opts);
 }
 export default signup;
