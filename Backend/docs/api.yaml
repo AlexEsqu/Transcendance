@@ -1,0 +1,167 @@
+openapi: 3.0.3
+info:
+  title: My API
+  version: 1.0.0
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: refreshToken
+  schemas: {}
+paths:
+  /api/users:
+    get:
+      tags:
+        - user
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    username:
+                      type: string
+                    profile_image_url:
+                      type: string
+  /api/users/{id}:
+    get:
+      tags:
+        - user
+      parameters:
+        - schema:
+            type: integer
+            minimum: 1
+          in: path
+          name: id
+          required: true
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  username:
+                    type: string
+                  profile_image_url:
+                    type: string
+  /api/users/signup:
+    post:
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                  minLength: 3
+                  maxLength: 20
+                password:
+                  type: string
+                  minLength: 8
+        required: true
+      responses:
+        "200":
+          description: Default Response
+  /api/auth/login:
+    post:
+      tags:
+        - auth
+      description: Logs in user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - username
+                - password
+        required: true
+      responses:
+        "200":
+          description: Default Response
+  /api/auth/refresh:
+    post:
+      tags:
+        - auth
+      description: Send refresh token in HttpOnly cookie called `refreshToken`
+      security:
+        - BearerAuth: []
+          cookieAuth: []
+      responses:
+        "200":
+          description: New access token
+          content:
+            application/json:
+              schema:
+                description: New access token
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                required:
+                  - accessToken
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                description: Unauthorized
+  /api/auth/logout:
+    post:
+      tags:
+        - auth
+      description: Will log out the user
+      security:
+        - BearerAuth: []
+          cookieAuth: []
+      responses:
+        "200":
+          description: Default Response
+  /api/users/{id}/delete:
+    delete:
+      tags:
+        - user
+      description: Deletes the user
+      parameters:
+        - schema:
+            type: integer
+            minimum: 1
+          in: path
+          name: id
+          required: true
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Default Response
+tags:
+  - name: auth
+    description: Auth endpoints
+  - name: user
+    description: User endpoints
