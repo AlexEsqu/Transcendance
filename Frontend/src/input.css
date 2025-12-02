@@ -8,6 +8,7 @@
     -moz-box-shadow: 0 0 110px 11px rgba(46,210,255,0.73);
     box-shadow: 0 0 110px 11px rgba(46,210,255,0.73);
   }
+  
   .glow-anim { animation: glow 2s ease-in-out infinite alternate; }
   @keyframes glow {
     from { box-shadow: 0 0 12px 4px rgba(46,210,255,0.4); }

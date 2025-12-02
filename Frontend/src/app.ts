@@ -1,5 +1,6 @@
 
-import { displayHeader, displayAliasQueryPage, displayFooter } from "./landing/alias"
+import { displayAliasQueryPage } from "./landing/alias"
+import { displayHeader, displayFooter } from "./landing/nav";
 import { displayGame } from "./landing/game";
 import "./input.css";
 

@@ -1,13 +1,10 @@
-
-import { createAttachElement, injectHTMLPage } from "./utils";
 import { displayGamePage } from "../app";
 
 import welcomeHtml from "../pages/welcome.html";
 import guestinHtml from "../pages/guestin.html";
-import footerHTML from "../pages/footer.html"
-import headerHTML from "../pages/header.html"
 
-export { displayHeader, displayAliasQueryPage, displayFooter }
+
+export { displayAliasQueryPage, localStorageKeyForAlias }
 
 const localStorageKeyForAlias : string = "PongAlias"
 
@@ -44,25 +41,5 @@ function displayAliasQueryPage() : void
 		console.log("clicking submit alias button");
 		displayGuestInPage();
 	})
-}
-
-function displayFooter() : void
-{
-	document.body.innerHTML += footerHTML
-
-	const deleteAliasButton = document.getElementById('delete-name-btn')
-
-	// adding a callback function to the delete data function
-	deleteAliasButton.addEventListener("click", function ()
-	{
-		console.log("clicking delete button");
-		localStorage.removeItem(localStorageKeyForAlias);
-		displayAliasQueryPage();
-	})
-}
-
-function displayHeader(name : string) : void
-{
-	document.body.innerHTML += headerHTML.replace('WISELY', name)
 }
 

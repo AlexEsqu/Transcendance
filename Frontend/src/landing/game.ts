@@ -1,7 +1,5 @@
-
 import { Pong } from "../game/Pong"
 
-import { createAttachElement } from "./utils";
 import gameHtml from '../pages/game.html'
 
 export { displayGame }
@@ -24,3 +22,5 @@ function displayGame() : void {
 	const gameWindow = document.getElementById("game-canvas");
 	new App(gameWindow);
 }
+
+
