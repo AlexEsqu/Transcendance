@@ -9,13 +9,15 @@ class App {
 	constructor(container : HTMLElement) {
 		const canvas = document.createElement("canvas");
 		canvas.id = "gameCanvas";
-		canvas.style.width = "800px";
-		canvas.style.height = "600px";
+		canvas.width = 800;
+		canvas.height = 600;
 		container.appendChild(canvas);
 		// const pong = new Pong("gameCanvas", "Popol", "Gaya");
-		const pong = new Pong("gameCanvas", undefined, undefined, true);
-		pong.loadGame();
-		pong.startPlay();
+		requestAnimationFrame(() => {
+			const pong = new Pong("gameCanvas", undefined, undefined, true);
+			pong.loadGame();
+			pong.startPlay();
+		});
 	}
 }
 

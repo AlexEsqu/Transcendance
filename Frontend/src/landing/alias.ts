@@ -5,32 +5,12 @@ import { displayGamePage } from "../app";
 import welcomeHtml from "../pages/welcome.html";
 import guestinHtml from "../pages/guestin.html";
 import footerHTML from "../pages/footer.html"
+import headerHTML from "../pages/header.html"
 
-
-export { displayGreetingHeader, displayAliasQueryPage, displayFooter }
-
-
-const greetingTitleText = (alias: string) : string => `Welcome, ${alias}!`;
-
-const deleteAliasLabelText : string = "If you want to delete your alias, click here:";
-const deleteAliasButtonText : string = "Delete Alias";
+export { displayHeader, displayAliasQueryPage, displayFooter }
 
 const localStorageKeyForAlias : string = "PongAlias"
 
-
-// function displaying the pages
-
-function displayGreetingHeader(name : string) : void
-{
-	const grouping : string  = "greeting";
-
-	// creating a semantic container for our page
-	let headerContainer : HTMLElement = createAttachElement("header", document.body, grouping, grouping);
-
-	// creating a title
-	let greetingTitle : HTMLElement = createAttachElement("h1", headerContainer, grouping, grouping);
-	greetingTitle.appendChild(document.createTextNode(greetingTitleText(name)));
-}
 
 function displayGuestInPage() : void
 {
@@ -80,3 +60,9 @@ function displayFooter() : void
 		displayAliasQueryPage();
 	})
 }
+
+function displayHeader(name : string) : void
+{
+	document.body.innerHTML += headerHTML.replace('WISELY', name)
+}
+
