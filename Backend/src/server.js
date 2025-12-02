@@ -4,12 +4,11 @@ import fs from "fs";
 import fastifyFormBody from "@fastify/formbody";
 import fastifyMultiPart from "@fastify/multipart";
 import authPlugin from "./plugins/jwt.js";
-import swagger from "@fastify/swagger";
-import swaggerUI from "@fastify/swagger-ui";
+import swaggerPlugin from "./plugins/swagger.js";
 import fastifyCookie from "@fastify/cookie";
-import yaml from "yaml";
-
+import clientAuthPluggin from "./plugins/validateApiKey.js";
 import { getUsers, getUser } from "./routes/users/getUsers.js";
+import yaml from "yaml";
 import postUser from "./routes/users/signup.js";
 import login from "./routes/auth/login.js";
 import refresh from "./routes/auth/refresh.js";
@@ -17,7 +16,9 @@ import logout from "./routes/auth/logout.js";
 import deleteUser from "./routes/users/deleteUser.js";
 import patchUserPassword from "./routes/users/patchUserPassword.js";
 import patchUserInfo from "./routes/users/patchUserInfo.js";
-
+import postMatches from "./routes/matches/postMatch.js";
+import getMatches from "./routes/matches/getMatches.js";
+import getUserMatches from "./routes/matches/getUserMatches.js";
 
 export const server = Fastify({
 	https: {
@@ -31,51 +32,22 @@ server.register(fastifyFormBody);
 server.register(fastifyMultiPart);
 server.register(authPlugin);
 server.register(fastifyCookie);
-
-server.register(swagger, {
-	openapi: {
-		info: { title: "My API", version: "1.0.0" },
-		components: {
-			securitySchemes: {
-				BearerAuth: {
-					type: "http",
-					scheme: "bearer",
-					bearerFormat: "JWT",
-				},
-				cookieAuth: {
-					type: "apiKey",
-					in: "cookie",
-					name: "refreshToken",
-				},
-			},
-		},
-		tags: [
-			{ name: "auth", description: "Auth endpoints" },
-			{ name: "user", description: "User endpoints" },
-		],
-	},
-	exposeRoute: true,
-});
-
-server.register(swaggerUI, {
-	routePrefix: "/docs",
-	swagger: { url: "/docs/json" },
-	uiConfig: {
-		deepLinking: false,
-	},
-	staticCSP: true,
-});
+server.register(swaggerPlugin);
+server.register(clientAuthPluggin);
 
 //ROUTES
-server.register(getUsers, { prefix: "/api" });
-server.register(getUser, { prefix: "/api" });
-server.register(postUser, { prefix: "/api" });
-server.register(login, { prefix: "/api" });
-server.register(refresh, { prefix: "/api" });
-server.register(logout, { prefix: "/api" });
-server.register(deleteUser, { prefix: "/api" });
-server.register(patchUserPassword, { prefix: "/api" });
-server.register(patchUserInfo, { prefix: "/api" });
+server.register(getUsers);
+server.register(getUser);
+server.register(postUser, { prefix: "users" });
+server.register(login, { prefix: "users" });
+server.register(refresh, { prefix: "users" });
+server.register(logout, { prefix: "users" });
+server.register(deleteUser, { prefix: "users" });
+server.register(patchUserPassword, { prefix: "users" });
+server.register(patchUserInfo, { prefix: "users" });
+server.register(postMatches);
+server.register(getMatches);
+server.register(getUserMatches);
 
 /**
  * Run the server!
@@ -92,8 +64,7 @@ const start = async () => {
 	}
 };
 start();
-//write the api as yaml
-
+// // write the api as yaml
 
 // server.ready((err) => {
 // 	if (err) throw err;

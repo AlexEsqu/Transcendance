@@ -5,7 +5,8 @@ export default function patchUserPassword(server) {
 	const opts = {
 		schema: {
 			tags: ["user"],
-			security: [{ BearerAuth: [] }],
+			security: server.security.UserAuth,
+			description: "Modifies the password of the user. `This endpoint requires client AND user authentication.`",
 			body: {
 				type: "object",
 				required: ["oldPassword", "newPassword"],
@@ -24,9 +25,9 @@ export default function patchUserPassword(server) {
 				},
 			},
 		},
-		onRequest: [server.authenticate],
+		onRequest: [server.authenticateUser],
 	};
-	server.patch("/users/me/password", opts, async (req, reply) => {
+	server.patch("/me/password", opts, async (req, reply) => {
 		try {
 			const { oldPassword, newPassword } = req.body;
 			const { id } = req.user;

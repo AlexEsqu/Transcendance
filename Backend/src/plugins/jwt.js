@@ -6,7 +6,7 @@ export default fp(async function (server, opts) {
 		secret: process.env.JWT_SECRET,
 	});
 
-	server.decorate("authenticate", async function (req, reply) {
+	server.decorate("authenticateUser", async function (req, reply) {
 		try {
 			await req.jwtVerify();
 		} catch (err) {
@@ -14,3 +14,5 @@ export default fp(async function (server, opts) {
 		}
 	});
 });
+
+

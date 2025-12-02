@@ -5,10 +5,10 @@ function logout(server) {
 	const opts = {
 		schema: {
 			tags: ["auth"],
-			description: "Will log out the user",
-			security: [{ BearerAuth: [], cookieAuth: [] }], // access token required
+			description: "Logs the user out by invalidating the refresh token stored in the `HttpOnly refreshToken cookie`. After logout, the user must reauthenticate with their username and password to obtain new tokens. This endpoint requires client authentification AND user authentification AND the refresh cookie stored in the HttpOnly refreshToken cookie",
+			security: server.security.UserAndSession,
 		},
-		onRequest: [server.authenticate],
+		onRequest: [server.authenticateUser],
 	};
 	server.post("/auth/logout", opts, async (req, reply) => {
 		//Clear the refresh token from db

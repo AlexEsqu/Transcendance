@@ -4,7 +4,8 @@ export default function patchUserInfo(server) {
 	const opts = {
 		schema: {
 			tags: ["user"],
-			security: [{ BearerAuth: [] }],
+			description: "Modifies the data of the user. `This endpoint requires client AND user authentication.`",
+			security: server.security.UserAuth,
 			body: {
 				type: "object",
 				properties: {
@@ -21,9 +22,9 @@ export default function patchUserInfo(server) {
 				},
 			},
 		},
-		onRequest: [server.authenticate],
+		onRequest: [server.authenticateUser],
 	};
-	server.patch("/users/me", opts, async (req, reply) => {
+	server.patch("/me", opts, async (req, reply) => {
 		try {
 			const { profilePictureUrl } = req.body;
 			const { id } = req.user;
