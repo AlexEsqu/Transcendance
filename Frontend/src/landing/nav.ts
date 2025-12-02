@@ -7,7 +7,7 @@ export {displayFooter, displayHeader}
 // adds a footer to the document body
 function displayFooter() : void
 {
-	document.body.innerHTML += footerHTML
+	document.body.insertAdjacentHTML("beforeend", footerHTML);
 
 	const deleteAliasButton = document.getElementById('delete-name-btn')
 
@@ -22,7 +22,8 @@ function displayFooter() : void
 // adds a header to the document body, replace name into it
 function displayHeader(name : string) : void
 {
-	document.body.innerHTML += headerHTML.replace('WISELY', name)
+	// document.body.innerHTML += headerHTML.replace('WISELY', name)
+	document.body.insertAdjacentHTML("beforeend", headerHTML.replace('WISELY', name))
 }
 
 function deleteUserData() : void

@@ -20,35 +20,48 @@ export class Paddle {
 	}
 
 	/**
-	 * 	- Update position in up direction or down
+	 * 	- Update position in up direction or down, respect map and ball collisions
 	 */
 	move(direction: string, posLimit: number, lastFrameTime: number): void {
 		const meshTopPos = this.mesh.position.z + (Paddle.WIDTH / 2);
 		const meshBottomPos = this.mesh.position.z - (Paddle.WIDTH / 2);
+
 		const deltaTime = (Date.now() - lastFrameTime) / 1000;
-        const alpha = 1 - Math.exp(Paddle.RESPONSIVENESS * deltaTime);
 		//	Frame-rate independent smoothing
+        const alpha = 1 - Math.exp(Paddle.RESPONSIVENESS * deltaTime);
 		const step = Paddle.SPEED * deltaTime * alpha;
 
 		posLimit += 0.1;
 		if (direction === "up" && (meshTopPos + step) <= posLimit)
 			this.mesh.position.z += step;
-		if (direction === "down" && (meshBottomPos - step) >= -posLimit)
+		else if (direction === "down" && (meshBottomPos - step) >= -posLimit)
 			this.mesh.position.z -= step;
 	}
+
+	// checkBallCollision(side: string, newPaddPos: number, ballPos: number): boolean {
+		
+	// 	if ((side === "up" && newPaddPos < ballPos) || (side === "down" && newPaddPos > ballPos))
+	// 		return true;
+	// 	return false;
+	// }
 
 	/**
 	 * 	- If no user is specified, the paddle is controlled by a robot and moves automatically.
 	 * 	- Do not always move, robot's behave is randomized
 	 */
-	autoMove(ballPosZ: number, ballPosX: number, posLimit: number, lastFrameTime: number): void {
-		//	Avoid the robot to always move perfectly : 1/3 chance to miss the target
+	autoMove(ball: Ball, posLimit: number, lastFrameTime: number): void {
+		//	Avoid the robot to always move perfectly : 1/4 chance to miss the target
 		if (Math.floor(Math.random() * 4) == 1) return ;
-		if (ballPosZ == this.mesh.position.z) return ;
+
+		const	ballPosZ = ball.mesh.position.z;
+		const	ballPosX = ball.mesh.position.x;
+
 		if (ballPosX >= 0) return ;
+		if (ballPosZ == this.mesh.position.z) return ;
 
 		const padPosZ = this.mesh.position.z;
 		const half = Paddle.WIDTH / 2;
+	
 		if (ballPosZ <= padPosZ + half && ballPosZ >= padPosZ - half) return ;
 		if (ballPosZ > padPosZ)
 			this.move("up", posLimit, lastFrameTime);
