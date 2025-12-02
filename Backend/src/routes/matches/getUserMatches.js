@@ -4,7 +4,7 @@ function getUserMatches(server) {
 	const opts = {
 		schema: {
 			tags: ["matches"],
-			description: "Returns a list of all matches that matches (lol) the user using the id parameter. `This endpoint requires client authentication.`",
+			description: "Returns a list of all the matches of a user using the user_id parameter. `This endpoint requires client authentication.`",
 			security: server.security.AppAuth,
 			params: {
 				type: "object",
