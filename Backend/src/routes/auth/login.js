@@ -1,6 +1,6 @@
+import { createAccessToken, createRefreshToken, hashRefreshToken } from "../../services/authServices.js";
 import db from "/app/src/database.js";
 import bcrypt from "bcrypt";
-import { createAccessToken, createRefreshToken, hashRefreshToken } from "../../services/authServices.js";
 
 const opts = {
 	schema: {

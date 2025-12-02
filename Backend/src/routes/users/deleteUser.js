@@ -1,5 +1,4 @@
 import db from "../../database.js";
-import { server } from "../../server.js";
 
 
 //TODO: GDPR => DONT FORGET TO ANONIMIZE THE USER EVERYWHERE IN DB
