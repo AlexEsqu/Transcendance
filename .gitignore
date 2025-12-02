@@ -1,5 +1,6 @@
 obj/
 build/
+node_modules
 node_modules/
 dist/
 .env
