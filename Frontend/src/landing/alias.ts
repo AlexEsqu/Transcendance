@@ -81,10 +81,36 @@ function displayRegisterPage() : void
 		console.log(`User tried to register with ${login} and ${password}`);
 
 		// checking the login is not an empty string (a profanity checker would be funny...)
-		if (login && false)
+		if (login && password)
 		{
-
+			registerUser(login, password);
 			displayGamePage();
 		}
 	})
+}
+
+async function registerUser(loginn: string, passwordd: string) : Promise<void>
+{
+	try
+	{
+		const response = await fetch('https://localhost:8443/users/signup',
+			{
+				method: 'POST',
+				body: JSON.stringify({ username: loginn, password: passwordd }),
+			});
+
+		if (!response.ok)
+			throw new Error(`HTTP error! status: ${response.status}`);
+		const data = await response.json();
+		console.log(data);
+
+	}
+	catch (error)
+	{
+		console.error('Failed to fetch users:', error);
+	}
+	finally
+	{
+		displayAliasQueryPage();
+	}
 }

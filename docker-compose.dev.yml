@@ -7,11 +7,13 @@ services:
       - "3000:3000"
     command: dev
     volumes:
-      - ./Backend:/app
+      - ./Backend/src:/app/src
+      - ./Backend/scripts:/app/scripts
       - sqlite:/app/data
     environment:
       - JWT_SECRET=${JWT_SECRET}
       - APP_SECRET_KEY=${APP_SECRET_KEY}
+
   typescript:
     build: ./Frontend
     container_name: typescript
@@ -19,14 +21,6 @@ services:
       - "8080:8080"
     volumes:
       - ./Frontend:/app
-      - /app/node_modules
-    environment:
-      - NODE_ENV=development
-      # to allow for reloading (website update as code change)
-      # setting the docker to check the file as written in the src/ folder
-      # at determinate intervals
-      - CHOKIDAR_USEPOLLING=true
-      - CHOKIDAR_INTERVAL=200
 
 volumes:
   sqlite:

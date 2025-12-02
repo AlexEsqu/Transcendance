@@ -36,10 +36,12 @@ server.register(authPlugin);
 server.register(fastifyCookie);
 server.register(swaggerPlugin);
 server.register(clientAuthPluggin);
-server.register(cors, {
-	origin: "*", // allow all origins;
-	methods: ["GET", "PATCH", "POST", "DELETE"],
-});
+// server.register(cors, {
+// 	origin: "*", // allow all origins;
+// 	methods: ["GET", "PATCH", "POST", "DELETE"],
+// });
+
+server.register(cors, { origin: '*', credentials: true, })
 
 //ROUTES
 server.register(getUsers);

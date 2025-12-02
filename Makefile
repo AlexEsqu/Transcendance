@@ -20,7 +20,7 @@ all: build up
 dev:
 	mkdir -p $(BACKEND_DIR)
 	docker compose -f ./docker-compose.dev.yml build
-	docker
+	docker compose -f ./docker-compose.dev.yml up
 
 build:
 	mkdir -p $(BACKEND_DIR)
