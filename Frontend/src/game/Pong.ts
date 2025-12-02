@@ -1,7 +1,7 @@
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
-import { Engine, Scene, Color4 } from '@babylonjs/core';
+import { Engine, Scene, Color4, GlowLayer } from '@babylonjs/core';
 import { createCamera, createVisualScoring, createMap, createLight } from "./Graphics"
 import { Ball } from "./Ball";
 import { Paddle } from "./Paddle";
@@ -58,14 +58,14 @@ export class Pong {
 		this.gameScene.clearColor = new Color4(0.004, 0.004, 0.102);
 
 		//	Create a glow layer to add a bloom effect around meshes
-		// const glowLayer = new GlowLayer("glow", this.gameScene, { mainTextureRatio: 0.6 });
-		// glowLayer.intensity = 0.5;
-		// glowLayer.blurKernelSize = 16;
+		const glowLayer = new GlowLayer("glow", this.gameScene, { mainTextureRatio: 0.6 });
+		glowLayer.intensity = 0.7;
+		glowLayer.blurKernelSize = 128;
 
 		const map = createMap(this.gameScene);
 
 		// Exclude bloom effect on the map
-		// glowLayer.addExcludedMesh(map);
+		glowLayer.addExcludedMesh(map);
 
 		//	Create the ball
 		this.ball = new Ball(this.gameScene);

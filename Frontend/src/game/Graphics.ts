@@ -10,11 +10,10 @@ function createMaterial(scene: Scene, color: Color3): StandardMaterial {
 
 	const meshMaterial = new StandardMaterial("ballMaterial", scene);
 	//	Color/texture of the material as if it were illuminated from within
-	// meshMaterial.diffuseColor = new Color3(0, 0, 0);
 	meshMaterial.emissiveColor = color;
 	meshMaterial.disableLighting = true;
 	//	Set transparency between 0 & 1
-	meshMaterial.alpha = 0.9;
+	meshMaterial.alpha = 0.8;
 
 	return meshMaterial;
 }
@@ -33,7 +32,7 @@ function createBall(scene: Scene): Mesh {
 	// 	{ size: Ball.RADIUS * 2 },
 	// 	scene
 	// );
-	mesh.material = createMaterial(scene, new Color3(0.749, 0.749, 0.749));
+	mesh.material = createMaterial(scene, new Color3(0.694, 0.824, 0.98));
 	return mesh;
 }
 
@@ -42,9 +41,7 @@ function createLight(scene: Scene): void {
 
 	const light = new DirectionalLight("light", new Vector3(0, -100, 0), scene);
 	light.diffuse = new Color3(0.004, 0.004, 0.102);
-	light.specular = new Color3(0.169, 0.169, 0.239);
 	light.specular = new Color3(0.059, 0.059, 0.09);
-	// light.specular = new Color3(0.016, 0.02, 0.271);
 }
 
 function createPaddle(scene: Scene): Mesh {
@@ -59,7 +56,7 @@ function createPaddle(scene: Scene): Mesh {
 		},
 		scene
 	);
-	mesh.material = createMaterial(scene, new Color3(0.749, 0.749, 0.749));
+	mesh.material = createMaterial(scene, new Color3(0.635, 0.761, 0.91));
 	return mesh;
 }
 
