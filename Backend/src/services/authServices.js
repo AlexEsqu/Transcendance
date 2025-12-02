@@ -1,6 +1,5 @@
-import { server } from "../server.js";
 import bcrypt from "bcrypt";
-
+import { server } from "../app.js";
 export function createAccessToken(id, username) {
 	const token = server.jwt.sign(
 		{
