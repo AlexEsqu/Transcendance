@@ -18,18 +18,24 @@ function displayAliasQueryPage() : void
 	const GuestInButton = document.getElementById('btn-guestin')
 	GuestInButton.addEventListener("click", function ()
 	{
-		console.log("clicking submit alias button");
+		console.log("clicking alias button");
 		displayGuestInPage();
+	})
+
+	const loginButton = document.getElementById('btn-guestin')
+	loginButton.addEventListener("click", function ()
+	{
+		console.log("clicking login button");
+		displayLoginPage();
 	})
 
 	const registerButton = document.getElementById('btn-register')
 	registerButton.addEventListener("click", function ()
 	{
-		console.log("clicking submit register button");
+		console.log("clicking register button");
 		displayRegisterPage();
 	})
 }
-
 
 // removes guest name from localstorage, displays a query page
 function removeGuestName() : void
@@ -61,7 +67,37 @@ function displayGuestInPage() : void
 
 function displayRegisterPage() : void
 {
-	document.body.innerHTML = registerHtml
+	document.body.innerHTML = loginHtml
+
+	const loginInput : HTMLInputElement = document.getElementById('input-login') as HTMLInputElement;
+	const passwordInput : HTMLInputElement = document.getElementById('input-password') as HTMLInputElement;
+	const registerButton : HTMLElement = document.getElementById('btn-submit-login')
+
+	registerButton.addEventListener('click', function ()
+	{
+		// store contents of the inputs
+		const login = loginInput.value;
+		const password = passwordInput.value;
+
+		// reset input fields
+		loginInput.value = "";
+		passwordInput.value = "";
+
+		// log for debug (TO DO: remove)
+		console.log(`User tried to login with ${login} and ${password}`);
+
+		// checking the login is not an empty string (a profanity checker would be funny...)
+		if (login && password)
+		{
+			registerUser(login, password);
+			displayGamePage();
+		}
+	})
+}
+
+function displayLoginPage() : void
+{
+		document.body.innerHTML = registerHtml
 
 	const loginInput : HTMLInputElement = document.getElementById('input-login') as HTMLInputElement;
 	const passwordInput : HTMLInputElement = document.getElementById('input-password') as HTMLInputElement;
@@ -83,20 +119,23 @@ function displayRegisterPage() : void
 		// checking the login is not an empty string (a profanity checker would be funny...)
 		if (login && password)
 		{
-			registerUser(login, password);
+			loginUser(login, password);
 			displayGamePage();
 		}
 	})
 }
 
-async function registerUser(loginn: string, passwordd: string) : Promise<void>
+async function registerUser(log: string, pass: string) : Promise<void>
 {
 	try
 	{
 		const response = await fetch('https://localhost:8443/users/signup',
 			{
 				method: 'POST',
-				body: JSON.stringify({ username: loginn, password: passwordd }),
+				headers: {
+					"Content-Type": 'application/json',
+				},
+				body: JSON.stringify({ username: log, password: pass }),
 			});
 
 		if (!response.ok)
@@ -108,9 +147,39 @@ async function registerUser(loginn: string, passwordd: string) : Promise<void>
 	catch (error)
 	{
 		console.error('Failed to fetch users:', error);
+		alert('Failed to create user')
 	}
 	finally
 	{
+		displayAliasQueryPage();
+	}
+}
+
+async function loginUser(log: string, pass: string) : Promise<void>
+{
+	try
+	{
+		const response = await fetch(`https://localhost:8443/users/auth/login`,
+			{
+				method: 'POST',
+				headers: {
+					"Content-Type": 'application/json',
+				},
+				body: JSON.stringify({ username: log, password: pass }),
+			});
+
+		if (!response.ok)
+			throw new Error(`HTTP error! status: ${response.status}`);
+
+		const data = await response.json();
+		console.log(data);
+		// displayGamePage(data.username)
+
+	}
+	catch (error)
+	{
+		console.error('Failed to fetch users:', error);
+		alert('Failed to login user')
 		displayAliasQueryPage();
 	}
 }
