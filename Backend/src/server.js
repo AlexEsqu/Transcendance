@@ -6,6 +6,8 @@ import fastifyMultiPart from "@fastify/multipart";
 import authPlugin from "./plugins/jwt.js";
 import swaggerPlugin from "./plugins/swagger.js";
 import fastifyCookie from "@fastify/cookie";
+import cors from "@fastify/cors";
+
 import clientAuthPluggin from "./plugins/validateApiKey.js";
 import { getUsers, getUser } from "./routes/users/getUsers.js";
 import yaml from "yaml";
@@ -34,6 +36,10 @@ server.register(authPlugin);
 server.register(fastifyCookie);
 server.register(swaggerPlugin);
 server.register(clientAuthPluggin);
+server.register(cors, {
+	origin: "*", // allow all origins;
+	methods: ["GET", "PATCH", "POST", "DELETE"],
+});
 
 //ROUTES
 server.register(getUsers);
