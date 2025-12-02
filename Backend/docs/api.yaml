@@ -1,0 +1,289 @@
+openapi: 3.0.3
+info:
+  title: My API
+  version: 1.0.0
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: refreshToken
+    AppClientAuth:
+      type: apiKey
+      in: header
+      name: X-App-Secret
+  schemas: {}
+paths:
+  /users:
+    get:
+      tags:
+        - user
+      description: Returns a list of all registered users. `This endpoint requires
+        client authentication.`
+      security: &a1
+        - AppClientAuth: []
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    username:
+                      type: string
+                    profile_image_url:
+                      type: string
+  /users/{id}:
+    get:
+      tags:
+        - user
+      description: Returns an object of an user using the id passed in parameters.
+        `This endpoint requires client authentication.`
+      parameters:
+        - schema:
+            type: integer
+            minimum: 1
+          in: path
+          name: id
+          required: true
+      security: *a1
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  username:
+                    type: string
+                  profile_image_url:
+                    type: string
+  /users/signup:
+    post:
+      tags:
+        - auth
+      description: Creates a new user account using a username and password. Does not
+        automatically log in the user.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                  minLength: 3
+                  maxLength: 20
+                password:
+                  type: string
+                  minLength: 8
+        required: true
+      responses:
+        "200":
+          description: Default Response
+  /users/auth/login:
+    post:
+      tags:
+        - auth
+      description: Authenticates the user using their username and password. On
+        success, returns a short-lived access token in the response body and
+        sets a long-lived refresh token in the `HttpOnly refreshToken cookie`,
+        which can later be used to obtain new access tokens.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - username
+                - password
+        required: true
+      responses:
+        "200":
+          description: Default Response
+  /users/auth/refresh:
+    post:
+      tags:
+        - auth
+      description: Uses the refresh token to issue a new access token. The endpoint
+        verifies the refresh token, checks that it is not expired or revoked.
+        This endpoint requires `client authentification` AND `user
+        authentification` AND the refresh cookie stored in the `HttpOnly
+        refreshToken cookie`
+      security: &a2
+        - BearerAuth: []
+        - cookieAuth: []
+        - AppClientAuth: []
+      responses:
+        "200":
+          description: New access token
+          content:
+            application/json:
+              schema:
+                description: New access token
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                required:
+                  - accessToken
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                description: Unauthorized
+  /users/auth/logout:
+    post:
+      tags:
+        - auth
+      description: Logs the user out by invalidating the refresh token stored in the
+        `HttpOnly refreshToken cookie`. After logout, the user must
+        reauthenticate with their username and password to obtain new tokens.
+        This endpoint requires client authentification AND user authentification
+        AND the refresh cookie stored in the HttpOnly refreshToken cookie
+      security: *a2
+      responses:
+        "200":
+          description: Default Response
+  /users/me:
+    delete:
+      tags:
+        - user
+      description: Deletes the user account and all its data. `This endpoint requires
+        client AND user authentication.`
+      security: &a3
+        - BearerAuth: []
+        - AppClientAuth: []
+      responses:
+        "200":
+          description: Default Response
+    patch:
+      tags:
+        - user
+      description: Modifies the data of the user. `This endpoint requires client AND
+        user authentication.`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                profilePictureUrl:
+                  type: string
+              additionalProperties: false
+      security: *a3
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+  /users/me/password:
+    patch:
+      tags:
+        - user
+      description: Modifies the password of the user. `This endpoint requires client
+        AND user authentication.`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - oldPassword
+                - newPassword
+              properties:
+                oldPassword:
+                  type: string
+                newPassword:
+                  type: string
+                  minLength: 8
+              additionalProperties: false
+        required: true
+      security: *a3
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+  /matches:
+    post:
+      tags:
+        - matches
+      description: Records a completed match between two users, including winner,
+        loser, scores, and match date. `This endpoint requires client
+        authentication.`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - winner_id
+                - loser_id
+                - winner_score
+                - loser_score
+                - date
+              properties:
+                winner_id:
+                  type: integer
+                loser_id:
+                  type: integer
+                winner_score:
+                  type: integer
+                loser_score:
+                  type: integer
+                date:
+                  type: string
+                  format: date-time
+        required: true
+      security: *a1
+      responses:
+        "200":
+          description: Default Response
+    get:
+      tags:
+        - matches
+      description: Returns a list of all matches. `This endpoint requires client
+        authentication.`
+      security: *a1
+      responses:
+        "200":
+          description: Default Response
+tags:
+  - name: auth
+    description: Auth endpoints
+  - name: user
+    description: User endpoints
+  - name: matches
+    description: Matches endpoints

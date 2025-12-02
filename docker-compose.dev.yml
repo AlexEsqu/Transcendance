@@ -4,11 +4,14 @@ services:
     container_name: fastify
     ports:
       - "8443:8443"
+      - "3000:3000"
     command: dev
     volumes:
       - ./Backend:/app
       - sqlite:/app/data
-
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - APP_SECRET_KEY=${APP_SECRET_KEY}
   typescript:
     build: ./Frontend
     container_name: typescript

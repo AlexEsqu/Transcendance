@@ -66,7 +66,7 @@ export class Pong {
 
 		// Exclude bloom effect on the map
 		// glowLayer.addExcludedMesh(map);
-		
+
 		//	Create the ball
 		this.ball = new Ball(this.gameScene);
 
@@ -181,9 +181,9 @@ export class Pong {
 	 */
 	handleInput(keys: {}): void {
 		//	Resize the game with the window
-		window.addEventListener('resize', () => {
-			this.engine.resize();
-		});
+		// window.addEventListener('resize', () => {
+		// 	this.engine.resize();
+		// });
 		//	Shift+Ctrl+Alt+I == Hide/show the Inspector
 		window.addEventListener("keydown", (ev) => {
             if (ev.shiftKey && ev.ctrlKey && ev.altKey && (ev.key === "I" || ev.key === "i")) {
