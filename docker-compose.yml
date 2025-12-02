@@ -7,11 +7,13 @@ services:
       - "3000:3000"
     command: start
     volumes:
-      - ./Backend:/app
+      - ./Backend/src:/app/src
+      - ./Backend/scripts:/app/scripts
       - sqlite:/app/data
     environment:
       - JWT_SECRET=${JWT_SECRET}
       - APP_SECRET_KEY=${APP_SECRET_KEY}
+
   typescript:
     build: ./Frontend
     container_name: typescript
@@ -19,8 +21,6 @@ services:
       - "8080:8080"
     volumes:
       - ./Frontend:/app
-      - /app/node_modules
-
 
 volumes:
   sqlite:
