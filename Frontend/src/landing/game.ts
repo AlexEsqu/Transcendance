@@ -1,26 +1,40 @@
 import { Pong } from "../game/Pong"
 
 import gameHtml from '../pages/game.html'
+import menuHtml from '../pages/menu.html'
+import { displayFooter, displayHeader } from "./nav";
 
-export { displayGame }
+export { displayGameWindow }
 
 class App {
 	constructor(canvas : HTMLElement) {
-		// const pong = new Pong("gameCanvas", "Popol", "Gaya");
+		document.body.insertAdjacentHTML("beforeend", gameHtml);
+
+		const pong = new Pong("game-canvas", undefined, undefined, true);
 		requestAnimationFrame(() => {
-			const pong = new Pong("game-canvas", undefined, undefined, true);
 			pong.loadGame();
 			pong.startPlay();
 		});
 	}
 }
 
-function displayGame() : void {
+function displayGameWindow() : void {
+	document.body.insertAdjacentHTML("beforeend", menuHtml);
 
-	document.body.innerHTML += gameHtml;
+	const GuestInButton : HTMLElement = document.getElementById('btn-startplay');
+	if (!GuestInButton) {
+		console.log("ERROR: btn-startplay is null");
+		return ;
+	}
 
-	const gameWindow = document.getElementById("game-canvas");
-	new App(gameWindow);
+	GuestInButton.addEventListener('click', (e) => {
+		const menu = document.getElementById("game-menu");
+		if (!menu) {
+			console.log("ERROR: menu can't be removed");
+			return ;
+		}
+		menu.remove();
+		const gameWindow = document.getElementById("game-canvas");
+		new App(gameWindow);
+	});
 }
-
-

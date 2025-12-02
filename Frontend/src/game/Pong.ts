@@ -93,7 +93,7 @@ export class Pong {
 	 * 	- Manage user input and render the scene
 	 */
 	startPlay(): void {
-		if (!this.gameScene || !this.ball || !this.player1.paddle || !this.player2.paddle) {
+		if (!this.engine || !this.gameScene || !this.ball || !this.player1.paddle || !this.player2.paddle) {
 			console.log("Error: while loading 'Pong' game");
 			return ;
 		}
