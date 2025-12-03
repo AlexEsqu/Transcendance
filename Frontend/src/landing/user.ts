@@ -126,20 +126,21 @@ class GuestUser extends User
 	}
 }
 
-async function getCurrentUser(): Promise<void>
+async function getCurrentUser(): Promise<User | null>
 {
+	let user : User | null = null;
 	const registeredUserJSON = localStorage.getItem(localStorageKeyForRegisteredUser);
 	const guestUserJSON = localStorage.getItem(localStorageKeyForGuestUser);
 
 	if (registeredUserJSON) {
 		const userData = JSON.parse(registeredUserJSON);
-		const user = new RegisteredUser(userData.name, userData.id, userData.token);
-		await user.logoutUser();
+		user = new RegisteredUser(userData.name, userData.id, userData.token);
 	}
 
 	else if (guestUserJSON) {
 		const userData = JSON.parse(guestUserJSON);
-		const user = new GuestUser(userData.name);
-		user.logoutUser();
+		user = new GuestUser(userData.name);
 	}
+
+	return user;
 }
