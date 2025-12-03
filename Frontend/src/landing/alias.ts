@@ -1,4 +1,4 @@
-import { displayGamePage } from "../app";
+import { displayGamePage, alias } from "../app";
 
 import welcomeHtml from "../pages/welcome.html";
 import guestinHtml from "../pages/guestin.html";
@@ -67,27 +67,35 @@ function displayGuestInPage() : void
 
 function displayRegisterPage() : void
 {
-	document.body.innerHTML = loginHtml
+	document.body.innerHTML = registerHtml
 
 	const loginInput : HTMLInputElement = document.getElementById('input-login') as HTMLInputElement;
 	const passwordInput : HTMLInputElement = document.getElementById('input-password') as HTMLInputElement;
-	const registerButton : HTMLElement = document.getElementById('btn-submit-login')
+	const passwordCheckInput : HTMLInputElement = document.getElementById('input-password-check') as HTMLInputElement;
+	const registerButton : HTMLElement = document.getElementById('btn-submit-register')
 
 	registerButton.addEventListener('click', function ()
 	{
 		// store contents of the inputs
 		const login = loginInput.value;
 		const password = passwordInput.value;
+		const passwordCheck = passwordCheckInput.value;
 
 		// reset input fields
 		loginInput.value = "";
 		passwordInput.value = "";
+		passwordCheckInput.value = "";
 
 		// log for debug (TO DO: remove)
 		console.log(`User tried to login with ${login} and ${password}`);
 
-		// checking the login is not an empty string (a profanity checker would be funny...)
-		if (login && password)
+		if (password !== passwordCheck)
+		{
+			alert("The passwords and password check don't match...");
+		}
+
+		// checking the login and passwords are not an empty string (a profanity checker would be funny...)
+		else if (login && password)
 		{
 			registerUser(login, password);
 			displayGamePage();
@@ -97,11 +105,11 @@ function displayRegisterPage() : void
 
 function displayLoginPage() : void
 {
-		document.body.innerHTML = registerHtml
+	document.body.innerHTML = loginHtml
 
 	const loginInput : HTMLInputElement = document.getElementById('input-login') as HTMLInputElement;
 	const passwordInput : HTMLInputElement = document.getElementById('input-password') as HTMLInputElement;
-	const registerButton : HTMLElement = document.getElementById('btn-submit-register')
+	const registerButton : HTMLElement = document.getElementById('btn-submit-login')
 
 	registerButton.addEventListener('click', function ()
 	{
@@ -142,6 +150,7 @@ async function registerUser(log: string, pass: string) : Promise<void>
 			throw new Error(`HTTP error! status: ${response.status}`);
 		const data = await response.json();
 		console.log(data);
+
 
 	}
 	catch (error)

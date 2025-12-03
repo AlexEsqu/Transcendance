@@ -4,7 +4,7 @@ import { displayHeader, displayFooter } from "./landing/nav";
 import { displayGameWindow } from "./landing/game";
 import "./input.css";
 
-export { displayGamePage }
+export { displayGamePage, alias }
 
 // checking if the user has an alias, not diplaying the game until they do
 let alias : string | null = localStorage.getItem("PongAlias");
