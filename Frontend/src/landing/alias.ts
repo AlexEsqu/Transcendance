@@ -1,4 +1,5 @@
 import { displayGamePage, alias } from "../app";
+import { User, GuestUser, RegisteredUser } from "./user"
 
 import welcomeHtml from "../pages/welcome.html";
 import guestinHtml from "../pages/guestin.html";
@@ -128,7 +129,6 @@ function displayLoginPage() : void
 		if (login && password)
 		{
 			loginUser(login, password);
-			displayGamePage();
 		}
 	})
 }
@@ -149,14 +149,16 @@ async function registerUser(log: string, pass: string) : Promise<void>
 		if (!response.ok)
 			throw new Error(`HTTP error! status: ${response.status}`);
 		const data = await response.json();
+
 		console.log(data);
-
-
 	}
 	catch (error)
 	{
 		console.error('Failed to fetch users:', error);
-		alert('Failed to create user')
+		if (error.status == 409)
+			alert('Username is already used')
+		else
+			alert('Failed to create user')
 	}
 	finally
 	{
@@ -164,26 +166,13 @@ async function registerUser(log: string, pass: string) : Promise<void>
 	}
 }
 
-async function loginUser(log: string, pass: string) : Promise<void>
+async function loginUser(login: string, password: string) : Promise<void>
 {
 	try
 	{
-		const response = await fetch(`https://localhost:8443/users/auth/login`,
-			{
-				method: 'POST',
-				headers: {
-					"Content-Type": 'application/json',
-				},
-				body: JSON.stringify({ username: log, password: pass }),
-			});
-
-		if (!response.ok)
-			throw new Error(`HTTP error! status: ${response.status}`);
-
-		const data = await response.json();
-		console.log(data);
-		// displayGamePage(data.username)
-
+		const user = await RegisteredUser.createUserFromLogin(login, password);
+		localStorage.setItem('RegisteredUser', JSON.stringify(user));
+		displayGamePage();
 	}
 	catch (error)
 	{
