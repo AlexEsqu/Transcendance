@@ -22,7 +22,7 @@ function displayAliasQueryPage() : void
 		displayGuestInPage();
 	})
 
-	const loginButton = document.getElementById('btn-guestin')
+	const loginButton = document.getElementById('btn-login')
 	loginButton.addEventListener("click", function ()
 	{
 		console.log("clicking login button");
