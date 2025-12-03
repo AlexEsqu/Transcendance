@@ -1,7 +1,7 @@
 
 import { displayAliasQueryPage } from "./landing/alias"
 import { displayHeader, displayFooter } from "./landing/nav";
-import { displayGame } from "./landing/game";
+import { displayGameWindow } from "./landing/game";
 import "./input.css";
 
 export { displayGamePage }
@@ -14,7 +14,7 @@ function displayGamePage() : void
 	document.body.innerHTML = "";
 	let alias : string | null = localStorage.getItem("PongAlias");
 	displayHeader(alias);
-	displayGame();
+	displayGameWindow();
 	displayFooter();
 }
 

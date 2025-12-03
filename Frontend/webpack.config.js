@@ -15,7 +15,9 @@ module.exports = {
     devServer: {
         host: "0.0.0.0",
         port: 8080, //port that we're using for local host (localhost:8080)
-        static: path.resolve(appDirectory, "public"), //tells webpack to serve from the public folder
+        static: {
+            directory: path.resolve(appDirectory, "public"), //tells webpack to serve from the public folder
+        },
         hot: true,
         devMiddleware: {
             publicPath: "/",
