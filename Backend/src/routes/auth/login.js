@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 
 const opts = {
 	schema: {
-		description: "Authenticates the user using their username and password. On success, returns a short-lived access token in the response body and sets a long-lived refresh token in the `HttpOnly refreshToken cookie`, which can later be used to obtain new access tokens.",
+		description: "Authenticates the user using their username and password. On success, returns a the user's id AND short-lived access token in the response body and sets a long-lived refresh token in the `HttpOnly refreshToken cookie`, which can later be used to obtain new access tokens.",
 		tags: ["auth"],
 		body: {
 			type: "object",
@@ -20,8 +20,9 @@ const opts = {
 			type: "object",
 			properties: {
 				accessToken: { type: "string" },
+				id: { type: "integer" },
 			},
-			required: ["accessToken"],
+			required: ["accessToken", "id"],
 		},
 	},
 };
@@ -56,7 +57,8 @@ function login(server) {
 					path: "/",
 					maxAge: 60 * 60 * 24 * 7, // 7 days
 				});
-				reply.send({ accessToken });
+				const id = user.id
+				reply.send({ accessToken, id });
 			}
 		} catch (err) {
 			console.log(err);
