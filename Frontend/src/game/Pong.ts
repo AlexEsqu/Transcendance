@@ -2,8 +2,9 @@ import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
 import { Engine, Scene, Color4, GlowLayer, Mesh } from '@babylonjs/core';
-import { sendMatchesPostRequest } from "./sendMatches";
 import { createCamera, createVisualScoring, createMap, createLight } from "./graphics"
+import { sendMatchesPostRequest } from "./sendMatches";
+import { IOptions } from "../landing/game";
 import { Ball } from "./Ball";
 import { Paddle } from "./Paddle";
 
@@ -43,7 +44,7 @@ export class Pong {
 	/**
 	 * 	- Create all scenes and game elements
 	 */
-	loadGame(): void {
+	loadGame(options: IOptions): void {
 		if (!this.engine) return ;
 
 		this.gameScene = new Scene(this.engine);

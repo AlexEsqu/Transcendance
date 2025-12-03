@@ -2,8 +2,6 @@ import { IPlayer } from "./Pong";
 
 export { sendMatchesPostRequest };
 
-const matchesURL: string = "https://localhost:8443/matches";
-
 interface IJSON {
 	winner_id: number;
 	loser_id: number;
@@ -32,6 +30,7 @@ function sendMatchesPostRequest(winner: IPlayer | null | undefined,
 		return ;
 	}
 
+	const matchesURL: string = "https://localhost:8443/matches";
 	const matchesJSON: IJSON = fillMatchesJSON(winner, loser, time);
 	const request = new Request(
 		matchesURL, 
