@@ -2,7 +2,7 @@
 import Fastify from "fastify";
 import fs from "fs";
 import fastifyFormBody from "@fastify/formbody";
-import fastifyMultiPart from "@fastify/multipart";
+import fastifyMultiPart, { ajvFilePlugin } from "@fastify/multipart";
 import authPlugin from "./plugins/jwt.js";
 import fastifyCookie from "@fastify/cookie";
 import cors from "@fastify/cors";
@@ -21,13 +21,18 @@ export const server = Fastify({
 		key: fs.readFileSync("/tmp/certs/server.key"),
 		cert: fs.readFileSync("/tmp/certs/server.crt"),
 	},
+	ajv: {
+		plugins: [ajvFilePlugin],
+	},
 });
 
 // MODULES
 server.register(clientAuthPluggin);
 
 server.register(fastifyFormBody);
-server.register(fastifyMultiPart);
+server.register(fastifyMultiPart, {
+	attachFieldsToBody: true,
+});
 server.register(authPlugin);
 server.register(fastifyCookie);
 server.register(swaggerPlugin);
