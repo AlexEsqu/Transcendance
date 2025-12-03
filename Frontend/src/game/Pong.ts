@@ -1,16 +1,16 @@
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
-import { Engine, Scene, Color4, GlowLayer } from '@babylonjs/core';
-import { createCamera, createVisualScoring, createMap, createLight } from "./Graphics"
+import { Engine, Scene, Color4, GlowLayer, Mesh } from '@babylonjs/core';
+import { sendMatchesPostRequest } from "./sendMatches";
+import { createCamera, createVisualScoring, createMap, createLight } from "./graphics"
 import { Ball } from "./Ball";
 import { Paddle } from "./Paddle";
-import { createAttachElement } from "../landing/utils";
 
-export interface Player {
+export interface IPlayer {
     score: number;
     paddle: Paddle | null;
-    name?: string;
+    id: number;
     text?: any;
 }
 
@@ -22,25 +22,21 @@ export class Pong {
 	canvas: HTMLCanvasElement;
 	engine: Engine;
 	gameScene: Scene;
-	menuScene: Scene;
-	endScene: Scene;
 	ball: Ball;
 	robot: boolean;
-	player1: Player;
-	player2: Player;
+	player1: IPlayer;
+	player2: IPlayer;
 	time: number;
 
-	constructor(canvasId: string, user1?: string, user2?: string, robot?: boolean) {
+	constructor(canvasId: string, user1: number, user2: number, robot?: boolean) {
 		this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
 		this.engine = new Engine(this.canvas, true);
 		this.gameScene = null;
-		this.menuScene = null;
-		this.endScene = null;
 		this.ball = null;
 		this.robot = true;
 		if (!robot || robot === undefined) this.robot = false;
-		this.player1 = { score: 0, paddle: null, text: "0", name: user1 ?? "Anonymous1"};
-		this.player2 = { score: 0, paddle: null, text: "0", name: user2 ?? "Anonymous2"};
+		this.player1 = { score: 0, paddle: null, text: "0", id: user1 ?? 0};
+		this.player2 = { score: 0, paddle: null, text: "0", id: user2};
 		this.time = Date.now();
 	}
 
@@ -58,11 +54,11 @@ export class Pong {
 		this.gameScene.clearColor = new Color4(0.004, 0.004, 0.102);
 
 		//	Create a glow layer to add a bloom effect around meshes
-		const glowLayer = new GlowLayer("glow", this.gameScene, { mainTextureRatio: 0.6 });
+		const glowLayer: GlowLayer = new GlowLayer("glow", this.gameScene, { mainTextureRatio: 0.6 });
 		glowLayer.intensity = 0.7;
 		glowLayer.blurKernelSize = 128;
 
-		const map = createMap(this.gameScene);
+		const map: Mesh = createMap(this.gameScene);
 
 		// Exclude bloom effect on the map
 		glowLayer.addExcludedMesh(map);
@@ -78,14 +74,8 @@ export class Pong {
 		this.player2.text = createVisualScoring("0", "white", 32, "-250px", "100px");
 		console.log("Game STATE: loaded");
 		
-		this.displayMenu();
 		// if (!this.menuScene || !this.gameScene || !this.endScene)
 			//	Handle error, message. stop processing ?
-	}
-
-	displayMenu() {
-		const test : HTMLElement = createAttachElement("h1", this.canvas, "test", "test");
-		test.appendChild(document.createTextNode("MENU"));
 	}
 
 	/**
@@ -127,49 +117,30 @@ export class Pong {
 			this.ball.move(this.time);
 			this.ball.update(this.player1, this.player2);
 		}
+		if (keys["ArrowDown"]) this.player2.paddle.move("down", (Pong.MAP_HEIGHT / 2), this.time);
+		if (keys["ArrowUp"]) this.player2.paddle.move("up", (Pong.MAP_HEIGHT / 2), this.time);
 		if (this.robot === false) {
 			if (keys["s"]) this.player1.paddle.move("down", (Pong.MAP_HEIGHT / 2), this.time);
 			if (keys["w"]) this.player1.paddle.move("up", (Pong.MAP_HEIGHT / 2), this.time);
 		}
 		else
 			this.player1.paddle.autoMove(this.ball, (Pong.MAP_HEIGHT / 2), this.time);
-		if (keys["ArrowDown"]) this.player2.paddle.move("down", (Pong.MAP_HEIGHT / 2), this.time);
-		if (keys["ArrowUp"]) this.player2.paddle.move("up", (Pong.MAP_HEIGHT / 2), this.time);
 		//	Update visual-score in the scene
 		this.player1.text.text = this.player1.score.toString();
 		this.player2.text.text = this.player2.score.toString();
 	}
 
 	/**
-	 * 	- Create environment and objects of the game
-	 * 	- Camera, light, map, ball, paddles and visual-scoring
-	 */
-	createGameScene(): void {
-		
-	}
-
-	createMenuScene(): void {
-
-		//	Remove default background color
-		// this.gameScene.clearColor = new Color4(0.004, 0.004, 0.102);
-
-		//	Display player's username
-		console.log("Game STATE: menu");
-
-		//	Display rules
-		//	Button click to start
-	}
-
-	/**
 	 * 	- Check if any of the players have reached the maximum score
 	 */
 	monitoringScore(): boolean {
-		//	Create a scene that displays the winner name -> TO DO
 		if (this.player1.score == Pong.MAX_SCORE) {
-			console.log("Game STATE: the winner is " + this.player1.name);
+			console.log("Game STATE: the winner is " + this.player1.id);
+			sendMatchesPostRequest(this.player1, this.player2, Date.now());
 			return false;
 		} else if (this.player2.score == Pong.MAX_SCORE) {
-			console.log("Game STATE: the winner is " + this.player2.name);
+			console.log("Game STATE: the winner is " + this.player2.id);
+			sendMatchesPostRequest(this.player2, this.player1, Date.now());
 			return false;
 		}
 		return true;

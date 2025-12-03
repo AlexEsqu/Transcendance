@@ -1,4 +1,4 @@
-import { Scene, Mesh, MeshBuilder, Vector3, Color3, StandardMaterial, ArcRotateCamera, DirectionalLight } from '@babylonjs/core';
+import { Scene, Mesh, MeshBuilder, Vector3, Color3, StandardMaterial, ArcRotateCamera, DirectionalLight, GroundMesh } from '@babylonjs/core';
 import { AdvancedDynamicTexture, TextBlock } from "@babylonjs/gui";
 import { Ball } from "./Ball"
 import { Paddle } from './Paddle';
@@ -8,7 +8,7 @@ function createMaterial(scene: Scene, color: Color3): StandardMaterial {
 	if (!scene || scene === undefined) return null;
 	if (color === undefined) color = new Color3(0.031, 0.031, 0.141);
 
-	const meshMaterial = new StandardMaterial("ballMaterial", scene);
+	const meshMaterial: StandardMaterial = new StandardMaterial("ballMaterial", scene);
 	//	Color/texture of the material as if it were illuminated from within
 	meshMaterial.emissiveColor = color;
 	meshMaterial.disableLighting = true;
@@ -22,7 +22,7 @@ function createMaterial(scene: Scene, color: Color3): StandardMaterial {
 function createBall(scene: Scene): Mesh {
 	if (!scene || scene === undefined) return null;
 
-	const mesh = MeshBuilder.CreateSphere(
+	const mesh: Mesh = MeshBuilder.CreateSphere(
 		'ball',
 		{ diameter: Ball.RADIUS * 2 },
 		scene
@@ -47,7 +47,7 @@ function createLight(scene: Scene): void {
 function createPaddle(scene: Scene): Mesh {
 	if (!scene || scene === undefined) return null;
 
-	const mesh = MeshBuilder.CreateBox(
+	const mesh: Mesh = MeshBuilder.CreateBox(
 		'paddle',
 		{
 			width: Paddle.WIDTH,
@@ -63,7 +63,7 @@ function createPaddle(scene: Scene): Mesh {
 function createCamera(scene: Scene, canvas) {
 	if (!scene || scene === undefined) return null;
 	
-	const camera = new ArcRotateCamera(
+	const camera: ArcRotateCamera = new ArcRotateCamera(
 		'arCamera',
 		-(Math.PI / 2), // alpha
 		-(Math.PI / 2), // beta
@@ -77,8 +77,8 @@ function createCamera(scene: Scene, canvas) {
 
 function createVisualScoring(text: string, color: string, fontSize: number, topPx: string, leftPx: string): TextBlock {
 	//	Create a fullscreen UI
-	const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("UI");
-	const block = new TextBlock();
+	const advancedTexture: AdvancedDynamicTexture = AdvancedDynamicTexture.CreateFullscreenUI("UI");
+	const block: TextBlock = new TextBlock();
 
 	block.text = text;
 	block.color = color;
@@ -92,7 +92,7 @@ function createVisualScoring(text: string, color: string, fontSize: number, topP
 function createMap(scene: Scene): Mesh {
 	if (!scene || scene === undefined) return null;
 
-	const map = MeshBuilder.CreateGround(
+	const map: GroundMesh = MeshBuilder.CreateGround(
 		'ground',
 		{ width: Pong.MAP_WIDTH, height: Pong.MAP_HEIGHT},
 		scene

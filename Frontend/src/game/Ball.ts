@@ -1,7 +1,7 @@
 import { Scene, Vector3, Mesh } from '@babylonjs/core';
+import { createBall } from "./graphics"
 import { Paddle } from "./Paddle";
-import { Pong, Player } from "./Pong";
-import { createBall } from "./Graphics"
+import { Pong, IPlayer } from "./Pong";
 
 export class Ball {
 	static START_SPEED = 7;
@@ -25,8 +25,8 @@ export class Ball {
 	 * 	- Move the ball according to its velocity 
 	 */
 	move(lastFrameTime: number): void {
-		const deltaTime = (Date.now() - lastFrameTime) / 1000;
-		const velocity = this.direction.scale(this.speed * deltaTime);
+		const deltaTime: number = (Date.now() - lastFrameTime) / 1000;
+		const velocity: Vector3 = this.direction.scale(this.speed * deltaTime);
 		this.mesh.position.addInPlace(velocity);
 	}
 
@@ -34,7 +34,7 @@ export class Ball {
 	 * 	- Update coordinates of the ball and check for collision.
 	 * 	- Depending on what/where the ball hits an object or a limit, its direction is reversed and gain speed
 	 */
-	update(player1: Player | undefined, player2: Player | undefined): void {
+	update(player1: IPlayer | undefined, player2: IPlayer | undefined): void {
 		if (!player1 || !player2) return ;
 
 		this.ball.minX = this.mesh.position.x - Ball.RADIUS;
@@ -47,8 +47,8 @@ export class Ball {
 		else if (this.isBallHittingPadd(player2, "right") == true)
 			return ;
 
-		const heightLimit = Pong.MAP_HEIGHT / 2;
-		const widthLimit = Pong.MAP_WIDTH / 2;
+		const heightLimit: number = Pong.MAP_HEIGHT / 2;
+		const widthLimit: number = Pong.MAP_WIDTH / 2;
 
 		if (this.isBallHittingWall(this.ball.minZ, this.ball.maxZ, heightLimit) === true) {
 			this.direction.z = -(this.direction.z);
@@ -88,12 +88,12 @@ export class Ball {
 	 * 	- If the ball is hitting the paddle, invert its direction and return true,
 	 * 		otherwise do nothing and return false.
 	 */
-	isBallHittingPadd(player: Player, side: string): boolean {
+	isBallHittingPadd(player: IPlayer, side: string): boolean {
 		const paddle = player.paddle;
-		if (!paddle || !paddle.mesh || side == undefined) return false;
+		if (!paddle || !paddle.mesh || side === undefined) return false;
 
-		const paddMaxZ = paddle.mesh.position.z + (Paddle.WIDTH / 2);
-		const paddMinZ = paddle.mesh.position.z - (Paddle.WIDTH / 2);
+		const paddMaxZ: number = paddle.mesh.position.z + (Paddle.WIDTH / 2);
+		const paddMinZ: number = paddle.mesh.position.z - (Paddle.WIDTH / 2);
 		
 		//	Check if the ball touches the paddle front (X-axis)
 		if (side === "right" && this.ball.maxX <= paddle.mesh.position.x - (Paddle.DEPTH / 2))

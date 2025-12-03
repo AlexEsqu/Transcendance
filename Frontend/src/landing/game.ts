@@ -10,7 +10,10 @@ class App {
 	constructor(canvas : HTMLElement) {
 		document.body.insertAdjacentHTML("beforeend", gameHtml);
 
-		const pong = new Pong("game-canvas", undefined, undefined, true);
+		const date = new Date(Date.now());
+		console.log(date.toISOString());
+		//	Hard coded users id -> must change later after auth
+		const pong = new Pong("game-canvas", 1, 2, true);
 		requestAnimationFrame(() => {
 			pong.loadGame();
 			pong.startPlay();
