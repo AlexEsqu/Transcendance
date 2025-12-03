@@ -1,6 +1,7 @@
-export {User, RegisteredUser, GuestUser}
+export {User, RegisteredUser, GuestUser, getCurrentUser, localStorageKeyForGuestUser, localStorageKeyForRegisteredUser}
 
-const localStorageKeyForAlias : string = "PongAlias"
+const localStorageKeyForGuestUser : string = "PongGuestUser"
+const localStorageKeyForRegisteredUser : string = "PongRegisteredUser"
 
 class User {
 	name: string;
@@ -15,6 +16,9 @@ class User {
 		return this.name;
 	}
 
+	logoutUser(): void
+	{
+	}
 
 }
 
@@ -28,6 +32,7 @@ class RegisteredUser extends User
 		super(name);
 		this.id = id;
 		this.token = token;
+		localStorage.setItem(localStorageKeyForRegisteredUser, JSON.stringify(this));
 	}
 
 	static async createUserFromLogin(username: string, password: string): Promise<RegisteredUser>
@@ -67,6 +72,8 @@ class RegisteredUser extends User
 
 			if (!response.ok)
 				throw new Error(`User removal failed: ${response.status}`);
+
+			localStorage.removeItem(localStorageKeyForRegisteredUser);
 		}
 
 		catch (error)
@@ -92,6 +99,8 @@ class RegisteredUser extends User
 
 			if (!response.ok)
 				throw new Error(`Logout failed: ${response.status}`);
+
+			localStorage.removeItem(localStorageKeyForRegisteredUser);
 		}
 
 		catch (error)
@@ -105,14 +114,32 @@ class RegisteredUser extends User
 
 class GuestUser extends User
 {
-	constructor(name: string)
+	constructor(username: string)
 	{
-		super(name);
-		localStorage.setItem(localStorageKeyForAlias, name);
+		super(username);
+		localStorage.setItem(localStorageKeyForGuestUser, JSON.stringify({ name: username }));
 	}
 
 	logoutUser(): void
 	{
-		localStorage.removeItem(localStorageKeyForAlias);
+		localStorage.removeItem(localStorageKeyForGuestUser);
+	}
+}
+
+async function getCurrentUser(): Promise<void>
+{
+	const registeredUserJSON = localStorage.getItem(localStorageKeyForRegisteredUser);
+	const guestUserJSON = localStorage.getItem(localStorageKeyForGuestUser);
+
+	if (registeredUserJSON) {
+		const userData = JSON.parse(registeredUserJSON);
+		const user = new RegisteredUser(userData.name, userData.id, userData.token);
+		await user.logoutUser();
+	}
+
+	else if (guestUserJSON) {
+		const userData = JSON.parse(guestUserJSON);
+		const user = new GuestUser(userData.name);
+		user.logoutUser();
 	}
 }

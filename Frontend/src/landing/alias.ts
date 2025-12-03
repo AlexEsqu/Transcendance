@@ -1,15 +1,12 @@
-import { displayGamePage, alias } from "../app";
-import { User, GuestUser, RegisteredUser } from "./user"
+import { displayGamePage } from "../app";
+import { User, GuestUser, RegisteredUser, localStorageKeyForGuestUser, localStorageKeyForRegisteredUser } from "./user"
 
 import welcomeHtml from "../pages/welcome.html";
 import guestinHtml from "../pages/guestin.html";
 import registerHtml from "../pages/register.html";
 import loginHtml from "../pages/login.html";
 
-
-export { displayAliasQueryPage, removeGuestName }
-
-const localStorageKeyForAlias : string = "PongAlias"
+export { displayAliasQueryPage }
 
 // replaces the document body with a menu page to choose to login, register or play as guest
 function displayAliasQueryPage() : void
@@ -38,12 +35,6 @@ function displayAliasQueryPage() : void
 	})
 }
 
-// removes guest name from localstorage, displays a query page
-function removeGuestName() : void
-{
-	localStorage.removeItem(localStorageKeyForAlias);
-}
-
 function displayGuestInPage() : void
 {
 	document.body.innerHTML = guestinHtml
@@ -60,7 +51,7 @@ function displayGuestInPage() : void
 		// checking the alias is not an empty string (a profanity checker would be funny...)
 		if (alias)
 		{
-			localStorage.setItem(localStorageKeyForAlias, alias);
+			new GuestUser(alias);
 			displayGamePage();
 		}
 	})
@@ -99,7 +90,6 @@ function displayRegisterPage() : void
 		else if (login && password)
 		{
 			registerUser(login, password);
-			displayGamePage();
 		}
 	})
 }

@@ -1,6 +1,7 @@
 import footerHTML from "../pages/footer.html"
 import headerHTML from "../pages/header.html"
-import { displayAliasQueryPage, removeGuestName } from "./alias"
+import { displayAliasQueryPage } from "./alias"
+import { User, GuestUser, RegisteredUser, getCurrentUser, localStorageKeyForGuestUser, localStorageKeyForRegisteredUser } from "./user"
 
 export {displayFooter, displayHeader}
 
@@ -28,6 +29,8 @@ function displayHeader(name : string) : void
 
 function deleteUserData() : void
 {
-	removeGuestName();
+	const userJSON : string | null = localStorage.getItem(localStorageKeyForRegisteredUser) ?? localStorage.getItem(localStorageKeyForGuestUser);
+	const user : User = JSON.parse(userJSON);
+	user.logoutUser();
 	displayAliasQueryPage();
 }
