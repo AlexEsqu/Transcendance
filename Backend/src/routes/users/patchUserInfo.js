@@ -1,6 +1,7 @@
 import db from "/app/src/database.js";
 import { pipeline } from "node:stream/promises";
-import fs from "fs"
+import { Readable } from "stream";
+import fs from "fs";
 
 export default function patchUserInfo(server) {
 	const opts = {
@@ -29,13 +30,24 @@ export default function patchUserInfo(server) {
 	};
 	server.patch("/me", opts, async (req, reply) => {
 		try {
-			const data = req.body.avatar
-
-			const uploadPath = `uploads/avatar/${data.filename}`;
-			await pipeline(data.file, fs.createWriteStream(uploadPath));
 			const id = req.user.id;
 
-			db.prepare(`UPDATE users SET profile_image_url = ? WHERE id = ?`).run(uploadPath, id);
+			const { avatar_url } = db.prepare(`SELECT avatar_url FROM users WHERE id = ?`).get(id);
+			const old_avatar_url = avatar_url;
+			const data = req.body.avatar;
+
+			const uploadPath = `${process.env.AVATARS_UPLOAD_PATH}${data.filename}`;
+			const buffer = await data.toBuffer();
+			fs.writeFileSync(uploadPath, buffer);
+
+			db.prepare(`UPDATE users SET avatar_url = ? WHERE id = ?`).run(uploadPath, id);
+
+			if (old_avatar_url) {
+				fs.unlink(old_avatar_url, (err) => {
+					if (err) throw err;
+					console.log(old_avatar_url + " was deleted");
+				});
+			}
 			reply.status(200).send({ success: true });
 		} catch (err) {
 			console.log(err);
