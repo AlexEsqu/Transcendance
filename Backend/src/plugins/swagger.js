@@ -52,5 +52,6 @@ export default fp(async (server, opts) => {
 			deepLinking: false,
 		},
 		staticCSP: true,
+		persistAuthorization: true,
 	});
 });
