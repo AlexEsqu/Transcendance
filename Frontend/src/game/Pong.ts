@@ -4,7 +4,7 @@ import "@babylonjs/loaders/glTF";
 import { Engine, Scene, Color4, GlowLayer, Mesh } from '@babylonjs/core';
 import { createCamera, createVisualScoring, createMap, createLight } from "./graphics"
 import { sendMatchesPostRequest } from "./sendMatches";
-import { IOptions } from "../landing/game";
+import { IOptions, Level } from "../landing/game";
 import { Ball } from "./Ball";
 import { Paddle } from "./Paddle";
 
@@ -24,18 +24,19 @@ export class Pong {
 	engine: Engine;
 	gameScene: Scene;
 	ball: Ball;
+	level: Level;
 	robot: boolean;
 	player1: IPlayer;
 	player2: IPlayer;
 	time: number;
 
-	constructor(canvasId: string, user1: number, user2: number, robot?: boolean) {
+	constructor(canvasId: string, user1: number, user2: number, options: IOptions) {
 		this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
 		this.engine = new Engine(this.canvas, true);
 		this.gameScene = null;
 		this.ball = null;
-		this.robot = true;
-		if (!robot || robot === undefined) this.robot = false;
+		this.level = options.level;
+		this.robot = options.nbOfPlayer == 1 ? true: false;
 		this.player1 = { score: 0, paddle: null, text: "0", id: user1 ?? 0};
 		this.player2 = { score: 0, paddle: null, text: "0", id: user2};
 		this.time = Date.now();
@@ -44,7 +45,7 @@ export class Pong {
 	/**
 	 * 	- Create all scenes and game elements
 	 */
-	loadGame(options: IOptions): void {
+	loadGame(): void {
 		if (!this.engine) return ;
 
 		this.gameScene = new Scene(this.engine);
@@ -65,18 +66,18 @@ export class Pong {
 		glowLayer.addExcludedMesh(map);
 
 		//	Create the ball
-		this.ball = new Ball(this.gameScene);
+		this.ball = new Ball(this.gameScene, this.level);
 
 		//	Creates 2 paddles, one for each players and 2DText for visual scoring
-		this.player1.paddle = new Paddle(this.gameScene, "left", Pong.MAP_WIDTH);
-		this.player2.paddle = new Paddle(this.gameScene, "right", Pong.MAP_WIDTH);
+		this.player1.paddle = new Paddle(this.gameScene, "left", Pong.MAP_WIDTH, this.level);
+		this.player2.paddle = new Paddle(this.gameScene, "right", Pong.MAP_WIDTH, this.level);
 		const line = createVisualScoring("|", "white", 32, "-250px", "0px");
 		this.player1.text = createVisualScoring("0", "white", 32, "-250px", "-100px");
 		this.player2.text = createVisualScoring("0", "white", 32, "-250px", "100px");
 		console.log("Game STATE: loaded");
-		
-		// if (!this.menuScene || !this.gameScene || !this.endScene)
-			//	Handle error, message. stop processing ?
+		// this.engine.runRenderLoop(() => {
+		// 	this.gameScene.render();
+		// })
 	}
 
 	/**
@@ -85,7 +86,7 @@ export class Pong {
 	 */
 	startPlay(): void {
 		if (!this.engine || !this.gameScene || !this.ball || !this.player1.paddle || !this.player2.paddle) {
-			console.log("Error: while loading 'Pong' game");
+			console.error("while loading 'Pong' game");
 			return ;
 		}
 		//	Should add a start start button --> TO DO ?
@@ -152,10 +153,6 @@ export class Pong {
 	 * 	- Saves keys status (on/off) to update scene objects accordingly.
 	 */
 	handleInput(keys: {}): void {
-		//	Resize the game with the window
-		// window.addEventListener('resize', () => {
-		// 	this.engine.resize();
-		// });
 		//	Shift+Ctrl+Alt+I == Hide/show the Inspector
 		window.addEventListener("keydown", (ev) => {
             if (ev.shiftKey && ev.ctrlKey && ev.altKey && (ev.key === "I" || ev.key === "i")) {

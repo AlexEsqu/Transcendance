@@ -1,6 +1,7 @@
 import { Vector3, Mesh } from '@babylonjs/core';
 import { createPaddle } from "./graphics"
 import { Ball } from "./Ball"
+import { Level } from '../landing/game';
 
 export class Paddle {
 	static WIDTH = 1.25;
@@ -11,7 +12,8 @@ export class Paddle {
 
 	mesh: Mesh;
 
-	constructor(scene, side, mapWidth) {
+	constructor(scene, side, mapWidth, level: Level) {
+		if (side === "left") Paddle.SPEED += level;
 		this.mesh = createPaddle(scene);
 		this.mesh.rotation.y = Math.PI / 2;
 		this.mesh.position = new Vector3((mapWidth / 2), 0.2, 0.0);

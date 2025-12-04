@@ -1,13 +1,11 @@
-import { IO } from "inspector/promises";
 import { Pong } from "../game/Pong"
 import gameHtml from '../pages/game.html'
 import optionsHtml from '../pages/options.html'
-import menuHtml from '../pages/menu.html'
 
 export enum Level {
 	easy,
 	medium,
-	hard
+	hard,
 };
 
 export interface IOptions {
@@ -16,56 +14,75 @@ export interface IOptions {
 };
 
 class App {
+	pong: Pong;
 	constructor(canvas : HTMLElement, options: IOptions) {
-		document.body.insertAdjacentHTML("beforeend", gameHtml);
-
 		//	Hard coded users id -> must change later after user auth !!!!!!!
-		const pong = new Pong("game-canvas", 1, 2, true);
+		this.pong = new Pong("game-canvas", 1, 2, options);
+		this.pong.loadGame();
+	}
+
+	play() {
 		requestAnimationFrame(() => {
-			pong.loadGame(options);
-			pong.startPlay();
+			this.pong.startPlay();
 		});
 	}
 }
 
 function launchPongGame(options: IOptions): void {
-	//	Display game menu with start button
-	document.body.insertAdjacentHTML("beforeend", menuHtml);
-	const GuestInButton : HTMLElement = document.getElementById('btn-startplay');
-	if (!GuestInButton) {
-		console.error("'btn-startplay' is null");
+	//	Display start button and game window
+	document.body.insertAdjacentHTML("beforeend", gameHtml);
+
+	const startDisplay: HTMLElement = document.getElementById("game-start");
+	const btnStart: HTMLElement = document.getElementById('btn-startplay');
+	
+	if (!btnStart || !startDisplay) {
+		console.error("'start' UI not found, can't load game");
 		return ;
 	}
+
 	//	Launch Pong game when user click on start button
-	GuestInButton.addEventListener('click', (e) => {
-		const menu = document.getElementById("game-menu");
-		if (!menu) {
-			console.error("Element game-menu is null, can't load game");
-			return ;
-		}
-		menu.remove();
-		const gameWindow = document.getElementById("game-canvas");
-		new App(gameWindow, options);
+	const gameWindow = document.getElementById("game-canvas");
+	const app = new App(gameWindow, options);
+	btnStart.addEventListener('click', (e) => {
+		startDisplay.remove();
+		app.play();
 	});
 }
 
-function selectGameOptions(): IOptions {
+function selectGameOptions(): Promise<IOptions> {
 	document.body.insertAdjacentHTML("beforeend", optionsHtml);
-	const GuestInButton: HTMLElement = document.getElementById('btn')
-	let level: Level;
-	let soloPlayer: boolean;
 
-	return null;
+	const optionsDisplay: HTMLElement = document.getElementById("game-options");
+	const btnSubmit: HTMLButtonElement = document.getElementById('btn-submit') as HTMLButtonElement;
+	const slctMode: HTMLSelectElement = document.getElementById('mode') as HTMLSelectElement;
+	const slctLevel: HTMLSelectElement = document.getElementById('level') as HTMLSelectElement;
+
+	if (!btnSubmit || !slctMode || !slctLevel || !optionsDisplay) {
+		console.error("'options' UI not found, can't load game");
+		return null;
+	}
+
+	//	Store selected options when user click on submit button
+	return new Promise((resolve) => {
+		btnSubmit.addEventListener('click', (e) => {
+			e.preventDefault();
+			let nbPlayer: number = parseInt(slctMode.value);
+			let level: Level = parseInt(slctLevel.value) as Level;
+			const options: IOptions = { 
+				level: level, 
+				nbOfPlayer: nbPlayer
+			};
+			optionsDisplay.remove();
+			resolve(options);
+		});
+	});
 }
 
 export function displayGameWindow() : void {
 	//	Select between 2 games --> TO DO
-	//	Select Pong game options
-	const options: IOptions = selectGameOptions();
-	if (options == null) {
-		console.error("No game options selected, can't load game");
-		return ;
-	}
 	//	Launch selected game with custom options
-	launchPongGame(options);
+	selectGameOptions().then(options => {
+		launchPongGame(options);
+	});
 }
+

@@ -2,6 +2,7 @@ import { Scene, Vector3, Mesh } from '@babylonjs/core';
 import { createBall } from "./graphics"
 import { Paddle } from "./Paddle";
 import { Pong, IPlayer } from "./Pong";
+import { Level } from '../landing/game';
 
 export class Ball {
 	static START_SPEED = 7;
@@ -13,7 +14,9 @@ export class Ball {
     ball: { minX: number; maxX: number; minZ: number; maxZ: number };
     speed: number;
 
-	constructor(scene: Scene) {
+	constructor(scene: Scene, level: Level) {
+		Ball.START_SPEED += level;
+		Ball.MAX_SPEED += level;
 		this.mesh = createBall(scene);
 		this.mesh.position = new Vector3(0.0, 0.2, 0.0);
 		this.direction = new Vector3(0.5, 0.0, 0.0).normalize();
