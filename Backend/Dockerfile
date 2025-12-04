@@ -27,6 +27,6 @@ RUN sleep 2
 ENV ADDRESS=0.0.0.0
 ENV PORT=8443
 ENV SQLITE_PATH=/app/data/database.db
-ENV AVATARS_UPLOAD_PATH=/app/uploads/avatars
+ENV AVATARS_UPLOAD_PATH=/app/uploads/avatars/
 ENV DOMAIN_NAME=https://localhost:8443/
 ENTRYPOINT ["npm", "run"]

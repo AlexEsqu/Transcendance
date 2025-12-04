@@ -1,13 +1,11 @@
 import db from "/app/src/database.js";
-import { pipeline } from "node:stream/promises";
-import { Readable } from "stream";
 import fs from "fs";
 
-export default function patchUserInfo(server) {
+export default function patchUserAvatar(server) {
 	const opts = {
 		schema: {
 			tags: ["user"],
-			description: "Modifies the data of the user. `This endpoint requires client AND user authentication.`",
+			description: "Modifies the avatar of the user. `This endpoint requires client AND user authentication.`",
 			security: server.security.UserAuth,
 			consumes: ["multipart/form-data"],
 			body: {
@@ -28,24 +26,28 @@ export default function patchUserInfo(server) {
 		},
 		onRequest: [server.authenticateUser],
 	};
-	server.patch("/me", opts, async (req, reply) => {
+	server.patch("/me/avatar", opts, async (req, reply) => {
 		try {
 			const id = req.user.id;
 
-			const { avatar_url } = db.prepare(`SELECT avatar_url FROM users WHERE id = ?`).get(id);
-			const old_avatar_url = avatar_url;
+			//retrive old avatar path
+			const { avatar_path } = db.prepare(`SELECT avatar_path FROM users WHERE id = ?`).get(id);
+			const old_avatar_path = avatar_path;
+
 			const data = req.body.avatar;
 
+			//get the full upload path
 			const uploadPath = `${process.env.AVATARS_UPLOAD_PATH}${data.filename}`;
+
 			const buffer = await data.toBuffer();
 			fs.writeFileSync(uploadPath, buffer);
 
-			db.prepare(`UPDATE users SET avatar_url = ? WHERE id = ?`).run(uploadPath, id);
+			db.prepare(`UPDATE users SET avatar_path = ? WHERE id = ?`).run(uploadPath, id);
 
-			if (old_avatar_url) {
-				fs.unlink(old_avatar_url, (err) => {
-					if (err) throw err;
-					console.log(old_avatar_url + " was deleted");
+			if (old_avatar_path) {
+				fs.unlink(old_avatar_path, (err) => {
+					// if (err) throw err;
+					console.log(old_avatar_path + " was deleted");
 				});
 			}
 			reply.status(200).send({ success: true });
