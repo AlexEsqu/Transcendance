@@ -1,13 +1,14 @@
 import { displayGamePage } from "../app";
-import { User, GuestUser, RegisteredUser, localStorageKeyForGuestUser, localStorageKeyForRegisteredUser } from "./user"
+import { User, GuestUser, RegisteredUser, getUserFromLocalStorage } from "./user"
 import { renderPageState } from "./history";
 
 import welcomeHtml from "../pages/welcome.html";
 import guestinHtml from "../pages/guestin.html";
 import registerHtml from "../pages/register.html";
 import loginHtml from "../pages/login.html";
+import settingHtml from "../pages/setting.html"
 
-export { displayAliasQueryPage, displayGamePage, displayLoginPage, displayRegisterPage, displayGuestInPage}
+export { displayAliasQueryPage, displayGamePage, displayLoginPage, displayRegisterPage, displayGuestInPage, displayUserSettingPage}
 
 // replaces the document body with a menu page to choose to login, register or play as guest
 function displayAliasQueryPage() : void
@@ -20,7 +21,6 @@ function displayAliasQueryPage() : void
 		console.log("clicking alias button");
 		let pageState = { page: 'loginAsGuest'};
 		window.history.pushState(pageState, '', '#' + pageState.page)
-		// displayGuestInPage();
 		renderPageState(pageState);
 	})
 
@@ -30,7 +30,6 @@ function displayAliasQueryPage() : void
 		console.log("clicking login button");
 		let pageState = { page: 'login'};
 		window.history.pushState(pageState, '', '#' + pageState.page);
-		// displayLoginPage();
 		renderPageState(pageState);
 	})
 
@@ -40,7 +39,6 @@ function displayAliasQueryPage() : void
 		console.log("clicking register button");
 		let pageState = { page: 'register'};
 		window.history.pushState(pageState, '', '#' + pageState.page);
-		// displayRegisterPage();
 		renderPageState(pageState);
 	})
 }
@@ -185,4 +183,24 @@ async function loginUser(login: string, password: string) : Promise<void>
 		alert('Failed to login user')
 		displayAliasQueryPage();
 	}
+}
+
+async function displayUserSettingPage()
+{
+	const user : User = await getUserFromLocalStorage();
+	document.body.innerHTML = settingHtml;
+
+	const submitAvatar = document.getElementById('btn-submit-avatar');
+	const inputAvatar = document.getElementById('input-avatar') as HTMLInputElement;
+	submitAvatar.addEventListener('click', () => {
+		inputAvatar.value = '';
+		user.addAvatar(inputAvatar.value);
+	})
+
+	const submitNewName = document.getElementById('btn-submit-rename-user');
+	const inputNewName = document.getElementById('input-rename-user') as HTMLInputElement;
+	submitNewName.addEventListener('click', () => {
+		inputNewName.value = '';
+		user.rename(inputNewName.value);
+	})
 }

@@ -1,4 +1,5 @@
-import { displayAliasQueryPage, displayGuestInPage, displayRegisterPage, displayLoginPage, displayGamePage } from "./alias";
+import { RemapBlock } from "@babylonjs/core";
+import { displayUserSettingPage, displayAliasQueryPage, displayGuestInPage, displayRegisterPage, displayLoginPage, displayGamePage } from "./alias";
 
 export { renderPageState, pageState}
 
@@ -28,6 +29,9 @@ function renderPageState(state: { page: string }) {
 			break;
 		case 'game':
 			displayGamePage();
+			break;
+		case 'setting':
+			displayUserSettingPage();
 			break;
 		default:
 			displayAliasQueryPage();

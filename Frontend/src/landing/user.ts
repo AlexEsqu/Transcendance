@@ -2,26 +2,32 @@ export {User, RegisteredUser, GuestUser, getUserFromLocalStorage, localStorageKe
 
 const localStorageKeyForGuestUser : string = "PongGuestUser"
 const localStorageKeyForRegisteredUser : string = "PongRegisteredUser"
+const placeholderAvatar : string = "./placeholder/avatarPlaceholder.png"
 
 class User {
 	name: string;
+	avatarPath: string;
 
 	constructor(name: string)
 	{
 		this.name = name;
+		this.avatarPath = placeholderAvatar;
 	}
 
-	getName(): string
+	getName(): string {	return this.name; }
+
+	logoutUser(): void {}
+
+	deleteUser(): void {}
+
+	addAvatar(imageUrl : string): void
 	{
-		return this.name;
+		this.avatarPath = imageUrl;
 	}
 
-	logoutUser(): void
+	rename(newName : string): void
 	{
-	}
-
-	deleteUser(): void
-	{
+		this.name = newName;
 	}
 
 }
@@ -114,6 +120,46 @@ class RegisteredUser extends User
 		}
 	}
 
+	async addAvatar(imageUrl : string): Promise<void>
+	{
+		try
+		{
+			const response = await fetch('https://localhost:8443/users/me',
+				{
+					method: 'PATCH',
+					headers:
+					{
+						'accept': 'application/json',
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${this.token}`,
+					},
+					body:
+					{
+						'profilePictureUrl': `${imageUrl}`
+					}
+				});
+
+			if (!response.ok)
+				throw new Error(`Logout failed: ${response.status}`);
+
+			localStorage.removeItem(localStorageKeyForRegisteredUser);
+			this.avatarPath = imageUrl;
+		}
+
+		catch (error)
+		{
+			console.error('Error during logout:', error);
+			throw error;
+		}
+	}
+
+	async rename(newName : string): Promise<void>
+	{
+		this.name = newName;
+		// TO DO when db has a route
+
+	}
+
 }
 
 class GuestUser extends User
@@ -131,6 +177,16 @@ class GuestUser extends User
 
 	deleteUser(): void {
 		this.logoutUser();
+	}
+
+	addAvatar(imageUrl : string): void
+	{
+		alert("You need to be a registered user to change your avatar")
+	}
+
+	rename(newName : string): void
+	{
+		this.name = newName;
 	}
 }
 
@@ -155,3 +211,5 @@ async function getUserFromLocalStorage(): Promise<User | null>
 	console.log('user obtained');
 	return user;
 }
+
+

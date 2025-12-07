@@ -2,7 +2,6 @@ import { Pong } from "../game/Pong"
 
 import gameHtml from '../pages/game.html'
 import menuHtml from '../pages/menu.html'
-import { displayFooter, displayHeader } from "./nav";
 
 export { displayGameWindow }
 
@@ -21,13 +20,13 @@ class App {
 function displayGameWindow() : void {
 	document.body.insertAdjacentHTML("beforeend", menuHtml);
 
-	const GuestInButton : HTMLElement = document.getElementById('btn-startplay');
-	if (!GuestInButton) {
+	const startButton : HTMLElement = document.getElementById('btn-startplay');
+	if (!startButton) {
 		console.log("ERROR: btn-startplay is null");
 		return ;
 	}
 
-	GuestInButton.addEventListener('click', (e) => {
+	startButton.addEventListener('click', (e) => {
 		const menu = document.getElementById("game-menu");
 		if (!menu) {
 			console.log("ERROR: menu can't be removed");

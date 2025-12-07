@@ -1,6 +1,6 @@
 
 import { displayAliasQueryPage } from "./landing/alias"
-import { displayHeader, displayFooter } from "./landing/nav";
+import { displayNavBar } from "./landing/nav";
 import { displayGameWindow } from "./landing/game";
 import { User, localStorageKeyForGuestUser, localStorageKeyForRegisteredUser } from "./landing/user"
 import "./input.css";
@@ -18,7 +18,7 @@ function displayGamePage() : void
 	document.body.innerHTML = "";
 	const userJSON : string | null = localStorage.getItem(localStorageKeyForRegisteredUser) ?? localStorage.getItem(localStorageKeyForGuestUser);
 	const user: User = JSON.parse(userJSON);
-	displayHeader(user.name);
+	displayNavBar();
 	displayGameWindow();
 }
 
