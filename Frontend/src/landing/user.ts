@@ -1,4 +1,4 @@
-export {User, RegisteredUser, GuestUser, getCurrentUser, localStorageKeyForGuestUser, localStorageKeyForRegisteredUser}
+export {User, RegisteredUser, GuestUser, getUserFromLocalStorage, localStorageKeyForGuestUser, localStorageKeyForRegisteredUser}
 
 const localStorageKeyForGuestUser : string = "PongGuestUser"
 const localStorageKeyForRegisteredUser : string = "PongRegisteredUser"
@@ -17,6 +17,10 @@ class User {
 	}
 
 	logoutUser(): void
+	{
+	}
+
+	deleteUser(): void
 	{
 	}
 
@@ -65,7 +69,7 @@ class RegisteredUser extends User
 					method: 'DELETE',
 					headers:
 					{
-						'Content-Type': 'application/json',
+						'accept': '*/*',
 						'Authorization': `Bearer ${this.token}`,
 					},
 				});
@@ -92,7 +96,7 @@ class RegisteredUser extends User
 					method: 'POST',
 					headers:
 					{
-						'Content-Type': 'application/json',
+						'accept': '*/*',
 						'Authorization': `Bearer ${this.token}`,
 					},
 				});
@@ -124,11 +128,17 @@ class GuestUser extends User
 	{
 		localStorage.removeItem(localStorageKeyForGuestUser);
 	}
+
+	deleteUser(): void {
+		this.logoutUser();
+	}
 }
 
-async function getCurrentUser(): Promise<User | null>
+async function getUserFromLocalStorage(): Promise<User | null>
 {
 	let user : User | null = null;
+
+	console.log('getting user');
 	const registeredUserJSON = localStorage.getItem(localStorageKeyForRegisteredUser);
 	const guestUserJSON = localStorage.getItem(localStorageKeyForGuestUser);
 
@@ -142,5 +152,6 @@ async function getCurrentUser(): Promise<User | null>
 		user = new GuestUser(userData.name);
 	}
 
+	console.log('user obtained');
 	return user;
 }

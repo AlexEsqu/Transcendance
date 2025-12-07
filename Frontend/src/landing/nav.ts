@@ -2,7 +2,7 @@ import footerHTML from "../pages/footer.html"
 import headerHTML from "../pages/header.html"
 import navHTML from "../pages/nav.html"
 import { displayAliasQueryPage } from "./alias"
-import { User, GuestUser, RegisteredUser, getCurrentUser, localStorageKeyForGuestUser, localStorageKeyForRegisteredUser } from "./user"
+import { User, GuestUser, RegisteredUser, getUserFromLocalStorage, localStorageKeyForGuestUser, localStorageKeyForRegisteredUser } from "./user"
 
 export {displayFooter, displayHeader}
 
@@ -31,14 +31,25 @@ function displayHeader(name : string) : void
 
 async function deleteUserData() : Promise<void>
 {
-	const user : User = await getCurrentUser()
+	const user : User = await getUserFromLocalStorage()
 	console.log(user);
 	user.logoutUser();
-	displayAliasQueryPage();
 }
 
 async function displayNavBar()
 {
-	const user : User = await getCurrentUser();
+	const user : User = await getUserFromLocalStorage();
 	document.body.insertAdjacentHTML("beforeend", navHTML.replace('USERNAME', user.name))
+
+	const logoutButton = document.getElementById('logout-btn');
+	logoutButton.addEventListener('click', () => {
+		user.logoutUser();
+		displayAliasQueryPage();
+	})
+
+	const deleteUserButton = document.getElementById('delete-user-btn');
+	deleteUserButton.addEventListener('click', () => {
+		user.deleteUser();
+		displayAliasQueryPage();
+	})
 }

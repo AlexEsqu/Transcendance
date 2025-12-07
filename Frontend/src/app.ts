@@ -7,6 +7,9 @@ import "./input.css";
 
 export { displayGamePage, User }
 
+let pageState = { page: 'welcome' };
+window.history.replaceState(pageState, null, '#welcome');
+
 // checking if a registered or guest user object is stored in the localStorage, not diplaying the game until they do
 const userJSON : string | null = localStorage.getItem(localStorageKeyForRegisteredUser) ?? localStorage.getItem(localStorageKeyForGuestUser);
 
@@ -17,7 +20,6 @@ function displayGamePage() : void
 	const user: User = JSON.parse(userJSON);
 	displayHeader(user.name);
 	displayGameWindow();
-	displayFooter();
 }
 
 if (userJSON)

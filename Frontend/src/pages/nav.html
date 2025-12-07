@@ -7,15 +7,10 @@
 			<div id='user-name' class="text-glow text-3xl m-0 p-0 leading-[0.7] self-start">USERNAME</div>
 		</div>
 
-		<div id="account-container" class="hidden group-hover:flex flex-col m-3 gap-5 items-start pt-4">
-			<div id='account-dropdown' class="text-xl m-0 p-0 relative group/account">
-				<button class="text-glow cursor-pointer">ACCOUNT</button>
-				<div id="account-content" class="hidden group-hover/account:block">
-					<button id='user-info-btn' class="block text-base">Settings</button>
-					<button id='logout-btn' class="block text-base">Logout</button>
-				</div>
-			</div>
-			<div id='credits-dropdown' class="text-glow text-xl m-0 p-0">CREDITS</div>
+		<div id="account-container" class="hidden group-hover:flex flex-col mt-3 ml-3 gap-2 items-start">
+			<button id='user-info-btn' class="text-base text-glow cursor-pointer">Settings</button>
+			<button id='logout-btn' class="text-base text-glow cursor-pointer">Logout</button>
+			<button id='delete-user-btn' class="text-base text-glow cursor-pointer">Delete account</button>
 		</div>
 
 	</div>
@@ -26,11 +21,12 @@
 		<div id='games-dropdown' class="text-glow text-xl m-0 p-0 relative group/game text-right">
 			<button class="text-glow text-3xl m-0 p-0 leading-[0.7]">GAMES</button>
 			<div class="hidden group-hover/game:flex flex-col self-end items-end">
-				<button id="pong-vs-ia-btn" class="text-base">Pong Match vs IA</button>
-				<button id="pong-local-btn" class="text-base">Pong Match local</button>
-				<button id="pong-tournament-btn" class="text-base">Tournament</button>
+				<button id="pong-vs-ia-btn" class="text-base text-glow cursor-pointer">Pong Match vs IA</button>
+				<button id="pong-local-btn" class="text-base text-glow cursor-pointer">Pong Match local</button>
+				<button id="pong-tournament-btn" class="text-base text-glow cursor-pointer">Tournament</button>
 			</div>
 		</div>
 
 	</div>
+
 </nav>

@@ -1,12 +1,13 @@
 import { displayGamePage } from "../app";
 import { User, GuestUser, RegisteredUser, localStorageKeyForGuestUser, localStorageKeyForRegisteredUser } from "./user"
+import { renderPageState } from "./history";
 
 import welcomeHtml from "../pages/welcome.html";
 import guestinHtml from "../pages/guestin.html";
 import registerHtml from "../pages/register.html";
 import loginHtml from "../pages/login.html";
 
-export { displayAliasQueryPage }
+export { displayAliasQueryPage, displayGamePage, displayLoginPage, displayRegisterPage, displayGuestInPage}
 
 // replaces the document body with a menu page to choose to login, register or play as guest
 function displayAliasQueryPage() : void
@@ -17,21 +18,30 @@ function displayAliasQueryPage() : void
 	GuestInButton.addEventListener("click", function ()
 	{
 		console.log("clicking alias button");
-		displayGuestInPage();
+		let pageState = { page: 'loginAsGuest'};
+		window.history.pushState(pageState, '', '#' + pageState.page)
+		// displayGuestInPage();
+		renderPageState(pageState);
 	})
 
 	const loginButton = document.getElementById('btn-login')
 	loginButton.addEventListener("click", function ()
 	{
 		console.log("clicking login button");
-		displayLoginPage();
+		let pageState = { page: 'login'};
+		window.history.pushState(pageState, '', '#' + pageState.page);
+		// displayLoginPage();
+		renderPageState(pageState);
 	})
 
 	const registerButton = document.getElementById('btn-register')
 	registerButton.addEventListener("click", function ()
 	{
 		console.log("clicking register button");
-		displayRegisterPage();
+		let pageState = { page: 'register'};
+		window.history.pushState(pageState, '', '#' + pageState.page);
+		// displayRegisterPage();
+		renderPageState(pageState);
 	})
 }
 
@@ -52,7 +62,10 @@ function displayGuestInPage() : void
 		if (alias)
 		{
 			new GuestUser(alias);
-			displayGamePage();
+			let pageState = { page: 'game'};
+			window.history.pushState(pageState, '', '#' + pageState.page);
+			// displayGamePage();
+			renderPageState(pageState);
 		}
 	})
 }
@@ -161,8 +174,10 @@ async function loginUser(login: string, password: string) : Promise<void>
 	try
 	{
 		const user = await RegisteredUser.createUserFromLogin(login, password);
-		localStorage.setItem('RegisteredUser', JSON.stringify(user));
-		displayGamePage();
+		let pageState = { page: 'game'};
+		window.history.pushState(pageState, '', '#' + pageState.page);
+		// displayGamePage();
+		renderPageState(pageState);
 	}
 	catch (error)
 	{
