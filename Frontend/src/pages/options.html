@@ -1,0 +1,37 @@
+<div id="game-options" class="bg-black max-h-screen font-mono text-white flex flex-col items-center justify-center">
+	<div class="glow-anim border rounded-md flex flex-col items-center justify-center">
+		<form name="game-options" class="flex flex-col flex-center gap-5 m-5 text-center" action="" method="post">
+			<!-- Choose game mode : 1 player (AI opponent) or 2  players (1vs1) -->
+			<div class="flex flex-col flex-center gap-1 m-1 text-center">
+				<label for="mode" class="text-glow p-3">Who fights ?</label>
+				<select id="mode" class="w-full bg-transparent placeholder:text-center text-slate-700 text-sm border border-slate-200 rounded pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none">
+					<option value="1">One player</option>
+					<option value="2">Two player</option>
+				</select>
+			</div>
+			<!-- Choose game level : the higher the level, the more challenging it is -->
+			<div class="flex flex-col flex-center gap-1 m-1 text-center">
+				<label for="level" class="text-glow p-3">How intense ?</label>
+				<select id="level" class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none">
+					<option value="0">easy</option>
+					<option value="1">medium</option>
+					<option value="2">hard</option>
+				</select>
+			</div>
+			<!-- Choose rendering customization -->
+			<div>
+				<p class="text-glow p-3">Customize the rendering</p>
+				<div class="flex items-center gap-2">
+					<label for="hs-color-input" class="text-glow p-1">Ball</label>
+					<input type="color" class="p-1 h-5 w-14 block bg-white border border-gray-200 cursor-pointer rounded-lg disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700" id="ball-color-input" value="#a2c2e8" title="Choose your color">
+					<label for="hs-color-input" class="text-glow p-1">Background</label>
+					<input type="color" class="p-1 h-5 w-14 block bg-white border border-gray-200 cursor-pointer rounded-lg disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700" id="back-color-input" value="#01011a" title="Choose your color">
+					<label for="hs-color-input" class="text-glow p-1">Paddle</label>
+					<input type="color" class="p-1 h-5 w-14 block bg-white border border-gray-200 cursor-pointer rounded-lg disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700" id="padd-color-input" value="#a2c2e8" title="Choose your color">
+				</div>
+			</div>
+			<!-- When every settings are good, submit the form -->
+			<button class="text-glow p-5 hover:text-glow-red" type="submit" id="btn-submit">Submit</button>
+		</form>
+	</div>
+</div>
