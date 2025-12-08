@@ -11,10 +11,11 @@ export default async function userRoutes(server) {
 	server.register(getUsers);
 	server.register(getUser);
 	server.register(postUser, { prefix: "users" });
-	server.register(deleteUser, { prefix: "users" });
 	server.register(patchUserPassword, { prefix: "users" });
 	server.register(patchUserAvatar, { prefix: "users" });
 	server.register(deleteUserAvatar, { prefix: "users" });
-	server.register(getFriends, { prefix: "users" });
 	server.register(addFriends, { prefix: "users" });
+	server.register(deleteUser, { prefix: "users" });
+
+	server.register(getFriends, { prefix: "users" });
 }

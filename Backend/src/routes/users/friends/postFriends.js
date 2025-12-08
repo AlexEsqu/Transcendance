@@ -19,7 +19,7 @@ export default function addFriends(server) {
 				},
 			},
 			response: {
-				200: {
+				201: {
 					type: "object",
 					properties: {
 						success: { type: "boolean" },
@@ -62,7 +62,7 @@ export default function addFriends(server) {
 				return reply.status(400).send({ error: "User id and friend_id cannot be the same" });
 			}
 			db.prepare(`INSERT INTO friends(user_id, friend_id) VALUES (?,?)`).run(userId, friendId);
-			reply.status(200).send({ success: true, message: `Sucessfully added ${req.friend.username} to ${req.user.username}'s friend list` });
+			reply.status(201).send({ success: true, message: `Sucessfully added ${req.friend.username} to ${req.user.username}'s friend list` });
 		} catch (err) {
 			if (err.code == "SQLITE_CONSTRAINT_PRIMARYKEY") {
 				return reply.status(400).send({ error: `User ${req.user.username} is already friend with ${req.friend.username}` });

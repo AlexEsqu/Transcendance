@@ -26,7 +26,7 @@ function signup(server) {
 				console.log(dbErr)
 				handleSQLiteError(dbErr, reply);
 			}
-			reply.status(200).send({ success: true, message: "Signed up successfully" })
+			reply.status(201).send({ success: true, message: "Signed up successfully" })
 		},
 	};
 	server.post("/signup", opts);
