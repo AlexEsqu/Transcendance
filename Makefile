@@ -55,6 +55,7 @@ back_down:
 
 fclean:
 	docker system prune -af
-	docker volume prune -af
+	docker volume prune -f
+	rm -rf $(BACKEND_DIR)
 
 re: fclean build up

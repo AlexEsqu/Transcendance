@@ -7,7 +7,6 @@ RUN npm install
 
 COPY . .
 
-
 RUN mkdir -p /tmp/certs
 RUN mkdir -p /app/data
 RUN mkdir -p /uploads/avatars
@@ -22,11 +21,11 @@ RUN if [ ! -f /tmp/certs/server.key ] || [ ! -f /tmp/certs/server.crt ]; then \
         echo "Certificates already exist, skipping."; \
     fi
 
-RUN node scripts/init-db.js
-RUN sleep 2
 ENV ADDRESS=0.0.0.0
 ENV PORT=8443
 ENV SQLITE_PATH=/app/data/database.db
 ENV AVATARS_UPLOAD_PATH=/app/uploads/avatars/
 ENV DOMAIN_NAME=https://localhost:8443/
-ENTRYPOINT ["npm", "run"]
+
+RUN chmod +x scripts/entrypoint.sh
+ENTRYPOINT ["./scripts/entrypoint.sh"]

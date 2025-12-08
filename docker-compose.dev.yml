@@ -5,7 +5,7 @@ services:
     ports:
       - "8443:8443"
       - "3000:3000"
-    command: dev
+    command: npm run dev
     volumes:
       - ./Backend/src:/app/src
       - ./Backend/scripts:/app/scripts
