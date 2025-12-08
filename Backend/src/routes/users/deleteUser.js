@@ -1,4 +1,5 @@
 import db from "../../database.js";
+import fs from "fs";
 
 //TODO: GDPR => DONT FORGET TO ANONIMIZE THE USER EVERYWHERE IN DB
 function deleteUser(server) {
@@ -18,7 +19,7 @@ function deleteUser(server) {
 		//delete the users avatar from db
 		const { avatar_path } = db.prepare(`SELECT avatar_path FROM users WHERE id = ?`).get(id);
 		if (avatar_path) {
-			fs.unlink(avatar_path, (err) => {
+			fs.unlink(avatar_path, () => {
 				console.log(avatar_path + " was deleted");
 			});
 		}

@@ -2,7 +2,7 @@ import fp from "fastify-plugin";
 import swagger from "@fastify/swagger";
 import swaggerUI from "@fastify/swagger-ui";
 
-export default fp(async (server, opts) => {
+export default fp(async (server) => {
 	// Security aliases
 	server.decorate("security", {
 		UserAuth: [{ BearerAuth: [] },  { AppClientAuth: [] }],

@@ -1,4 +1,5 @@
 import db from "../../database.js";
+import {modifyUserAvatarKeyName} from "../../utils/utils.js";
 //Schema that serves an user
 
 export function getUser(server) {
@@ -29,24 +30,19 @@ export function getUser(server) {
 		onRequest: [server.authenticateClient],
 	};
 
-	server.get("/users/:id", singleUserSchema, (req, res) => {
+	server.get("/users/:id", singleUserSchema, (req, reply) => {
 		try {
 			const { id } = req.params;
 			const user = db.prepare(`SELECT id, username, avatar_path FROM users WHERE id = ?`).get(id);
 			if (!user) {
-				return res.status(404).send({ error: "User not found" });
+				return reply.status(404).send({ error: "User not found" });
 			}
-			user.avatar_url = user.avatar_path;
-			delete user.avatar_path;
-
-			if (user.avatar_url) {
-				user.avatar_url = user.avatar_url.replace(process.env.AVATARS_UPLOAD_PATH, `${process.env.DOMAIN_NAME}avatars/`);
-			}
+			modifyUserAvatarKeyName(user);
 			console.log(user);
-			res.send(user);
+			reply.send(user);
 		} catch (err) {
 			console.log(err);
-			return res.status(500).send({ error: "Internal server error" });
+			return reply.status(500).send({ error: "Internal server error" });
 		}
 	});
 }
@@ -73,18 +69,13 @@ export function getUsers(server) {
 		},
 		onRequest: [server.authenticateClient],
 	};
-	server.get("/users", allUsersSchema, (req, res) => {
+	server.get("/users", allUsersSchema, (req, reply) => {
 		const users = db.prepare(`SELECT id, username, avatar_path FROM users`).all();
 		users.forEach((user) => {
-			user.avatar_url = user.avatar_path;
-			delete user.avatar_path;
-
-			if (user.avatar_url) {
-				user.avatar_url = user.avatar_url.replace(process.env.AVATARS_UPLOAD_PATH, `${process.env.DOMAIN_NAME}avatars/`);
-			}
+			modifyUserAvatarKeyName(user);
 		});
 
 		console.log(users);
-		res.send(users);
+		reply.send(users);
 	});
 }

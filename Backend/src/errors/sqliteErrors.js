@@ -22,7 +22,7 @@ export function handleSQLiteError(err, res) {
       statusCode = 500; // Internal Server Error
   }
 
-  res.status(statusCode).send({
+  reply.status(statusCode).send({
     error: "SQLite Error",
     message: err.message,
     code: err.code

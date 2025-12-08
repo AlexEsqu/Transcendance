@@ -30,7 +30,6 @@ export const server = Fastify({
 
 // MODULES
 server.register(clientAuthPluggin);
-
 server.register(fastifyFormBody);
 server.register(fastifyMultiPart, {
 	attachFieldsToBody: true,

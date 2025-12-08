@@ -14,6 +14,7 @@ function getMatches(server) {
 			const matches = db.prepare(`SELECT * FROM matches`).all();
 			reply.send({ matches });
 		} catch (err) {
+			console.log(err)
 			reply.status(500).send({ error: "Internal server error" });
 		}
 	});

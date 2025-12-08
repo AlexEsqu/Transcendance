@@ -23,7 +23,7 @@ export default function deleteUserAvatar(server) {
 			if (avatar_path) {
 				db.prepare(`UPDATE users SET avatar_path = NULL WHERE id = ?`).run(id);
 
-				fs.unlink(avatar_path, (err) => {
+				fs.unlink(avatar_path, () => {
 					console.log(avatar_path + " was deleted");
 				});
 			}

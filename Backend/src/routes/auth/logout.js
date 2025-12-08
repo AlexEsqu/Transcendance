@@ -1,5 +1,4 @@
 import db from "/app/src/database.js";
-import bcrypt from "bcrypt";
 
 function logout(server) {
 	const opts = {

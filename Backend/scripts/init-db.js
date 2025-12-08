@@ -1,7 +1,7 @@
 // scripts/init-db.js
 import Database from "better-sqlite3";
 
-const db = new Database("/app/data/database.db");
+export const db = new Database("/app/data/database.db");
 db.pragma("journal_mode = WAL");
 
 db.prepare(`
@@ -28,11 +28,11 @@ db.prepare(`
 
 db.prepare(`
     CREATE TABLE IF NOT EXISTS friends (
-        	user_id    INTEGER NOT NULL,
-    		friend_id  INTEGER NOT NULL,
-    		PRIMARY KEY (user_id, friend_id),
-    		FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    		FOREIGN KEY (friend_id) REFERENCES users(id) ON DELETE CASCADE
+        user_id INTEGER NOT NULL,
+    	friend_id INTEGER NOT NULL,
+    	PRIMARY KEY (user_id, friend_id),
+    	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    	FOREIGN KEY (friend_id) REFERENCES users(id) ON DELETE CASCADE
     );
 `).run();
 

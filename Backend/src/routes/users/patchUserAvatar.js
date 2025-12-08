@@ -45,8 +45,7 @@ export default function patchUserAvatar(server) {
 			db.prepare(`UPDATE users SET avatar_path = ? WHERE id = ?`).run(uploadPath, id);
 
 			if (old_avatar_path) {
-				fs.unlink(old_avatar_path, (err) => {
-					// if (err) throw err;
+				fs.unlink(old_avatar_path, () => {
 					console.log(old_avatar_path + " was deleted");
 				});
 			}

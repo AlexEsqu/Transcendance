@@ -1,6 +1,6 @@
 import fp from "fastify-plugin";
 
-export default fp(async (fastify, opts) => {
+export default fp(async (fastify) => {
 	fastify.decorate("authenticateClient", async (request, reply) => {
 		const apiKey = request.headers["x-app-secret"];
 
