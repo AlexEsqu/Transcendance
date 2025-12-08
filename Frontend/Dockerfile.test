@@ -1,0 +1,21 @@
+FROM node:20-slim
+
+# Install Chromium for Karma ChromeHeadless
+RUN apt-get update && apt-get install -y \
+    chromium \
+    ca-certificates \
+    git \
+ && rm -rf /var/lib/apt/lists/*
+
+# Set Chrome binary for karma-chrome-launcher
+ENV CHROME_BIN=/usr/bin/chromium
+ENV CI=true
+
+WORKDIR /app
+COPY package.json package-lock.json* /app/
+RUN npm ci
+
+COPY . /app
+
+# Default command runs karma
+CMD ["npm", "run", "test"]

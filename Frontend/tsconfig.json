@@ -4,7 +4,7 @@
     "module": "ESNext",
     "moduleResolution": "node",
     "outDir": "dist",
-    "rootDir": "src",
+    "rootDir": ".",
     "sourceMap": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -13,9 +13,10 @@
   },
   "include": [
     "src/**/*",
+	"tests/**/*",
     "global.d.ts",
 	"src/types/env.d.ts"
-  ],
+, "tests"  ],
   "exclude": [
     "node_modules",
     "dist"

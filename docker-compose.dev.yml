@@ -26,6 +26,23 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - APP_SECRET_KEY=${APP_SECRET_KEY}
 
+  jasmine:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile.test
+    container_name: jasmine
+    environment:
+      - CHROME_BIN=/usr/bin/chromium
+      - CI=true
+    volumes:
+      - ./Frontend:/app
+      - /app/node_modules
+    ports:
+      - "9222:9222"
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - APP_SECRET_KEY=${APP_SECRET_KEY}
+
 volumes:
   sqlite:
   user_avatars:
