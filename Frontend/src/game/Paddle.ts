@@ -1,20 +1,21 @@
+import { createPaddle } from './Graphics';
 import { Vector3, Mesh } from '@babylonjs/core';
-import { createPaddle } from "./graphics"
-import { Ball } from "./Ball"
+import { Ball } from "./Ball";
 import { Level } from '../landing/game';
 
 export class Paddle {
 	static WIDTH = 1.25;
 	static HEIGHT = 0.25;
 	static DEPTH = 0.25;
-	static SPEED = 20.0;
-	static RESPONSIVENESS = -19.0
+	static SPEED = 25.0;
+	static RESPONSIVENESS = -19.0;
+	static BOT_PROBABILITY = 4;
 
 	mesh: Mesh;
 
-	constructor(scene, side, mapWidth, level: Level) {
-		if (side === "left") Paddle.SPEED += level;
-		this.mesh = createPaddle(scene);
+	constructor(scene, side, mapWidth, level: Level, colorHex: string) {
+		Paddle.BOT_PROBABILITY += level;
+		this.mesh = createPaddle(scene, Paddle.HEIGHT, Paddle.WIDTH, Paddle.DEPTH, colorHex);
 		this.mesh.rotation.y = Math.PI / 2;
 		this.mesh.position = new Vector3((mapWidth / 2), 0.2, 0.0);
 		if (side === "left") this.mesh.position.x = -(mapWidth / 2);
@@ -50,8 +51,8 @@ export class Paddle {
 	 * 	- Do not always move, robot's behave is randomized
 	 */
 	autoMove(ball: Ball, posLimit: number, lastFrameTime: number): void {
-		//	Avoid the robot to always move perfectly : 1/4 chance to miss the target
-		if (Math.floor(Math.random() * 4) == 1) return ;
+		//	Avoid the robot to always move perfectly : 1/BOT_PROBABILITY chance to miss the target
+		if (Math.floor(Math.random() * Paddle.BOT_PROBABILITY) == 1) return ;
 
 		const ballPosZ: number = ball.mesh.position.z;
 		const ballPosX: number = ball.mesh.position.x;

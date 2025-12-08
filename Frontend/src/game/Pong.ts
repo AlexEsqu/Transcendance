@@ -2,11 +2,11 @@ import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
 import { Engine, Scene, Color4, GlowLayer, Mesh } from '@babylonjs/core';
-import { createCamera, createVisualScoring, createMap, createLight } from "./graphics"
 import { sendMatchesPostRequest } from "./sendMatches";
 import { IOptions, Level } from "../landing/game";
 import { Ball } from "./Ball";
 import { Paddle } from "./Paddle";
+import { createCamera, createVisualScoring, createMap, createLight } from './Graphics';
 
 export interface IPlayer {
     score: number;
@@ -29,6 +29,7 @@ export class Pong {
 	player1: IPlayer;
 	player2: IPlayer;
 	time: number;
+	customOptions: IOptions;
 
 	constructor(canvasId: string, user1: number, user2: number, options: IOptions) {
 		this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
@@ -40,6 +41,7 @@ export class Pong {
 		this.player1 = { score: 0, paddle: null, text: "0", id: user1 ?? 0};
 		this.player2 = { score: 0, paddle: null, text: "0", id: user2};
 		this.time = Date.now();
+		this.customOptions = options;
 	}
 
 	/**
@@ -50,34 +52,34 @@ export class Pong {
 
 		this.gameScene = new Scene(this.engine);
 		createCamera(this.gameScene, this.canvas);
-		createLight(this.gameScene);
+		createLight(this.gameScene, this.customOptions.backgroundColor);
 
 		//	Remove default background color
-		this.gameScene.clearColor = new Color4(0.004, 0.004, 0.102);
+		this.gameScene.clearColor = new Color4().fromHexString(this.customOptions.backgroundColor);
 
 		//	Create a glow layer to add a bloom effect around meshes
 		const glowLayer: GlowLayer = new GlowLayer("glow", this.gameScene, { mainTextureRatio: 0.6 });
 		glowLayer.intensity = 0.7;
 		glowLayer.blurKernelSize = 128;
 
-		const map: Mesh = createMap(this.gameScene);
+		const map: Mesh = createMap(this.gameScene, Pong.MAP_HEIGHT, Pong.MAP_WIDTH);
 
 		// Exclude bloom effect on the map
 		glowLayer.addExcludedMesh(map);
 
 		//	Create the ball
-		this.ball = new Ball(this.gameScene, this.level);
+		this.ball = new Ball(this.gameScene, this.level, this.customOptions.ballColor);
 
 		//	Creates 2 paddles, one for each players and 2DText for visual scoring
-		this.player1.paddle = new Paddle(this.gameScene, "left", Pong.MAP_WIDTH, this.level);
-		this.player2.paddle = new Paddle(this.gameScene, "right", Pong.MAP_WIDTH, this.level);
+		this.player1.paddle = new Paddle(this.gameScene, "left", Pong.MAP_WIDTH, this.level, this.customOptions.paddColor);
+		this.player2.paddle = new Paddle(this.gameScene, "right", Pong.MAP_WIDTH, this.level, this.customOptions.paddColor);
 		const line = createVisualScoring("|", "white", 32, "-250px", "0px");
 		this.player1.text = createVisualScoring("0", "white", 32, "-250px", "-100px");
 		this.player2.text = createVisualScoring("0", "white", 32, "-250px", "100px");
 		console.log("Game STATE: loaded");
-		// this.engine.runRenderLoop(() => {
-		// 	this.gameScene.render();
-		// })
+		this.engine.runRenderLoop(() => {
+			this.gameScene.render();
+		})
 	}
 
 	/**

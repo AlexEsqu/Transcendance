@@ -1,8 +1,7 @@
 import { Scene, Mesh, MeshBuilder, Vector3, Color3, StandardMaterial, ArcRotateCamera, DirectionalLight, GroundMesh } from '@babylonjs/core';
 import { AdvancedDynamicTexture, TextBlock } from "@babylonjs/gui";
-import { Ball } from "./Ball"
-import { Paddle } from './Paddle';
-import { Pong } from './Pong';
+
+export { createBall, createPaddle, createCamera, createVisualScoring, createMap, createLight }
 
 function createMaterial(scene: Scene, color: Color3): StandardMaterial {
 	if (!scene || scene === undefined) return null;
@@ -19,12 +18,12 @@ function createMaterial(scene: Scene, color: Color3): StandardMaterial {
 }
 
 // { diameter: Ball.RADIUS * 2, segments: 2, updatable: true },
-function createBall(scene: Scene): Mesh {
+function createBall(scene: Scene, radius: number, colorHex: string): Mesh {
 	if (!scene || scene === undefined) return null;
 
 	const mesh: Mesh = MeshBuilder.CreateSphere(
 		'ball',
-		{ diameter: Ball.RADIUS * 2 },
+		{ diameter: radius * 2 },
 		scene
 	);
 	// const mesh = MeshBuilder.CreateBox(
@@ -32,35 +31,37 @@ function createBall(scene: Scene): Mesh {
 	// 	{ size: Ball.RADIUS * 2 },
 	// 	scene
 	// );
-	mesh.material = createMaterial(scene, new Color3(0.694, 0.824, 0.98));
+	const color : Color3 = new Color3().fromHexString(colorHex);
+	mesh.material = createMaterial(scene, color);
 	return mesh;
 }
 
-function createLight(scene: Scene): void {
-	if (!scene || scene === undefined) return ;
+function createLight(scene: Scene, colorHex: string): DirectionalLight {
+	if (!scene || scene === undefined) return null;
 
-	const light = new DirectionalLight("light", new Vector3(0, -100, 0), scene);
-	light.diffuse = new Color3(0.004, 0.004, 0.102);
-	light.specular = new Color3(0.059, 0.059, 0.09);
+	const light = new DirectionalLight("light", new Vector3(0, -1, 0), scene);
+	light.diffuse = new Color3().fromHexString(colorHex);
+	light.specular = light.diffuse.scale(0.9);
+	return light;
 }
 
-function createPaddle(scene: Scene): Mesh {
+function createPaddle(scene: Scene, height: number, width: number, depth: number, colorHex: string): Mesh {
 	if (!scene || scene === undefined) return null;
 
 	const mesh: Mesh = MeshBuilder.CreateBox(
 		'paddle',
 		{
-			width: Paddle.WIDTH,
-			height: Paddle.HEIGHT,
-			depth: Paddle.DEPTH
+			width: width,
+			height: height,
+			depth: depth
 		},
 		scene
 	);
-	mesh.material = createMaterial(scene, new Color3(0.635, 0.761, 0.91));
+	mesh.material = createMaterial(scene, new Color3().fromHexString(colorHex));
 	return mesh;
 }
 
-function createCamera(scene: Scene, canvas) {
+function createCamera(scene: Scene, canvas): ArcRotateCamera {
 	if (!scene || scene === undefined) return null;
 	
 	const camera: ArcRotateCamera = new ArcRotateCamera(
@@ -73,6 +74,7 @@ function createCamera(scene: Scene, canvas) {
 	);
 	//	Allow to move the camera -> uncomment for debug
 	// camera.attachControl(canvas, true);
+	return camera;
 }
 
 function createVisualScoring(text: string, color: string, fontSize: number, topPx: string, leftPx: string): TextBlock {
@@ -89,15 +91,13 @@ function createVisualScoring(text: string, color: string, fontSize: number, topP
 	return block;
 }
 
-function createMap(scene: Scene): Mesh {
+function createMap(scene: Scene, height: number, width: number): Mesh {
 	if (!scene || scene === undefined) return null;
 
 	const map: GroundMesh = MeshBuilder.CreateGround(
 		'ground',
-		{ width: Pong.MAP_WIDTH, height: Pong.MAP_HEIGHT},
+		{ width: width, height: height},
 		scene
 	);
 	return map;
 }
-
-export { createBall, createPaddle, createCamera, createVisualScoring, createMap, createLight };

@@ -11,6 +11,9 @@ export enum Level {
 export interface IOptions {
 	level: Level;
 	nbOfPlayer: number;
+	ballColor: string;
+	paddColor: string;
+	backgroundColor: string;
 };
 
 class App {
@@ -32,10 +35,10 @@ function launchPongGame(options: IOptions): void {
 	//	Display start button and game window
 	document.body.insertAdjacentHTML("beforeend", gameHtml);
 
-	const startDisplay: HTMLElement = document.getElementById("game-start");
+	const startBtnDisplay: HTMLElement = document.getElementById("game-start");
 	const btnStart: HTMLElement = document.getElementById('btn-startplay');
 	
-	if (!btnStart || !startDisplay) {
+	if (!btnStart || !startBtnDisplay) {
 		console.error("'start' UI not found, can't load game");
 		return ;
 	}
@@ -44,7 +47,7 @@ function launchPongGame(options: IOptions): void {
 	const gameWindow = document.getElementById("game-canvas");
 	const app = new App(gameWindow, options);
 	btnStart.addEventListener('click', (e) => {
-		startDisplay.remove();
+		startBtnDisplay.remove();
 		app.play();
 	});
 }
@@ -52,12 +55,15 @@ function launchPongGame(options: IOptions): void {
 function selectGameOptions(): Promise<IOptions> {
 	document.body.insertAdjacentHTML("beforeend", optionsHtml);
 
-	const optionsDisplay: HTMLElement = document.getElementById("game-options");
+	const optionsMenuDisplay: HTMLElement = document.getElementById("game-options");
 	const btnSubmit: HTMLButtonElement = document.getElementById('btn-submit') as HTMLButtonElement;
 	const slctMode: HTMLSelectElement = document.getElementById('mode') as HTMLSelectElement;
 	const slctLevel: HTMLSelectElement = document.getElementById('level') as HTMLSelectElement;
+	const ballColorInput = document.getElementById('ball-color-input') as HTMLInputElement;
+	const backColorInput = document.getElementById('back-color-input') as HTMLInputElement;
+	const paddColorInput = document.getElementById('padd-color-input') as HTMLInputElement;
 
-	if (!btnSubmit || !slctMode || !slctLevel || !optionsDisplay) {
+	if (!btnSubmit || !slctMode || !slctLevel || !optionsMenuDisplay) {
 		console.error("'options' UI not found, can't load game");
 		return null;
 	}
@@ -66,13 +72,19 @@ function selectGameOptions(): Promise<IOptions> {
 	return new Promise((resolve) => {
 		btnSubmit.addEventListener('click', (e) => {
 			e.preventDefault();
-			let nbPlayer: number = parseInt(slctMode.value);
-			let level: Level = parseInt(slctLevel.value) as Level;
+			const nbPlayer: number = parseInt(slctMode.value);
+			const level: Level = parseInt(slctLevel.value) as Level;
+			const ballColor: string = ballColorInput.value;
+			const backColor: string = backColorInput.value;
+			const paddColor: string = paddColorInput.value;
 			const options: IOptions = { 
 				level: level, 
-				nbOfPlayer: nbPlayer
+				nbOfPlayer: nbPlayer,
+				ballColor: ballColor,
+				backgroundColor: backColor,
+				paddColor: paddColor
 			};
-			optionsDisplay.remove();
+			optionsMenuDisplay.remove();
 			resolve(options);
 		});
 	});
