@@ -7,8 +7,8 @@ import authPlugin from "./plugins/jwt.js";
 import fastifyCookie from "@fastify/cookie";
 import cors from "@fastify/cors";
 import fastifyRateLimit from "@fastify/rate-limit";
-import fastifyStatic from "@fastify/static"
-import path from "node:path"
+import fastifyStatic from "@fastify/static";
+import path from "node:path";
 
 //Plugins
 import clientAuthPluggin from "./plugins/validateApiKey.js";
@@ -38,7 +38,7 @@ server.register(fastifyMultiPart, {
 server.register(authPlugin);
 server.register(fastifyCookie);
 server.register(swaggerPlugin);
-server.register(cors, { origin: "*", credentials: true });
+server.register(cors, { origin: "*", credentials: true, methods: ["GET", "POST", "PATCH", "DELETE"] });
 //Routes
 server.register(matchesRoutes);
 server.register(userRoutes);
@@ -51,6 +51,6 @@ server.register(fastifyRateLimit, {
 });
 
 server.register(fastifyStatic, {
-  root: path.join(process.env.AVATARS_UPLOAD_PATH),
-  prefix: "/avatars/",
+	root: path.join(process.env.AVATARS_UPLOAD_PATH),
+	prefix: "/avatars/",
 });
