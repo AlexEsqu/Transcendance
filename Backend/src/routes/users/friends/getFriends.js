@@ -6,7 +6,9 @@ export default function getFriends(server) {
 		schema: {
 			tags: ["friends"],
 			security: server.security.AppAuth,
-			description: "Returns a list of all the users friends. `This endpoint requires client authentication.`",
+			description:
+				"Returns the complete list of friends for the user specified by the id path parameter.\
+				Returns basic profile information for each friend.`This endpoint requires client authentication.`",
 			params: {
 				type: "object",
 				properties: {
