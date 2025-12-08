@@ -18,14 +18,75 @@ components:
       name: X-App-Secret
   schemas: {}
 paths:
+  /matches:
+    post:
+      tags:
+        - matches
+      description: Records a completed match between two users, including winner,
+        loser, scores, and match date. `This endpoint requires client
+        authentication.`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - winner_id
+                - loser_id
+                - winner_score
+                - loser_score
+                - date
+              properties:
+                winner_id:
+                  type: integer
+                loser_id:
+                  type: integer
+                winner_score:
+                  type: integer
+                loser_score:
+                  type: integer
+                date:
+                  type: string
+                  format: date-time
+        required: true
+      security: &a1
+        - AppClientAuth: []
+      responses:
+        "200":
+          description: Default Response
+    get:
+      tags:
+        - matches
+      description: Returns a list of all matches. `This endpoint requires client
+        authentication.`
+      security: *a1
+      responses:
+        "200":
+          description: Default Response
+  /matches/{user_id}:
+    get:
+      tags:
+        - matches
+      description: Returns a list of all the matches of a user using the user_id
+        parameter. `This endpoint requires client authentication.`
+      parameters:
+        - schema:
+            type: integer
+            minimum: 1
+          in: path
+          name: user_id
+          required: true
+      security: *a1
+      responses:
+        "200":
+          description: Default Response
   /users:
     get:
       tags:
         - user
       description: Returns a list of all registered users. `This endpoint requires
         client authentication.`
-      security: &a1
-        - AppClientAuth: []
+      security: *a1
       responses:
         "200":
           description: Default Response
@@ -96,14 +157,153 @@ paths:
       responses:
         "200":
           description: Default Response
+  /users/me:
+    delete:
+      tags:
+        - user
+      description: Deletes the user account and all its data. `This endpoint requires
+        client AND user authentication.`
+      security: &a2
+        - BearerAuth: []
+        - AppClientAuth: []
+      responses:
+        "204":
+          description: Default Response
+  /users/me/password:
+    patch:
+      tags:
+        - user
+      description: Modifies the password of the user. `This endpoint requires client
+        AND user authentication.`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - oldPassword
+                - newPassword
+              properties:
+                oldPassword:
+                  type: string
+                newPassword:
+                  type: string
+                  minLength: 8
+              additionalProperties: false
+        required: true
+      security: *a2
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+  /users/me/avatar:
+    patch:
+      tags:
+        - user
+      description: Modifies the avatar of the user. `This endpoint requires client AND
+        user authentication.`
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - avatar
+              properties:
+                avatar:
+                  type: string
+                  format: binary
+        required: true
+      security: *a2
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+    delete:
+      tags:
+        - user
+      description: Deletes the avatar of the user. `This endpoint requires client AND
+        user authentication.`
+      security: *a2
+      responses:
+        "204":
+          description: Default Response
+  /users/{id}/friends:
+    get:
+      tags:
+        - friends
+      description: Returns the complete list of friends for the user specified by the
+        id path parameter.				Returns basic profile information for each
+        friend.`This endpoint requires client authentication.`
+      parameters:
+        - schema:
+            type: integer
+            minimum: 1
+          in: path
+          name: id
+          required: true
+      security: *a1
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    username:
+                      type: string
+                    avatar_url:
+                      type: string
+  /users/me/friends:
+    post:
+      tags:
+        - friends
+      description: Adds a new friend to the authenticated user’s friend list.	The
+        friend_id provided in the request body is validated before the
+        friendship record is created.						`This endpoint requires client
+        authentication AND user authentication.`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - friend_id
+              properties:
+                friend_id:
+                  type: integer
+                  minimum: 1
+        required: true
+      security: *a2
+      responses:
+        "200":
+          description: Default Response
   /users/auth/login:
     post:
       tags:
         - auth
       description: Authenticates the user using their username and password. On
-        success, returns a short-lived access token in the response body and
-        sets a long-lived refresh token in the `HttpOnly refreshToken cookie`,
-        which can later be used to obtain new access tokens.
+        success, returns a the user's id AND short-lived access token in the
+        response body and sets a long-lived refresh token in the `HttpOnly
+        refreshToken cookie`, which can later be used to obtain new access
+        tokens.
       requestBody:
         content:
           application/json:
@@ -130,7 +330,7 @@ paths:
         This endpoint requires `client authentification` AND `user
         authentification` AND the refresh cookie stored in the `HttpOnly
         refreshToken cookie`
-      security: &a2
+      security: &a3
         - BearerAuth: []
         - cookieAuth: []
         - AppClientAuth: []
@@ -162,121 +362,7 @@ paths:
         reauthenticate with their username and password to obtain new tokens.
         This endpoint requires client authentification AND user authentification
         AND the refresh cookie stored in the HttpOnly refreshToken cookie
-      security: *a2
-      responses:
-        "200":
-          description: Default Response
-  /users/me:
-    delete:
-      tags:
-        - user
-      description: Deletes the user account and all its data. `This endpoint requires
-        client AND user authentication.`
-      security: &a3
-        - BearerAuth: []
-        - AppClientAuth: []
-      responses:
-        "200":
-          description: Default Response
-    patch:
-      tags:
-        - user
-      description: Modifies the data of the user. `This endpoint requires client AND
-        user authentication.`
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                profilePictureUrl:
-                  type: string
-              additionalProperties: false
       security: *a3
-      responses:
-        "200":
-          description: Default Response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-  /users/me/password:
-    patch:
-      tags:
-        - user
-      description: Modifies the password of the user. `This endpoint requires client
-        AND user authentication.`
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - oldPassword
-                - newPassword
-              properties:
-                oldPassword:
-                  type: string
-                newPassword:
-                  type: string
-                  minLength: 8
-              additionalProperties: false
-        required: true
-      security: *a3
-      responses:
-        "200":
-          description: Default Response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-  /matches:
-    post:
-      tags:
-        - matches
-      description: Records a completed match between two users, including winner,
-        loser, scores, and match date. `This endpoint requires client
-        authentication.`
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - winner_id
-                - loser_id
-                - winner_score
-                - loser_score
-                - date
-              properties:
-                winner_id:
-                  type: integer
-                loser_id:
-                  type: integer
-                winner_score:
-                  type: integer
-                loser_score:
-                  type: integer
-                date:
-                  type: string
-                  format: date-time
-        required: true
-      security: *a1
-      responses:
-        "200":
-          description: Default Response
-    get:
-      tags:
-        - matches
-      description: Returns a list of all matches. `This endpoint requires client
-        authentication.`
-      security: *a1
       responses:
         "200":
           description: Default Response
