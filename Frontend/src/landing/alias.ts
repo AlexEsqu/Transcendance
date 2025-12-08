@@ -48,7 +48,7 @@ function displayGuestInPage() : void
 	document.body.innerHTML = guestinHtml
 
 	const GuestInInput : HTMLInputElement = document.getElementById('input-alias') as HTMLInputElement;
-	const GuestInButton : HTMLElement = document.getElementById('btn-submitalias')
+	const GuestInButton : HTMLElement = document.getElementById('btn-submit-alias')
 
 	GuestInButton.addEventListener('click', function ()
 	{
@@ -174,7 +174,6 @@ async function loginUser(login: string, password: string) : Promise<void>
 		const user = await RegisteredUser.createUserFromLogin(login, password);
 		let pageState = { page: 'game'};
 		window.history.pushState(pageState, '', '#' + pageState.page);
-		// displayGamePage();
 		renderPageState(pageState);
 	}
 	catch (error)
@@ -193,14 +192,32 @@ async function displayUserSettingPage()
 	const submitAvatar = document.getElementById('btn-submit-avatar');
 	const inputAvatar = document.getElementById('input-avatar') as HTMLInputElement;
 	submitAvatar.addEventListener('click', () => {
-		inputAvatar.value = '';
 		user.addAvatar(inputAvatar.value);
+		inputAvatar.value = '';
 	})
 
 	const submitNewName = document.getElementById('btn-submit-rename-user');
 	const inputNewName = document.getElementById('input-rename-user') as HTMLInputElement;
 	submitNewName.addEventListener('click', () => {
-		inputNewName.value = '';
 		user.rename(inputNewName.value);
+		inputNewName.value = '';
+	})
+
+	const submitNewPassword = document.getElementById('btn-submit-password');
+	const inputOldPassword = document.getElementById('input-old-password') as HTMLInputElement;
+	const inputNewPassword = document.getElementById('input-password') as HTMLInputElement;
+	const inputNewPasswordCheck = document.getElementById('input-password-check') as HTMLInputElement;
+	submitNewPassword.addEventListener('click', () => {
+		if (inputNewPassword.value === inputNewPasswordCheck.value)
+		{
+			user.changePassword(inputOldPassword.value, inputNewPassword.value);
+		}
+		else
+		{
+			alert('The new password does not match');
+		}
+		inputNewPassword.value = '';
+		inputNewPasswordCheck.value = '';
+		inputOldPassword.value = '';
 	})
 }
