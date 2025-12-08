@@ -1,11 +1,49 @@
 <div class="min-h-screen font-mono text-white flex flex-col items-center justify-center">
 	<div class="glow-anim border rounded-md flex flex-col items-center justify-center">
-		<!-- <h1 class="text-xl font-bold p-4 m-2">Choose</h1> -->
-		<div class='flex flex-col flex-center gap-4 m-4'>
-			<input class="text-glow p-5 placeholder:text-center placeholder:text-glow" placeholder="LOGIN" id="input-login"></input>
-			<input class="text-glow p-5 placeholder:text-center focus:border-hidden focus:outile-hidden placeholder:text-glow" placeholder="PASSWORD" id="input-password"></input>
-			<input class="text-glow p-5 placeholder:text-center focus:border-hidden focus:outile-hidden placeholder:text-glow" placeholder="REPEAT PASSWORD" id="input-password-check"></input>
-			<button class="text-glow p-5 hover:text-glow-red" id="btn-submit-register">Register</button>
-		</div>
+		<form class='flex flex-col flex-center gap-4 m-6'>
+
+			<label
+				for="input-login"
+				class="text-center pt-3"
+			>Choose a login</label>
+			<input
+				id="input-login"
+				name="input-login"
+				type="text"
+				class="pb-5 text-center placeholder:text-center"
+				placeholder="XXXbgd75XXX"
+			>
+
+			<label
+				for="input-password"
+				class="text-center pt-3"
+			>Choose a password</label>
+			<input
+				id="input-password"
+				name="input-password"
+				type="password"
+				class="pb-5 text-center placeholder:text-center"
+				placeholder="********"
+			>
+
+			<label
+				for="input-password-check"
+				class="text-center pt-3"
+			>Check your password</label>
+			<input
+				id="input-password-check"
+				name="input-password-check"
+				type="password"
+				class="pb-5 text-center placeholder:text-center"
+				placeholder="********"
+			>
+
+			<button
+				id="btn-submit-register"
+				name="btn-submit-register"
+				class="text-glow p-5 hover:text-glow-red"
+			>Register</button>
+
+		</form>
 	</div>
 </div>
