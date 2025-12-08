@@ -14,7 +14,8 @@ const start = async () => {
 start();
 
 // // write the api as yaml
-
+// import yaml from "yaml"
+// import fs from "fs"
 // server.ready((err) => {
 // 	if (err) throw err;
 

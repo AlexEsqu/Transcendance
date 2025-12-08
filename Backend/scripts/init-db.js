@@ -10,7 +10,7 @@ db.prepare(`
         username TEXT NOT NULL UNIQUE,
         password_hash TEXT NOT NULL,
         refresh_token_hash TEXT,
-        profile_image_url TEXT
+        avatar_path TEXT
     );
 `).run();
 

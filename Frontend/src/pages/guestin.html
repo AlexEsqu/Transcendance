@@ -1,9 +1,25 @@
-<div class="bg-black min-h-screen font-mono text-white flex flex-col items-center justify-center">
+<div class="min-h-screen font-mono text-white flex flex-col items-center justify-center">
 	<div class="glow-anim border rounded-md flex flex-col items-center justify-center">
-		<!-- <h1 class="text-xl font-bold p-4 m-2">Choose</h1> -->
-		<div class='flex flex-col flex-center gap-4 m-4'>
-			<input class='p-4 placeholder:text-center' placeholder="Choose an alias" id="input-alias"></input>
-			<button class="text-glow p-5 hover:text-glow-red" id="btn-submitalias">Submit</button>
-		</div>
+
+		<form id='guestin-form' class='flex flex-col flex-center gap-4 m-4'>
+
+			<label
+				for="input-alias"
+				class="text-center p-5"
+			>Choose an alias</label>
+			<input
+				name='input-alias'
+				id="input-alias"
+				class='p-4 placeholder:text-center'
+				required placeholder="Wisely, Lilith, V..."
+			></input>
+
+			<button
+				class="text-glow p-5 hover:text-glow-red"
+				id="btn-submit-alias"
+			>Submit</button>
+			
+		</form>
+
 	</div>
 </div>

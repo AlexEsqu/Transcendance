@@ -1,33 +1,33 @@
 import footerHTML from "../pages/footer.html"
 import headerHTML from "../pages/header.html"
-import { displayAliasQueryPage, removeGuestName } from "./alias"
+import navHTML from "../pages/nav.html"
+import { displayAliasQueryPage, displayUserSettingPage } from "./alias"
+import { renderPageState } from "./history"
+import { User, GuestUser, RegisteredUser, getUserFromLocalStorage } from "./user"
 
-export {displayFooter, displayHeader}
+export { displayNavBar}
 
-// adds a footer to the document body
-function displayFooter() : void
+async function displayNavBar()
 {
-	document.body.insertAdjacentHTML("beforeend", footerHTML);
+	const user : User = await getUserFromLocalStorage();
+	document.body.insertAdjacentHTML("beforeend", navHTML.replace('USERNAME', user.name))
 
-	const deleteAliasButton = document.getElementById('delete-name-btn')
-
-	// adding a callback function to the delete data function
-	deleteAliasButton.addEventListener("click", function ()
-	{
-		console.log("clicking delete button");
-		deleteUserData()
+	const logoutButton = document.getElementById('logout-btn');
+	logoutButton.addEventListener('click', () => {
+		user.logoutUser();
+		displayAliasQueryPage();
 	})
-}
 
-// adds a header to the document body, replace name into it
-function displayHeader(name : string) : void
-{
-	// document.body.innerHTML += headerHTML.replace('WISELY', name)
-	document.body.insertAdjacentHTML("beforeend", headerHTML.replace('WISELY', name))
-}
+	const deleteUserButton = document.getElementById('delete-user-btn');
+	deleteUserButton.addEventListener('click', () => {
+		user.deleteUser();
+		displayAliasQueryPage();
+	})
 
-function deleteUserData() : void
-{
-	removeGuestName();
-	displayAliasQueryPage();
+	const settingUserButton = document.getElementById('user-info-btn');
+	settingUserButton.addEventListener('click', () => {
+		let pageState = { page: 'setting'};
+		window.history.pushState(pageState, '', '#' + pageState.page);
+		renderPageState(pageState);
+	})
 }
