@@ -5,7 +5,11 @@ export default function addFriends(server) {
 	const opts = {
 		schema: {
 			tags: ["friends"],
-			description: "Lets the user add a friend using the friend's id passed as parameter. `This endpoint requires client AND user authentication.`",
+			description:
+				"Adds a new friend to the authenticated user’s friend list.\
+						The friend_id provided in the request body is validated before the friendship record is created.\
+						`This endpoint requires client authentication AND user authentication.`",
+
 			security: server.security.UserAuth,
 			body: {
 				type: "object",
