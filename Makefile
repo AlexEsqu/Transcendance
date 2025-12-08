@@ -33,7 +33,7 @@ down:
 	docker compose -f ./docker-compose.yml down -v
 
 clean:
-	docker compose -f ./docker-compose.yml down --volume --remove-orphans
+	docker compose -f ./docker-compose.yml down --volumes --remove-orphans
 	docker volume rm backend -f
 
 front:
@@ -58,7 +58,7 @@ back_down:
 
 fclean:
 	docker system prune -af
-	docker volume prune -f
+	docker volume prune -af
 	rm -rf $(BACKEND_DIR)
 
 re: fclean build up
