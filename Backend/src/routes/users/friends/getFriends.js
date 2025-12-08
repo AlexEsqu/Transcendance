@@ -4,7 +4,7 @@ import { getUserbyId, modifyUserAvatarKeyName } from "../../../utils/utils.js";
 export default function getFriends(server) {
 	const opts = {
 		schema: {
-			tags: ["friends"],
+			tags: ["user"],
 			security: server.security.AppAuth,
 			description:
 				"Returns the complete list of friends for the user specified by the id path parameter.\

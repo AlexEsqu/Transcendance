@@ -4,7 +4,7 @@ import { getUserbyId } from "../../../utils/utils.js";
 export default function addFriends(server) {
 	const opts = {
 		schema: {
-			tags: ["friends"],
+			tags: ["user"],
 			description:
 				"Adds a new friend to the authenticated user's friend list.\
 						The friend_id provided in the request body is validated before the friendship record is created.\
