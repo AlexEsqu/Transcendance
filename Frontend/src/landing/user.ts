@@ -4,6 +4,17 @@ const localStorageKeyForGuestUser : string = "PongGuestUser"
 const localStorageKeyForRegisteredUser : string = "PongRegisteredUser"
 const placeholderAvatar : string = "./placeholder/avatarPlaceholder.png"
 
+const apiKey : string = process.env.APP_SECRET_KEY ?? "oups";
+console.log('API Key loaded:', apiKey ? 'yes' : 'no');
+
+const ENV = {
+  APP_SECRET_KEY: process.env.APP_SECRET_KEY,
+  JWT_SECRET: process.env.JWT_SECRET,
+  NODE_ENV: process.env.NODE_ENV,
+};
+
+console.log('Environment:', ENV);
+
 class User {
 	name: string;
 	avatarPath: string;
@@ -29,6 +40,8 @@ class User {
 	{
 		this.name = newName;
 	}
+
+	changePassword(oldPassword : string, newPassword : string): void {}
 
 }
 
@@ -77,6 +90,7 @@ class RegisteredUser extends User
 					{
 						'accept': '*/*',
 						'Authorization': `Bearer ${this.token}`,
+						'X-App-Secret': `${apiKey}`
 					},
 				});
 
@@ -104,6 +118,7 @@ class RegisteredUser extends User
 					{
 						'accept': '*/*',
 						'Authorization': `Bearer ${this.token}`,
+						'X-App-Secret': `${apiKey}`
 					},
 				});
 
@@ -132,11 +147,11 @@ class RegisteredUser extends User
 						'accept': 'application/json',
 						'Content-Type': 'application/json',
 						'Authorization': `Bearer ${this.token}`,
+						'X-App-Secret': `${apiKey}`
 					},
-					body:
-					{
+					body: JSON.stringify({
 						'profilePictureUrl': `${imageUrl}`
-					}
+					})
 				});
 
 			if (!response.ok)
@@ -160,6 +175,38 @@ class RegisteredUser extends User
 
 	}
 
+	async changePassword(oldPass : string, newPass : string): Promise<void>
+	{
+		try
+		{
+			const response = await fetch('https://localhost:8443/users/me/password',
+				{
+					method: 'PATCH',
+					headers:
+					{
+						'accept': 'application/json',
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${this.token}`,
+						'X-App-Secret': `${apiKey}`
+					},
+					body: JSON.stringify({
+						oldPassword: oldPass,
+						newPassword: newPass
+					})
+				});
+
+			if (!response.ok)
+				throw new Error(`Password change failed: ${response.status}`);
+
+		}
+
+		catch (error)
+		{
+			console.error('Error during logout:', error);
+			throw error;
+		}
+	}
+
 }
 
 class GuestUser extends User
@@ -175,7 +222,8 @@ class GuestUser extends User
 		localStorage.removeItem(localStorageKeyForGuestUser);
 	}
 
-	deleteUser(): void {
+	deleteUser(): void
+	{
 		this.logoutUser();
 	}
 
@@ -187,6 +235,11 @@ class GuestUser extends User
 	rename(newName : string): void
 	{
 		this.name = newName;
+	}
+
+	changePassword(oldPassword : string, newPassword : string): void
+	{
+		alert("You need to be a registered user to change your password")
 	}
 }
 
