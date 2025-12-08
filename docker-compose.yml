@@ -5,7 +5,7 @@ services:
     ports:
       - "8443:8443"
       - "3000:3000"
-    command: start
+    command: npm run start
     volumes:
       - ./Backend/src:/app/src
       - ./Backend/scripts:/app/scripts

@@ -29,4 +29,6 @@ ENV PORT=8443
 ENV SQLITE_PATH=/app/data/database.db
 ENV AVATARS_UPLOAD_PATH=/app/uploads/avatars/
 ENV DOMAIN_NAME=https://localhost:8443/
-ENTRYPOINT ["npm", "run"]
+
+RUN chmod +x scripts/entrypoint.sh
+ENTRYPOINT ["./scripts/entrypoint.sh"]
