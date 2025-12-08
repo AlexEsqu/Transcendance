@@ -6,7 +6,7 @@ export default function addFriends(server) {
 		schema: {
 			tags: ["friends"],
 			description:
-				"Adds a new friend to the authenticated user’s friend list.\
+				"Adds a new friend to the authenticated user's friend list.\
 						The friend_id provided in the request body is validated before the friendship record is created.\
 						`This endpoint requires client authentication AND user authentication.`",
 
@@ -16,6 +16,27 @@ export default function addFriends(server) {
 				required: ["friend_id"],
 				properties: {
 					friend_id: { type: "integer", minimum: 1 },
+				},
+			},
+			response: {
+				200: {
+					type: "object",
+					properties: {
+						success: { type: "boolean" },
+						message: { type: "string" },
+					},
+				},
+				404: {
+					type: "object",
+					properties: {
+						error: { type: "string" },
+					},
+				},
+				400: {
+					type: "object",
+					properties: {
+						error: { type: "string" },
+					},
 				},
 			},
 		},

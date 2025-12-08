@@ -1,5 +1,5 @@
 import db from "../../database.js";
-import {modifyUserAvatarKeyName} from "../../utils/utils.js";
+import { modifyUserAvatarKeyName } from "../../utils/utils.js";
 //Schema that serves an user
 
 export function getUser(server) {
@@ -23,6 +23,12 @@ export function getUser(server) {
 						id: { type: "integer" },
 						username: { type: "string" },
 						avatar_url: { type: "string" },
+					},
+				},
+				404: {
+					type: "object",
+					properties: {
+						error: { type: "string" },
 					},
 				},
 			},
