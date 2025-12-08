@@ -57,7 +57,6 @@ export function getUsers(server) {
 			tags: ["user"],
 			security: server.security.AppAuth,
 			description: "Returns a list of all registered users. `This endpoint requires client authentication.`",
-			security: server.security.AppAuth,
 			response: {
 				200: {
 					type: "array",
