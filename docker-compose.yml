@@ -10,6 +10,8 @@ services:
       - ./Backend/src:/app/src
       - ./Backend/scripts:/app/scripts
       - sqlite:/app/data
+      - user_avatars:/app/uploads/avatars
+
     environment:
       - JWT_SECRET=${JWT_SECRET}
       - APP_SECRET_KEY=${APP_SECRET_KEY}
@@ -24,3 +26,4 @@ services:
 
 volumes:
   sqlite:
+  user_avatars:

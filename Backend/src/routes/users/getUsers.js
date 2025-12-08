@@ -21,7 +21,7 @@ export function getUser(server) {
 					properties: {
 						id: { type: "integer" },
 						username: { type: "string" },
-						profile_image_url: { type: "string" },
+						avatar_url: { type: "string" },
 					},
 				},
 			},
@@ -32,9 +32,15 @@ export function getUser(server) {
 	server.get("/users/:id", singleUserSchema, (req, res) => {
 		try {
 			const { id } = req.params;
-			const user = db.prepare(`SELECT id, username, profile_image_url FROM users WHERE id = ?`).get(id);
+			const user = db.prepare(`SELECT id, username, avatar_path FROM users WHERE id = ?`).get(id);
 			if (!user) {
 				return res.status(404).send({ error: "User not found" });
+			}
+			user.avatar_url = user.avatar_path;
+			delete user.avatar_path;
+
+			if (user.avatar_url) {
+				user.avatar_url = user.avatar_url.replace(process.env.AVATARS_UPLOAD_PATH, `${process.env.DOMAIN_NAME}avatars/`);
 			}
 			console.log(user);
 			res.send(user);
@@ -60,7 +66,7 @@ export function getUsers(server) {
 						properties: {
 							id: { type: "integer" },
 							username: { type: "string" },
-							profile_image_url: { type: "string" },
+							avatar_url: { type: "string" },
 						},
 					},
 				},
@@ -69,7 +75,16 @@ export function getUsers(server) {
 		onRequest: [server.authenticateClient],
 	};
 	server.get("/users", allUsersSchema, (req, res) => {
-		const users = db.prepare(`SELECT id, username, profile_image_url FROM users`).all();
+		const users = db.prepare(`SELECT id, username, avatar_path FROM users`).all();
+		users.forEach((user) => {
+			user.avatar_url = user.avatar_path;
+			delete user.avatar_path;
+
+			if (user.avatar_url) {
+				user.avatar_url = user.avatar_url.replace(process.env.AVATARS_UPLOAD_PATH, `${process.env.DOMAIN_NAME}avatars/`);
+			}
+		});
+
 		console.log(users);
 		res.send(users);
 	});
