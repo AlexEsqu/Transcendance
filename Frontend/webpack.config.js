@@ -1,6 +1,7 @@
 const path = require("path");
 const fs = require("fs");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const webpack = require("webpack");
 const appDirectory = fs.realpathSync(process.cwd());
 
 module.exports = {
@@ -47,7 +48,12 @@ module.exports = {
         new HtmlWebpackPlugin({
             inject: true,
             template: path.resolve(appDirectory, "public/index.html"),
-        })
+        }),
+		new webpack.DefinePlugin({
+			'process.env.APP_SECRET_KEY': JSON.stringify(process.env.APP_SECRET_KEY || 'default'),
+			'process.env.JWT_SECRET': JSON.stringify(process.env.JWT_SECRET || 'default'),
+			'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+		}),
     ],
     mode: "development",
 };

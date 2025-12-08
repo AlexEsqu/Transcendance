@@ -22,6 +22,9 @@ services:
       - "8080:8080"
     volumes:
       - ./Frontend:/app
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - APP_SECRET_KEY=${APP_SECRET_KEY}
 
 volumes:
   sqlite:

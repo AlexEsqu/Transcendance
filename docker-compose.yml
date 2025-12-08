@@ -24,6 +24,10 @@ services:
     volumes:
       - ./Frontend:/app
 
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - APP_SECRET_KEY=${APP_SECRET_KEY}
+
 volumes:
   sqlite:
   user_avatars:
