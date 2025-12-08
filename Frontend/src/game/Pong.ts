@@ -77,7 +77,7 @@ export class Pong {
 		this.player1.text = createVisualScoring("0", "white", 32, "-250px", "-100px");
 		this.player2.text = createVisualScoring("0", "white", 32, "-250px", "100px");
 		console.log("Game STATE: loaded");
-		
+
 		this.displayMenu();
 		// if (!this.menuScene || !this.gameScene || !this.endScene)
 			//	Handle error, message. stop processing ?
@@ -145,7 +145,7 @@ export class Pong {
 	 * 	- Camera, light, map, ball, paddles and visual-scoring
 	 */
 	createGameScene(): void {
-		
+
 	}
 
 	createMenuScene(): void {
