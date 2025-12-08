@@ -13,17 +13,14 @@ FRONT_SERVICES		=	typescript
 BACK_SERVICES		=	fastify
 
 USER := $(shell whoami)
-BACKEND_DIR := ./data/Backend
 
 all: build up
 
 dev:
-	mkdir -p $(BACKEND_DIR)
 	docker compose -f ./docker-compose.dev.yml build
 	docker compose -f ./docker-compose.dev.yml up
 
 build:
-	mkdir -p $(BACKEND_DIR)
 	docker compose -f ./docker-compose.yml build
 
 up:
@@ -33,7 +30,7 @@ down:
 	docker compose -f ./docker-compose.yml down -v
 
 clean:
-	docker compose -f ./docker-compose.yml down --volume --remove-orphans
+	docker compose -f ./docker-compose.yml down --volumes --remove-orphans
 	docker volume rm backend -f
 
 front:
@@ -58,7 +55,6 @@ back_down:
 
 fclean:
 	docker system prune -af
-	docker volume prune -f
-	rm -rf $(BACKEND_DIR)
+	docker volume prune -af
 
 re: fclean build up
