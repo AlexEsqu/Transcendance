@@ -21,7 +21,7 @@ export default function putUsername(server) {
 				},
 			},
 		},
-		onRequest: [server.authenticateUser],
+		onRequest: [server.authenticateUser, server.authenticateClient],
 	};
 	server.put("/me/username", opts, async (req, reply) => {
 		try {

@@ -12,7 +12,7 @@ function deleteUser(server) {
 				204: { type: "null" },
 			},
 		},
-		onRequest: [server.authenticateUser],
+		onRequest: [server.authenticateUser, server.authenticateClient],
 	};
 	server.delete("/me", opts, (req, reply) => {
 		const { id } = req.user;

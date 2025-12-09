@@ -8,4 +8,5 @@ export default fp(async (fastify) => {
 			reply.code(401).send({ error: "Unauthorized" });
 		}
 	});
+
 });

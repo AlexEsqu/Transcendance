@@ -24,7 +24,7 @@ export default function putUserAvatar(server) {
 				},
 			},
 		},
-		onRequest: [server.authenticateUser],
+		onRequest: [server.authenticateUser, server.authenticateClient],
 	};
 	server.put("/me/avatar", opts, async (req, reply) => {
 		try {

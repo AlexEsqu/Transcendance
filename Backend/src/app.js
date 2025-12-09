@@ -12,6 +12,8 @@ import path from "node:path";
 
 //Plugins
 import clientAuthPluggin from "./plugins/validateApiKey.js";
+import sessionAuthPluggin from "./plugins/validateSessionToken.js";
+
 import swaggerPlugin from "./plugins/swagger.js";
 //Routes
 import matchesRoutes from "./routes/matches/index.js";
@@ -30,6 +32,8 @@ export const server = Fastify({
 
 // MODULES
 server.register(clientAuthPluggin);
+server.register(sessionAuthPluggin);
+
 server.register(fastifyFormBody);
 server.register(fastifyMultiPart, {
 	attachFieldsToBody: true,

@@ -11,7 +11,7 @@ export default function deleteUserAvatar(server) {
 				204: { type: "null" },
 			},
 		},
-		onRequest: [server.authenticateUser],
+		onRequest: [server.authenticateUser, server.authenticateClient],
 	};
 	server.delete("/me/avatar", opts, async (req, reply) => {
 		try {

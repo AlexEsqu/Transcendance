@@ -25,7 +25,7 @@ export default function putUserPassword(server) {
 				},
 			},
 		},
-		onRequest: [server.authenticateUser],
+		onRequest: [server.authenticateUser, server.authenticateClient],
 	};
 	server.patch("/me/password", opts, async (req, reply) => {
 		try {

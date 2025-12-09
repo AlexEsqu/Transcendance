@@ -40,7 +40,7 @@ export default function addFriend(server) {
 				},
 			},
 		},
-		onRequest: [server.authenticateUser],
+		onRequest: [server.authenticateUser, server.authenticateClient],
 		preHandler: async (req, reply) => {
 			// Verify the id passed as parameter
 			const { friend_id } = req.body;
