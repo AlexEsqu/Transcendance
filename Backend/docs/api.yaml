@@ -72,7 +72,6 @@ paths:
       parameters:
         - schema:
             type: integer
-            minimum: 1
           in: path
           name: user_id
           required: true
@@ -112,7 +111,6 @@ paths:
       parameters:
         - schema:
             type: integer
-            minimum: 1
           in: path
           name: id
           required: true
@@ -130,6 +128,15 @@ paths:
                   username:
                     type: string
                   avatar_url:
+                    type: string
+        "404":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
                     type: string
   /users/signup:
     post:
@@ -157,18 +164,6 @@ paths:
       responses:
         "200":
           description: Default Response
-  /users/me:
-    delete:
-      tags:
-        - user
-      description: Deletes the user account and all its data. `This endpoint requires
-        client AND user authentication.`
-      security: &a2
-        - BearerAuth: []
-        - AppClientAuth: []
-      responses:
-        "204":
-          description: Default Response
   /users/me/password:
     patch:
       tags:
@@ -191,7 +186,9 @@ paths:
                   minLength: 8
               additionalProperties: false
         required: true
-      security: *a2
+      security: &a2
+        - BearerAuth: []
+        - AppClientAuth: []
       responses:
         "200":
           description: Default Response
@@ -240,17 +237,137 @@ paths:
       responses:
         "204":
           description: Default Response
+  /users/me/username:
+    patch:
+      tags:
+        - user
+      description: Modifies the username of the user. `This endpoint requires client
+        AND user authentication.`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - new_username
+              properties:
+                new_username:
+                  type: string
+              additionalProperties: false
+        required: true
+      security: *a2
+      responses:
+        "200":
+          description: Default Response
+  /users/me/friends:
+    post:
+      tags:
+        - user
+      description: Adds a new friend to the authenticated user's friend list.						The
+        friend_id provided in the request body is validated before the
+        friendship record is created.						`This endpoint requires client
+        authentication AND user authentication.`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - friend_id
+              properties:
+                friend_id:
+                  type: integer
+        required: true
+      security: *a2
+      responses:
+        "201":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        "400":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        "404":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+    delete:
+      tags:
+        - user
+      description: Deletes a friend from the authenticated user's friend list using
+        the id passed in the body.						`This endpoint requires client
+        authentication AND user authentication.`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - friend_id
+              properties:
+                friend_id:
+                  type: integer
+        required: true
+      security: *a2
+      responses:
+        "204":
+          description: Default Response
+        "400":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        "404":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /users/me:
+    delete:
+      tags:
+        - user
+      description: Deletes the user account and all its data. `This endpoint requires
+        client AND user authentication.`
+      security: *a2
+      responses:
+        "204":
+          description: Default Response
   /users/{id}/friends:
     get:
       tags:
-        - friends
+        - user
       description: Returns the complete list of friends for the user specified by the
         id path parameter.				Returns basic profile information for each
         friend.`This endpoint requires client authentication.`
       parameters:
         - schema:
             type: integer
-            minimum: 1
           in: path
           name: id
           required: true
@@ -271,30 +388,6 @@ paths:
                       type: string
                     avatar_url:
                       type: string
-  /users/me/friends:
-    post:
-      tags:
-        - friends
-      description: Adds a new friend to the authenticated user’s friend list.	The
-        friend_id provided in the request body is validated before the
-        friendship record is created.						`This endpoint requires client
-        authentication AND user authentication.`
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - friend_id
-              properties:
-                friend_id:
-                  type: integer
-                  minimum: 1
-        required: true
-      security: *a2
-      responses:
-        "200":
-          description: Default Response
   /users/auth/login:
     post:
       tags:

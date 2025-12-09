@@ -12,7 +12,7 @@ export default function getFriends(server) {
 			params: {
 				type: "object",
 				properties: {
-					id: { type: "integer", minimum: 1 },
+					id: { type: "integer"},
 				},
 				required: ["id"],
 			},

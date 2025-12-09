@@ -9,7 +9,7 @@ function getUserMatches(server) {
 			params: {
 				type: "object",
 				properties: {
-					user_id: { type: "integer", minimum: 1 },
+					user_id: { type: "integer"},
 				},
 				required: ["user_id"],
 			},
