@@ -26,7 +26,13 @@ function refresh(server) {
 					},
 					required: ["accessToken"],
 				},
-				401: { description: "Unauthorized" },
+				401: {
+					description: "Unauthorized",
+					type: "object",
+					properties: {
+						error: { type: "string" },
+					},
+				},
 			},
 		},
 		onRequest: [server.authenticateUser, server.authenticateClient, server.authenticateRefreshToken],
