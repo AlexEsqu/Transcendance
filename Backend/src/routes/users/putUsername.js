@@ -1,6 +1,6 @@
 import db from "/app/src/database.js";
 
-export default function patchUsername(server) {
+export default function putUsername(server) {
 	const opts = {
 		schema: {
 			tags: ["user"],
@@ -23,7 +23,7 @@ export default function patchUsername(server) {
 		},
 		onRequest: [server.authenticateUser],
 	};
-	server.patch("/me/username", opts, async (req, reply) => {
+	server.put("/me/username", opts, async (req, reply) => {
 		try {
 			const newUsername = req.body.new_username;
 			const { id } = req.user;

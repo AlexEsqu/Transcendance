@@ -1,7 +1,7 @@
 import db from "/app/src/database.js";
 import bcrypt from "bcrypt";
 
-export default function patchUserPassword(server) {
+export default function putUserPassword(server) {
 	const opts = {
 		schema: {
 			tags: ["user"],

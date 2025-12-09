@@ -1,7 +1,7 @@
 import db from "/app/src/database.js";
 import fs from "fs";
 
-export default function patchUserAvatar(server) {
+export default function putUserAvatar(server) {
 	const opts = {
 		schema: {
 			tags: ["user"],
@@ -26,7 +26,7 @@ export default function patchUserAvatar(server) {
 		},
 		onRequest: [server.authenticateUser],
 	};
-	server.patch("/me/avatar", opts, async (req, reply) => {
+	server.put("/me/avatar", opts, async (req, reply) => {
 		try {
 			const id = req.user.id;
 
