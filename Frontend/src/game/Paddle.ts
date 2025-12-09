@@ -8,7 +8,7 @@ export class Paddle {
 	static HEIGHT = 0.25;
 	static DEPTH = 0.25;
 	static SPEED = 25.0;
-	static RESPONSIVENESS = -19.0;
+	static RESPONSIVENESS = -25.0;
 	static BOT_PROBABILITY = 4;
 
 	mesh: Mesh;

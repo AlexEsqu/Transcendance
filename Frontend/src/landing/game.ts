@@ -3,9 +3,7 @@ import gameHtml from '../pages/game.html'
 import optionsHtml from '../pages/options.html'
 
 export enum Level {
-	easy,
-	medium,
-	hard,
+	easy, medium, hard
 };
 
 export interface IOptions {
@@ -13,7 +11,7 @@ export interface IOptions {
 	nbOfPlayer: number;
 	ballColor: string;
 	paddColor: string;
-	backgroundColor: string;
+	mapColor: string;
 };
 
 class App {
@@ -22,11 +20,12 @@ class App {
 		//	Hard coded users id -> must change later after user auth !!!!!!!
 		this.pong = new Pong("game-canvas", 1, 2, options);
 		this.pong.loadGame();
+		this.pong.runGame();
 	}
 
 	play() {
 		requestAnimationFrame(() => {
-			this.pong.startPlay();
+			this.pong.launch(3);
 		});
 	}
 }
@@ -81,7 +80,7 @@ function selectGameOptions(): Promise<IOptions> {
 				level: level, 
 				nbOfPlayer: nbPlayer,
 				ballColor: ballColor,
-				backgroundColor: backColor,
+				mapColor: backColor,
 				paddColor: paddColor
 			};
 			optionsMenuDisplay.remove();
