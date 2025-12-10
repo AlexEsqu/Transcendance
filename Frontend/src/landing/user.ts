@@ -214,7 +214,7 @@ class GuestUser extends User
 	constructor(username: string)
 	{
 		super(username);
-		localStorage.setItem(localStorageKeyForGuestUser, JSON.stringify({ name: username }));
+		localStorage.setItem(localStorageKeyForGuestUser, JSON.stringify({ name: this.name }));
 	}
 
 	logoutUser(): void

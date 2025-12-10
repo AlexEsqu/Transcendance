@@ -1,35 +1,37 @@
+import { createPaddle } from './Graphics';
 import { Vector3, Mesh } from '@babylonjs/core';
-import { createPaddle } from "./Graphics"
-import { Ball } from "./Ball"
+import { Ball } from "./Ball";
+import { Level } from '../landing/game';
 
 export class Paddle {
 	static WIDTH = 1.25;
 	static HEIGHT = 0.25;
 	static DEPTH = 0.25;
-	static SPEED = 20.0;
-	static RESPONSIVENESS = -19.0
+	static SPEED = 25.0;
+	static RESPONSIVENESS = -19.0;
+	static BOT_PROBABILITY = 4;
 
 	mesh: Mesh;
 
-	constructor(scene, side, mapWidth) {
-		this.mesh = createPaddle(scene);
+	constructor(scene, side, mapWidth, level: Level, colorHex: string) {
+		Paddle.BOT_PROBABILITY += level;
+		this.mesh = createPaddle(scene, Paddle.HEIGHT, Paddle.WIDTH, Paddle.DEPTH, colorHex);
 		this.mesh.rotation.y = Math.PI / 2;
 		this.mesh.position = new Vector3((mapWidth / 2), 0.2, 0.0);
-		if (side === "left")
-			this.mesh.position.x = -(mapWidth / 2);
+		if (side === "left") this.mesh.position.x = -(mapWidth / 2);
 	}
 
 	/**
 	 * 	- Update position in up direction or down, respect map and ball collisions
 	 */
 	move(direction: string, posLimit: number, lastFrameTime: number): void {
-		const meshTopPos = this.mesh.position.z + (Paddle.WIDTH / 2);
-		const meshBottomPos = this.mesh.position.z - (Paddle.WIDTH / 2);
+		const meshTopPos: number = this.mesh.position.z + (Paddle.WIDTH / 2);
+		const meshBottomPos: number = this.mesh.position.z - (Paddle.WIDTH / 2);
 
-		const deltaTime = (Date.now() - lastFrameTime) / 1000;
+		const deltaTime: number = (Date.now() - lastFrameTime) / 1000;
 		//	Frame-rate independent smoothing
-        const alpha = 1 - Math.exp(Paddle.RESPONSIVENESS * deltaTime);
-		const step = Paddle.SPEED * deltaTime * alpha;
+        const alpha: number = 1 - Math.exp(Paddle.RESPONSIVENESS * deltaTime);
+		const step: number = Paddle.SPEED * deltaTime * alpha;
 
 		posLimit += 0.1;
 		if (direction === "up" && (meshTopPos + step) <= posLimit)
@@ -39,7 +41,6 @@ export class Paddle {
 	}
 
 	// checkBallCollision(side: string, newPaddPos: number, ballPos: number): boolean {
-		
 	// 	if ((side === "up" && newPaddPos < ballPos) || (side === "down" && newPaddPos > ballPos))
 	// 		return true;
 	// 	return false;
@@ -50,17 +51,17 @@ export class Paddle {
 	 * 	- Do not always move, robot's behave is randomized
 	 */
 	autoMove(ball: Ball, posLimit: number, lastFrameTime: number): void {
-		//	Avoid the robot to always move perfectly : 1/4 chance to miss the target
-		if (Math.floor(Math.random() * 4) == 1) return ;
+		//	Avoid the robot to always move perfectly : 1/BOT_PROBABILITY chance to miss the target
+		if (Math.floor(Math.random() * Paddle.BOT_PROBABILITY) == 1) return ;
 
-		const	ballPosZ = ball.mesh.position.z;
-		const	ballPosX = ball.mesh.position.x;
+		const ballPosZ: number = ball.mesh.position.z;
+		const ballPosX: number = ball.mesh.position.x;
 
 		if (ballPosX >= 0) return ;
 		if (ballPosZ == this.mesh.position.z) return ;
 
-		const padPosZ = this.mesh.position.z;
-		const half = Paddle.WIDTH / 2;
+		const padPosZ: number = this.mesh.position.z;
+		const half: number = Paddle.WIDTH / 2;
 	
 		if (ballPosZ <= padPosZ + half && ballPosZ >= padPosZ - half) return ;
 		if (ballPosZ > padPosZ)

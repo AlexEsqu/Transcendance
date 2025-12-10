@@ -3,10 +3,8 @@ import { User, GuestUser, RegisteredUser, getUserFromLocalStorage } from "./user
 import { renderPageState } from "./history";
 
 import welcomeHtml from "../pages/welcome.html";
-import guestinHtml from "../pages/guestin.html";
-import registerHtml from "../pages/register.html";
-import loginHtml from "../pages/login.html";
 import formHtml from "../pages/form.html";
+import userHtml from "../pages/user.html";
 
 import avatarFormHtml from "../pages/forms/avatarForm.html"
 import guestFormHtml from "../pages/forms/guestForm.html"
@@ -15,7 +13,7 @@ import passwordFormHtml from "../pages/forms/passwordForm.html"
 import registerFormHtml from "../pages/forms/registerForm.html"
 import renameFormHtml from "../pages/forms/renameForm.html"
 
-export { displayAliasQueryPage, displayGamePage, displayLoginPage, displayRegisterPage, displayGuestPage, displayUserSettingPage}
+export { displayAliasQueryPage, displayGamePage, displayLoginPage, displayRegisterPage, displayGuestPage, displayUserPage}
 
 // replaces the document body with a menu page to choose to login, register or play as guest
 function displayAliasQueryPage() : void
@@ -183,40 +181,40 @@ async function loginUser(login: string, password: string) : Promise<void>
 	}
 }
 
-async function displayUserSettingPage()
+async function displayUserPage()
 {
 	const user : User = await getUserFromLocalStorage();
-	document.body.innerHTML = formHtml;
+	document.body.innerHTML = userHtml;
 
-	const submitAvatar = document.getElementById('btn-submit-avatar');
-	const inputAvatar = document.getElementById('input-avatar') as HTMLInputElement;
-	submitAvatar.addEventListener('click', () => {
-		user.addAvatar(inputAvatar.value);
-		inputAvatar.value = '';
-	})
+	// const submitAvatar = document.getElementById('btn-submit-avatar');
+	// const inputAvatar = document.getElementById('input-avatar') as HTMLInputElement;
+	// submitAvatar.addEventListener('click', () => {
+	// 	user.addAvatar(inputAvatar.value);
+	// 	inputAvatar.value = '';
+	// })
 
-	const submitNewName = document.getElementById('btn-submit-rename-user');
-	const inputNewName = document.getElementById('input-rename-user') as HTMLInputElement;
-	submitNewName.addEventListener('click', () => {
-		user.rename(inputNewName.value);
-		inputNewName.value = '';
-	})
+	// const submitNewName = document.getElementById('btn-submit-rename-user');
+	// const inputNewName = document.getElementById('input-rename-user') as HTMLInputElement;
+	// submitNewName.addEventListener('click', () => {
+	// 	user.rename(inputNewName.value);
+	// 	inputNewName.value = '';
+	// })
 
-	const submitNewPassword = document.getElementById('btn-submit-password');
-	const inputOldPassword = document.getElementById('input-old-password') as HTMLInputElement;
-	const inputNewPassword = document.getElementById('input-password') as HTMLInputElement;
-	const inputNewPasswordCheck = document.getElementById('input-password-check') as HTMLInputElement;
-	submitNewPassword.addEventListener('click', () => {
-		if (inputNewPassword.value === inputNewPasswordCheck.value)
-		{
-			user.changePassword(inputOldPassword.value, inputNewPassword.value);
-		}
-		else
-		{
-			alert('The new password does not match');
-		}
-		inputNewPassword.value = '';
-		inputNewPasswordCheck.value = '';
-		inputOldPassword.value = '';
-	})
+	// const submitNewPassword = document.getElementById('btn-submit-password');
+	// const inputOldPassword = document.getElementById('input-old-password') as HTMLInputElement;
+	// const inputNewPassword = document.getElementById('input-password') as HTMLInputElement;
+	// const inputNewPasswordCheck = document.getElementById('input-password-check') as HTMLInputElement;
+	// submitNewPassword.addEventListener('click', () => {
+	// 	if (inputNewPassword.value === inputNewPasswordCheck.value)
+	// 	{
+	// 		user.changePassword(inputOldPassword.value, inputNewPassword.value);
+	// 	}
+	// 	else
+	// 	{
+	// 		alert('The new password does not match');
+	// 	}
+	// 	inputNewPassword.value = '';
+	// 	inputNewPasswordCheck.value = '';
+	// 	inputOldPassword.value = '';
+	// })
 }
