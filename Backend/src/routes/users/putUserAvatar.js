@@ -1,4 +1,3 @@
-import db from "/app/src/database.js";
 import fs from "fs";
 
 export default function putUserAvatar(server) {
@@ -17,10 +16,24 @@ export default function putUserAvatar(server) {
 			},
 			response: {
 				200: {
-					type: "object",
-					properties: {
-						success: { type: "boolean" },
-					},
+					description: "Updated avatar successfully",
+					$ref: "SuccessMessageResponse#",
+				},
+				400: {
+					description: "Bad Request: Invalid input or missing fields",
+					$ref: "errorResponse#",
+				},
+				401: {
+					description: "Unauthorized: Invalid credentials",
+					$ref: "errorResponse#",
+				},
+				500: {
+					description: "Internal Server Error",
+					$ref: "errorResponse#",
+				},
+				default: {
+					description: "Unexpected error",
+					$ref: "errorResponse#",
 				},
 			},
 		},
@@ -35,7 +48,7 @@ export default function putUserAvatar(server) {
 			const old_avatar_path = avatar_path;
 
 			const data = req.body.avatar;
-
+			
 			//get the full upload path
 			const uploadPath = `${process.env.AVATARS_UPLOAD_PATH}${data.filename}`;
 
@@ -49,9 +62,9 @@ export default function putUserAvatar(server) {
 					console.log(old_avatar_path + " was deleted");
 				});
 			}
-			reply.status(200).send({ success: true });
+			reply.status(200).send({ success: true, message: "Updated avatar successfully" });
 		} catch (err) {
-			server.log.error(err);
+			console.log(err);
 			reply.status(500).send("internal server error");
 		}
 	});

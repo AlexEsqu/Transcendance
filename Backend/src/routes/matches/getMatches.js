@@ -9,18 +9,18 @@ export default function getMatches(server) {
 					type: "array",
 					items: { $ref: "matchObject#" },
 				},
-			},
-			401: {
-				description: "Unauthorized: Invalid credentials",
-				$ref: "errorResponse#",
-			},
-			500: {
-				description: "Internal Server Error",
-				$ref: "errorResponse#",
-			},
-			default: {
-				description: "Unexpected error",
-				$ref: "errorResponse#",
+				401: {
+					description: "Unauthorized: Invalid credentials",
+					$ref: "errorResponse#",
+				},
+				500: {
+					description: "Internal Server Error",
+					$ref: "errorResponse#",
+				},
+				default: {
+					description: "Unexpected error",
+					$ref: "errorResponse#",
+				},
 			},
 		},
 		onRequest: [server.authenticateClient],

@@ -18,10 +18,24 @@ export default function putUserPassword(server) {
 			},
 			response: {
 				200: {
-					type: "object",
-					properties: {
-						success: { type: "boolean" },
-					},
+					description: "Updated password successfully",
+					$ref: "SuccessMessageResponse#",
+				},
+				400: {
+					description: "Bad Request: Invalid input or missing fields",
+					$ref: "errorResponse#",
+				},
+				401: {
+					description: "Unauthorized: Invalid credentials",
+					$ref: "errorResponse#",
+				},
+				500: {
+					description: "Internal Server Error",
+					$ref: "errorResponse#",
+				},
+				default: {
+					description: "Unexpected error",
+					$ref: "errorResponse#",
 				},
 			},
 		},
@@ -40,9 +54,9 @@ export default function putUserPassword(server) {
 			//if ok, hash new password and update db
 			const newPasswordHash = await bcrypt.hash(newPassword, await bcrypt.genSalt(10));
 			server.db.prepare(`UPDATE users SET password_hash = ? WHERE id = ?`).run(newPasswordHash, id);
-			reply.status(200).send({ success: true });
+			reply.status(200).send({ success: true, message: "Updated password successfully" });
 		} catch (err) {
-			server.log.error(err);
+			console.log(err);
 		}
 	});
 }

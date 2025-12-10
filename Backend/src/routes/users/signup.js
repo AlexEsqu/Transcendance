@@ -40,7 +40,7 @@ export default function signup(server) {
 			addUser.run(username, hash);
 			reply.status(201).send({ success: true, message: "Signed up successfully" });
 		} catch (err) {
-			server.log.error(err);
+			console.log(err);
 			if (err.code == "SQLITE_CONSTRAINT_UNIQUE") {
 				reply.status(409).send({ error: "Username is already taken" });
 			}

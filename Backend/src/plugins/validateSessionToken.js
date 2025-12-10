@@ -39,7 +39,7 @@ export default fp(async (server) => {
 
 			// Log unexpected errors only
 			if (!["UnauthorizedError", "JsonWebTokenError"].includes(err.name)) {
-				server.log.error(err);
+				console.log(err);
 			}
 
 			return reply.status(401).send({ error: "Invalid refresh token" });

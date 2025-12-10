@@ -66,7 +66,7 @@ export default function login(server) {
 				reply.send({ accessToken, id });
 			}
 		} catch (err) {
-			server.log.error(err);
+			console.log(err);
 			return reply.status(500).send({ error: "Internal server error" });
 		}
 	});

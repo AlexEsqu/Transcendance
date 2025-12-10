@@ -8,28 +8,29 @@ export default function deleteFriend(server) {
 			description:
 				"Deletes a friend from the authenticated user's friend list using the id passed in the body.\
 						`This endpoint requires client authentication AND user authentication.`",
-
 			security: server.security.UserAuth,
-			body: {
-				type: "object",
-				required: ["friend_id"],
-				properties: {
-					friend_id: { type: "integer"},
-				},
-			},
+			body: { $ref: "userIdObject#" },
 			response: {
 				204: { type: "null" },
-				404: {
-					type: "object",
-					properties: {
-						error: { type: "string" },
-					},
-				},
 				400: {
-					type: "object",
-					properties: {
-						error: { type: "string" },
-					},
+					description: "Bad Request: Invalid input or missing fields",
+					$ref: "errorResponse#",
+				},
+				401: {
+					description: "Unauthorized: Invalid credentials",
+					$ref: "errorResponse#",
+				},
+				404: {
+					description: "Not Found: User not found",
+					$ref: "errorResponse#",
+				},
+				500: {
+					description: "Internal Server Error",
+					$ref: "errorResponse#",
+				},
+				default: {
+					description: "Unexpected error",
+					$ref: "errorResponse#",
 				},
 			},
 		},
@@ -57,6 +58,7 @@ export default function deleteFriend(server) {
 
 			//check if they are friends before trying to delete
 			const friend = server.db.prepare(`SELECT * FROM friends WHERE user_id = ? AND friend_id = ?`).get(userId, friendId);
+
 			if (!friend)
 				return reply.status(400).send({
 					error: `User ${req.user.username} is not friend with ${req.friend.username}`,
@@ -65,7 +67,7 @@ export default function deleteFriend(server) {
 			server.db.prepare(`DELETE FROM friends WHERE user_id = ? AND friend_id = ?`).run(userId, friendId);
 			return reply.status(204).send();
 		} catch (err) {
-			server.log.error(err);
+			console.log(err);
 			return reply.status(500).send({ error: "Internal server error" });
 		}
 	});

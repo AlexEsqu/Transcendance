@@ -30,6 +30,7 @@ export const SignupBody = {
 
 export const SuccessMessageResponse = {
 	$id: "SuccessMessageResponse",
+	description: "OK",
 	type: "object",
 	properties: {
 		success: { type: "boolean" },
@@ -57,5 +58,19 @@ export const userIdObject = {
 	required: ["user_id"],
 	properties: {
 		user_id: { type: "integer" },
+	},
+};
+
+export const publicUserObject = {
+	$id: "publicUserObject",
+	type: "array",
+	required: ["id", "username", "avatar"],
+	items: {
+		type: "object",
+		properties: {
+			id: { type: "integer" },
+			username: { type: "string" },
+			avatar_url: { type: "string" },
+		},
 	},
 };

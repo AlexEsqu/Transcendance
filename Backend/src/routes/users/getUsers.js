@@ -1,4 +1,3 @@
-import db from "../../database.js";
 import { modifyUserAvatarKeyName } from "../../utils/utils.js";
 //Schema that serves an user
 
@@ -8,28 +7,24 @@ export function getUser(server) {
 			tags: ["user"],
 			description: "Returns an object of an user using the id passed in parameters. `This endpoint requires client authentication.`",
 			security: server.security.AppAuth,
-			params: {
-				type: "object",
-				properties: {
-					id: { type: "integer"},
-				},
-				required: ["id"],
-			},
-
+			params: { $ref: "userIdObject#" },
 			response: {
-				200: {
-					type: "object",
-					properties: {
-						id: { type: "integer" },
-						username: { type: "string" },
-						avatar_url: { type: "string" },
-					},
+				200: { $ref: "publicUserObject#" },
+				401: {
+					description: "Unauthorized: Invalid credentials",
+					$ref: "errorResponse#",
 				},
 				404: {
-					type: "object",
-					properties: {
-						error: { type: "string" },
-					},
+					description: "Not Found: User not found",
+					$ref: "errorResponse#",
+				},
+				500: {
+					description: "Internal Server Error",
+					$ref: "errorResponse#",
+				},
+				default: {
+					description: "Unexpected error",
+					$ref: "errorResponse#",
 				},
 			},
 		},
@@ -47,7 +42,7 @@ export function getUser(server) {
 			console.log(user);
 			reply.send(user);
 		} catch (err) {
-			server.log.error(err);
+			console.log(err);
 			return reply.status(500).send({ error: "Internal server error" });
 		}
 	});

@@ -14,7 +14,7 @@ export default function postMatches(server) {
 					description: "Bad Request: Invalid input or missing fields",
 					$ref: "errorResponse#",
 				},
-								401: {
+				401: {
 					description: "Unauthorized: Invalid credentials",
 					$ref: "errorResponse#",
 				},
@@ -53,7 +53,7 @@ export default function postMatches(server) {
 			stmnt.run(match.winner_id, match.loser_id, match.winner_score, match.loser_score, match.date);
 			reply.status(200).send({ success: true, message: "Match added successfully" });
 		} catch (err) {
-			server.log.error(err);
+			console.log(err);
 			reply.status(500).send({ error: "Internal server error" });
 		}
 	});

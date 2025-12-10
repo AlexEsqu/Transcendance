@@ -9,24 +9,24 @@ export default function getFriends(server) {
 			description:
 				"Returns the complete list of friends for the user specified by the id path parameter.\
 				Returns basic profile information for each friend.`This endpoint requires client authentication.`",
-			params: {
-				type: "object",
-				properties: {
-					id: { type: "integer"},
-				},
-				required: ["id"],
-			},
+			params: { $ref: "userIdObject#" },
 			response: {
-				200: {
-					type: "array",
-					items: {
-						type: "object",
-						properties: {
-							id: { type: "integer" },
-							username: { type: "string" },
-							avatar_url: { type: "string" },
-						},
-					},
+				200: { $ref: "publicUserObject#" },
+				401: {
+					description: "Unauthorized: Invalid credentials",
+					$ref: "errorResponse#",
+				},
+				404: {
+					description: "Not Found: User not found",
+					$ref: "errorResponse#",
+				},
+				500: {
+					description: "Internal Server Error",
+					$ref: "errorResponse#",
+				},
+				default: {
+					description: "Unexpected error",
+					$ref: "errorResponse#",
 				},
 			},
 		},
@@ -52,7 +52,7 @@ export default function getFriends(server) {
 
 			reply.send(friends);
 		} catch (err) {
-			server.log.error(err);
+			console.log(err);
 			return reply.status(500).send({ error: "Internal server error" });
 		}
 	});

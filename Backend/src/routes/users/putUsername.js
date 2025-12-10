@@ -1,5 +1,3 @@
-import db from "/app/src/database.js";
-
 export default function putUsername(server) {
 	const opts = {
 		schema: {
@@ -14,10 +12,26 @@ export default function putUsername(server) {
 				},
 				additionalProperties: false,
 			},
-			400: {
-				type: "object",
-				properties: {
-					error: { type: "string" },
+			response: {
+				200: {
+					description: "Updated username successfully",
+					$ref: "SuccessMessageResponse#",
+				},
+				400: {
+					description: "Bad Request: Invalid input or missing fields",
+					$ref: "errorResponse#",
+				},
+				401: {
+					description: "Unauthorized: Invalid credentials",
+					$ref: "errorResponse#",
+				},
+				500: {
+					description: "Internal Server Error",
+					$ref: "errorResponse#",
+				},
+				default: {
+					description: "Unexpected error",
+					$ref: "errorResponse#",
 				},
 			},
 		},
@@ -29,12 +43,12 @@ export default function putUsername(server) {
 			const { id } = req.user;
 
 			server.db.prepare(`UPDATE users SET username = ? WHERE id = ?`).run(newUsername, id);
-			reply.status(200).send({ success: true });
+			reply.status(200).send({ success: true, message: "Updated username successfully" });
 		} catch (err) {
 			if (err.code == "SQLITE_CONSTRAINT_UNIQUE") {
 				return reply.status(400).send({ error: "Username is taken already" });
 			}
-			server.log.error(err);
+			console.log(err);
 			return reply.status(500).send({ error: "Internal server error" });
 		}
 	});

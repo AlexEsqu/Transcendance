@@ -7,7 +7,7 @@ const start = async () => {
 			host: process.env.ADDRESS,
 		});
 	} catch (err) {
-		server.log.error(err);
+		console.log(err);
 		process.exit(1);
 	}
 };

@@ -1,4 +1,3 @@
-import db from "/app/src/database.js";
 import fs from "fs";
 
 export default function deleteUserAvatar(server) {
@@ -9,6 +8,18 @@ export default function deleteUserAvatar(server) {
 			security: server.security.UserAuth,
 			response: {
 				204: { type: "null" },
+				401: {
+					description: "Unauthorized: Invalid credentials",
+					$ref: "errorResponse#",
+				},
+				500: {
+					description: "Internal Server Error",
+					$ref: "errorResponse#",
+				},
+				default: {
+					description: "Unexpected error",
+					$ref: "errorResponse#",
+				},
 			},
 		},
 		onRequest: [server.authenticateUser, server.authenticateClient],
@@ -29,7 +40,7 @@ export default function deleteUserAvatar(server) {
 			}
 			reply.status(204).send();
 		} catch (err) {
-			server.log.error(err);
+			console.log(err);
 			reply.status(500).send("internal server error");
 		}
 	});

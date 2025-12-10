@@ -11,32 +11,24 @@ export default function addFriend(server) {
 						`This endpoint requires client authentication AND user authentication.`",
 
 			security: server.security.UserAuth,
-			body: {
-				type: "object",
-				required: ["friend_id"],
-				properties: {
-					friend_id: { type: "integer"},
-				},
-			},
+			body: { $ref: "userIdObject#" },
 			response: {
-				201: {
-					type: "object",
-					properties: {
-						success: { type: "boolean" },
-						message: { type: "string" },
-					},
+				201: { $ref: "SuccessMessageResponse#" },
+				400: {
+					description: "Bad Request: Invalid input or missing fields",
+					$ref: "errorResponse#",
 				},
 				404: {
-					type: "object",
-					properties: {
-						error: { type: "string" },
-					},
+					description: "Not Found: User not found",
+					$ref: "errorResponse#",
 				},
-				400: {
-					type: "object",
-					properties: {
-						error: { type: "string" },
-					},
+				500: {
+					description: "Internal Server Error",
+					$ref: "errorResponse#",
+				},
+				default: {
+					description: "Unexpected error",
+					$ref: "errorResponse#",
 				},
 			},
 		},
@@ -67,7 +59,7 @@ export default function addFriend(server) {
 			if (err.code == "SQLITE_CONSTRAINT_PRIMARYKEY") {
 				return reply.status(400).send({ error: `User ${req.user.username} is already friend with ${req.friend.username}` });
 			}
-			server.log.error(err);
+			console.log(err);
 			return reply.status(500).send({ error: "Internal server error" });
 		}
 	});

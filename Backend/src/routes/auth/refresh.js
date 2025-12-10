@@ -60,7 +60,7 @@ function refresh(server) {
 			// Send access token
 			return reply.send({ accessToken: newAccessToken });
 		} catch (err) {
-			server.log.error(err);
+			console.log(err);
 			return reply.status(401).send({ error: "Invalid token" });
 		}
 	});
