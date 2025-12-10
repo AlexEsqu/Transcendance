@@ -8,7 +8,7 @@ export default function putUsername(server) {
 				type: "object",
 				required: ["new_username"],
 				properties: {
-					new_username: { type: "string" },
+					new_username: { type: "string", minLength: 3, maxLength: 20 },
 				},
 				additionalProperties: false,
 			},
@@ -23,6 +23,10 @@ export default function putUsername(server) {
 				},
 				401: {
 					description: "Unauthorized: Invalid credentials",
+					$ref: "errorResponse#",
+				},
+				409: {
+					description: "Conflict: Username is taken already",
 					$ref: "errorResponse#",
 				},
 				500: {
@@ -46,7 +50,7 @@ export default function putUsername(server) {
 			reply.status(200).send({ success: true, message: "Updated username successfully" });
 		} catch (err) {
 			if (err.code == "SQLITE_CONSTRAINT_UNIQUE") {
-				return reply.status(400).send({ error: "Username is taken already" });
+				return reply.status(409).send({ error: "Username is taken already" });
 			}
 			console.log(err);
 			return reply.status(500).send({ error: "Internal server error" });
