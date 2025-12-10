@@ -1,4 +1,3 @@
-import db from "../../../database.js";
 import { getUserbyId } from "../../../utils/utils.js";
 
 export default function deleteFriend(server) {
@@ -11,7 +10,7 @@ export default function deleteFriend(server) {
 			security: server.security.UserAuth,
 			body: { $ref: "userIdObject#" },
 			response: {
-				204: { type: "null" },
+				204: { description: "Successfully deleted friend", type: "null" },
 				400: {
 					description: "Bad Request: Invalid input or missing fields",
 					$ref: "errorResponse#",
@@ -37,8 +36,8 @@ export default function deleteFriend(server) {
 		onRequest: [server.authenticateUser, server.authenticateClient],
 		preHandler: async (req, reply) => {
 			// Verify the id passed as parameter
-			const { friend_id } = req.body;
-			const user = await getUserbyId(friend_id, db);
+			const { id } = req.body;
+			const user = await getUserbyId(id, server.db);
 			if (!user) {
 				return reply.status(404).send({ error: "Friend not found" });
 			}

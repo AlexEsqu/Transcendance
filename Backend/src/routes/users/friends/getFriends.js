@@ -1,4 +1,3 @@
-import db from "../../../database.js";
 import { getUserbyId, modifyUserAvatarKeyName } from "../../../utils/utils.js";
 
 export default function getFriends(server) {
@@ -11,7 +10,11 @@ export default function getFriends(server) {
 				Returns basic profile information for each friend.`This endpoint requires client authentication.`",
 			params: { $ref: "userIdObject#" },
 			response: {
-				200: { $ref: "publicUserObject#" },
+				200: {
+					type: "array",
+					items: { $ref: "publicUserObject#" },
+				},
+
 				401: {
 					description: "Unauthorized: Invalid credentials",
 					$ref: "errorResponse#",
@@ -35,14 +38,14 @@ export default function getFriends(server) {
 	server.get("/:id/friends", opts, async (req, reply) => {
 		try {
 			const { id } = req.params;
-			const user = await getUserbyId(id, db);
+			const user = await getUserbyId(id, server.db);
 			if (!user) {
 				return reply.status(404).send({ error: "User not found" });
 			}
 			const friends_id = server.db.prepare(`SELECT friend_id FROM friends WHERE user_id = ?`).all(id);
 			let friends = [];
 			for (const row of friends_id) {
-				const friend = await getUserbyId(row.friend_id, db);
+				const friend = await getUserbyId(row.friend_id, server.db);
 				if (friend) {
 					modifyUserAvatarKeyName(friend);
 					friends.push(friend);
