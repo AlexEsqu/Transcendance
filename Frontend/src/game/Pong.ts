@@ -28,7 +28,7 @@ enum State {
 };
 
 export class Pong {
-	static MAP_WIDTH = 8.5;
+	static MAP_WIDTH = 10;
 	static MAP_HEIGHT = 6;
 	static MAX_SCORE = 11;
 
@@ -74,8 +74,7 @@ export class Pong {
 		// createLight(this.gameScene, this.options.mapColor);
 
 		//	Remove default background color
-		this.gameScene.clearColor = new Color4(0.012, 0.027, 0.071);
-		// this.gameScene.clearColor = new Color4().fromHexString(this.options.mapColor);
+		this.gameScene.clearColor = new Color4(0, 0, 0, 0);
 
 		//	Create a glow layer to add a bloom effect around meshes
 		const glowLayer: GlowLayer = new GlowLayer("glow", this.gameScene, { mainTextureRatio: 0.6 });
@@ -93,10 +92,10 @@ export class Pong {
 		//	Creates 2 paddles, one for each players and 2DText for visual scoring
 		this.player1.paddle = new Paddle(this.gameScene, "left", Pong.MAP_WIDTH, this.options.level, this.options.paddColor);
 		this.player2.paddle = new Paddle(this.gameScene, "right", Pong.MAP_WIDTH, this.options.level, this.options.paddColor);
+
 		const line = createText("|", "white", 38, "-150px", "0px", this.gui);
 		this.player1.text = createText("0", "white", 38, "-150px", "-100px", this.gui);
 		this.player2.text = createText("0", "white", 38, "-150px", "100px", this.gui);
-
 		console.log("GAME-STATE: loaded");
 	}
 
@@ -163,10 +162,10 @@ export class Pong {
 		this.state = State.launch;
 		
 		const keys = [
-			{ frame: 0, value: 70 },
-			{ frame: 30, value: 50 }
+			{ frame: 0, value: 60 },
+			{ frame: 30, value: 30 }
 		];
-		const timer = createText(count.toString(), this.options.ballColor, 70, "200px", "0px", this.gui);
+		const timer = createText(count.toString(), this.options.ballColor, 60, "200px", "0px", this.gui);
 		const animation = createAnimation("timer", "fontSize", keys);
 		
 		timer.animations = [animation];
@@ -211,6 +210,10 @@ export class Pong {
 	 * 	- Saves keys status (on/off) to update scene objects accordingly.
 	 */
 	handleInput(keys: {}): void {
+		//	Resize the game with the window
+		window.addEventListener('resize', () => {
+			this.engine.resize();
+		});
 		//	Shift+Ctrl+Alt+I == Hide/show the Inspector
 		window.addEventListener("keydown", (ev) => {
             if (ev.shiftKey && ev.ctrlKey && ev.altKey && (ev.key === "I" || ev.key === "i")) {

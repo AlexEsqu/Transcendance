@@ -14,7 +14,7 @@ export class Paddle {
 	mesh: Mesh;
 
 	constructor(scene, side, mapWidth, level: Level, colorHex: string) {
-		Paddle.BOT_PROBABILITY += level;
+		Paddle.BOT_PROBABILITY -= level;
 		this.mesh = createPaddle(scene, Paddle.HEIGHT, Paddle.WIDTH, Paddle.DEPTH, colorHex);
 		this.mesh.rotation.y = Math.PI / 2;
 		this.mesh.position = new Vector3((mapWidth / 2), 0.2, 0.0);
