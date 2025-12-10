@@ -9,7 +9,7 @@ export function getUser(server) {
 			security: server.security.AppAuth,
 			params: { $ref: "userIdObject#" },
 			response: {
-				// 200: { $ref: "publicUserObject#" },
+				200: { $ref: "publicUserObject#" },
 				400: {
 					description: "Bad Request: Invalid input or missing fields",
 					$ref: "errorResponse#",
@@ -66,14 +66,7 @@ export function getUsers(server) {
 			response: {
 				200: {
 					type: "array",
-					items: {
-						type: "object",
-						properties: {
-							id: { type: "integer" },
-							username: { type: "string" },
-							avatar_url: { type: "string" },
-						},
-					},
+					items: { $ref: "publicUserObject#" },
 				},
 			},
 		},

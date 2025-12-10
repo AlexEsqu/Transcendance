@@ -5,7 +5,7 @@ export const errorResponse = {
 		error: { type: "string" },
 		message: { type: "string" },
 	},
-	required: ["error"],
+	// required: ["error"],
 };
 
 export const authCredentialsBody = {
@@ -66,12 +66,9 @@ export const publicUserObject = {
 	$id: "publicUserObject",
 	type: "object",
 	required: ["id", "username", "avatar_url"],
-	items: {
-		type: "object",
-		properties: {
-			id: { type: "integer" },
-			username: { type: "string" },
-			avatar_url: { type: ["string", "null"] },
-		},
+	properties: {
+		id: { type: "integer" },
+		username: { type: "string" },
+		avatar_url: { type: ["string", "null"] },
 	},
 };
