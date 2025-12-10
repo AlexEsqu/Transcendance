@@ -9,7 +9,11 @@ export function getUser(server) {
 			security: server.security.AppAuth,
 			params: { $ref: "userIdObject#" },
 			response: {
-				200: { $ref: "publicUserObject#" },
+				// 200: { $ref: "publicUserObject#" },
+				400: {
+					description: "Bad Request: Invalid input or missing fields",
+					$ref: "errorResponse#",
+				},
 				401: {
 					description: "Unauthorized: Invalid credentials",
 					$ref: "errorResponse#",
@@ -20,7 +24,11 @@ export function getUser(server) {
 				},
 				500: {
 					description: "Internal Server Error",
-					$ref: "errorResponse#",
+					type: "object",
+					properties: {
+						error: { type: "string" },
+						message: { type: "string" },
+					},
 				},
 				default: {
 					description: "Unexpected error",
@@ -34,13 +42,14 @@ export function getUser(server) {
 	server.get("/users/:id", singleUserSchema, (req, reply) => {
 		try {
 			const { id } = req.params;
+			console.log(id);
 			const user = server.db.prepare(`SELECT id, username, avatar_path FROM users WHERE id = ?`).get(id);
 			if (!user) {
 				return reply.status(404).send({ error: "User not found" });
 			}
 			modifyUserAvatarKeyName(user);
 			console.log(user);
-			reply.send(user);
+			return reply.status(200).send(user);
 		} catch (err) {
 			console.log(err);
 			return reply.status(500).send({ error: "Internal server error" });
@@ -75,7 +84,6 @@ export function getUsers(server) {
 		users.forEach((user) => {
 			modifyUserAvatarKeyName(user);
 		});
-
 		console.log(users);
 		reply.send(users);
 	});

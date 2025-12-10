@@ -3,6 +3,7 @@ export const errorResponse = {
 	additionalProperties: false,
 	properties: {
 		error: { type: "string" },
+		message: { type: "string" },
 	},
 	required: ["error"],
 };
@@ -55,22 +56,22 @@ export const matchObject = {
 export const userIdObject = {
 	$id: "userIdObject",
 	type: "object",
-	required: ["user_id"],
+	required: ["id"],
 	properties: {
-		user_id: { type: "integer" },
+		id: { type: "integer" },
 	},
 };
 
 export const publicUserObject = {
 	$id: "publicUserObject",
-	type: "array",
-	required: ["id", "username", "avatar"],
+	type: "object",
+	required: ["id", "username", "avatar_url"],
 	items: {
 		type: "object",
 		properties: {
 			id: { type: "integer" },
 			username: { type: "string" },
-			avatar_url: { type: "string" },
+			avatar_url: { type: ["string", "null"] },
 		},
 	},
 };

@@ -9,7 +9,7 @@ import cors from "@fastify/cors";
 import fastifyRateLimit from "@fastify/rate-limit";
 import fastifyStatic from "@fastify/static";
 import path from "node:path";
-import { authCredentialsBody, errorResponse, SignupBody, SuccessMessageResponse, matchObject, userIdObject ,publicUserObject} from "./schemas/schemas.js";
+import { authCredentialsBody, errorResponse, SignupBody, SuccessMessageResponse, matchObject, userIdObject, publicUserObject } from "./schemas/schemas.js";
 
 //Plugins
 import clientAuthPluggin from "./plugins/validateApiKey.js";
@@ -27,7 +27,11 @@ export const server = Fastify({
 	},
 	ajv: {
 		plugins: [ajvFilePlugin],
-	}
+		customOptions: {
+			allErrors: true,
+			strict: false, // optional, but useful when debugging schemas
+		},
+	},
 });
 
 server.register(db);
@@ -68,4 +72,4 @@ server.addSchema(SignupBody);
 server.addSchema(SuccessMessageResponse);
 server.addSchema(matchObject);
 server.addSchema(userIdObject);
-server.addSchema(publicUserObject)
+server.addSchema(publicUserObject);

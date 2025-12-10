@@ -30,15 +30,15 @@ export default function getUserMatches(server) {
 		},
 		onRequest: [server.authenticateClient],
 	};
-	server.get("/matches/:user_id", opts, async (req, reply) => {
+	server.get("/:id/matches", opts, async (req, reply) => {
 		try {
-			const { user_id } = req.params;
-			const user = server.db.prepare(`SELECT id FROM users WHERE id = ?`).get(user_id);
+			const { id } = req.params;
+			const user = server.db.prepare(`SELECT id FROM users WHERE id = ?`).get(id);
 			if (!user) {
 				return reply.status(404).send({ error: "User not found" });
 			}
 			const stmnt = server.db.prepare(`SELECT * FROM matches WHERE winner_id = ? OR loser_id = ?`);
-			const matches = stmnt.all(user_id, user_id);
+			const matches = stmnt.all(id, id);
 			console.log(matches);
 			return reply.status(200).send(matches);
 		} catch (err) {
