@@ -37,3 +37,25 @@ export const SuccessMessageResponse = {
 	},
 	required: ["success", "message"],
 };
+
+export const matchObject = {
+	$id: "matchObject",
+	type: "object",
+	required: ["winner_id", "loser_id", "winner_score", "loser_score", "date"],
+	properties: {
+		winner_id: { type: "integer" },
+		loser_id: { type: "integer" },
+		winner_score: { type: "integer" },
+		loser_score: { type: "integer" },
+		date: { type: "string", format: "date-time" },
+	},
+};
+
+export const userIdObject = {
+	$id: "userIdObject",
+	type: "object",
+	required: ["user_id"],
+	properties: {
+		user_id: { type: "integer" },
+	},
+};

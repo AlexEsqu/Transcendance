@@ -9,7 +9,7 @@ import cors from "@fastify/cors";
 import fastifyRateLimit from "@fastify/rate-limit";
 import fastifyStatic from "@fastify/static";
 import path from "node:path";
-import { authCredentialsBody, errorResponse, SignupBody, SuccessMessageResponse } from "./schemas/schemas.js";
+import { authCredentialsBody, errorResponse, SignupBody, SuccessMessageResponse, matchObject, userIdObject } from "./schemas/schemas.js";
 
 //Plugins
 import clientAuthPluggin from "./plugins/validateApiKey.js";
@@ -19,7 +19,7 @@ import swaggerPlugin from "./plugins/swagger.js";
 import matchesRoutes from "./routes/matches/index.js";
 import userRoutes from "./routes/users/index.js";
 import authRoutes from "./routes/auth/index.js";
-import db from "./database.js"
+import db from "./database.js";
 export const server = Fastify({
 	https: {
 		key: fs.readFileSync("/tmp/certs/server.key"),
@@ -31,7 +31,6 @@ export const server = Fastify({
 });
 
 server.register(db);
-
 
 // MODULES
 server.register(clientAuthPluggin);
@@ -67,3 +66,5 @@ server.addSchema(authCredentialsBody);
 server.addSchema(errorResponse);
 server.addSchema(SignupBody);
 server.addSchema(SuccessMessageResponse);
+server.addSchema(matchObject);
+server.addSchema(userIdObject);
