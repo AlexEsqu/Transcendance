@@ -1,5 +1,4 @@
 import { createRefreshToken, createAccessToken, hashRefreshToken } from "../../services/authServices.js";
-import db from "/app/src/database.js";
 
 function refresh(server) {
 	const opts = {
@@ -8,18 +7,9 @@ function refresh(server) {
 			description:
 				"Uses the refresh token to issue a new access token. The endpoint verifies the refresh token, checks that it is not expired or revoked. This endpoint requires `client authentification` AND `user authentification` AND the refresh cookie stored in the `HttpOnly refreshToken cookie`",
 			security: server.security.UserAndSession,
-			parameters: [
-				{
-					name: "refreshToken",
-					in: "cookie",
-					description: "HttpOnly refresh token cookie, sent automatically by the browser",
-					required: true,
-					schema: { type: "string" },
-				},
-			],
 			response: {
 				200: {
-					description: "New access token",
+					description: "Returns new access token",
 					type: "object",
 					properties: {
 						accessToken: { type: "string" },
@@ -27,11 +17,16 @@ function refresh(server) {
 					required: ["accessToken"],
 				},
 				401: {
-					description: "Unauthorized",
-					type: "object",
-					properties: {
-						error: { type: "string" },
-					},
+					description: "Unauthorized: Invalid credentials",
+					$ref: "errorResponse#",
+				},
+				500: {
+					description: "Internal Server Error",
+					$ref: "errorResponse#",
+				},
+				default: {
+					description: "Unexpected error",
+					$ref: "errorResponse#",
 				},
 			},
 		},
@@ -49,23 +44,23 @@ function refresh(server) {
 			// Rotate refresh token
 			const newRefreshToken = createRefreshToken(id, username);
 			const newRefreshTokenHash = await hashRefreshToken(newRefreshToken);
-
+			console.log("upadting refresh token");
 			// Save new refresh token hash in DB
-			db.prepare(`UPDATE users SET refresh_token_hash = ? WHERE id = ?`).run(newRefreshTokenHash, id);
+			server.db.prepare(`UPDATE users SET refresh_token_hash = ? WHERE id = ?`).run(newRefreshTokenHash, id);
 
 			// Send new refresh token to user
 			reply.setCookie("refreshToken", newRefreshToken, {
 				httpOnly: true,
 				secure: true,
 				sameSite: "strict",
-				path: "api/auth/refresh",
+				path: "/users/auth",
 				maxAge: 60 * 60 * 24 * 7, // 7 days
 			});
 
 			// Send access token
 			return reply.send({ accessToken: newAccessToken });
 		} catch (err) {
-			console.log(err);
+			server.log.error(err);
 			return reply.status(401).send({ error: "Invalid token" });
 		}
 	});

@@ -28,13 +28,13 @@ export default function putUsername(server) {
 			const newUsername = req.body.new_username;
 			const { id } = req.user;
 
-			db.prepare(`UPDATE users SET username = ? WHERE id = ?`).run(newUsername, id);
+			server.db.prepare(`UPDATE users SET username = ? WHERE id = ?`).run(newUsername, id);
 			reply.status(200).send({ success: true });
 		} catch (err) {
 			if (err.code == "SQLITE_CONSTRAINT_UNIQUE") {
 				return reply.status(400).send({ error: "Username is taken already" });
 			}
-			console.log(err);
+			server.log.error(err);
 			return reply.status(500).send({ error: "Internal server error" });
 		}
 	});

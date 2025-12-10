@@ -1,6 +1,6 @@
-import db from "/app/src/database.js";
 import bcrypt from "bcrypt";
 
+//TODO: https://stackoverflow.com/questions/21978658/invalidating-json-web-tokens
 export default function putUserPassword(server) {
 	const opts = {
 		schema: {
@@ -32,17 +32,17 @@ export default function putUserPassword(server) {
 			const { oldPassword, newPassword } = req.body;
 			const { id } = req.user;
 			//check the old password compared to the hash in db
-			const data = db.prepare(`SELECT password_hash FROM users WHERE id = ?`).get(id);
+			const data = server.db.prepare(`SELECT password_hash FROM users WHERE id = ?`).get(id);
 			const match = await bcrypt.compare(oldPassword, data.password_hash);
 			if (!match) {
 				return reply.status(400).send({ error: "Old password incorrect" });
 			}
 			//if ok, hash new password and update db
 			const newPasswordHash = await bcrypt.hash(newPassword, await bcrypt.genSalt(10));
-			db.prepare(`UPDATE users SET password_hash = ? WHERE id = ?`).run(newPasswordHash, id);
+			server.db.prepare(`UPDATE users SET password_hash = ? WHERE id = ?`).run(newPasswordHash, id);
 			reply.status(200).send({ success: true });
 		} catch (err) {
-			console.log(err);
+			server.log.error(err);
 		}
 	});
 }

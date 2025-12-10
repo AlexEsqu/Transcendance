@@ -1,39 +1,48 @@
-import db from "../database.js";
 import bcrypt from "bcrypt";
 import fp from "fastify-plugin";
 
 export default fp(async (server) => {
-	server.decorate("authenticateRefreshToken", async (request) => {
+	server.decorate("authenticateRefreshToken", async (request, reply) => {
 		try {
-			const { refreshToken } = request.cookies;
-
+			const { refreshToken } = request.cookies
 			if (!refreshToken) {
-				throw server.httpErrors.unauthorized("Missing refreshToken cookie");
+				return reply.status(401).send({ error: "Missing refreshToken cookie" });
 			}
 
-			// Verify signature (ensures token is structurally valid)
-			const { id } = await server.jwt.verify(refreshToken);
+			// Verify JWT structure and signature
+			const payload = await server.jwt.verify(refreshToken);
+
+			// Ensure token has an id
+			if (!payload.id) {
+				return reply.status(401).send({ error: "Invalid refresh token" });
+			}
 
 			// Get stored hash from DB
-			const row = db.prepare(`SELECT refresh_token_hash FROM users WHERE id = ?`).get(id);
-			if (!row) {
-				throw server.httpErrors.unauthorized("Unauthorized");
+			const row = server.db.prepare(`SELECT refresh_token_hash FROM users WHERE id = ?`).get(payload.id);
+
+			if (!row?.refresh_token_hash) {
+				return reply.status(401).send({ error: "Unauthorized" });
 			}
 
-			const storedHash = row.refresh_token_hash;
-
-			// Compare raw refresh token with stored hash
-			const match = await bcrypt.compare(refreshToken, storedHash);
+			// Compare token to stored hash
+			const match = await bcrypt.compare(refreshToken, row.refresh_token_hash);
 
 			if (!match) {
-				throw server.httpErrors.unauthorized("Unauthorized");
+				return reply.status(401).send({ error: "Unauthorized" });
 			}
+
+			request.userId = payload.id;
 		} catch (err) {
-			server.log.error(err);
 			if (err.name === "TokenExpiredError") {
-				throw server.httpErrors.unauthorized("Refresh token expired");
+				return reply.status(401).send({ error: "Refresh token expired" });
 			}
-			throw server.httpErrors.unauthorized("Invalid refresh token");
+
+			// Log unexpected errors only
+			if (!["UnauthorizedError", "JsonWebTokenError"].includes(err.name)) {
+				server.log.error(err);
+			}
+
+			return reply.status(401).send({ error: "Invalid refresh token" });
 		}
 	});
 });

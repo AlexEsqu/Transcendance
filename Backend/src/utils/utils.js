@@ -8,6 +8,6 @@ export function modifyUserAvatarKeyName(user) {
 }
 
 export async function getUserbyId(id, db) {
-	return await db.prepare(`SELECT id, username, avatar_path FROM users WHERE id = ?`).get(id);
+	return await server.db.prepare(`SELECT id, username, avatar_path FROM users WHERE id = ?`).get(id);
 }
 

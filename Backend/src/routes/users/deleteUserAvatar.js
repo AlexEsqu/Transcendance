@@ -18,10 +18,10 @@ export default function deleteUserAvatar(server) {
 			const id = req.user.id;
 
 			//retrive avatar path
-			const { avatar_path } = db.prepare(`SELECT avatar_path FROM users WHERE id = ?`).get(id);
+			const { avatar_path } = server.db.prepare(`SELECT avatar_path FROM users WHERE id = ?`).get(id);
 
 			if (avatar_path) {
-				db.prepare(`UPDATE users SET avatar_path = NULL WHERE id = ?`).run(id);
+				server.db.prepare(`UPDATE users SET avatar_path = NULL WHERE id = ?`).run(id);
 
 				fs.unlink(avatar_path, () => {
 					console.log(avatar_path + " was deleted");
@@ -29,7 +29,7 @@ export default function deleteUserAvatar(server) {
 			}
 			reply.status(204).send();
 		} catch (err) {
-			console.log(err);
+			server.log.error(err);
 			reply.status(500).send("internal server error");
 		}
 	});

@@ -39,7 +39,7 @@ export default function getFriends(server) {
 			if (!user) {
 				return reply.status(404).send({ error: "User not found" });
 			}
-			const friends_id = db.prepare(`SELECT friend_id FROM friends WHERE user_id = ?`).all(id);
+			const friends_id = server.db.prepare(`SELECT friend_id FROM friends WHERE user_id = ?`).all(id);
 			let friends = [];
 			for (const row of friends_id) {
 				const friend = await getUserbyId(row.friend_id, db);
@@ -52,7 +52,7 @@ export default function getFriends(server) {
 
 			reply.send(friends);
 		} catch (err) {
-			console.log(err);
+			server.log.error(err);
 			return reply.status(500).send({ error: "Internal server error" });
 		}
 	});

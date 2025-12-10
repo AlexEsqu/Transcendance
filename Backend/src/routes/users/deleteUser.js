@@ -17,13 +17,13 @@ function deleteUser(server) {
 	server.delete("/me", opts, (req, reply) => {
 		const { id } = req.user;
 		//delete the users avatar from db
-		const { avatar_path } = db.prepare(`SELECT avatar_path FROM users WHERE id = ?`).get(id);
+		const { avatar_path } = server.db.prepare(`SELECT avatar_path FROM users WHERE id = ?`).get(id);
 		if (avatar_path) {
 			fs.unlink(avatar_path, () => {
 				console.log(avatar_path + " was deleted");
 			});
 		}
-		db.prepare(`DELETE FROM users WHERE id = ?`).run(id);
+		server.db.prepare(`DELETE FROM users WHERE id = ?`).run(id);
 		reply.status(204).send();
 	});
 }

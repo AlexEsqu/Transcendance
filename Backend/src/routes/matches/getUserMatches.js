@@ -20,15 +20,15 @@ function getUserMatches(server) {
 		try {
 			const { user_id } = req.params;
 			console.log(req.params)
-			const user = db.prepare(`SELECT id FROM users WHERE id = ?`).get(user_id);
+			const user = server.db.prepare(`SELECT id FROM users WHERE id = ?`).get(user_id);
 			if (!user) {
 				return reply.status(404).send({ error: "User not found" });
 			}
-			const stmnt = db.prepare(`SELECT * FROM matches WHERE winner_id = ? OR loser_id = ?`);
+			const stmnt = server.db.prepare(`SELECT * FROM matches WHERE winner_id = ? OR loser_id = ?`);
 			const matches = stmnt.all(user_id,user_id)
 			reply.send({ matches });
 		} catch (err) {
-			console.log(err);
+			server.log.error(err);
 			reply.status(500).send({ error: "Internal server error" });
 		}
 	});

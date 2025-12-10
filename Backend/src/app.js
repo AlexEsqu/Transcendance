@@ -9,17 +9,17 @@ import cors from "@fastify/cors";
 import fastifyRateLimit from "@fastify/rate-limit";
 import fastifyStatic from "@fastify/static";
 import path from "node:path";
+import { authCredentialsBody, errorResponse, SignupBody, SuccessMessageResponse } from "./schemas/schemas.js";
 
 //Plugins
 import clientAuthPluggin from "./plugins/validateApiKey.js";
 import sessionAuthPluggin from "./plugins/validateSessionToken.js";
-
 import swaggerPlugin from "./plugins/swagger.js";
 //Routes
 import matchesRoutes from "./routes/matches/index.js";
 import userRoutes from "./routes/users/index.js";
 import authRoutes from "./routes/auth/index.js";
-
+import db from "./database.js"
 export const server = Fastify({
 	https: {
 		key: fs.readFileSync("/tmp/certs/server.key"),
@@ -29,6 +29,9 @@ export const server = Fastify({
 		plugins: [ajvFilePlugin],
 	},
 });
+
+server.register(db);
+
 
 // MODULES
 server.register(clientAuthPluggin);
@@ -41,7 +44,7 @@ server.register(fastifyMultiPart, {
 server.register(authPlugin);
 server.register(fastifyCookie);
 server.register(swaggerPlugin);
-server.register(cors, { origin: "*", credentials: true, methods: ["GET", "POST", "PATCH", "DELETE"] });
+server.register(cors, { origin: "*", credentials: true, methods: ["GET", "POST", "PUT", "DELETE"] });
 //Routes
 server.register(matchesRoutes);
 server.register(userRoutes);
@@ -57,3 +60,10 @@ server.register(fastifyStatic, {
 	root: path.join(process.env.AVATARS_UPLOAD_PATH),
 	prefix: "/avatars/",
 });
+
+//Schema
+
+server.addSchema(authCredentialsBody);
+server.addSchema(errorResponse);
+server.addSchema(SignupBody);
+server.addSchema(SuccessMessageResponse);

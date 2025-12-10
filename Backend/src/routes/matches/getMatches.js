@@ -11,7 +11,7 @@ function getMatches(server) {
 	};
 	server.get("/matches", opts, (req, reply) => {
 		try {
-			const matches = db.prepare(`SELECT * FROM matches`).all();
+			const matches = server.db.prepare(`SELECT * FROM matches`).all();
 			reply.send({ matches });
 		} catch (err) {
 			console.log(err)

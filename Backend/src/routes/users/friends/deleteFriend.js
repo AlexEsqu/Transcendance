@@ -56,16 +56,16 @@ export default function deleteFriend(server) {
 			}
 
 			//check if they are friends before trying to delete
-			const friend = db.prepare(`SELECT * FROM friends WHERE user_id = ? AND friend_id = ?`).get(userId, friendId);
+			const friend = server.db.prepare(`SELECT * FROM friends WHERE user_id = ? AND friend_id = ?`).get(userId, friendId);
 			if (!friend)
 				return reply.status(400).send({
 					error: `User ${req.user.username} is not friend with ${req.friend.username}`,
 				});
 
-			db.prepare(`DELETE FROM friends WHERE user_id = ? AND friend_id = ?`).run(userId, friendId);
+			server.db.prepare(`DELETE FROM friends WHERE user_id = ? AND friend_id = ?`).run(userId, friendId);
 			return reply.status(204).send();
 		} catch (err) {
-			console.log(err);
+			server.log.error(err);
 			return reply.status(500).send({ error: "Internal server error" });
 		}
 	});

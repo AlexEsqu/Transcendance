@@ -39,7 +39,7 @@ export function getUser(server) {
 	server.get("/users/:id", singleUserSchema, (req, reply) => {
 		try {
 			const { id } = req.params;
-			const user = db.prepare(`SELECT id, username, avatar_path FROM users WHERE id = ?`).get(id);
+			const user = server.db.prepare(`SELECT id, username, avatar_path FROM users WHERE id = ?`).get(id);
 			if (!user) {
 				return reply.status(404).send({ error: "User not found" });
 			}
@@ -47,7 +47,7 @@ export function getUser(server) {
 			console.log(user);
 			reply.send(user);
 		} catch (err) {
-			console.log(err);
+			server.log.error(err);
 			return reply.status(500).send({ error: "Internal server error" });
 		}
 	});
@@ -76,7 +76,7 @@ export function getUsers(server) {
 		onRequest: [server.authenticateClient],
 	};
 	server.get("/users", allUsersSchema, (req, reply) => {
-		const users = db.prepare(`SELECT id, username, avatar_path FROM users`).all();
+		const users = server.db.prepare(`SELECT id, username, avatar_path FROM users`).all();
 		users.forEach((user) => {
 			modifyUserAvatarKeyName(user);
 		});

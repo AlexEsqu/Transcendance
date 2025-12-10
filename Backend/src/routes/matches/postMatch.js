@@ -21,7 +21,7 @@ function postMatches(server) {
 		onRequest: [server.authenticateClient],
 		preHandler: async (req, reply) => {
 			const { winner_id, loser_id } = req.body;
-			const stmnt = db.prepare(`SELECT id from users WHERE id = ?`);
+			const stmnt = server.db.prepare(`SELECT id from users WHERE id = ?`);
 			const winner = stmnt.get(winner_id);
 			const loser = stmnt.get(loser_id);
 			if (winner_id == loser_id) {
@@ -38,11 +38,11 @@ function postMatches(server) {
 	server.post("/matches", opts, async (req, reply) => {
 		try {
 			const match = req.body;
-			const stmnt = db.prepare(`INSERT INTO matches (winner_id, loser_id, winner_score ,loser_score, date) VALUES (?,?,?,?,?)`);
+			const stmnt = server.db.prepare(`INSERT INTO matches (winner_id, loser_id, winner_score ,loser_score, date) VALUES (?,?,?,?,?)`);
 			stmnt.run(match.winner_id, match.loser_id, match.winner_score, match.loser_score, match.date);
 			reply.status(200).send({ success: true, message: "Match added successfully" });
 		} catch (err) {
-			console.log(err);
+			server.log.error(err);
 			reply.status(500).send({ error: "Internal server error" });
 		}
 	});
