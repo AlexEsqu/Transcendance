@@ -41,7 +41,7 @@ export default function putUserPassword(server) {
 		},
 		onRequest: [server.authenticateUser, server.authenticateClient],
 	};
-	server.patch("/me/password", opts, async (req, reply) => {
+	server.put("/me/password", opts, async (req, reply) => {
 		try {
 			const { oldPassword, newPassword } = req.body;
 			const { id } = req.user;
@@ -49,7 +49,7 @@ export default function putUserPassword(server) {
 			const data = server.db.prepare(`SELECT password_hash FROM users WHERE id = ?`).get(id);
 			const match = await bcrypt.compare(oldPassword, data.password_hash);
 			if (!match) {
-				return reply.status(400).send({ error: "Old password incorrect" });
+				return reply.status(401).send({ error: "Incorrect old password" });
 			}
 			//if ok, hash new password and update db
 			const newPasswordHash = await bcrypt.hash(newPassword, await bcrypt.genSalt(10));
