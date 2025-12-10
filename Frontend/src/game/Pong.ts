@@ -61,7 +61,7 @@ export class Pong {
 	}
 
 	/**
-	 * 	- Create all scenes and game elements
+	 * 	- Create the scene and all its elements
 	 */
 	loadGame(): void {
 		if (!this.engine) return ;
@@ -85,7 +85,7 @@ export class Pong {
 		const map: Mesh = createMap(this.gameScene, Pong.MAP_HEIGHT, Pong.MAP_WIDTH, this.options.mapColor);
 
 		// Exclude bloom effect on the map
-		glowLayer.addExcludedMesh(map);
+		// glowLayer.addExcludedMesh(map);
 
 		//	Create the ball
 		this.ball = new Ball(this.gameScene, this.options.level, this.options.ballColor);
@@ -93,9 +93,9 @@ export class Pong {
 		//	Creates 2 paddles, one for each players and 2DText for visual scoring
 		this.player1.paddle = new Paddle(this.gameScene, "left", Pong.MAP_WIDTH, this.options.level, this.options.paddColor);
 		this.player2.paddle = new Paddle(this.gameScene, "right", Pong.MAP_WIDTH, this.options.level, this.options.paddColor);
-		const line = createText("|", "white", 32, "-250px", "0px", this.gui);
-		this.player1.text = createText("0", "white", 32, "-250px", "-100px", this.gui);
-		this.player2.text = createText("0", "white", 32, "-250px", "100px", this.gui);
+		const line = createText("|", "white", 38, "-150px", "0px", this.gui);
+		this.player1.text = createText("0", "white", 38, "-150px", "-100px", this.gui);
+		this.player2.text = createText("0", "white", 38, "-150px", "100px", this.gui);
 
 		console.log("GAME-STATE: loaded");
 	}
@@ -163,10 +163,10 @@ export class Pong {
 		this.state = State.launch;
 		
 		const keys = [
-			{ frame: 0, value: 90 },
+			{ frame: 0, value: 70 },
 			{ frame: 30, value: 50 }
 		];
-		const timer = createText(count.toString(), "white", 90, "0px", "0px", this.gui);
+		const timer = createText(count.toString(), this.options.ballColor, 70, "200px", "0px", this.gui);
 		const animation = createAnimation("timer", "fontSize", keys);
 		
 		timer.animations = [animation];
