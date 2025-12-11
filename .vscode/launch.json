@@ -1,0 +1,46 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Frontend: Chrome (webpack-dev-server)",
+      "type": "pwa-chrome",
+      "request": "launch",
+      "url": "http://localhost:8080",
+      "webRoot": "${workspaceFolder}/Frontend",
+      "sourceMapPathOverrides": {
+        "webpack:///./*": "${workspaceFolder}/Frontend/*",
+        "webpack:///*": "${workspaceFolder}/Frontend/*"
+      }
+    },
+    {
+      "name": "Frontend: Karma (debug UI)",
+      "type": "pwa-chrome",
+      "request": "launch",
+      "url": "http://localhost:9876/debug.html",
+      "webRoot": "${workspaceFolder}/Frontend",
+      "sourceMapPathOverrides": {
+        "webpack:///./*": "${workspaceFolder}/Frontend/*",
+        "webpack:///*": "${workspaceFolder}/Frontend/*"
+      }
+    },
+    {
+      "name": "Backend: Attach to Fastify (Docker)",
+      "type": "pwa-node",
+      "request": "attach",
+      "address": "localhost",
+      "port": 9229,
+      "restart": true,
+      "protocol": "inspector",
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Dev: Frontend + Backend",
+      "configurations": [
+        "Frontend: Chrome (webpack-dev-server)",
+        "Backend: Attach to Fastify (Docker)"
+      ]
+    }
+  ]
+}

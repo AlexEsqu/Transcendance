@@ -3,12 +3,9 @@
   "compilerOptions": {
     "rootDir": ".",
     "types": ["jasmine", "node"],
-    "noEmit": false,
-    "sourceMap": true
+    "sourceMap": true,
+    "noEmit": false
   },
-  "include": [
-    "src/**/*",
-    "tests/**/*"
-  ],
+  "include": ["src/**/*", "tests/**/*"],
   "exclude": ["node_modules", "dist"]
 }
