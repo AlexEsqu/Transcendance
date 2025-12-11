@@ -12,9 +12,7 @@ export function createAccessToken(id, username, db) {
 	//SET IS ACTIVE TO TRUE
 	var date = new Date();
 	var sqliteDate = date.toISOString();
-	db.prepare(
-		`UPDATE users SET is_active = ?, last_activity = ? WHERE id = ?`
-	).run("true", sqliteDate, id);
+	db.prepare(`UPDATE users SET last_activity = ? WHERE id = ?`).run(sqliteDate, id);
 	return token;
 }
 
