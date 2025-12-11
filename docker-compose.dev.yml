@@ -9,6 +9,7 @@ services:
     volumes:
       - ./Backend/src:/app/src
       - ./Backend/scripts:/app/scripts
+      - ./Backend/tests:/app/tests
       - sqlite:/app/data
       - user_avatars:/app/uploads/avatars
     environment:

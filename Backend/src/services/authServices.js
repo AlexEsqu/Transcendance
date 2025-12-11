@@ -1,25 +1,35 @@
 import bcrypt from "bcrypt";
-import { server } from "../app.js";
 
-export function createAccessToken(id, username, db) {
-	const token = server.jwt.sign(
-		{
-			id: id,
-			username: username,
-		},
-		{ expiresIn: "5m" } //TODO
-	);
-	//SET IS ACTIVE TO TRUE
-	var date = new Date();
-	var sqliteDate = date.toISOString();
-	db.prepare(`UPDATE users SET last_activity = ? WHERE id = ?`).run(sqliteDate, id);
-	return token;
+
+export function createAccessToken(server, id, username) {
+  // Use the injected server instance instead of server
+  const token = server.jwt.sign(
+    { id, username },
+    { expiresIn: "5m" } // TODO: adjust
+  );
+
+  // Update last_activity in DB
+  const date = new Date();
+  const sqliteDate = date.toISOString();
+  server.db.prepare(`UPDATE users SET last_activity = ? WHERE id = ?`).run(sqliteDate, id);
+
+  return token;
 }
 
-export function createRefreshToken(id, username) {
-	return server.jwt.sign({ id, username }, { expiresIn: "7d" });
+/**
+ * Creates a refresh token using the provided server instance
+ */
+export function createRefreshToken(server, id, username) {
+  return server.jwt.sign(
+    { id, username },
+    { expiresIn: "7d" } // TODO: adjust
+  );
 }
 
+/**
+ * Hashes a refresh token
+ */
 export async function hashRefreshToken(token) {
-	return await bcrypt.hash(token, await bcrypt.genSalt(10));
+  const salt = await bcrypt.genSalt(10);
+  return bcrypt.hash(token, salt);
 }

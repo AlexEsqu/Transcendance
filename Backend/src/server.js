@@ -1,4 +1,7 @@
-import { server } from "./app.js";
+import { buildServer } from "./app.js";
+
+
+export const server = buildServer({ useHttps: true });
 
 const start = async () => {
 	try {
