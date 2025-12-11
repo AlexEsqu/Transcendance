@@ -40,10 +40,13 @@ export function getUser(server) {
 		onRequest: [server.authenticateClient],
 	};
 
-	server.get("/users/:id", singleUserSchema, (req, reply) => {
+	server.get("/users/:id", singleUserSchema, async (req, reply) => {
 		try {
 			const { id } = req.params;
-			const user = getUserbyId(id, server.db);
+
+			const user = await getUserbyId(id, server.db);
+			console.log(user);
+
 			if (!user) {
 				return reply.status(404).send({ error: "User not found" });
 			}

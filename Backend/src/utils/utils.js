@@ -13,9 +13,8 @@ export function formatUserObject(user) {
 }
 
 export async function getUserbyId(id, db) {
-	return await db
-		.prepare(`SELECT id, username, avatar, last_activity FROM users WHERE id = ?`)
-		.get(id);
+	return  db.prepare(`SELECT id, username, avatar, last_activity FROM users WHERE id = ?`)
+				.get(id);
 }
 
 export function computeActive(last_active_at) {
