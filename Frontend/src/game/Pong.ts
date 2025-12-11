@@ -135,6 +135,26 @@ export class Pong {
 	}
 
 	/**
+	 * 	- Create environment and objects of the game
+	 * 	- Camera, light, map, ball, paddles and visual-scoring
+	 */
+	createGameScene(): void {
+
+	}
+
+	createMenuScene(): void {
+
+		//	Remove default background color
+		// this.gameScene.clearColor = new Color4(0.004, 0.004, 0.102);
+
+		//	Display player's username
+		console.log("Game STATE: menu");
+
+		//	Display rules
+		//	Button click to start
+	}
+
+	/**
 	 * 	- Check if any of the players have reached the maximum score
 	 */
 	monitoringScore(): boolean {

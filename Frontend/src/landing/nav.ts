@@ -1,7 +1,5 @@
-import footerHTML from "../pages/footer.html"
-import headerHTML from "../pages/header.html"
 import navHTML from "../pages/nav.html"
-import { displayAliasQueryPage, displayUserSettingPage } from "./alias"
+import { displayAliasQueryPage, displayUserPage } from "./alias"
 import { renderPageState } from "./history"
 import { User, GuestUser, RegisteredUser, getUserFromLocalStorage } from "./user"
 
@@ -10,7 +8,10 @@ export { displayNavBar}
 async function displayNavBar()
 {
 	const user : User = await getUserFromLocalStorage();
-	document.body.insertAdjacentHTML("beforeend", navHTML.replace('USERNAME', user.name))
+	document.body.insertAdjacentHTML("beforeend", navHTML.replace('USERNAME', user.name));
+
+	const avatarImage = document.getElementById('user-avatar') as HTMLImageElement;
+	avatarImage.src = user.avatarPath;
 
 	const logoutButton = document.getElementById('logout-btn');
 	logoutButton.addEventListener('click', () => {
@@ -26,7 +27,7 @@ async function displayNavBar()
 
 	const settingUserButton = document.getElementById('user-info-btn');
 	settingUserButton.addEventListener('click', () => {
-		let pageState = { page: 'setting'};
+		let pageState = { page: 'user'};
 		window.history.pushState(pageState, '', '#' + pageState.page);
 		renderPageState(pageState);
 	})

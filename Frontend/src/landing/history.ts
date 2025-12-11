@@ -1,5 +1,5 @@
 import { RemapBlock } from "@babylonjs/core";
-import { displayUserSettingPage, displayAliasQueryPage, displayGuestInPage, displayRegisterPage, displayLoginPage, displayGamePage } from "./alias";
+import { displayUserPage, displayAliasQueryPage, displayGuestPage, displayRegisterPage, displayLoginPage, displayGamePage } from "./alias";
 
 export { renderPageState, pageState}
 
@@ -19,7 +19,7 @@ function renderPageState(state: { page: string }) {
 			displayAliasQueryPage();
 			break;
 		case 'loginAsGuest':
-			displayGuestInPage();
+			displayGuestPage();
 			break;
 		case 'register':
 			displayRegisterPage();
@@ -30,8 +30,8 @@ function renderPageState(state: { page: string }) {
 		case 'game':
 			displayGamePage();
 			break;
-		case 'setting':
-			displayUserSettingPage();
+		case 'user':
+			displayUserPage();
 			break;
 		default:
 			displayAliasQueryPage();

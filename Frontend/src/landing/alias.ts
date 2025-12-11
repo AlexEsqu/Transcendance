@@ -3,20 +3,25 @@ import { User, GuestUser, RegisteredUser, getUserFromLocalStorage } from "./user
 import { renderPageState } from "./history";
 
 import welcomeHtml from "../pages/welcome.html";
-import guestinHtml from "../pages/guestin.html";
-import registerHtml from "../pages/register.html";
-import loginHtml from "../pages/login.html";
-import settingHtml from "../pages/setting.html"
+import formHtml from "../pages/form.html";
+import userHtml from "../pages/user.html";
 
-export { displayAliasQueryPage, displayGamePage, displayLoginPage, displayRegisterPage, displayGuestInPage, displayUserSettingPage}
+import avatarFormHtml from "../pages/forms/avatarForm.html"
+import guestFormHtml from "../pages/forms/guestForm.html"
+import loginFormHtml from "../pages/forms/loginForm.html"
+import passwordFormHtml from "../pages/forms/passwordForm.html"
+import registerFormHtml from "../pages/forms/registerForm.html"
+import renameFormHtml from "../pages/forms/renameForm.html"
+
+export { displayAliasQueryPage, displayGamePage, displayLoginPage, displayRegisterPage, displayGuestPage, displayUserPage}
 
 // replaces the document body with a menu page to choose to login, register or play as guest
 function displayAliasQueryPage() : void
 {
 	document.body.innerHTML = welcomeHtml;
 
-	const GuestInButton = document.getElementById('btn-guestin')
-	GuestInButton.addEventListener("click", function ()
+	const GuestButton = document.getElementById('btn-guestin')
+	GuestButton.addEventListener("click", function ()
 	{
 		console.log("clicking alias button");
 		let pageState = { page: 'loginAsGuest'};
@@ -43,26 +48,26 @@ function displayAliasQueryPage() : void
 	})
 }
 
-function displayGuestInPage() : void
+function displayGuestPage() : void
 {
-	document.body.innerHTML = guestinHtml
+	document.body.innerHTML = '';
+	document.body.insertAdjacentHTML('afterbegin', formHtml);
+	const container = document.getElementById('form-container');
+	container.insertAdjacentHTML('beforeend', guestFormHtml);
 
-	const GuestInInput : HTMLInputElement = document.getElementById('input-alias') as HTMLInputElement;
-	const GuestInButton : HTMLElement = document.getElementById('btn-submit-alias')
-
-	GuestInButton.addEventListener('click', function ()
+	const guestForm : HTMLFormElement = document.getElementById('guest-form') as HTMLFormElement;
+	guestForm.addEventListener('submit', function (e)
 	{
-		const alias = GuestInInput.value;
-		GuestInInput.value = ""; // reset input field
-		console.log(alias);
+		e.preventDefault();
+		const formData = new FormData(guestForm);
+		const alias = formData.get('input-alias') as string;
 
-		// checking the alias is not an empty string (a profanity checker would be funny...)
-		if (alias)
-		{
+		console.log(alias); // TODO : remove
+
+		if (alias) {
 			new GuestUser(alias);
 			let pageState = { page: 'game'};
-			window.history.pushState(pageState, '', '#' + pageState.page);
-			// displayGamePage();
+			window.history.pushState(pageState, '', `#${pageState.page}`);
 			renderPageState(pageState);
 		}
 	})
@@ -70,34 +75,29 @@ function displayGuestInPage() : void
 
 function displayRegisterPage() : void
 {
-	document.body.innerHTML = registerHtml
+	document.body.innerHTML = '';
+	document.body.insertAdjacentHTML('afterbegin', formHtml);
+	const container = document.getElementById('form-container');
+	container.insertAdjacentHTML('beforeend', registerFormHtml);
 
-	const loginInput : HTMLInputElement = document.getElementById('input-login') as HTMLInputElement;
-	const passwordInput : HTMLInputElement = document.getElementById('input-password') as HTMLInputElement;
-	const passwordCheckInput : HTMLInputElement = document.getElementById('input-password-check') as HTMLInputElement;
-	const registerButton : HTMLElement = document.getElementById('btn-submit-register')
+	const registerForm : HTMLFormElement = document.getElementById('register-form') as HTMLFormElement;
 
-	registerButton.addEventListener('click', function ()
+	registerForm.addEventListener('submit', function (e)
 	{
-		// store contents of the inputs
-		const login = loginInput.value;
-		const password = passwordInput.value;
-		const passwordCheck = passwordCheckInput.value;
+		e.preventDefault();
 
-		// reset input fields
-		loginInput.value = "";
-		passwordInput.value = "";
-		passwordCheckInput.value = "";
+		const formData = new FormData(registerForm);
+		const login = formData.get('input-login') as string;
+		const password = formData.get('input-password') as string;
+		const passwordCheck = formData.get('input-password-check') as string;
 
-		// log for debug (TO DO: remove)
-		console.log(`User tried to login with ${login} and ${password}`);
+		console.log(`User tried to register with ${login}`);
 
 		if (password !== passwordCheck)
 		{
-			alert("The passwords and password check don't match...");
+			alert("The passwords don't match...");
 		}
 
-		// checking the login and passwords are not an empty string (a profanity checker would be funny...)
 		else if (login && password)
 		{
 			registerUser(login, password);
@@ -107,26 +107,23 @@ function displayRegisterPage() : void
 
 function displayLoginPage() : void
 {
-	document.body.innerHTML = loginHtml
+	document.body.innerHTML = '';
+	document.body.insertAdjacentHTML('afterbegin', formHtml);
+	const container = document.getElementById('form-container');
+	container.insertAdjacentHTML('beforeend', loginFormHtml);
 
-	const loginInput : HTMLInputElement = document.getElementById('input-login') as HTMLInputElement;
-	const passwordInput : HTMLInputElement = document.getElementById('input-password') as HTMLInputElement;
-	const registerButton : HTMLElement = document.getElementById('btn-submit-login')
+	const loginForm : HTMLFormElement = document.getElementById('login-form') as HTMLFormElement;
 
-	registerButton.addEventListener('click', function ()
+	loginForm.addEventListener('submit', function (e)
 	{
-		// store contents of the inputs
-		const login = loginInput.value;
-		const password = passwordInput.value;
+		e.preventDefault();
 
-		// reset input fields
-		loginInput.value = "";
-		passwordInput.value = "";
+		const formData = new FormData(loginForm);
+		const login = formData.get('input-login') as string;
+		const password = formData.get('input-password') as string;
 
-		// log for debug (TO DO: remove)
-		console.log(`User tried to register with ${login} and ${password}`);
+		console.log(`User tried to login with ${login}`);
 
-		// checking the login is not an empty string (a profanity checker would be funny...)
 		if (login && password)
 		{
 			loginUser(login, password);
@@ -184,40 +181,40 @@ async function loginUser(login: string, password: string) : Promise<void>
 	}
 }
 
-async function displayUserSettingPage()
+async function displayUserPage()
 {
 	const user : User = await getUserFromLocalStorage();
-	document.body.innerHTML = settingHtml;
+	document.body.innerHTML = userHtml;
 
-	const submitAvatar = document.getElementById('btn-submit-avatar');
-	const inputAvatar = document.getElementById('input-avatar') as HTMLInputElement;
-	submitAvatar.addEventListener('click', () => {
-		user.addAvatar(inputAvatar.value);
-		inputAvatar.value = '';
-	})
+	// const submitAvatar = document.getElementById('btn-submit-avatar');
+	// const inputAvatar = document.getElementById('input-avatar') as HTMLInputElement;
+	// submitAvatar.addEventListener('click', () => {
+	// 	user.addAvatar(inputAvatar.value);
+	// 	inputAvatar.value = '';
+	// })
 
-	const submitNewName = document.getElementById('btn-submit-rename-user');
-	const inputNewName = document.getElementById('input-rename-user') as HTMLInputElement;
-	submitNewName.addEventListener('click', () => {
-		user.rename(inputNewName.value);
-		inputNewName.value = '';
-	})
+	// const submitNewName = document.getElementById('btn-submit-rename-user');
+	// const inputNewName = document.getElementById('input-rename-user') as HTMLInputElement;
+	// submitNewName.addEventListener('click', () => {
+	// 	user.rename(inputNewName.value);
+	// 	inputNewName.value = '';
+	// })
 
-	const submitNewPassword = document.getElementById('btn-submit-password');
-	const inputOldPassword = document.getElementById('input-old-password') as HTMLInputElement;
-	const inputNewPassword = document.getElementById('input-password') as HTMLInputElement;
-	const inputNewPasswordCheck = document.getElementById('input-password-check') as HTMLInputElement;
-	submitNewPassword.addEventListener('click', () => {
-		if (inputNewPassword.value === inputNewPasswordCheck.value)
-		{
-			user.changePassword(inputOldPassword.value, inputNewPassword.value);
-		}
-		else
-		{
-			alert('The new password does not match');
-		}
-		inputNewPassword.value = '';
-		inputNewPasswordCheck.value = '';
-		inputOldPassword.value = '';
-	})
+	// const submitNewPassword = document.getElementById('btn-submit-password');
+	// const inputOldPassword = document.getElementById('input-old-password') as HTMLInputElement;
+	// const inputNewPassword = document.getElementById('input-password') as HTMLInputElement;
+	// const inputNewPasswordCheck = document.getElementById('input-password-check') as HTMLInputElement;
+	// submitNewPassword.addEventListener('click', () => {
+	// 	if (inputNewPassword.value === inputNewPasswordCheck.value)
+	// 	{
+	// 		user.changePassword(inputOldPassword.value, inputNewPassword.value);
+	// 	}
+	// 	else
+	// 	{
+	// 		alert('The new password does not match');
+	// 	}
+	// 	inputNewPassword.value = '';
+	// 	inputNewPasswordCheck.value = '';
+	// 	inputOldPassword.value = '';
+	// })
 }
