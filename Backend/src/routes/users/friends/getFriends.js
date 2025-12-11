@@ -1,4 +1,4 @@
-import { getUserbyId, modifyUserAvatarKeyName } from "../../../utils/utils.js";
+import { getUserbyId, replaceAvatarPathByUrl } from "../../../utils/utils.js";
 
 export default function getFriends(server) {
 	const opts = {
@@ -47,7 +47,7 @@ export default function getFriends(server) {
 			for (const row of friends_id) {
 				const friend = await getUserbyId(row.friend_id, server.db);
 				if (friend) {
-					modifyUserAvatarKeyName(friend);
+					replaceAvatarPathByUrl(friend);
 					friends.push(friend);
 				}
 			}

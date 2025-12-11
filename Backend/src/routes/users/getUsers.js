@@ -1,4 +1,4 @@
-import { modifyUserAvatarKeyName } from "../../utils/utils.js";
+import { replaceAvatarPathByUrl } from "../../utils/utils.js";
 //Schema that serves an user
 
 export function getUser(server) {
@@ -43,11 +43,11 @@ export function getUser(server) {
 		try {
 			const { id } = req.params;
 			console.log(id);
-			const user = server.db.prepare(`SELECT id, username, avatar_path FROM users WHERE id = ?`).get(id);
+			const user = server.db.prepare(`SELECT id, username, avatar FROM users WHERE id = ?`).get(id);
 			if (!user) {
 				return reply.status(404).send({ error: "User not found" });
 			}
-			modifyUserAvatarKeyName(user);
+			replaceAvatarPathByUrl(user);
 			console.log(user);
 			return reply.status(200).send(user);
 		} catch (err) {
@@ -73,9 +73,9 @@ export function getUsers(server) {
 		onRequest: [server.authenticateClient],
 	};
 	server.get("/users", allUsersSchema, (req, reply) => {
-		const users = server.db.prepare(`SELECT id, username, avatar_path FROM users`).all();
+		const users = server.db.prepare(`SELECT id, username, avatar FROM users`).all();
 		users.forEach((user) => {
-			modifyUserAvatarKeyName(user);
+			replaceAvatarPathByUrl(user);
 		});
 		console.log(users);
 		reply.send(users);

@@ -100,7 +100,7 @@ paths:
                       type: integer
                     username:
                       type: string
-                    avatar_url:
+                    avatar:
                       type: string
   /users/{id}:
     get:
@@ -127,7 +127,7 @@ paths:
                     type: integer
                   username:
                     type: string
-                  avatar_url:
+                  avatar:
                     type: string
         "404":
           description: Default Response
@@ -386,7 +386,7 @@ paths:
                       type: integer
                     username:
                       type: string
-                    avatar_url:
+                    avatar:
                       type: string
   /users/auth/login:
     post:

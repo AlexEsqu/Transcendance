@@ -44,8 +44,8 @@ export default function putUserAvatar(server) {
 			const id = req.user.id;
 
 			//retrive old avatar path
-			const { avatar_path } = server.db.prepare(`SELECT avatar_path FROM users WHERE id = ?`).get(id);
-			const old_avatar_path = avatar_path;
+			const { avatar } = server.db.prepare(`SELECT avatar FROM users WHERE id = ?`).get(id);
+			const old_avatar = avatar;
 
 			const data = req.body.avatar;
 			
@@ -55,11 +55,11 @@ export default function putUserAvatar(server) {
 			const buffer = await data.toBuffer();
 			fs.writeFileSync(uploadPath, buffer);
 
-			server.db.prepare(`UPDATE users SET avatar_path = ? WHERE id = ?`).run(uploadPath, id);
+			server.db.prepare(`UPDATE users SET avatar = ? WHERE id = ?`).run(uploadPath, id);
 
-			if (old_avatar_path) {
-				fs.unlink(old_avatar_path, () => {
-					console.log(old_avatar_path + " was deleted");
+			if (old_avatar) {
+				fs.unlink(old_avatar, () => {
+					console.log(old_avatar + " was deleted");
 				});
 			}
 			reply.status(200).send({ success: true, message: "Updated avatar successfully" });

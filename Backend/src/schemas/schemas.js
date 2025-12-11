@@ -65,10 +65,10 @@ export const userIdObject = {
 export const publicUserObject = {
 	$id: "publicUserObject",
 	type: "object",
-	required: ["id", "username", "avatar_url"],
+	required: ["id", "username", "avatar"],
 	properties: {
 		id: { type: "integer" },
 		username: { type: "string" },
-		avatar_url: { type: ["string", "null"] },
+		avatar: { type: ["string", "null"] },
 	},
 };

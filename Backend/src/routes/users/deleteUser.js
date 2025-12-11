@@ -29,10 +29,10 @@ function deleteUser(server) {
 		try {
 			const { id } = req.user;
 			//delete the users avatar from db
-			const { avatar_path } = server.db.prepare(`SELECT avatar_path FROM users WHERE id = ?`).get(id);
-			if (avatar_path) {
-				fs.unlink(avatar_path, () => {
-					console.log(avatar_path + " was deleted");
+			const { avatar } = server.db.prepare(`SELECT avatar FROM users WHERE id = ?`).get(id);
+			if (avatar) {
+				fs.unlink(avatar, () => {
+					console.log(avatar + " was deleted");
 				});
 			}
 			server.db.prepare(`DELETE FROM users WHERE id = ?`).run(id);

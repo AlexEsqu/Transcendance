@@ -29,13 +29,13 @@ export default function deleteUserAvatar(server) {
 			const id = req.user.id;
 
 			//retrive avatar path
-			const { avatar_path } = server.db.prepare(`SELECT avatar_path FROM users WHERE id = ?`).get(id);
+			const { avatar } = server.db.prepare(`SELECT avatar FROM users WHERE id = ?`).get(id);
 
-			if (avatar_path) {
-				server.db.prepare(`UPDATE users SET avatar_path = NULL WHERE id = ?`).run(id);
+			if (avatar) {
+				server.db.prepare(`UPDATE users SET avatar = NULL WHERE id = ?`).run(id);
 
-				fs.unlink(avatar_path, () => {
-					console.log(avatar_path + " was deleted");
+				fs.unlink(avatar, () => {
+					console.log(avatar + " was deleted");
 				});
 			}
 			reply.status(204).send();
