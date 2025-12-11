@@ -17,6 +17,10 @@ export default function addFriend(server) {
 					description: "Bad Request: Invalid input or missing fields",
 					$ref: "errorResponse#",
 				},
+				401: {
+					description: "Unauthorized: Invalid credentials",
+					$ref: "errorResponse#",
+				},
 				404: {
 					description: "Not Found: User not found",
 					$ref: "errorResponse#",
@@ -52,8 +56,7 @@ export default function addFriend(server) {
 			if (userId == friendId) {
 				return reply.status(400).send({ error: "User id and friend_id cannot be the same" });
 			}
-			server.db.prepare(`INSERT INTO friends(user_id, friend_id) VALUES (?,?)`)
-			.run(userId, friendId);
+			server.db.prepare(`INSERT INTO friends(user_id, friend_id) VALUES (?,?)`).run(userId, friendId);
 			reply.status(201).send({
 				success: true,
 				message: `Sucessfully added ${req.friend.username} to ${req.user.username}'s friend list`,
