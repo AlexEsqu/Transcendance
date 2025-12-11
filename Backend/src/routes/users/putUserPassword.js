@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 
-//TODO: https://stackoverflow.com/questions/21978658/invalidating-json-web-tokens
+// TODO: https://stackoverflow.com/questions/21978658/invalidating-json-web-tokens
+//DELOG USER
 export default function putUserPassword(server) {
 	const opts = {
 		schema: {

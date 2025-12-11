@@ -6,7 +6,7 @@ export function createAccessToken(id, username) {
 			id: id,
 			username: username,
 		},
-		{ expiresIn: "59m" }
+		{ expiresIn: "5m" } //TODO
 	);
 	return token;
 }
