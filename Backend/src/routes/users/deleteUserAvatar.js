@@ -7,10 +7,11 @@ export default function deleteUserAvatar(server) {
 			description: "Deletes the avatar of the user. `This endpoint requires client AND user authentication.`",
 			security: server.security.UserAuth,
 			response: {
-204: {
+				204: {
 					description: "Success: Avatar deleted successfully",
 					type: "null",
-				},				401: {
+				},
+				401: {
 					description: "Unauthorized: Invalid credentials",
 					$ref: "errorResponse#",
 				},

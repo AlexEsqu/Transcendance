@@ -14,7 +14,6 @@ export default function getFriends(server) {
 					type: "array",
 					items: { $ref: "publicUserObject#" },
 				},
-
 				401: {
 					description: "Unauthorized: Invalid credentials",
 					$ref: "errorResponse#",
