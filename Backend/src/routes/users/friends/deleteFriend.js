@@ -10,7 +10,10 @@ export default function deleteFriend(server) {
 			security: server.security.UserAuth,
 			body: { $ref: "userIdObject#" },
 			response: {
-				204: { description: "Successfully deleted friend", type: "null" },
+				204: {
+					description: "Success: Friend deleted successfully",
+					type: "null",
+				},
 				400: {
 					description: "Bad Request: Invalid input or missing fields",
 					$ref: "errorResponse#",

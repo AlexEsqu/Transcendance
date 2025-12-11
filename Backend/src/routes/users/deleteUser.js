@@ -8,7 +8,10 @@ function deleteUser(server) {
 			description: "Deletes the user account and all its data. `This endpoint requires client AND user authentication.`",
 			security: server.security.UserAuth,
 			response: {
-				204: { type: "null" },
+				204: {
+					description: "Success: User deleted successfully",
+					type: "null",
+				},
 				401: {
 					description: "Unauthorized: Invalid credentials",
 					$ref: "errorResponse#",
