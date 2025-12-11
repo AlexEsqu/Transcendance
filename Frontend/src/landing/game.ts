@@ -1,24 +1,14 @@
 import { Pong } from "../game/Pong"
+import { IOptions, Level } from "../game/Data"
 import gameHtml from '../pages/game.html'
 import optionsHtml from '../pages/options.html'
-
-export enum Level {
-	easy, medium, hard
-};
-
-export interface IOptions {
-	level: Level;
-	nbOfPlayer: number;
-	ballColor: string;
-	paddColor: string;
-	mapColor: string;
-};
 
 class App {
 	pong: Pong;
 	constructor(canvas : HTMLElement, options: IOptions) {
 		//	Hard coded users id -> must change later after user auth !!!!!!!
-		this.pong = new Pong("game-canvas", 1, 2, options);
+		const userId: Array<number> = [2];
+		this.pong = new Pong("game-canvas", userId, options);
 		this.pong.loadGame();
 		this.pong.runGame();
 	}
