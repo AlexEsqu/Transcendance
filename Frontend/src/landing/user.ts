@@ -15,7 +15,7 @@ const ENV = {
 
 console.log('Environment:', ENV);
 
-class User {
+abstract class User {
 	name: string;
 	avatarPath: string;
 
@@ -25,23 +25,15 @@ class User {
 		this.avatarPath = placeholderAvatar;
 	}
 
-	getName(): string {	return this.name; }
+	abstract logoutUser(): void
 
-	logoutUser(): void {}
+	abstract deleteAccount(): void
 
-	deleteUser(): void {}
+	abstract addAvatar(imageUrl : string): void
 
-	addAvatar(imageUrl : string): void
-	{
-		this.avatarPath = imageUrl;
-	}
+	abstract rename(newName : string): void
 
-	rename(newName : string): void
-	{
-		this.name = newName;
-	}
-
-	changePassword(oldPassword : string, newPassword : string): void {}
+	abstract changePassword(oldPassword : string, newPassword : string): void
 
 }
 
@@ -65,9 +57,10 @@ class RegisteredUser extends User
 				method: 'POST',
 				headers:
 				{
+					"accept": "*/*",
 					"Content-Type": 'application/json',
 				},
-				body: JSON.stringify({ username, password }),
+				body: JSON.stringify({ username: username, password: password }),
 			}
 		);
 
@@ -79,7 +72,7 @@ class RegisteredUser extends User
 		return new RegisteredUser(username, data.id, data.accessToken);
 	}
 
-	async deleteUser(): Promise<void>
+	async deleteAccount(): Promise<void>
 	{
 		try
 		{
@@ -89,8 +82,7 @@ class RegisteredUser extends User
 					headers:
 					{
 						'accept': '*/*',
-						'Authorization': `Bearer ${this.token}`,
-						'X-App-Secret': `${apiKey}`
+						'Authorization': `Bearer ${this.token}`
 					},
 				});
 
@@ -222,7 +214,7 @@ class GuestUser extends User
 		localStorage.removeItem(localStorageKeyForGuestUser);
 	}
 
-	deleteUser(): void
+	deleteAccount(): void
 	{
 		this.logoutUser();
 	}

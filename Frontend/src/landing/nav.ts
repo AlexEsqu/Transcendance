@@ -21,7 +21,7 @@ async function displayNavBar()
 
 	const deleteUserButton = document.getElementById('delete-user-btn');
 	deleteUserButton.addEventListener('click', () => {
-		user.deleteUser();
+		user.deleteAccount();
 		displayAliasQueryPage();
 	})
 
