@@ -48,7 +48,7 @@ export default function login(server) {
 			if (!match) {
 				return reply.status(401).send({ error: "Invalid credentials" });
 			} else {
-				const accessToken = createAccessToken(user.id, username);
+				const accessToken = createAccessToken(user.id, username, server.db);
 				const refreshToken = createRefreshToken(user.id, username);
 
 				const refreshTokenHash = await hashRefreshToken(refreshToken);
@@ -63,6 +63,7 @@ export default function login(server) {
 					maxAge: 60 * 60 * 24 * 7, // 7 days
 				});
 				const id = user.id;
+
 				reply.send({ accessToken, id });
 			}
 		} catch (err) {

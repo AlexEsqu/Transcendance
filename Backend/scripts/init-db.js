@@ -7,6 +7,7 @@ db.pragma("journal_mode = WAL");
 db.prepare(`
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+		last_activity DATETIME,
         username TEXT NOT NULL UNIQUE,
         password_hash TEXT NOT NULL,
         refresh_token_hash TEXT,

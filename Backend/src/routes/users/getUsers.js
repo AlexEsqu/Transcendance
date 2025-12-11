@@ -1,11 +1,12 @@
-import { replaceAvatarPathByUrl } from "../../utils/utils.js";
+import { formatUserObject, getUserbyId } from "../../utils/utils.js";
 //Schema that serves an user
 
 export function getUser(server) {
 	const singleUserSchema = {
 		schema: {
 			tags: ["user"],
-			description: "Returns an object of an user using the id passed in parameters. `This endpoint requires client authentication.`",
+			description:
+				"Returns an object of an user using the id passed in parameters. `This endpoint requires client authentication.`",
 			security: server.security.AppAuth,
 			params: { $ref: "userIdObject#" },
 			response: {
@@ -42,13 +43,11 @@ export function getUser(server) {
 	server.get("/users/:id", singleUserSchema, (req, reply) => {
 		try {
 			const { id } = req.params;
-			console.log(id);
-			const user = server.db.prepare(`SELECT id, username, avatar FROM users WHERE id = ?`).get(id);
+			const user = getUserbyId(id, server.db);
 			if (!user) {
 				return reply.status(404).send({ error: "User not found" });
 			}
-			replaceAvatarPathByUrl(user);
-			console.log(user);
+			formatUserObject(user);
 			return reply.status(200).send(user);
 		} catch (err) {
 			console.log(err);
@@ -62,7 +61,8 @@ export function getUsers(server) {
 		schema: {
 			tags: ["user"],
 			security: server.security.AppAuth,
-			description: "Returns a list of all registered users. `This endpoint requires client authentication.`",
+			description:
+				"Returns a list of all registered users. `This endpoint requires client authentication.`",
 			response: {
 				200: {
 					type: "array",
@@ -73,9 +73,11 @@ export function getUsers(server) {
 		onRequest: [server.authenticateClient],
 	};
 	server.get("/users", allUsersSchema, (req, reply) => {
-		const users = server.db.prepare(`SELECT id, username, avatar FROM users`).all();
+		const users = server.db
+			.prepare(`SELECT id, username, avatar, last_activity FROM users`)
+			.all();
 		users.forEach((user) => {
-			replaceAvatarPathByUrl(user);
+			formatUserObject(user);
 		});
 		console.log(users);
 		reply.send(users);
