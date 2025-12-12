@@ -2,27 +2,29 @@
 import { displayAliasQueryPage } from "./landing/alias"
 import { displayNavBar } from "./landing/nav";
 import { displayGameWindow } from "./landing/game";
-import { User, localStorageKeyForGuestUser, localStorageKeyForRegisteredUser } from "./landing/user"
+import { GuestUser, RegisteredUser, User, getUserFromLocalStorage } from "./landing/User"
 import "./input.css";
+import { RegisterClass } from "@babylonjs/core";
 
-export { displayGamePage, User }
+export { displayGamePage, userObject }
 
 let pageState = { page: 'welcome' };
 window.history.replaceState(pageState, null, '#welcome');
 
 // checking if a registered or guest user object is stored in the localStorage, not diplaying the game until they do
-const userJSON : string | null = localStorage.getItem(localStorageKeyForRegisteredUser) ?? localStorage.getItem(localStorageKeyForGuestUser);
+let guestObject : User = new GuestUser('');
+let userObject : User = new RegisteredUser('');
+
+console.log(userObject);
 
 function displayGamePage() : void
 {
 	document.body.innerHTML = "";
-	const userJSON : string | null = localStorage.getItem(localStorageKeyForRegisteredUser) ?? localStorage.getItem(localStorageKeyForGuestUser);
-	const user: User = JSON.parse(userJSON);
 	displayNavBar();
 	displayGameWindow();
 }
 
-if (userJSON)
+if (userObject)
 	displayGamePage();
 else
 	displayAliasQueryPage();

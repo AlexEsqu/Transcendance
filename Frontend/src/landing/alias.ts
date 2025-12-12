@@ -1,17 +1,17 @@
-import { displayGamePage } from "../app";
-import { User, GuestUser, RegisteredUser, getUserFromLocalStorage } from "./user"
+import { displayGamePage, userObject } from "../app";
+import { User, GuestUser, RegisteredUser, getUserFromLocalStorage } from "./User"
 import { renderPageState } from "./history";
 
 import welcomeHtml from "../pages/welcome.html";
 import formHtml from "../pages/form.html";
 import userHtml from "../pages/user.html";
 
-import avatarFormHtml from "../pages/forms/avatarForm.html"
 import guestFormHtml from "../pages/forms/guestForm.html"
 import loginFormHtml from "../pages/forms/loginForm.html"
 import passwordFormHtml from "../pages/forms/passwordForm.html"
 import registerFormHtml from "../pages/forms/registerForm.html"
 import renameFormHtml from "../pages/forms/renameForm.html"
+import avatarFormHtml from "../pages/forms/avatarForm.html"
 
 export { displayAliasQueryPage, displayGamePage, displayLoginPage, displayRegisterPage, displayGuestPage, displayUserPage}
 
@@ -100,7 +100,7 @@ function displayRegisterPage() : void
 
 		else if (login && password)
 		{
-			registerUser(login, password);
+			userObject.createUser(login, password);
 		}
 	})
 }
@@ -126,7 +126,7 @@ function displayLoginPage() : void
 
 		if (login && password)
 		{
-			loginUser(login, password);
+			userObject.loginUser(login, password);
 		}
 	})
 }
@@ -168,7 +168,8 @@ async function loginUser(login: string, password: string) : Promise<void>
 {
 	try
 	{
-		const user = await RegisteredUser.createUserFromLogin(login, password);
+
+
 		let pageState = { page: 'game'};
 		window.history.pushState(pageState, '', '#' + pageState.page);
 		renderPageState(pageState);
@@ -183,7 +184,6 @@ async function loginUser(login: string, password: string) : Promise<void>
 
 async function displayUserPage()
 {
-	const user : User = await getUserFromLocalStorage();
 	document.body.innerHTML = userHtml;
 
 	// const submitAvatar = document.getElementById('btn-submit-avatar');
@@ -218,3 +218,5 @@ async function displayUserPage()
 	// 	inputOldPassword.value = '';
 	// })
 }
+
+
