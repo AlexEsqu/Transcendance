@@ -13,6 +13,7 @@ interface IJSON {
 function fillMatchesJSON(results: IRound, time?: number): IJSON {
 	const date = new Date(time ?? Date.now());
 
+	// get Id from Name
 	let matches: IJSON = {
 		winner_id: results.winnerId,
 		loser_id: results.loserId,

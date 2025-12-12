@@ -1,13 +1,22 @@
 <div id="game-options" class="bg-black max-h-screen font-mono text-white flex flex-col items-center justify-center">
 	<div class="glow-anim border rounded-md flex flex-col items-center justify-center">
 		<form name="game-options" class="flex flex-col flex-center gap-5 m-5 text-center" action="" method="post">
-			<!-- Choose game mode : 1 player (AI opponent) or 2  players (1vs1) -->
+			<!-- Choose game mode/type : 1vsAI, 1vs1 or tournaments -->
+			 <div class="flex flex-col flex-center gap-1 m-1 text-center">
+				<label for="mode" class="text-glow p-3">Match type</label>
+				<select id="mode" class="w-full bg-transparent placeholder:text-center text-slate-700 text-sm border border-slate-200 rounded pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none">
+					<option value="1">One player and a robot</option>
+					<option value="2">Two players</option>
+					<option value="4">Tournament with 4 friends</option>
+					<option value="8">Tournament with 8 friends</option>
+				</select>
+			</div>
+			<!-- Choose participants -->
 			<div class="flex flex-col flex-center gap-1 m-1 text-center">
 				<label for="mode" class="text-glow p-3">Who fights ?</label>
-				<select id="mode" class="w-full bg-transparent placeholder:text-center text-slate-700 text-sm border border-slate-200 rounded pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none">
-					<option value="1">One player</option>
-					<option value="2">Two player</option>
-				</select>
+				<div id="players-container" class="w-full flex flex-col gap-2">
+					<!-- inputs are handled dynamically -->
+				</div>
 			</div>
 			<!-- Choose game level : the higher the level, the more challenging it is -->
 			<div class="flex flex-col flex-center gap-1 m-1 text-center">

@@ -6,6 +6,7 @@ enum State {
 
 interface IPlayer {
 	id: number;
+	name: string;
 	score: number;
 };
 //	Add custom options of the player later!!!???
@@ -27,4 +28,5 @@ interface IOptions {
 	ballColor: string;
 	paddColor: string;
 	mapColor: string;
+	players: string[];
 };

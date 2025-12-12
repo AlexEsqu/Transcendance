@@ -5,10 +5,15 @@ import optionsHtml from '../pages/options.html'
 
 class App {
 	pong: Pong;
+	startBtnDisplay: HTMLElement;
+	startBtn: HTMLElement;
+
 	constructor(canvas : HTMLElement, options: IOptions) {
-		//	Hard coded users id -> must change later after user auth !!!!!!!
-		const userId: Array<number> = [2];
-		this.pong = new Pong("game-canvas", userId, options);
+		this.startBtnDisplay = document.getElementById("game-start");
+		this.startBtn = document.getElementById('btn-startplay');
+		this.setupStartButton();
+
+		this.pong = new Pong("game-canvas", options, () => this.showStartButton());
 		this.pong.loadGame();
 		this.pong.runGame();
 	}
@@ -18,9 +23,28 @@ class App {
 			this.pong.launch(3);
 		});
 	}
+
+	setupStartButton() {
+		if (!this.startBtn || !this.startBtnDisplay) {
+			console.error("'start button' UI not found");
+			return ;
+		}
+
+		this.startBtn.addEventListener('click', () => {
+			this.startBtnDisplay.style.display = 'none';
+			this.play();
+			console.log("LAUNCH GAME");
+		});
+	}
+
+	showStartButton() {
+		if (this.startBtn)
+			this.startBtnDisplay.style.display = 'flex';
+	}
 }
 
-function launchPongGame(options: IOptions): void {
+function launchPongGame(options: IOptions): void
+{
 	//	Display start button and game window
 	document.body.insertAdjacentHTML("beforeend", gameHtml);
 
@@ -35,14 +59,59 @@ function launchPongGame(options: IOptions): void {
 	//	Launch Pong game when user click on start button
 	const gameWindow = document.getElementById("game-canvas");
 	const app = new App(gameWindow, options);
-	btnStart.addEventListener('click', (e) => {
-		startBtnDisplay.remove();
-		app.play();
-	});
+	// btnStart.addEventListener('click', (e) => {
+	// 	startBtnDisplay.remove();
+	// 	app.play();
+	// });
 }
 
-function selectGameOptions(): Promise<IOptions> {
+function generatePlayersInputs(nbOfPlayers: number): void
+{
+	const playersContainer = document.getElementById('players-container');
+	if (!playersContainer) {
+		console.error("'players-container' not found");
+		return ;
+	}
+
+	playersContainer.innerHTML = '';
+	for (let i = 1; i <= nbOfPlayers; i++)
+	{
+		const input = document.createElement('input');
+		input.type = 'text';
+		input.id = `player${i}`;
+        input.name = `player${i}`;
+        input.placeholder = nbOfPlayers === 1 ? 'Your name' : `Player ${i}`;
+        input.className = 'w-full bg-transparent text-slate-700 text-sm border border-slate-200 rounded px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400';
+        playersContainer.appendChild(input);
+	}
+}
+
+function getPlayerNames(): string[] {
+    const playersContainer = document.getElementById('players-container');
+    if (!playersContainer) return [];
+    
+    const inputs = playersContainer.querySelectorAll('input');
+    return Array.from(inputs).map(input => (input as HTMLInputElement).value || `Player ${input.id.replace('player', '')}`);
+}
+
+function initializePlayerInputs(): void {
+    const modeSelect = document.getElementById('mode') as HTMLSelectElement;
+    if (!modeSelect) {
+        console.error("'mode' select not found");
+        return;
+    }
+    
+    generatePlayersInputs(parseInt(modeSelect.value));
+    modeSelect.addEventListener('change', function() {
+        const numberOfPlayers = parseInt(this.value);
+        generatePlayersInputs(numberOfPlayers);
+    });
+}
+
+function selectGameOptions(): Promise<IOptions>
+{
 	document.body.insertAdjacentHTML("beforeend", optionsHtml);
+	initializePlayerInputs();
 
 	const optionsMenuDisplay: HTMLElement = document.getElementById("game-options");
 	const btnSubmit: HTMLButtonElement = document.getElementById('btn-submit') as HTMLButtonElement;
@@ -57,7 +126,7 @@ function selectGameOptions(): Promise<IOptions> {
 		return null;
 	}
 
-	//	Store selected options when user click on submit button
+	//	Return selected options when user click on submit button
 	return new Promise((resolve) => {
 		btnSubmit.addEventListener('click', (e) => {
 			e.preventDefault();
@@ -71,7 +140,8 @@ function selectGameOptions(): Promise<IOptions> {
 				nbOfPlayer: nbPlayer,
 				ballColor: ballColor,
 				mapColor: backColor,
-				paddColor: paddColor
+				paddColor: paddColor,
+				players: getPlayerNames()
 			};
 			optionsMenuDisplay.remove();
 			resolve(options);
@@ -80,8 +150,6 @@ function selectGameOptions(): Promise<IOptions> {
 }
 
 export function displayGameWindow() : void {
-	//	Select between 2 games --> TO DO
-	//	Launch selected game with custom options
 	selectGameOptions().then(options => {
 		launchPongGame(options);
 	});

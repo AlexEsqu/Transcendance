@@ -8,11 +8,13 @@ import { State, IPlayer, IRound, IOptions } from "./Data"
 import { Ball } from "./Ball";
 import { Paddle } from './Paddle';
 import { createCamera, createText, createMap, createLight, createAnimation } from './Graphics';
+import { stat } from "fs";
 
 export interface IPaddle {
 	paddle: Paddle,
 	player: IPlayer,
-	text: TextBlock
+	scoreText: TextBlock,
+	nameText: TextBlock
 };
 
 export class Pong {
@@ -34,8 +36,10 @@ export class Pong {
 	leftPadd: IPaddle;
 	rightPadd: IPaddle;
 	players: Array<IPlayer>;
+	isLaunched: boolean;
+	onNewRound?: () => void;
 
-	constructor(canvasId: string, userId: Array<number>, options: IOptions) {
+	constructor(canvasId: string, options: IOptions, onNewRound?: () => void) {
 		this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
 		this.engine = new Engine(this.canvas, true);
 		this.gameScene = null;
@@ -45,20 +49,19 @@ export class Pong {
 		this.options = options;
 		this.state = State.opening;
 		this.time = Date.now();
-		this.robot = options.nbOfPlayer == 1 ? true: false;
-		this.leftPadd = { paddle: null, player: null, text: null };
-		this.rightPadd = { paddle: null, player: null, text: null };
+		this.robot = false;
+		this.leftPadd = { paddle: null, player: null, scoreText: null, nameText: null };
+		this.rightPadd = { paddle: null, player: null, scoreText: null, nameText: null };
+		this.players = options.players.slice(0, options.nbOfPlayer).map(name => ({ name, id: 0, score: 0 }));
 		if (options.nbOfPlayer === 1) {
 			// special case: player is a robot
-			this.players = [{ id: 0, score: 0 }];
-			this.players.push({ id: userId[0], score: 0 });
-		} else {
-			this.players = userId.slice(0, options.nbOfPlayer).map(id => ({
-				id,
-				score: 0
-			}));
+			this.robot = true;
+			this.players.push({ id: 0, name: "Robot", score: 0 });
+			this.players.reverse();
 		}
 		if (options.nbOfPlayer >= 4) Pong.MAX_ROUNDS = options.nbOfPlayer - 1;
+		this.onNewRound = onNewRound;
+		this.isLaunched = false;
 	}
 
 	/**
@@ -94,8 +97,10 @@ export class Pong {
 		this.leftPadd.paddle = new Paddle(this.gameScene, "left", Pong.MAP_WIDTH, this.options.level, this.options.paddColor);
 		this.rightPadd.paddle = new Paddle(this.gameScene, "right", Pong.MAP_WIDTH, this.options.level, this.options.paddColor);
 		const line = createText("|", "white", 38, "-150px", "0px", this.gui);
-		this.leftPadd.text = createText("0", "white", 38, "-150px", "-100px", this.gui);
-		this.rightPadd.text = createText("0", "white", 38, "-150px", "100px", this.gui);
+		this.leftPadd.scoreText = createText("0", "white", 38, "-150px", "-50px", this.gui);
+		this.rightPadd.scoreText = createText("0", "white", 38, "-150px", "50px", this.gui);
+		this.leftPadd.nameText = createText("", "white", 28, "-150px", "-200px", this.gui);
+		this.rightPadd.nameText = createText("", "white", 28, "-150px", "200x", this.gui);
 
 		console.log("GAME-STATE: loaded");
 	}
@@ -110,22 +115,33 @@ export class Pong {
 			return ;
 		}
 
+		this.newRound(0, null, 0);
+
 		const keys = {};
 		let rounds: Array<IRound> = null;
-		let roundIndex: number = 0;
-		let playerIndex: number = 0;
+		let roundIndex: number = 1;
+		let playerIndex: number = 2;
 		let isNewRound: boolean = true;
 
-		roundIndex += this.newRound(playerIndex, roundIndex);
 		//	Manage user input
 		this.handleInput(keys);
 		this.gameScene.registerBeforeRender(() => {
 			if (this.state === State.opening) this.opening();
-			if (this.state === State.play) this.updateGame(keys);
-			isNewRound = this.monitoringRounds(roundIndex);
-			if (isNewRound === true) {
-				rounds = this.saveResults(rounds);
-				roundIndex += this.newRound(playerIndex, roundIndex);
+			if (this.state === State.play && this.isLaunched) {
+				let status = this.updateGame(keys);
+				isNewRound = this.monitoringRounds(roundIndex);
+				if (status && !isNewRound)
+					this.launch(3);
+				if (isNewRound) {
+					this.state = State.pause;
+					this.isLaunched = false;
+					rounds = this.saveResults(rounds);
+					if (this.newRound(playerIndex, rounds, roundIndex)) {
+						roundIndex += 1;
+						playerIndex += 2;
+					}
+					if (this.onNewRound) this.onNewRound();
+				}
 			}
 			if (this.state === State.end) this.endGame(rounds, roundIndex);
 			this.time = Date.now();
@@ -140,65 +156,15 @@ export class Pong {
 		});
 	}
 
-	newRound(playerIndex: number, roundIndex: number): number {
-		console.log("GAME-STATE: new round");
-		//	Reset data
-		this.leftPadd.paddle.resetPosition(Pong.MAP_WIDTH, "left");
-		this.rightPadd.paddle.resetPosition(Pong.MAP_WIDTH, "right");
-		this.leftPadd.text.text = "0";
-		this.rightPadd.text.text = "0";
-		this.ball.reset(true);
-
-		if (playerIndex >= this.options.nbOfPlayer || roundIndex >= Pong.MAX_ROUNDS) return 0;
-		//	Who's playing now ?
-		this.leftPadd.player = this.players[playerIndex];
-		playerIndex++;
-		this.rightPadd.player = this.players[playerIndex];
-		playerIndex++;
-
-		//	Update each player's name -- TO DO !!!!!!!!!!!!!!!!!!!!!!!!!!
-		//	Update gameHistoryTree -- TO DO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		return 1;
-	}
-
-	/**
-	 * 	- Save current round's results
-	 */
-	saveResults(rounds: Array<IRound>): Array<IRound> {
-		if (!this.leftPadd.player || !this.rightPadd.player) return rounds;
-
-		console.log("GAME-STATE: saving results");
-		let results: IRound;
-		if (this.leftPadd.player.score == Pong.MAX_SCORE) {
-			results = {
-				winnerId: this.leftPadd.player.id,
-				maxScore: this.leftPadd.player.score,
-				loserId: this.rightPadd.player.id,
-				minScore: this.rightPadd.player.score
-			};
-		} else {
-			results = {
-				winnerId: this.rightPadd.player.id,
-				maxScore: this.rightPadd.player.score,
-				loserId: this.leftPadd.player.id,
-				minScore: this.leftPadd.player.score
-			};
-		}
-		if (!rounds)
-			rounds = [ results ];
-		else
-			rounds.push(results);
-		return rounds;
-	}
-
 	/**
 	 * 	- Listen to new user input and update game data accordingly
 	 */
-	updateGame(keys: {}): void {
+	updateGame(keys: {}): number {
+		let status: number = 0;
 		//	Move and update direction if there has been an impact with the ball
 		this.ball.move(this.time);
 		if (this.ball.update(this.leftPadd, this.rightPadd) == true)
-			this.launch(3);
+			status = 1;
 		
 		//	If a user presses a key, update the position of its padd
 		if (keys["ArrowDown"]) this.rightPadd.paddle.move("down", (Pong.MAP_HEIGHT / 2), this.time);
@@ -211,13 +177,15 @@ export class Pong {
 			this.leftPadd.paddle.autoMove(this.ball, (Pong.MAP_HEIGHT / 2), this.time);
 
 		//	Update visual-scoring in the scene
-		this.leftPadd.text.text = this.leftPadd.player.score.toString();
-		this.rightPadd.text.text = this.rightPadd.player.score.toString();
+		this.leftPadd.scoreText.text = this.leftPadd.player.score.toString();
+		this.rightPadd.scoreText.text = this.rightPadd.player.score.toString();
+		return status;
 	}
 
 	launch(count: number): void {
 		if (count <= 0) {
 			this.state = State.play;
+			this.isLaunched = true;
 			this.ball.launch();
 			return ;
 		}
@@ -236,6 +204,35 @@ export class Pong {
 			count--;
 			this.launch(count);
 		});
+	}
+
+	newRound(playerIndex: number, rounds: IRound[], roundIndex: number): number {
+		console.log("GAME-STATE: new round");
+
+		//	Reset data
+		this.leftPadd.paddle.resetPosition(Pong.MAP_WIDTH, "left");
+		this.rightPadd.paddle.resetPosition(Pong.MAP_WIDTH, "right");
+		this.ball.reset(true);
+
+		if (playerIndex >= this.options.nbOfPlayer || roundIndex >= Pong.MAX_ROUNDS) return 0;
+		//	Who's playing now ?
+		// if (this.options.nbOfPlayer == 4 && roundIndex == Pong.MAX_ROUNDS) {
+		// 	this.leftPadd.player = this.players.rounds[0].winnerId;
+		// 	this.rightPadd.player = this.players[playerIndex];
+		// }
+		this.leftPadd.player = this.players[playerIndex];
+		playerIndex++;
+		this.rightPadd.player = this.players[playerIndex];
+		playerIndex++;
+
+		//	Update each player's name and score
+		this.leftPadd.nameText.text = this.leftPadd.player.name;
+		this.rightPadd.nameText.text = this.rightPadd.player.name;
+		this.leftPadd.scoreText.text = "0";
+		this.rightPadd.scoreText.text = "0";
+
+		//	Update gameHistoryTree -- TO DO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		return 1;
 	}
 
 	opening(): void {
@@ -259,7 +256,7 @@ export class Pong {
 		}
 		console.log("GAME-STATE: the winner is " + rounds[roundIndex - 1].winnerId);
 		console.log("GAME-STATE: the looser is " + rounds[roundIndex - 1].loserId);
-		sendMatchesPostRequest(rounds[roundIndex - 1], Date.now());
+		// sendMatchesPostRequest(rounds[roundIndex - 1], Date.now());
 	}
 
 	/**
@@ -270,10 +267,42 @@ export class Pong {
 
 		if (this.leftPadd.player.score == Pong.MAX_SCORE || this.rightPadd.player.score == Pong.MAX_SCORE) {
 			console.log("GAME-STATE: a player has won the round");
+			console.log(roundIndex);
+			console.log(Pong.MAX_ROUNDS);
 			if (roundIndex >= Pong.MAX_ROUNDS) this.state = State.end;
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * 	- Save current round's results
+	 */
+	saveResults(rounds: Array<IRound>): Array<IRound> {
+		if (!this.leftPadd.player || !this.rightPadd.player || this.state != State.play) return rounds;
+
+		console.log("GAME-STATE: saving results");
+		let results: IRound;
+		if (this.leftPadd.player.score == Pong.MAX_SCORE) {
+			results = {
+				winnerId: this.leftPadd.player.id,
+				maxScore: this.leftPadd.player.score,
+				loserId: this.rightPadd.player.id,
+				minScore: this.rightPadd.player.score
+			};
+		} else {
+			results = {
+				winnerId: this.rightPadd.player.id,
+				maxScore: this.rightPadd.player.score,
+				loserId: this.leftPadd.player.id,
+				minScore: this.leftPadd.player.score
+			};
+		}
+		if (!rounds)
+			rounds = [ results ];
+		else
+			rounds.push(results);
+		return rounds;
 	}
 
 	/**
