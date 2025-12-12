@@ -1,32 +1,53 @@
 
 import { displayAliasQueryPage } from "./landing/alias"
-import { displayNavBar } from "./landing/nav";
+import { displayNavBar, goToPage, updateNavFromUserData } from "./landing/nav";
 import { displayGameWindow } from "./landing/game";
-import { GuestUser, RegisteredUser, User, getUserFromLocalStorage } from "./landing/User"
+import { GuestUser, RegisteredUser, User } from "./landing/User"
+import { UserState } from "./landing/UserState";
 import "./input.css";
 import { RegisterClass } from "@babylonjs/core";
 
-export { displayGamePage, userObject }
+export { userState }
 
-let pageState = { page: 'welcome' };
-window.history.replaceState(pageState, null, '#welcome');
+let pageState = { page: 'landing' };
+window.history.replaceState(pageState, null, '#landing');
 
-// checking if a registered or guest user object is stored in the localStorage, not diplaying the game until they do
-let guestObject : User = new GuestUser('');
-let userObject : User = new RegisteredUser('');
+const userState = UserState.getInstance();
 
-console.log(userObject);
+console.log(`User is :`);
+console.log(userState)
 
-function displayGamePage() : void
+// userState.subscribe((user) =>
+// {
+// 	console.log('User changed:', user?.getName() || 'No user');
+
+// 	if (user)
+// 	{
+// 		// User logged in - show nav bar if it doesn't exist
+// 		const navExists = document.querySelector('nav');
+// 		if (!navExists)
+// 			displayNavBar();
+
+// 		// Update nav content
+// 		updateNavFromUserData(user);
+// 	}
+// 	else
+// 	{
+// 		// User logged out - remove nav and show login
+// 		const nav = document.querySelector('nav');
+// 		if (nav) nav.remove();
+// 		displayAliasQueryPage();
+// 	}
+// });
+
+if (userState.getUser())
 {
-	document.body.innerHTML = "";
-	displayNavBar();
-	displayGameWindow();
+	// user logged in, can display game
+	goToPage('game');
 }
-
-if (userObject)
-	displayGamePage();
 else
-	displayAliasQueryPage();
-
+{
+	// User logged out, show login page
+	goToPage('landing');
+}
 

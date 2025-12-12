@@ -1,10 +1,13 @@
 import { RemapBlock } from "@babylonjs/core";
-import { displayUserPage, displayAliasQueryPage, displayGuestPage, displayRegisterPage, displayLoginPage, displayGamePage } from "./alias";
-import { displayDeletePage, displayRenamePage, displayPasswordPage } from "./dashboard"
+import { displayAliasQueryPage, displayGuestPage, displayRegisterPage, displayLoginPage } from "./alias";
+import { displayDashboardPage, displayDeletePage, displayRenamePage, displayPasswordPage } from "./dashboard"
+import { displayGameWindow } from "./game";
+import { displayNavBar } from "./nav";
+
 export { renderPageState, pageState}
 
 // initialize history of the website to use back and forward buttons
-let pageState = { page: 'welcome' };
+let pageState = { page: 'landing' };
 window.history.replaceState(pageState, null, '');
 
 window.addEventListener('popstate', (event) => {
@@ -13,9 +16,12 @@ window.addEventListener('popstate', (event) => {
 	}
 });
 
-function renderPageState(state: { page: string }) {
+function renderPageState(state: { page: string })
+{
+	document.body.innerHTML = "";
+
 	switch (state.page) {
-		case 'welcome':
+		case 'landing':
 			displayAliasQueryPage();
 			break;
 		case 'loginAsGuest':
@@ -28,10 +34,11 @@ function renderPageState(state: { page: string }) {
 			displayLoginPage();
 			break;
 		case 'game':
-			displayGamePage();
+			displayNavBar();
+			displayGameWindow();
 			break;
-		case 'user':
-			displayUserPage();
+		case 'dashboard':
+			displayDashboardPage();
 			break;
 		case 'password':
 			displayPasswordPage();

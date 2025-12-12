@@ -1,6 +1,7 @@
 import { Pong } from "../game/Pong"
 import gameHtml from '../pages/game.html'
 import optionsHtml from '../pages/options.html'
+import { displayNavBar } from "./nav";
 
 export enum Level {
 	easy,
@@ -37,7 +38,7 @@ function launchPongGame(options: IOptions): void {
 
 	const startBtnDisplay: HTMLElement = document.getElementById("game-start");
 	const btnStart: HTMLElement = document.getElementById('btn-startplay');
-	
+
 	if (!btnStart || !startBtnDisplay) {
 		console.error("'start' UI not found, can't load game");
 		return ;
@@ -77,8 +78,8 @@ function selectGameOptions(): Promise<IOptions> {
 			const ballColor: string = ballColorInput.value;
 			const backColor: string = backColorInput.value;
 			const paddColor: string = paddColorInput.value;
-			const options: IOptions = { 
-				level: level, 
+			const options: IOptions = {
+				level: level,
 				nbOfPlayer: nbPlayer,
 				ballColor: ballColor,
 				backgroundColor: backColor,
@@ -97,4 +98,5 @@ export function displayGameWindow() : void {
 		launchPongGame(options);
 	});
 }
+
 
