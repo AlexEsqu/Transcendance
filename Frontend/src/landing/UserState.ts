@@ -141,7 +141,10 @@ class UserState
 		const response = await fetch('https://localhost:8443/users/auth/login',
 			{
 				method: 'POST',
-				headers: { "Content-Type": 'application/json' },
+				headers: {
+					'accept': 'application/json',
+					"Content-Type": 'application/json'
+				},
 				body: JSON.stringify(
 					{
 						username, password
@@ -163,7 +166,10 @@ class UserState
 		const response = await fetch('https://localhost:8443/users/signup',
 			{
 				method: 'POST',
-				headers: { "Content-Type": 'application/json' },
+				headers: {
+					'accept': 'application/json',
+					"Content-Type": 'application/json'
+				},
 				body: JSON.stringify(
 					{
 						username, password
@@ -189,7 +195,10 @@ class UserState
 			const response = await fetch('https://localhost:8443/users/auth/logout',
 				{
 					method: 'POST',
-					headers: { 'Authorization': `Bearer ${this.user.accessToken}` },
+					headers: {
+						'accept': 'application/json',
+						'Authorization': `Bearer ${this.user.accessToken}`
+					},
 				}
 			);
 
@@ -207,7 +216,10 @@ class UserState
 			const response = await fetch('https://localhost:8443/users/me',
 				{
 					method: 'DELETE',
-					headers: { 'Authorization': `Bearer ${this.user.accessToken}` },
+					headers: {
+						'accept': 'application/json',
+						'Authorization': `Bearer ${this.user.accessToken}`
+					},
 				}
 			);
 

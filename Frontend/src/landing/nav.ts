@@ -3,7 +3,6 @@ import { displayAliasQueryPage } from "./alias"
 import { renderPageState } from "./history"
 import { User, GuestUser, RegisteredUser } from "./User"
 import { userState } from "../app"
-import { Subscriber } from "./UserState"
 
 export { displayNavBar}
 
@@ -48,8 +47,6 @@ function setDeleteUserButton()
 
 	deleteUserButton.addEventListener('click', async () =>
 	{
-		const user = userState.getUser();
-
 		if (confirm('Are you sure you want to delete your account?'))
 		{
 			try
