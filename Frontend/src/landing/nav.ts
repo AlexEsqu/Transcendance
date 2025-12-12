@@ -4,28 +4,37 @@ import { renderPageState } from "./history"
 import { User, GuestUser, RegisteredUser } from "./User"
 import { userState } from "../app"
 
-export { displayNavBar, goToPage }
+export { displayNavBar, goToPage, updateNavFromUserData }
 
 async function displayNavBar()
 {
 	document.body.insertAdjacentHTML("beforeend", navHTML);
 
-	// subscribe to changes in the user object so they update the nav bar
-	userState.subscribe(updateNavFromUseData);
-
 	// add button events
 	setLogoutButton();
 	setSettingButton();
-	if (userState.getUser() instanceof RegisteredUser)
-		setDeleteUserButton();
+
+	// subscribe to changes in the user object so they update the nav bar
+	// userState.subscribe(updateNavFromUserData);
+
+	const currentUser = userState.getUser();
+	if (currentUser) {
+		updateNavFromUserData(currentUser);
+	}
 }
 
-function updateNavFromUseData(user: User): void
+function updateNavFromUserData(user: User | null): void
 {
+	console.log('updateNavFromUseData called with user:', user?.getName() || 'null');
+
 	if (!user)
 	{
 		goToPage('landing');
+		return;
 	}
+
+	if (user instanceof RegisteredUser)
+		setDeleteUserButton();
 
 	const userNameElement = document.getElementById('user-name-nav');
 	userNameElement.textContent = user.getName();
@@ -89,6 +98,12 @@ function setSettingButton()
 
 function goToPage(pageName: string)
 {
+	const currentHash = window.location.hash.replace('#', '');
+	if (currentHash === pageName) {
+		console.log('Already on page:', pageName);
+		return;
+	}
+
 	const pageState = { page: pageName };
 	window.history.pushState(pageState, '', `#${pageState.page}`);
 	renderPageState(pageState);

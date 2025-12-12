@@ -2,7 +2,7 @@ import { RegisteredUser, GuestUser, User } from "./User";
 
 export { Subscriber, UserState }
 
-type Subscriber = (user: User) => void;
+type Subscriber = (user: User | null) => void;
 
 const localStorageKeyForGuestUser : string = "PongGuestUser"
 const localStorageKeyForRegisteredUser : string = "PongRegisteredUser"
@@ -61,7 +61,8 @@ class UserState
 	public subscribe(callback: Subscriber): () => void
 	{
 		this.subscriberVector.push(callback);
-		return (function ()
+		callback(this.user);
+		return (() =>
 		{
 			this.subscriberVector = this.subscriberVector.filter
 			(

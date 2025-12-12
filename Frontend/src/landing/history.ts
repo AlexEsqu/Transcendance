@@ -2,6 +2,7 @@ import { RemapBlock } from "@babylonjs/core";
 import { displayAliasQueryPage, displayGuestPage, displayRegisterPage, displayLoginPage } from "./alias";
 import { displayDashboardPage, displayDeletePage, displayRenamePage, displayPasswordPage } from "./dashboard"
 import { displayGameWindow } from "./game";
+import { displayNavBar } from "./nav";
 
 export { renderPageState, pageState}
 
@@ -15,7 +16,10 @@ window.addEventListener('popstate', (event) => {
 	}
 });
 
-function renderPageState(state: { page: string }) {
+function renderPageState(state: { page: string })
+{
+	document.body.innerHTML = "";
+
 	switch (state.page) {
 		case 'landing':
 			displayAliasQueryPage();
@@ -30,6 +34,7 @@ function renderPageState(state: { page: string }) {
 			displayLoginPage();
 			break;
 		case 'game':
+			displayNavBar();
 			displayGameWindow();
 			break;
 		case 'dashboard':

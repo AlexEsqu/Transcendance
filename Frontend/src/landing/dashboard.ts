@@ -22,5 +22,4 @@ async function displayRenamePage()
 async function displayDashboardPage()
 {
 	document.body.innerHTML = userHtml;
-
 }
