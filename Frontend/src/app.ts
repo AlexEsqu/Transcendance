@@ -2,7 +2,7 @@
 import { displayAliasQueryPage } from "./landing/alias"
 import { displayNavBar } from "./landing/nav";
 import { displayGameWindow } from "./landing/game";
-import { GuestUser, RegisteredUser, User, getUserFromLocalStorage } from "./landing/user"
+import { GuestUser, RegisteredUser, User, getUserFromLocalStorage } from "./landing/User"
 import "./input.css";
 import { RegisterClass } from "@babylonjs/core";
 

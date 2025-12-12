@@ -1,7 +1,7 @@
 import navHTML from "../pages/nav.html"
 import { displayAliasQueryPage, displayUserPage } from "./alias"
 import { renderPageState } from "./history"
-import { User, GuestUser, RegisteredUser, getUserFromLocalStorage } from "./user"
+import { User, GuestUser, RegisteredUser, getUserFromLocalStorage } from "./User"
 import { userObject } from "../app"
 
 export { displayNavBar}

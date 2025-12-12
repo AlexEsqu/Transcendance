@@ -1,5 +1,5 @@
 import { displayGamePage, userObject } from "../app";
-import { User, GuestUser, RegisteredUser, getUserFromLocalStorage } from "./user"
+import { User, GuestUser, RegisteredUser, getUserFromLocalStorage } from "./User"
 import { renderPageState } from "./history";
 
 import welcomeHtml from "../pages/welcome.html";
