@@ -2,31 +2,44 @@
 import { displayAliasQueryPage } from "./landing/alias"
 import { displayNavBar } from "./landing/nav";
 import { displayGameWindow } from "./landing/game";
-import { GuestUser, RegisteredUser, User, getUserFromLocalStorage } from "./landing/User"
+import { GuestUser, RegisteredUser, User } from "./landing/User"
+import { UserState } from "./landing/UserState";
 import "./input.css";
 import { RegisterClass } from "@babylonjs/core";
 
-export { displayGamePage, userObject }
+export { userState }
 
 let pageState = { page: 'welcome' };
 window.history.replaceState(pageState, null, '#welcome');
 
-// checking if a registered or guest user object is stored in the localStorage, not diplaying the game until they do
-let guestObject : User = new GuestUser('');
-let userObject : User = new RegisteredUser('');
+const userState = UserState.getInstance();
 
-console.log(userObject);
+console.log(`User is :`);
+console.log(userState)
 
-function displayGamePage() : void
+userState.subscribe((user) =>
 {
-	document.body.innerHTML = "";
-	displayNavBar();
+	console.log('User changed:', user?.getName() || 'No user');
+
+	if (user)
+	{
+		// user logged in, can display game
+		document.body.innerHTML = "";
+		displayNavBar();
+	}
+	else
+	{
+		// User logged out, show login page
+		displayAliasQueryPage();
+	}
+});
+
+if (userState.getUser())
+{
 	displayGameWindow();
 }
-
-if (userObject)
-	displayGamePage();
 else
+{
 	displayAliasQueryPage();
-
+}
 

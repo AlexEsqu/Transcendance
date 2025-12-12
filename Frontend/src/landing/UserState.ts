@@ -1,25 +1,37 @@
-import { User } from "./User";
+import { RegisteredUser, GuestUser, User } from "./User";
 
 export { Subscriber, UserState }
 
 type Subscriber = (user: User) => void;
 
-// wrapping the User element in a listening class with singleton
+const localStorageKeyForGuestUser : string = "PongGuestUser"
+const localStorageKeyForRegisteredUser : string = "PongRegisteredUser"
+
+// wrapping the User element in a observer class with singleton
 class UserState
 {
+
+	//--------------------------- ATTRIBUTES -------------------------------//
+
+	// user object containing the data
 	private user: User = null;
 
-	// list of all the elements which need to be notified
-	// if the user state changes
+	// list of elements which need to be notified if user state changes
 	private subscriberVector: Subscriber[] = [];
 
-	// singleton, to only ever get one user active
+	// singleton of the class object, to only ever get one user active
 	private static instance: UserState;
 
-	// singleton constructor is private
-	private constructor() {}
+	//--------------------------- CONSTRUCTORS ------------------------------//
 
-	// getter
+	// singleton constructor is private
+	private constructor()
+	{
+		this.loadFromLocalStorage();
+	}
+
+	//---------------------------- GETTER -----------------------------------//
+
 	public static getInstance(): UserState
 	{
 		if (!UserState.instance)
@@ -28,13 +40,22 @@ class UserState
 		return UserState.instance;
 	}
 
-	// setter which modified User objects and
-	// notifies subscribers listening in for state changes
+	public getUser(): User | null
+	{
+		return this.user;
+	}
+
+	//--------------------------- SETTER ------------------------------------//
+
+	// modified User objects and notifies subscribers for state changes
 	public setUser(newUser: User): void
 	{
 		this.user = newUser;
+		this.saveToLocalStorage();
 		this.notifySubscribers();
 	}
+
+	//----------------------- OBSERVER PATTERN ------------------------------//
 
 	// subscribing function which returns a unsubscribe function
 	public subscribe(callback: Subscriber): () => void
@@ -53,4 +74,148 @@ class UserState
 	{
 		this.subscriberVector.forEach(callback => callback(this.user));
 	}
+
+	//--------------------------- STORAGE ----------------------------------//
+
+	private saveToLocalStorage(): void
+	{
+		// clearing out any possible remaining User object from local
+		localStorage.removeItem(localStorageKeyForGuestUser);
+		localStorage.removeItem(localStorageKeyForRegisteredUser);
+
+		if (!this.user)
+			return;
+
+		if (this.user instanceof RegisteredUser)
+		{
+			localStorage.setItem(localStorageKeyForRegisteredUser, JSON.stringify(
+				{
+					name: this.user.name,
+					id: this.user.id,
+					accessToken: this.user.accessToken,
+					avatarPath: this.user.avatarPath
+				}
+			));
+		}
+		else if (this.user instanceof GuestUser)
+		{
+			localStorage.setItem(localStorageKeyForGuestUser, JSON.stringify({
+				name: this.user.name,
+				avatarPath: this.user.avatarPath
+			}));
+		}
+	}
+
+	private loadFromLocalStorage(): void
+	{
+		const registeredData = localStorage.getItem(localStorageKeyForRegisteredUser);
+		const guestData = localStorage.getItem(localStorageKeyForGuestUser);
+
+		if (registeredData)
+		{
+			const data = JSON.parse(registeredData);
+			this.user = new RegisteredUser(data.name, data.id, data.accessToken);
+			this.user.avatarPath = data.avatarPath;
+		}
+		else if (guestData)
+		{
+			const data = JSON.parse(guestData);
+			this.user = new GuestUser(data.name);
+			this.user.avatarPath = data.avatarPath;
+		}
+
+		this.notifySubscribers();
+	}
+
+
+	//-------------- AUTHENTICATION ---------------------//
+
+	public loginAsGuest(username: string): void
+	{
+		const guestUser = new GuestUser(username);
+		this.setUser(guestUser);
+	}
+
+	public async loginAsRegistered(username: string, password: string)
+	{
+		const response = await fetch('https://localhost:8443/users/auth/login',
+			{
+				method: 'POST',
+				headers: { "Content-Type": 'application/json' },
+				body: JSON.stringify(
+					{
+						username, password
+					}
+				),
+			}
+		);
+
+		if (!response.ok)
+			throw new Error('Login failed');
+
+		const data = await response.json();
+		const user = new RegisteredUser(username, data.id, data.accessToken);
+		this.setUser(user);
+	}
+
+	public async register(username: string, password: string): Promise<void>
+	{
+		const response = await fetch('https://localhost:8443/users/signup',
+			{
+				method: 'POST',
+				headers: { "Content-Type": 'application/json' },
+				body: JSON.stringify(
+					{
+						username, password
+					}
+				),
+			}
+		);
+
+		if (!response.ok)
+		{
+			if (response.status === 409)
+				throw new Error('Username already exists');
+			throw new Error('Registration failed');
+		}
+
+		await this.loginAsRegistered(username, password);
+	}
+
+	public async logout(): Promise<void>
+	{
+		if (this.user instanceof RegisteredUser)
+		{
+			const response = await fetch('https://localhost:8443/users/auth/logout',
+				{
+					method: 'POST',
+					headers: { 'Authorization': `Bearer ${this.user.accessToken}` },
+				}
+			);
+
+			if (!response.ok)
+				throw new Error('Logout failed');
+		}
+
+		this.setUser(null);
+	}
+
+	public async deleteAccount(): Promise<void>
+	{
+		if (this.user instanceof RegisteredUser)
+		{
+			const response = await fetch('https://localhost:8443/users/me',
+				{
+					method: 'DELETE',
+					headers: { 'Authorization': `Bearer ${this.user.accessToken}` },
+				}
+			);
+
+			if (!response.ok)
+				throw new Error('Delete failed');
+		}
+
+		this.setUser(null);
+	}
+
 }

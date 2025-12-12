@@ -1,6 +1,8 @@
 import { RemapBlock } from "@babylonjs/core";
-import { displayUserPage, displayAliasQueryPage, displayGuestPage, displayRegisterPage, displayLoginPage, displayGamePage } from "./alias";
+import { displayAliasQueryPage, displayGuestPage, displayRegisterPage, displayLoginPage } from "./alias";
 import { displayDeletePage, displayRenamePage, displayPasswordPage } from "./dashboard"
+import { displayGameWindow } from "./game";
+
 export { renderPageState, pageState}
 
 // initialize history of the website to use back and forward buttons
@@ -28,11 +30,11 @@ function renderPageState(state: { page: string }) {
 			displayLoginPage();
 			break;
 		case 'game':
-			displayGamePage();
+			displayGameWindow();
 			break;
-		case 'user':
-			displayUserPage();
-			break;
+		// case 'user':
+		// 	displayUserPage();
+		// 	break;
 		case 'password':
 			displayPasswordPage();
 			break;

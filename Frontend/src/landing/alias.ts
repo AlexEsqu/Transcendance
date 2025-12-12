@@ -1,10 +1,9 @@
-import { displayGamePage, userObject } from "../app";
-import { User, GuestUser, RegisteredUser, getUserFromLocalStorage } from "./User"
+import { userState } from "../app";
+import { User, GuestUser, RegisteredUser } from "./User"
 import { renderPageState } from "./history";
 
 import welcomeHtml from "../pages/welcome.html";
 import formHtml from "../pages/form.html";
-import userHtml from "../pages/user.html";
 
 import guestFormHtml from "../pages/forms/guestForm.html"
 import loginFormHtml from "../pages/forms/loginForm.html"
@@ -13,7 +12,7 @@ import registerFormHtml from "../pages/forms/registerForm.html"
 import renameFormHtml from "../pages/forms/renameForm.html"
 import avatarFormHtml from "../pages/forms/avatarForm.html"
 
-export { displayAliasQueryPage, displayGamePage, displayLoginPage, displayRegisterPage, displayGuestPage, displayUserPage}
+export { displayAliasQueryPage, displayLoginPage, displayRegisterPage, displayGuestPage}
 
 // replaces the document body with a menu page to choose to login, register or play as guest
 function displayAliasQueryPage() : void
@@ -65,10 +64,7 @@ function displayGuestPage() : void
 		console.log(alias); // TODO : remove
 
 		if (alias) {
-			new GuestUser(alias);
-			let pageState = { page: 'game'};
-			window.history.pushState(pageState, '', `#${pageState.page}`);
-			renderPageState(pageState);
+			userState.loginAsGuest(alias);
 		}
 	})
 }
@@ -100,7 +96,7 @@ function displayRegisterPage() : void
 
 		else if (login && password)
 		{
-			userObject.createUser(login, password);
+			userState.register(login, password);
 		}
 	})
 }
@@ -126,97 +122,10 @@ function displayLoginPage() : void
 
 		if (login && password)
 		{
-			userObject.loginUser(login, password);
+			userState.loginAsRegistered(login, password);
 		}
 	})
 }
 
-async function registerUser(log: string, pass: string) : Promise<void>
-{
-	try
-	{
-		const response = await fetch('https://localhost:8443/users/signup',
-			{
-				method: 'POST',
-				headers: {
-					"Content-Type": 'application/json',
-				},
-				body: JSON.stringify({ username: log, password: pass }),
-			});
-
-		if (!response.ok)
-			throw new Error(`HTTP error! status: ${response.status}`);
-		const data = await response.json();
-
-		console.log(data);
-	}
-	catch (error)
-	{
-		console.error('Failed to fetch users:', error);
-		if (error.status == 409)
-			alert('Username is already used')
-		else
-			alert('Failed to create user')
-	}
-	finally
-	{
-		displayAliasQueryPage();
-	}
-}
-
-async function loginUser(login: string, password: string) : Promise<void>
-{
-	try
-	{
-
-
-		let pageState = { page: 'game'};
-		window.history.pushState(pageState, '', '#' + pageState.page);
-		renderPageState(pageState);
-	}
-	catch (error)
-	{
-		console.error('Failed to fetch users:', error);
-		alert('Failed to login user')
-		displayAliasQueryPage();
-	}
-}
-
-async function displayUserPage()
-{
-	document.body.innerHTML = userHtml;
-
-	// const submitAvatar = document.getElementById('btn-submit-avatar');
-	// const inputAvatar = document.getElementById('input-avatar') as HTMLInputElement;
-	// submitAvatar.addEventListener('click', () => {
-	// 	user.addAvatar(inputAvatar.value);
-	// 	inputAvatar.value = '';
-	// })
-
-	// const submitNewName = document.getElementById('btn-submit-rename-user');
-	// const inputNewName = document.getElementById('input-rename-user') as HTMLInputElement;
-	// submitNewName.addEventListener('click', () => {
-	// 	user.rename(inputNewName.value);
-	// 	inputNewName.value = '';
-	// })
-
-	// const submitNewPassword = document.getElementById('btn-submit-password');
-	// const inputOldPassword = document.getElementById('input-old-password') as HTMLInputElement;
-	// const inputNewPassword = document.getElementById('input-password') as HTMLInputElement;
-	// const inputNewPasswordCheck = document.getElementById('input-password-check') as HTMLInputElement;
-	// submitNewPassword.addEventListener('click', () => {
-	// 	if (inputNewPassword.value === inputNewPasswordCheck.value)
-	// 	{
-	// 		user.changePassword(inputOldPassword.value, inputNewPassword.value);
-	// 	}
-	// 	else
-	// 	{
-	// 		alert('The new password does not match');
-	// 	}
-	// 	inputNewPassword.value = '';
-	// 	inputNewPasswordCheck.value = '';
-	// 	inputOldPassword.value = '';
-	// })
-}
 
 
