@@ -27,6 +27,10 @@ export default function putUserAvatar(server) {
 					description: "Unauthorized: Invalid credentials",
 					$ref: "errorResponse#",
 				},
+				413: {
+					description: "Payload too large",
+					$ref: "errorResponse#",
+				},
 				500: {
 					description: "Internal Server Error",
 					$ref: "errorResponse#",

@@ -1,42 +1,50 @@
+import bcrypt from "bcrypt"; 
+
 export async function addUser(
-	server,
-	{
-		username = "test_user",
-		passwordHash = "fakehash",
-		avatar = null,
-		refreshTokenHash = null,
-	} = {}
+  server,
+  {
+    username,
+    password,
+    avatar = null,
+    refreshTokenHash = null,
+	is_active,
+  }
 ) {
-	const stmt = server.db.prepare(`
+  // allow tests to provide passwordHash OR password
+  const finalHash = await bcrypt.hash(password, 10)
+
+  const stmt = server.db.prepare(`
     INSERT INTO users (username, password_hash, avatar, refresh_token_hash)
     VALUES (?, ?, ?, ?)
   `);
-	const info = stmt.run(username, passwordHash, avatar, refreshTokenHash);
 
-	return {
-		id: info.lastInsertRowid,
-		username,
-		avatar,
-		refreshTokenHash,
-	};
+  const info = stmt.run(username, finalHash, avatar, refreshTokenHash);
+
+  return {
+    id: info.lastInsertRowid,
+    username,
+    password,
+    avatar,
+    refreshTokenHash,
+	is_active,
+  };
 }
-
 export async function addMatch(
   server,
-  {
-    winner_id = 0,
-    loser_id = 0,
-    winner_score = 0,
-    loser_score = 0,
-    date = new Date().toISOString(),
-  } = {}
+  { winner_id, loser_id, winner_score, loser_score, date }
 ) {
-  const stmnt = server.db.prepare(
-    `INSERT INTO matches (winner_id, loser_id, winner_score, loser_score, date)
-     VALUES (?, ?, ?, ?, ?)`
-  );
+  const stmt = server.db.prepare(`
+    INSERT INTO matches (winner_id, loser_id, winner_score, loser_score, date)
+    VALUES (?, ?, ?, ?, ?)
+  `);
 
-  const info = stmnt.run(winner_id, loser_id, winner_score, loser_score, date);
+  const info = stmt.run(
+    winner_id,
+    loser_id,
+    winner_score,
+    loser_score,
+    date
+  );
 
   return {
     id: info.lastInsertRowid,

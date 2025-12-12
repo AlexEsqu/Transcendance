@@ -42,7 +42,7 @@ export default function signup(server) {
 		} catch (err) {
 			console.log(err);
 			if (err.code == "SQLITE_CONSTRAINT_UNIQUE") {
-				reply.status(409).send({ error: "Username is already taken" });
+				reply.status(409).send({error: "Conflict",  message: "Username is already taken" });
 			}
 			handleSQLiteError(err, reply);
 		}

@@ -6,9 +6,15 @@ export default fp(async function (server) {
 		secret: process.env.JWT_SECRET,
 	});
 
-	server.decorate("authenticateUser", async function () {
-		
+	server.decorate("authenticateUser", async function (req, res, next) {
+		// Mock implementation
+		if (req.headers.authorization === "Bearer invalidToken") {
+			throw new Error("Invalid token");
+		}
+		req.user = {
+			id: 1,
+			username: "user1",
+		};
+		next();
 	});
 });
-
-

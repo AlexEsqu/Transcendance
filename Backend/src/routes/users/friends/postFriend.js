@@ -25,6 +25,10 @@ export default function addFriend(server) {
 					description: "Not Found: User not found",
 					$ref: "errorResponse#",
 				},
+				409: {
+					description: "Conflict: Friendship already exists",
+					$ref: "errorResponse#",
+				},
 				500: {
 					description: "Internal Server Error",
 					$ref: "errorResponse#",
@@ -41,7 +45,7 @@ export default function addFriend(server) {
 			const { id } = req.body;
 			const user = await getUserbyId(id, server.db);
 			if (!user) {
-				return reply.status(404).send({ error: "Friend id not found" });
+				return reply.status(404).send({ error: "Friend user id not found" });
 			}
 			console.log(user);
 
@@ -63,7 +67,7 @@ export default function addFriend(server) {
 			});
 		} catch (err) {
 			if (err.code == "SQLITE_CONSTRAINT_PRIMARYKEY") {
-				return reply.status(400).send({ error: `User ${req.user.username} is already friend with ${req.friend.username}` });
+				return reply.status(409).send({error: "Conflict", message: `User ${req.user.username} is already friend with ${req.friend.username}` });
 			}
 			console.log(err);
 			return reply.status(500).send({ error: "Internal server error" });

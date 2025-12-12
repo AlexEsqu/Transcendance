@@ -1,57 +1,90 @@
-// tests/matches.test.js
-import { test, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { buildServer } from "../src/app.js";
 import mockDb from "./mocks/inMemoryDb.js";
 import mockApiKey from "./mocks/mockValidateApiKey.js";
-import { addMatch, addUser } from "./utils/testUtils.js";
+import { matches } from "./mocks/mockObjects.js";
+
 let server;
 
-beforeEach(async () => {
+beforeAll(async () => {
 	server = buildServer({
 		dbOverride: mockDb,
 		apiKeyPluginOverride: mockApiKey,
 	});
-
 	await server.ready();
 });
 
-test("GET /matches returns all seeded matches", async () => {
-	// Add mock users first (needed for foreign keys if you enforce them)
-	await addUser(server, { username: "user1" });
-	await addUser(server, { username: "user2" });
+afterAll(async () => {
+	await server.close();
+});
 
-	// Seed matches
-	
-  // Seed matches using addMtch
-	await addMatch(server, { winner_id: 1, loser_id: 2, winner_score: 11, loser_score: 8 });
-   	await addMatch(server, { winner_id: 2, loser_id: 1, winner_score: 11, loser_score: 7 });
-	// Perform request
-	const response = await server.inject({
-		method: "GET",
-		url: "/matches",
+describe("GET /matches", () => {
+	it("returns all seeded matches", async () => {
+		const response = await server.inject({
+			method: "GET",
+			url: "/matches",
+		});
+
+		expect(response.statusCode).toBe(200);
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const expectedMatches = matches.map(({ id, ...rest }) => rest);
+		expect(response.json()).toEqual(expectedMatches);
+	});
+});
+
+describe("GET /users/:id/matches", () => {
+	it("returns all matches for user 1", async () => {
+		const userId = 1;
+
+		const res = await server.inject({
+			method: "GET",
+			url: `/users/${userId}/matches`,
+		});
+
+		expect(res.statusCode).toBe(200);
+
+		const expectedMatches = matches
+			.filter(
+				(match) =>
+					match.winner_id === userId || match.loser_id === userId
+			)
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			.map(({ id, ...rest }) => rest);
+
+		expect(res.json()).toEqual(expectedMatches);
 	});
 
-	// Assertions
-	expect(response.statusCode).toBe(200);
+	it("returns empty array", async () => {
+		const userId = 4;
 
-	const matches = response.json();
-	expect(matches).toHaveLength(2);
+		const res = await server.inject({
+			method: "GET",
+			url: `/users/${userId}/matches`,
+		});
 
-	// Check if seeded matches exist
-	expect(matches).toEqual(
-		expect.arrayContaining([
-			expect.objectContaining({
-				winner_id: 1,
-				loser_id: 2,
-				winner_score: 11,
-				loser_score: 8,
-			}),
-			expect.objectContaining({
-				winner_id: 2,
-				loser_id: 1,
-				winner_score: 11,
-				loser_score: 7,
-			}),
-		])
-	);
+		expect(res.statusCode).toBe(200);
+
+		const expectedMatches = matches
+			.filter(
+				(match) =>
+					match.winner_id === userId || match.loser_id === userId
+			)
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			.map(({ id, ...rest }) => rest);
+
+		expect(res.json()).toEqual(expectedMatches);
+	});
+
+	it("returns 404 if user not found", async () => {
+		const userId = 5;
+
+		const res = await server.inject({
+			method: "GET",
+			url: `/users/${userId}/matches`,
+		});
+
+		expect(res.statusCode).toBe(404);
+
+		expect(res.json()).toEqual({ error: "User not found" });
+	});
 });
