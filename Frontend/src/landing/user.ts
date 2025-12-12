@@ -1,4 +1,6 @@
-export {User, RegisteredUser, GuestUser, getUserFromLocalStorage, localStorageKeyForGuestUser, localStorageKeyForRegisteredUser}
+export {User, RegisteredUser, GuestUser, getUserFromLocalStorage,  }
+import { userObject } from "../app"
+
 
 const localStorageKeyForGuestUser : string = "PongGuestUser"
 const localStorageKeyForRegisteredUser : string = "PongRegisteredUser"
@@ -25,6 +27,12 @@ abstract class User {
 		this.avatarPath = placeholderAvatar;
 	}
 
+	abstract createUser(username: string, password: string): void
+
+	// technically a setter for the user object
+	abstract loginUser(username: string, password: string): void
+
+	// technically a setter as well
 	abstract logoutUser(): void
 
 	abstract deleteAccount(): void
@@ -35,22 +43,56 @@ abstract class User {
 
 	abstract changePassword(oldPassword : string, newPassword : string): void
 
+	// getter for the User object
+	abstract getUser(): User
+
 }
 
 class RegisteredUser extends User
 {
-	id: number;
-	token: string;
+	id: number | null;
+	accessToken: string | null;
 
-	constructor(name: string, id: number, token: string)
+	constructor(name: string)
 	{
 		super(name);
-		this.id = id;
-		this.token = token;
-		localStorage.setItem(localStorageKeyForRegisteredUser, JSON.stringify(this));
+		this.id = null;
+		this.accessToken = null;
 	}
 
-	static async createUserFromLogin(username: string, password: string): Promise<RegisteredUser>
+	async createUser(username: string, password: string): Promise<void>
+	{
+		try
+		{
+			const response = await fetch('https://localhost:8443/users/signup',
+			{
+				method: 'POST',
+				headers: {
+					"Content-Type": 'application/json',
+				},
+				body: JSON.stringify({ username: username, password: password }),
+			});
+
+			if (!response.ok)
+				throw new Error(`HTTP error! status: ${response.status}`);
+
+			const data = await response.json();
+
+			console.log(data);
+
+			this.loginUser(username, password);
+		}
+		catch (error)
+		{
+			console.error('Failed to fetch users:', error);
+			if (error.status == 409)
+				alert('Username is already used')
+			else
+				alert('Failed to create user')
+		}
+	}
+
+	async loginUser(username: string, password: string): Promise<void>
 	{
 		const response = await fetch(`https://localhost:8443/users/auth/login`,
 			{
@@ -69,7 +111,9 @@ class RegisteredUser extends User
 
 		const data = await response.json();
 		console.log(data);
-		return new RegisteredUser(username, data.id, data.accessToken);
+
+		this.id = data.id;
+		this.accessToken = data.accessToken;
 	}
 
 	async deleteAccount(): Promise<void>
@@ -82,7 +126,7 @@ class RegisteredUser extends User
 					headers:
 					{
 						'accept': '*/*',
-						'Authorization': `Bearer ${this.token}`
+						'Authorization': `Bearer ${this.accessToken}`
 					},
 				});
 
@@ -109,7 +153,7 @@ class RegisteredUser extends User
 					headers:
 					{
 						'accept': '*/*',
-						'Authorization': `Bearer ${this.token}`,
+						'Authorization': `Bearer ${this.accessToken}`,
 						'X-App-Secret': `${apiKey}`
 					},
 				});
@@ -138,7 +182,7 @@ class RegisteredUser extends User
 					{
 						'accept': 'application/json',
 						'Content-Type': 'application/json',
-						'Authorization': `Bearer ${this.token}`,
+						'Authorization': `Bearer ${this.accessToken}`,
 						'X-App-Secret': `${apiKey}`
 					},
 					body: JSON.stringify({
@@ -178,7 +222,7 @@ class RegisteredUser extends User
 					{
 						'accept': 'application/json',
 						'Content-Type': 'application/json',
-						'Authorization': `Bearer ${this.token}`,
+						'Authorization': `Bearer ${this.accessToken}`,
 						'X-App-Secret': `${apiKey}`
 					},
 					body: JSON.stringify({
@@ -199,6 +243,11 @@ class RegisteredUser extends User
 		}
 	}
 
+	getUser(): User
+	{
+		return this;
+	}
+
 }
 
 class GuestUser extends User
@@ -209,9 +258,20 @@ class GuestUser extends User
 		localStorage.setItem(localStorageKeyForGuestUser, JSON.stringify({ name: this.name }));
 	}
 
+	createUser(username: string, password: string): void
+	{
+		this.loginUser(username, password);
+	}
+
+	loginUser(username: string, password: string): void
+	{
+		this.name = username;
+	}
+
 	logoutUser(): void
 	{
 		localStorage.removeItem(localStorageKeyForGuestUser);
+		this.name = null;
 	}
 
 	deleteAccount(): void
@@ -232,6 +292,11 @@ class GuestUser extends User
 	changePassword(oldPassword : string, newPassword : string): void
 	{
 		alert("You need to be a registered user to change your password")
+	}
+
+	getUser(): User
+	{
+		return this;
 	}
 }
 
@@ -256,5 +321,6 @@ async function getUserFromLocalStorage(): Promise<User | null>
 	console.log('user obtained');
 	return user;
 }
+
 
 
