@@ -7,17 +7,19 @@ import authPlugin from "./plugins/jwt.js";
 import fastifyCookie from "@fastify/cookie";
 import cors from "@fastify/cors";
 import fastifyRateLimit from "@fastify/rate-limit";
-import fastifyStatic from "@fastify/static"
-import path from "node:path"
+import fastifyStatic from "@fastify/static";
+import path from "node:path";
+import { authCredentialsBody, errorResponse, SignupBody, SuccessMessageResponse, matchObject, userIdObject, publicUserObject } from "./schemas/schemas.js";
 
 //Plugins
 import clientAuthPluggin from "./plugins/validateApiKey.js";
+import sessionAuthPluggin from "./plugins/validateSessionToken.js";
 import swaggerPlugin from "./plugins/swagger.js";
 //Routes
 import matchesRoutes from "./routes/matches/index.js";
 import userRoutes from "./routes/users/index.js";
 import authRoutes from "./routes/auth/index.js";
-
+import db from "./database.js";
 export const server = Fastify({
 	https: {
 		key: fs.readFileSync("/tmp/certs/server.key"),
@@ -25,11 +27,18 @@ export const server = Fastify({
 	},
 	ajv: {
 		plugins: [ajvFilePlugin],
+		customOptions: {
+			allErrors: true,
+			strict: false, // optional, but useful when debugging schemas
+		},
 	},
 });
 
+server.register(db);
+
 // MODULES
 server.register(clientAuthPluggin);
+server.register(sessionAuthPluggin);
 
 server.register(fastifyFormBody);
 server.register(fastifyMultiPart, {
@@ -38,7 +47,7 @@ server.register(fastifyMultiPart, {
 server.register(authPlugin);
 server.register(fastifyCookie);
 server.register(swaggerPlugin);
-server.register(cors, { origin: "*", credentials: true });
+server.register(cors, { origin: "*", credentials: true, methods: ["GET", "POST", "PUT", "DELETE"] });
 //Routes
 server.register(matchesRoutes);
 server.register(userRoutes);
@@ -51,6 +60,16 @@ server.register(fastifyRateLimit, {
 });
 
 server.register(fastifyStatic, {
-  root: path.join(process.env.AVATARS_UPLOAD_PATH),
-  prefix: "/avatars/",
+	root: path.join(process.env.AVATARS_UPLOAD_PATH),
+	prefix: "/avatars/",
 });
+
+//Schema
+
+server.addSchema(authCredentialsBody);
+server.addSchema(errorResponse);
+server.addSchema(SignupBody);
+server.addSchema(SuccessMessageResponse);
+server.addSchema(matchObject);
+server.addSchema(userIdObject);
+server.addSchema(publicUserObject);

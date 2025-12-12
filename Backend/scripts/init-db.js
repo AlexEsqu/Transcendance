@@ -1,16 +1,17 @@
 // scripts/init-db.js
 import Database from "better-sqlite3";
 
-const db = new Database("/app/data/database.db");
+export const db = new Database("/app/data/database.db");
 db.pragma("journal_mode = WAL");
 
 db.prepare(`
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+		last_activity DATETIME,
         username TEXT NOT NULL UNIQUE,
         password_hash TEXT NOT NULL,
         refresh_token_hash TEXT,
-        avatar_path TEXT
+        avatar TEXT
     );
 `).run();
 
@@ -22,6 +23,17 @@ db.prepare(`
         winner_score INTEGER NOT NULL,
         loser_score INTEGER NOT NULL,
         date DATETIME NOT NULL
+    );
+`).run();
+
+
+db.prepare(`
+    CREATE TABLE IF NOT EXISTS friends (
+        user_id INTEGER NOT NULL,
+    	friend_id INTEGER NOT NULL,
+    	PRIMARY KEY (user_id, friend_id),
+    	FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    	FOREIGN KEY (friend_id) REFERENCES users(id) ON DELETE CASCADE
     );
 `).run();
 

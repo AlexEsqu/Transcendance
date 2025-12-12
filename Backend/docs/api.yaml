@@ -18,224 +18,6 @@ components:
       name: X-App-Secret
   schemas: {}
 paths:
-  /users:
-    get:
-      tags:
-        - user
-      description: Returns a list of all registered users. `This endpoint requires
-        client authentication.`
-      security: &a1
-        - AppClientAuth: []
-      responses:
-        "200":
-          description: Default Response
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                    username:
-                      type: string
-                    avatar_url:
-                      type: string
-  /users/{id}:
-    get:
-      tags:
-        - user
-      description: Returns an object of an user using the id passed in parameters.
-        `This endpoint requires client authentication.`
-      parameters:
-        - schema:
-            type: integer
-            minimum: 1
-          in: path
-          name: id
-          required: true
-      security: *a1
-      responses:
-        "200":
-          description: Default Response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: integer
-                  username:
-                    type: string
-                  avatar_url:
-                    type: string
-  /users/signup:
-    post:
-      tags:
-        - auth
-      description: Creates a new user account using a username and password. Does not
-        automatically log in the user.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - username
-                - password
-              properties:
-                username:
-                  type: string
-                  minLength: 3
-                  maxLength: 20
-                password:
-                  type: string
-                  minLength: 8
-        required: true
-      responses:
-        "200":
-          description: Default Response
-  /users/auth/login:
-    post:
-      tags:
-        - auth
-      description: Authenticates the user using their username and password. On
-        success, returns a short-lived access token in the response body and
-        sets a long-lived refresh token in the `HttpOnly refreshToken cookie`,
-        which can later be used to obtain new access tokens.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                password:
-                  type: string
-              required:
-                - username
-                - password
-        required: true
-      responses:
-        "200":
-          description: Default Response
-  /users/auth/refresh:
-    post:
-      tags:
-        - auth
-      description: Uses the refresh token to issue a new access token. The endpoint
-        verifies the refresh token, checks that it is not expired or revoked.
-        This endpoint requires `client authentification` AND `user
-        authentification` AND the refresh cookie stored in the `HttpOnly
-        refreshToken cookie`
-      security: &a2
-        - BearerAuth: []
-        - cookieAuth: []
-        - AppClientAuth: []
-      responses:
-        "200":
-          description: New access token
-          content:
-            application/json:
-              schema:
-                description: New access token
-                type: object
-                properties:
-                  accessToken:
-                    type: string
-                required:
-                  - accessToken
-        "401":
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                description: Unauthorized
-  /users/auth/logout:
-    post:
-      tags:
-        - auth
-      description: Logs the user out by invalidating the refresh token stored in the
-        `HttpOnly refreshToken cookie`. After logout, the user must
-        reauthenticate with their username and password to obtain new tokens.
-        This endpoint requires client authentification AND user authentification
-        AND the refresh cookie stored in the HttpOnly refreshToken cookie
-      security: *a2
-      responses:
-        "200":
-          description: Default Response
-  /users/me:
-    delete:
-      tags:
-        - user
-      description: Deletes the user account and all its data. `This endpoint requires
-        client AND user authentication.`
-      security: &a3
-        - BearerAuth: []
-        - AppClientAuth: []
-      responses:
-        "200":
-          description: Default Response
-    patch:
-      tags:
-        - user
-      description: Modifies the data of the user. `This endpoint requires client AND
-        user authentication.`
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                profilePictureUrl:
-                  type: string
-              additionalProperties: false
-      security: *a3
-      responses:
-        "200":
-          description: Default Response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-  /users/me/password:
-    patch:
-      tags:
-        - user
-      description: Modifies the password of the user. `This endpoint requires client
-        AND user authentication.`
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - oldPassword
-                - newPassword
-              properties:
-                oldPassword:
-                  type: string
-                newPassword:
-                  type: string
-                  minLength: 8
-              additionalProperties: false
-        required: true
-      security: *a3
-      responses:
-        "200":
-          description: Default Response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
   /matches:
     post:
       tags:
@@ -267,7 +49,8 @@ paths:
                   type: string
                   format: date-time
         required: true
-      security: *a1
+      security: &a1
+        - AppClientAuth: []
       responses:
         "200":
           description: Default Response
@@ -277,6 +60,402 @@ paths:
       description: Returns a list of all matches. `This endpoint requires client
         authentication.`
       security: *a1
+      responses:
+        "200":
+          description: Default Response
+  /matches/{user_id}:
+    get:
+      tags:
+        - matches
+      description: Returns a list of all the matches of a user using the user_id
+        parameter. `This endpoint requires client authentication.`
+      parameters:
+        - schema:
+            type: integer
+          in: path
+          name: user_id
+          required: true
+      security: *a1
+      responses:
+        "200":
+          description: Default Response
+  /users:
+    get:
+      tags:
+        - user
+      description: Returns a list of all registered users. `This endpoint requires
+        client authentication.`
+      security: *a1
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    username:
+                      type: string
+                    avatar:
+                      type: string
+  /users/{id}:
+    get:
+      tags:
+        - user
+      description: Returns an object of an user using the id passed in parameters.
+        `This endpoint requires client authentication.`
+      parameters:
+        - schema:
+            type: integer
+          in: path
+          name: id
+          required: true
+      security: *a1
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  username:
+                    type: string
+                  avatar:
+                    type: string
+        "404":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /users/signup:
+    post:
+      tags:
+        - auth
+      description: Creates a new user account using a username and password. Does not
+        automatically log in the user.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                  minLength: 3
+                  maxLength: 20
+                password:
+                  type: string
+                  minLength: 8
+        required: true
+      responses:
+        "200":
+          description: Default Response
+  /users/me/password:
+    patch:
+      tags:
+        - user
+      description: Modifies the password of the user. `This endpoint requires client
+        AND user authentication.`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - oldPassword
+                - newPassword
+              properties:
+                oldPassword:
+                  type: string
+                newPassword:
+                  type: string
+                  minLength: 8
+              additionalProperties: false
+        required: true
+      security: &a2
+        - BearerAuth: []
+        - AppClientAuth: []
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+  /users/me/avatar:
+    patch:
+      tags:
+        - user
+      description: Modifies the avatar of the user. `This endpoint requires client AND
+        user authentication.`
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - avatar
+              properties:
+                avatar:
+                  type: string
+                  format: binary
+        required: true
+      security: *a2
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+    delete:
+      tags:
+        - user
+      description: Deletes the avatar of the user. `This endpoint requires client AND
+        user authentication.`
+      security: *a2
+      responses:
+        "204":
+          description: Default Response
+  /users/me/username:
+    patch:
+      tags:
+        - user
+      description: Modifies the username of the user. `This endpoint requires client
+        AND user authentication.`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - new_username
+              properties:
+                new_username:
+                  type: string
+              additionalProperties: false
+        required: true
+      security: *a2
+      responses:
+        "200":
+          description: Default Response
+  /users/me/friends:
+    post:
+      tags:
+        - user
+      description: Adds a new friend to the authenticated user's friend list.						The
+        friend_id provided in the request body is validated before the
+        friendship record is created.						`This endpoint requires client
+        authentication AND user authentication.`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - friend_id
+              properties:
+                friend_id:
+                  type: integer
+        required: true
+      security: *a2
+      responses:
+        "201":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        "400":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        "404":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+    delete:
+      tags:
+        - user
+      description: Deletes a friend from the authenticated user's friend list using
+        the id passed in the body.						`This endpoint requires client
+        authentication AND user authentication.`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - friend_id
+              properties:
+                friend_id:
+                  type: integer
+        required: true
+      security: *a2
+      responses:
+        "204":
+          description: Default Response
+        "400":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        "404":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /users/me:
+    delete:
+      tags:
+        - user
+      description: Deletes the user account and all its data. `This endpoint requires
+        client AND user authentication.`
+      security: *a2
+      responses:
+        "204":
+          description: Default Response
+  /users/{id}/friends:
+    get:
+      tags:
+        - user
+      description: Returns the complete list of friends for the user specified by the
+        id path parameter.				Returns basic profile information for each
+        friend.`This endpoint requires client authentication.`
+      parameters:
+        - schema:
+            type: integer
+          in: path
+          name: id
+          required: true
+      security: *a1
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    username:
+                      type: string
+                    avatar:
+                      type: string
+  /users/auth/login:
+    post:
+      tags:
+        - auth
+      description: Authenticates the user using their username and password. On
+        success, returns a the user's id AND short-lived access token in the
+        response body and sets a long-lived refresh token in the `HttpOnly
+        refreshToken cookie`, which can later be used to obtain new access
+        tokens.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - username
+                - password
+        required: true
+      responses:
+        "200":
+          description: Default Response
+  /users/auth/refresh:
+    post:
+      tags:
+        - auth
+      description: Uses the refresh token to issue a new access token. The endpoint
+        verifies the refresh token, checks that it is not expired or revoked.
+        This endpoint requires `client authentification` AND `user
+        authentification` AND the refresh cookie stored in the `HttpOnly
+        refreshToken cookie`
+      security: &a3
+        - BearerAuth: []
+        - cookieAuth: []
+        - AppClientAuth: []
+      responses:
+        "200":
+          description: New access token
+          content:
+            application/json:
+              schema:
+                description: New access token
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                required:
+                  - accessToken
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                description: Unauthorized
+  /users/auth/logout:
+    post:
+      tags:
+        - auth
+      description: Logs the user out by invalidating the refresh token stored in the
+        `HttpOnly refreshToken cookie`. After logout, the user must
+        reauthenticate with their username and password to obtain new tokens.
+        This endpoint requires client authentification AND user authentification
+        AND the refresh cookie stored in the HttpOnly refreshToken cookie
+      security: *a3
       responses:
         "200":
           description: Default Response

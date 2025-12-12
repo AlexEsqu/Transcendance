@@ -7,5 +7,5 @@ import postMatches from "./postMatch.js";
 export default async function matchesRoutes(server) {
   server.register(postMatches);
   server.register(getMatches);
-  server.register(getUserMatches);
+  server.register(getUserMatches, { prefix: "users" });
 }

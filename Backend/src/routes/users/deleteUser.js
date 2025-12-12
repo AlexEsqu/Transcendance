@@ -1,4 +1,4 @@
-import db from "../../database.js";
+import fs from "fs";
 
 //TODO: GDPR => DONT FORGET TO ANONIMIZE THE USER EVERYWHERE IN DB
 function deleteUser(server) {
@@ -8,22 +8,49 @@ function deleteUser(server) {
 			description: "Deletes the user account and all its data. `This endpoint requires client AND user authentication.`",
 			security: server.security.UserAuth,
 			response: {
-				204: { type: "null" },
+				204: {
+					description: "Success: User deleted successfully",
+					type: "null",
+				},
+				401: {
+					description: "Unauthorized: Invalid credentials",
+					$ref: "errorResponse#",
+				},
+				500: {
+					description: "Internal Server Error",
+					$ref: "errorResponse#",
+				},
+				default: {
+					description: "Unexpected error",
+					$ref: "errorResponse#",
+				},
 			},
 		},
-		onRequest: [server.authenticateUser],
+		onRequest: [server.authenticateUser, server.authenticateClient],
 	};
 	server.delete("/me", opts, (req, reply) => {
-		const { id } = req.user;
-		//delete the users avatar from db
-		const { avatar_path } = db.prepare(`SELECT avatar_path FROM users WHERE id = ?`).get(id);
-		if (avatar_path) {
-			fs.unlink(avatar_path, (err) => {
-				console.log(avatar_path + " was deleted");
+		try {
+			const { id } = req.user;
+			//delete the users avatar from db
+			const {avatar } = server.db.prepare(`SELECT avatar FROM users WHERE id = ?`).get(id);
+			if (avatar) {
+				fs.unlink(avatar, () => {
+					console.log(avatar + " was deleted");
+				});
+			}
+			server.db.prepare(`DELETE FROM users WHERE id = ?`).run(id);
+			//Clear the refresh token from cookies
+			reply.clearCookie("refreshToken", {
+				httpOnly: true,
+				secure: true,
+				sameSite: "strict",
+				path: "/users/auth",
 			});
+			return reply.status(204).send();
+		} catch (err) {
+			console.log(err);
+			return reply.status(500).send({ error: "Internal server error" });
 		}
-		db.prepare(`DELETE FROM users WHERE id = ?`).run(id);
-		reply.status(204).send();
 	});
 }
 
