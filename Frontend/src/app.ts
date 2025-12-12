@@ -1,6 +1,6 @@
 
 import { displayAliasQueryPage } from "./landing/alias"
-import { displayNavBar } from "./landing/nav";
+import { displayNavBar, goToPage } from "./landing/nav";
 import { displayGameWindow } from "./landing/game";
 import { GuestUser, RegisteredUser, User } from "./landing/User"
 import { UserState } from "./landing/UserState";
@@ -9,8 +9,8 @@ import { RegisterClass } from "@babylonjs/core";
 
 export { userState }
 
-let pageState = { page: 'welcome' };
-window.history.replaceState(pageState, null, '#welcome');
+let pageState = { page: 'landing' };
+window.history.replaceState(pageState, null, '#landing');
 
 const userState = UserState.getInstance();
 
@@ -36,10 +36,14 @@ userState.subscribe((user) =>
 
 if (userState.getUser())
 {
+	// user logged in, can display game
+	document.body.innerHTML = "";
+	displayNavBar();
 	displayGameWindow();
 }
 else
 {
+	// User logged out, show login page
 	displayAliasQueryPage();
 }
 

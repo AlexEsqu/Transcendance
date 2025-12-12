@@ -2,7 +2,7 @@ import { userState } from "../app";
 import { User, GuestUser, RegisteredUser } from "./User"
 import { renderPageState } from "./history";
 
-import welcomeHtml from "../pages/welcome.html";
+import landingHtml from "../pages/landing.html";
 import formHtml from "../pages/form.html";
 
 import guestFormHtml from "../pages/forms/guestForm.html"
@@ -17,7 +17,7 @@ export { displayAliasQueryPage, displayLoginPage, displayRegisterPage, displayGu
 // replaces the document body with a menu page to choose to login, register or play as guest
 function displayAliasQueryPage() : void
 {
-	document.body.innerHTML = welcomeHtml;
+	document.body.innerHTML = landingHtml;
 
 	const GuestButton = document.getElementById('btn-guestin')
 	GuestButton.addEventListener("click", function ()

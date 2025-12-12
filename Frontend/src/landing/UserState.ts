@@ -128,7 +128,7 @@ class UserState
 	}
 
 
-	//-------------- AUTHENTICATION ---------------------//
+	//------------------------ AUTHENTICATION -------------------------------//
 
 	public loginAsGuest(username: string): void
 	{

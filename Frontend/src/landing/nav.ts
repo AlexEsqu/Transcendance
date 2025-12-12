@@ -4,7 +4,7 @@ import { renderPageState } from "./history"
 import { User, GuestUser, RegisteredUser } from "./User"
 import { userState } from "../app"
 
-export { displayNavBar}
+export { displayNavBar, goToPage }
 
 async function displayNavBar()
 {
@@ -14,7 +14,6 @@ async function displayNavBar()
 	userState.subscribe(updateNavFromUseData);
 
 	// add button events
-
 	setLogoutButton();
 	setSettingButton();
 	if (userState.getUser() instanceof RegisteredUser)
@@ -25,19 +24,14 @@ function updateNavFromUseData(user: User): void
 {
 	if (!user)
 	{
-		// return;
-		goToAliasPage();
+		goToPage('landing');
 	}
 
 	const userNameElement = document.getElementById('user-name-nav');
-	const avatarImage = document.getElementById('user-avatar-nav') as HTMLImageElement;
+	userNameElement.textContent = user.getName();
 
-	if (userNameElement) {
-		userNameElement.textContent = user.getName();
-	}
-	if (avatarImage) {
-		avatarImage.src = user.getAvatarPath();
-	}
+	const avatarImage = document.getElementById('user-avatar-nav') as HTMLImageElement;
+	avatarImage.src = user.getAvatarPath();
 }
 
 function setDeleteUserButton()
@@ -52,7 +46,7 @@ function setDeleteUserButton()
 			try
 			{
 				await userState.deleteAccount();
-				goToAliasPage();
+				goToPage('landing');
 			}
 			catch (error)
 			{
@@ -72,7 +66,7 @@ function setLogoutButton()
 		try
 		{
 			await userState.logout();
-			goToAliasPage();
+			goToPage('landing');
 		}
 		catch (error)
 		{
@@ -87,15 +81,15 @@ function setSettingButton()
 
 	settingUserButton.addEventListener('click', () =>
 	{
-		const pageState = { page: 'user' };
+		const pageState = { page: 'dashboard' };
 		window.history.pushState(pageState, '', `#${pageState.page}`);
 		renderPageState(pageState);
 	});
 }
 
-function goToAliasPage()
+function goToPage(pageName: string)
 {
-	const pageState = { page: 'welcome' };
+	const pageState = { page: pageName };
 	window.history.pushState(pageState, '', `#${pageState.page}`);
 	renderPageState(pageState);
 }
