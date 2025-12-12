@@ -1,0 +1,306 @@
+import { buildServer } from "../src/app.js";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import mockDb from "./mocks/inMemoryDb.js";
+import mockApiKey from "./mocks/mockValidateApiKey.js";
+import { users } from "./mocks/mockObjects.js";
+let server;
+
+import fs from "fs";
+import path from "path";
+import FormData from "form-data";
+beforeAll(async () => {
+	server = buildServer({
+		dbOverride: mockDb,
+		apiKeyPluginOverride: mockApiKey,
+	});
+	await server.ready();
+});
+
+let accessToken;
+
+export function loginUser(user) {
+	it("POST /users/auth/login returns 200 for valid credentials", async () => {
+		const response = await server.inject({
+			method: "POST",
+			url: "/users/auth/login",
+			payload: {
+				username: `${user.username}`,
+				password: `${user.password}`,
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toHaveProperty("accessToken");
+		return response.json().accessToken;
+	});
+}
+
+beforeAll(async () => {
+	users[0].is_active = true;
+	const response = await server.inject({
+		method: "POST",
+		url: "/users/auth/login",
+		payload: { username: users[0].username, password: users[0].password },
+	});
+	expect(response.statusCode).toBe(200);
+	accessToken = response.json().accessToken;
+});
+afterAll(async () => {
+	await server.close();
+});
+
+//TESTING GET /USERS
+describe("GET /users", () => {
+	it("returns all users", async () => {
+		const response = await server.inject({
+			method: "GET",
+			url: "/users",
+		});
+
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toMatchObject(
+			users.map((user) => ({
+				id: user.id,
+				username: user.username,
+				avatar: user.avatar,
+				is_active: user.is_active,
+			}))
+		);
+	});
+});
+
+describe("GET /users/:id", () => {
+	it("returns a single user", async () => {
+		const userId = 1;
+
+		const response = await server.inject({
+			method: "GET",
+			url: `/users/${userId}`,
+		});
+
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toMatchObject({
+			id: users[0].id,
+			username: users[0].username,
+			avatar: users[0].avatar,
+			is_active: users[0].is_active,
+		});
+	});
+
+	it("returns 404 for non-existing user", async () => {
+		const userId = 99;
+		const response = await server.inject({
+			method: "GET",
+			url: `/users/${userId}`,
+		});
+		expect(response.statusCode).toBe(404);
+		expect(response.json()).toMatchObject({ error: "User not found" });
+	});
+
+	it("returns 400 for bad request", async () => {
+		const response = await server.inject({
+			method: "GET",
+			url: "/users/wkjqbhdijb",
+		});
+
+		expect(response.statusCode).toBe(400);
+		expect(response.json()).toHaveProperty("error", "Bad Request");
+	});
+});
+
+describe("POST /users/auth/login", () => {
+	loginUser(users[0]);
+});
+
+describe("PUT /users/me/password", () => {
+	it("returns 401 for not logged in", async () => {
+		const response = await server.inject({
+			method: "PUT",
+			url: "/users/me/password",
+			payload: {
+				oldPassword: "password",
+				newPassword: "newPassword",
+			},
+		});
+		expect(response.statusCode).toBe(401);
+		expect(response.json()).toHaveProperty("error", "Unauthorized");
+	});
+
+	it("returns 200 for successful password change", async () => {
+		const response = await server.inject({
+			method: "PUT",
+			url: "/users/me/password",
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+				"X-App-Secret": "bgb",
+			},
+			payload: {
+				oldPassword: users[0].password,
+				newPassword: "newPassword",
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toHaveProperty(
+			"message",
+			"Updated password successfully"
+		);
+	});
+});
+
+describe("PUT /users/me/avatar", () => {
+	it("returns 401 if not logged in", async () => {
+		const response = await server.inject({
+			method: "PUT",
+			url: "/users/me/avatar",
+		});
+
+		expect(response.statusCode).toBe(401);
+		expect(response.json()).toHaveProperty("error", "Unauthorized");
+	});
+
+	it("updates avatar successfully for logged-in user", async () => {
+		// Path to a test image in your project
+		const filePath = path.join(process.cwd(), "/tests/img/avatar.jpg");
+		const form = new FormData();
+		form.append("avatar", fs.createReadStream(filePath));
+
+		const response = await server.inject({
+			method: "PUT",
+			url: "/users/me/avatar",
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+				"X-App-Secret": "bgb",
+				...form.getHeaders(), // important: sets proper multipart headers
+			},
+			payload: form,
+		});
+
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toMatchObject({
+			success: true,
+			message: "Updated avatar successfully",
+		});
+	});
+
+	it("returns 413 for file too large", async () => {
+		// Path to a test image in your project
+		const filePath = path.join(process.cwd(), "/tests/img/largeImage.jpeg");
+		const form = new FormData();
+		form.append("avatar", fs.createReadStream(filePath));
+
+		const response = await server.inject({
+			method: "PUT",
+			url: "/users/me/avatar",
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+				"X-App-Secret": "bgb",
+				...form.getHeaders(), // important: sets proper multipart headers
+			},
+			payload: form,
+		});
+		expect(response.statusCode).toBe(413);
+		expect(response.json()).toMatchObject({
+			error: "Payload Too Large",
+			message: "request file too large",
+		});
+	});
+});
+
+describe("DELETE /users/me/avatar", () => {
+	it("returns 401 for not logged in", async () => {
+		const response = await server.inject({
+			method: "DELETE",
+			url: "/users/me/avatar",
+		});
+
+		expect(response.statusCode).toBe(401);
+		expect(response.json()).toHaveProperty("error", "Unauthorized");
+	});
+
+	it("returns 204 for successful avatar deletion", async () => {
+		const response = await server.inject({
+			method: "DELETE",
+			url: "/users/me/avatar",
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+				"X-App-Secret": "bgb",
+			},
+		});
+
+		expect(response.statusCode).toBe(204);
+	});
+});
+
+describe("PUT /users/me/username", () => {
+	it("returns 401 for not logged in", async () => {
+		const response = await server.inject({
+			method: "PUT",
+			url: "/users/me/username",
+			payload: {
+				newUsername: "newUsername",
+			},
+		});
+		expect(response.statusCode).toBe(401);
+		expect(response.json()).toHaveProperty("error", "Unauthorized");
+	});
+
+	it("returns 200 for successful username change", async () => {
+		const response = await server.inject({
+			method: "PUT",
+			url: "/users/me/username",
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+				"X-App-Secret": "bgb",
+			},
+			payload: {
+				new_username: "newUsername",
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toMatchObject({
+			success: true,
+			message: "Updated username successfully",
+		});
+	});
+
+	it("returns 409 for username taken", async () => {
+		const response = await server.inject({
+			method: "PUT",
+			url: "/users/me/username",
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+				"X-App-Secret": "bgb",
+			},
+			payload: {
+				new_username: "user2",
+			},
+		});
+		expect(response.statusCode).toBe(409);
+		expect(response.json()).toMatchObject({
+			error: "Conflict",
+			message: "Username is taken already",
+		});
+	});
+});
+
+describe("DELETE /users/me", () => {
+	it("returns 401 for not logged in", async () => {
+		const response = await server.inject({
+			method: "DELETE",
+			url: "/users/me",
+		});
+		expect(response.statusCode).toBe(401);
+		expect(response.json()).toHaveProperty("error", "Unauthorized");
+	});
+
+	it("returns 204 for successful user deletion", async () => {
+		const response = await server.inject({
+			method: "DELETE",
+			url: "/users/me",
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+				"X-App-Secret": "bgb",
+			},
+		});
+		expect(response.statusCode).toBe(204);
+	});
+});

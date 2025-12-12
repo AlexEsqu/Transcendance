@@ -4,11 +4,11 @@ export default function getFriends(server) {
 	const opts = {
 		schema: {
 			tags: ["user"],
-			security: server.security.AppAuth,
+			security: server.security.UserAuth,
 			description:
-				"Returns the complete list of friends for the user specified by the id path parameter.\
-				Returns basic profile information for each friend.`This endpoint requires client authentication.`",
-			params: { $ref: "userIdObject#" },
+				"Returns the complete list of friends of the authenticated user.\
+				Returns basic profile information for each friend.\
+				`This endpoint requires client authentication AND user authentication.`",
 			response: {
 				200: {
 					type: "array",
@@ -32,15 +32,12 @@ export default function getFriends(server) {
 				},
 			},
 		},
-		onRequest: [server.authenticateClient],
+		onRequest: [server.authenticateClient, server.authenticateUser],
 	};
-	server.get("/:id/friends", opts, async (req, reply) => {
+	server.get("/me/friends", opts, async (req, reply) => {
 		try {
-			const { id } = req.params;
-			const user = await getUserbyId(id, server.db);
-			if (!user) {
-				return reply.status(404).send({ error: "User not found" });
-			}
+			const { id } = req.user;
+		
 			const friends_id = server.db.prepare(`SELECT friend_id FROM friends WHERE user_id = ?`).all(id);
 			let friends = [];
 			for (const row of friends_id) {

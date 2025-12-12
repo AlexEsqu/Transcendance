@@ -48,8 +48,8 @@ export default function login(server) {
 			if (!match) {
 				return reply.status(401).send({ error: "Invalid credentials" });
 			} else {
-				const accessToken = createAccessToken(user.id, username, server.db);
-				const refreshToken = createRefreshToken(user.id, username);
+				const accessToken = createAccessToken(server, user.id, username);
+				const refreshToken = createRefreshToken(server, user.id, username);
 
 				const refreshTokenHash = await hashRefreshToken(refreshToken);
 				const addRefreshToken = server.db.prepare(`UPDATE users SET refresh_token_hash = ? WHERE id = ?`);

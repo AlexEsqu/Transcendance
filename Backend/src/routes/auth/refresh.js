@@ -39,10 +39,10 @@ function refresh(server) {
 			const { id, username } = await server.jwt.verify(refreshToken);
 
 			// Create new access token
-			const newAccessToken = createAccessToken(id, username, server.db);
+			const newAccessToken = createAccessToken(server, id, username);
 
 			// Rotate refresh token
-			const newRefreshToken = createRefreshToken(id, username);
+			const newRefreshToken = createRefreshToken(server, id, username);
 			const newRefreshTokenHash = await hashRefreshToken(newRefreshToken);
 			console.log("upadting refresh token");
 			// Save new refresh token hash in DB

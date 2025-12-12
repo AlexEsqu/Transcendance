@@ -42,7 +42,7 @@ export default function deleteFriend(server) {
 			const { id } = req.body;
 			const user = await getUserbyId(id, server.db);
 			if (!user) {
-				return reply.status(404).send({ error: "Friend not found" });
+				return reply.status(404).send({ error: "Friend user id not found" });
 			}
 			console.log(user);
 
