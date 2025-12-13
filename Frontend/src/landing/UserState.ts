@@ -14,7 +14,7 @@ class UserState
 	//--------------------------- ATTRIBUTES -------------------------------//
 
 	// user object containing the data
-	private user: User = null;
+	private user: User | null = null;
 
 	// list of elements which need to be notified if user state changes
 	private subscriberVector: Subscriber[] = [];
@@ -57,18 +57,19 @@ class UserState
 
 	//----------------------- OBSERVER PATTERN ------------------------------//
 
-	// subscribing function which returns a unsubscribe function
-	public subscribe(callback: Subscriber): () => void
+	// callback is the function that will be called when an event is notified
+	public subscribe(callback: Subscriber): void
 	{
 		this.subscriberVector.push(callback);
 		callback(this.user);
-		return (() =>
-		{
-			this.subscriberVector = this.subscriberVector.filter
-			(
-				subscribers => subscribers !== callback
-			);
-		})
+	}
+
+	public unsubscribe(callback: Subscriber): void
+	{
+		this.subscriberVector = this.subscriberVector.filter
+		(
+			subscriber => subscriber !== callback
+		);
 	}
 
 	private notifySubscribers(): void
@@ -125,7 +126,7 @@ class UserState
 			this.user.avatarPath = data.avatarPath;
 		}
 
-		this.notifySubscribers();
+		// this.notifySubscribers();
 	}
 
 
