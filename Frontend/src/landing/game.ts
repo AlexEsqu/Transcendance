@@ -91,7 +91,14 @@ function selectGameOptions(): Promise<IOptions> {
 	});
 }
 
-export function displayGameWindow() : void {
+export function displayGameWindow() : void
+{
+	const main = document.querySelector('main') as HTMLElement;
+	if (!main)
+		return;
+
+	main.innerHTML = '';
+
 	//	Select between 2 games --> TO DO
 	//	Launch selected game with custom options
 	selectGameOptions().then(options => {

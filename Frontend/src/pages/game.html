@@ -1,18 +1,21 @@
-<!-- Button start to launch the game -->
-<div
-	id="game-start"
-	class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+<main class="flex-1 flex items-center justify-center w-full">
 
-	<div class="border rounded-md flex flex-col items-center justify-center bg-black">
-		<button
-			class="text-glow p-5 hover:text-glow-red"
-			id="btn-startplay">
-			Start to play</button>
+	<!-- Button start to launch the game -->
+	<div
+		id="game-start"
+		class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
 
+		<div class="border rounded-md flex flex-col items-center justify-center bg-black">
+			<button
+				class="text-glow p-5 hover:text-glow-red"
+				id="btn-startplay">
+				Start to play</button>
+		</div>
 	</div>
 
-</div>
+	</div>
+		<canvas id="game-canvas" class="w-full max-w-7xl aspect-video"></canvas>
+	</div>
 
-<main class="flex-1 flex items-center justify-center w-full">
-	<canvas id="game-canvas" class="w-full max-w-7xl aspect-video"></canvas>
+
 </main>
