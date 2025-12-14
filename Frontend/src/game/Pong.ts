@@ -8,7 +8,6 @@ import { State, IPlayer, IRound, IOptions } from "./Data"
 import { Ball } from "./Ball";
 import { Paddle } from './Paddle';
 import { createCamera, createText, createMap, createLight, createAnimation } from './Graphics';
-import { stat } from "fs";
 
 export interface IPaddle {
 	paddle: Paddle,
@@ -20,7 +19,7 @@ export interface IPaddle {
 export class Pong {
 	static MAP_WIDTH = 10;
 	static MAP_HEIGHT = 6;
-	static MAX_SCORE = 3;
+	static MAX_SCORE = 2;
 	static MAX_ROUNDS = 1;
 
 	canvas: HTMLCanvasElement;
@@ -130,8 +129,7 @@ export class Pong {
 			if (this.state === State.play && this.isLaunched) {
 				let status = this.updateGame(keys);
 				isNewRound = this.monitoringRounds(roundIndex);
-				if (status && !isNewRound)
-					this.launch(3);
+				if (status && !isNewRound) this.launch(3);
 				if (isNewRound) {
 					this.state = State.pause;
 					this.isLaunched = false;
@@ -214,16 +212,30 @@ export class Pong {
 		this.rightPadd.paddle.resetPosition(Pong.MAP_WIDTH, "right");
 		this.ball.reset(true);
 
-		if (playerIndex >= this.options.nbOfPlayer || roundIndex >= Pong.MAX_ROUNDS) return 0;
+		console.log(rounds);
+
 		//	Who's playing now ?
-		// if (this.options.nbOfPlayer == 4 && roundIndex == Pong.MAX_ROUNDS) {
-		// 	this.leftPadd.player = this.players.rounds[0].winnerId;
-		// 	this.rightPadd.player = this.players[playerIndex];
-		// }
-		this.leftPadd.player = this.players[playerIndex];
-		playerIndex++;
-		this.rightPadd.player = this.players[playerIndex];
-		playerIndex++;
+		if (this.options.nbOfPlayer == 4 && roundIndex == (Pong.MAX_ROUNDS - 1)) {
+			console.log("NEW round 4 players and last round");
+			this.leftPadd.player = rounds[0].winner;
+			this.rightPadd.player = rounds[1].winner;
+		} else if (this.options.nbOfPlayer == 8 && roundIndex == (Pong.MAX_ROUNDS / 2)) {
+			this.leftPadd.player = rounds[0].winner;
+			this.rightPadd.player = rounds[1].winner;
+		} else if (this.options.nbOfPlayer == 8 && roundIndex == (Pong.MAX_ROUNDS / 2) + 1) {
+			this.leftPadd.player = rounds[2].winner;
+			this.rightPadd.player = rounds[3].winner;
+		} else if (this.options.nbOfPlayer == 8 && roundIndex == (Pong.MAX_ROUNDS - 1)) {
+			this.leftPadd.player = rounds[4].winner;
+			this.rightPadd.player = rounds[5].winner;
+		} else {
+			if (playerIndex >= this.options.nbOfPlayer || roundIndex >= Pong.MAX_ROUNDS) return 0;
+			console.log("NEW round first");
+			this.leftPadd.player = this.players[playerIndex];
+			playerIndex++;
+			this.rightPadd.player = this.players[playerIndex];
+			playerIndex++;
+		}
 
 		//	Update each player's name and score
 		this.leftPadd.nameText.text = this.leftPadd.player.name;
@@ -254,8 +266,8 @@ export class Pong {
 			console.error("results of matches are lost");
 			return ;
 		}
-		console.log("GAME-STATE: the winner is " + rounds[roundIndex - 1].winnerId);
-		console.log("GAME-STATE: the looser is " + rounds[roundIndex - 1].loserId);
+		console.log("GAME-STATE: the winner is " + rounds[roundIndex - 1].winner.name);
+		console.log("GAME-STATE: the looser is " + rounds[roundIndex - 1].loser.name);
 		// sendMatchesPostRequest(rounds[roundIndex - 1], Date.now());
 	}
 
@@ -267,8 +279,6 @@ export class Pong {
 
 		if (this.leftPadd.player.score == Pong.MAX_SCORE || this.rightPadd.player.score == Pong.MAX_SCORE) {
 			console.log("GAME-STATE: a player has won the round");
-			console.log(roundIndex);
-			console.log(Pong.MAX_ROUNDS);
 			if (roundIndex >= Pong.MAX_ROUNDS) this.state = State.end;
 			return true;
 		}
@@ -279,22 +289,22 @@ export class Pong {
 	 * 	- Save current round's results
 	 */
 	saveResults(rounds: Array<IRound>): Array<IRound> {
-		if (!this.leftPadd.player || !this.rightPadd.player || this.state != State.play) return rounds;
+		if (!this.leftPadd.player || !this.rightPadd.player) return rounds;
 
 		console.log("GAME-STATE: saving results");
 		let results: IRound;
 		if (this.leftPadd.player.score == Pong.MAX_SCORE) {
 			results = {
-				winnerId: this.leftPadd.player.id,
+				winner: this.leftPadd.player,
 				maxScore: this.leftPadd.player.score,
-				loserId: this.rightPadd.player.id,
+				loser: this.rightPadd.player,
 				minScore: this.rightPadd.player.score
 			};
 		} else {
 			results = {
-				winnerId: this.rightPadd.player.id,
+				winner: this.rightPadd.player,
 				maxScore: this.rightPadd.player.score,
-				loserId: this.leftPadd.player.id,
+				loser: this.leftPadd.player,
 				minScore: this.leftPadd.player.score
 			};
 		}

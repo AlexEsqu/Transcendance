@@ -15,8 +15,8 @@ function fillMatchesJSON(results: IRound, time?: number): IJSON {
 
 	// get Id from Name
 	let matches: IJSON = {
-		winner_id: results.winnerId,
-		loser_id: results.loserId,
+		winner_id: results.winner.id,
+		loser_id: results.loser.id,
 		winner_score: results.maxScore,
 		loser_score: results.minScore,
 		date: date.toISOString()

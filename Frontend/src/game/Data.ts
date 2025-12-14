@@ -12,9 +12,9 @@ interface IPlayer {
 //	Add custom options of the player later!!!???
 
 interface IRound {
-	winnerId: number;
+	winner: IPlayer;
 	maxScore: number;
-	loserId: number;
+	loser: IPlayer;
 	minScore: number;
 };
 

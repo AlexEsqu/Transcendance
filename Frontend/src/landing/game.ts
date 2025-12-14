@@ -57,7 +57,9 @@ function launchPongGame(options: IOptions): void
 	}
 
 	//	Launch Pong game when user click on start button
-	const gameWindow = document.getElementById("game-canvas");
+	const gameWindow = document.getElementById("game-canvas") as HTMLCanvasElement;
+	gameWindow.width = window.innerWidth;
+	gameWindow.height = window.innerHeight;
 	const app = new App(gameWindow, options);
 	// btnStart.addEventListener('click', (e) => {
 	// 	startBtnDisplay.remove();
