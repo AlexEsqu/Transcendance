@@ -1,6 +1,10 @@
 <main class="flex-1 flex items-center justify-center w-full">
-	<canvas id="game-canvas" class="w-full aspect-video"></canvas>
+  <div class="relative w-full aspect-video">
+    <canvas id="game-canvas" class="absolute inset-0 w-full h-full"></canvas>
+    <canvas id="ui-canvas"   class="absolute inset-100 w-full h-full pointer-events-none"></canvas>
+  </div>
 </main>
+
 
 <!-- Button start to launch the game -->
 <div id="game-start" class="font-mono text-white w-full h-screen flex flex-col items-center fixed mt-[50%] ">

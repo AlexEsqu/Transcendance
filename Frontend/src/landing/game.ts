@@ -138,7 +138,7 @@ function selectGameOptions(): Promise<IOptions>
 			const paddColor: string = paddColorInput.value;
 			const options: IOptions = { 
 				level: level, 
-				nbOfPlayer: nbPlayer,
+				nbOfPlayers: nbPlayer,
 				ballColor: ballColor,
 				mapColor: backColor,
 				paddColor: paddColor,

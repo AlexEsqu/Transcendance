@@ -22,47 +22,37 @@ export class Pong {
 
 	canvas: HTMLCanvasElement;
 	engine: Engine;
-	// scene.id: Scene;
 	gui: AdvancedDynamicTexture;
-	// camera: ArcRotateCamera;
-	// ball: Ball;
-	options: IOptions;
 	robot: boolean;
-	state: State;
 	time: number;
-	// leftPadd: IPaddle;
-	// rightPadd: IPaddle;
-	players: Array<IPlayer>;
 	isLaunched: boolean;
 	onNewRound?: () => void;
 	scene: IScene;
+	canvasUI: HTMLCanvasElement;
 
 	constructor(canvasId: string, options: IOptions, onNewRound?: () => void) {
 		this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
 		this.engine = new Engine(this.canvas, true);
-		// this.gameScene = null;
 		this.gui = null;
-		// this.camera = null;
-		// this.scene.ball = null;
 		this.scene = null;
-
-		this.options = options;
-		this.state = State.opening;
-		this.time = Date.now();
 		this.robot = false;
-		// this.leftPadd = { paddle: null, player: null, scoreText: null, nameText: null };
-		// this.rightPadd = { paddle: null, player: null, scoreText: null, nameText: null };
-		this.players = options.players.slice(0, options.nbOfPlayer).map(name => ({ name, id: 0, score: 0 }));
-		if (options.nbOfPlayer === 1) {
-			// special case: player is a robot
-			this.robot = true;
-			this.players.push({ id: 0, name: "Robot", score: 0 });
-			this.players.reverse();
-		}
-		if (options.nbOfPlayer >= 4) Pong.MAX_ROUNDS = options.nbOfPlayer - 1;
+		if (options.nbOfPlayers >= 4) Pong.MAX_ROUNDS = options.nbOfPlayers - 1;
 		this.onNewRound = onNewRound;
 		this.isLaunched = false;
-		this.scene = loadGame(this.engine, this.canvas, this.options);
+		this.scene = loadGame(this.engine, this.canvas, options, this.gui);
+		let players = options.players.slice(0, options.nbOfPlayers).map(name => ({ name, id: 0, score: 0 }));
+		if (options.nbOfPlayers === 1) {
+			// special case: player is a robot
+			this.robot = true;
+			players.push({ id: 0, name: "Robot", score: 0 });
+			players.reverse();
+		}
+		this.scene.players = players;
+		this.scene.state = State.opening;
+		this.time = Date.now();
+		this.canvasUI = document.getElementById("ui-canvas") as HTMLCanvasElement;
+		this.canvasUI.width = window.innerWidth;
+		this.canvasUI.height = window.innerHeight;
 	}
 
 	
@@ -84,7 +74,7 @@ export class Pong {
 		for (let i = 0; i <= 5; i++)
 			roundsColors.push("rgb(141, 188, 255, 1)");
 
-		newRound(0, null, 0);
+		newRound(this.scene, 0, null, 0);
 
 		const keys = {};
 		let rounds: Array<IRound> = null;
@@ -95,16 +85,16 @@ export class Pong {
 		//	Manage user input
 		this.handleInput(keys);
 		this.scene.id.registerBeforeRender(() => {
-			if (this.state === State.opening) this.opening();
-			if (this.state === State.play && this.isLaunched) {
+			if (this.scene.state === State.opening) this.opening();
+			if (this.scene.state === State.play && this.isLaunched) {
 				let status = this.updateGame(keys);
-				isNewRound = monitoringRounds(roundIndex);
+				isNewRound = monitoringRounds(this.scene, roundIndex);
 				if (status && !isNewRound) this.launch(3);
 				if (isNewRound) {
-					this.state = State.pause;
+					this.scene.state = State.pause;
 					this.isLaunched = false;
-					rounds = saveResults(rounds);
-					if (newRound(playerIndex, rounds, roundIndex)) {
+					rounds = saveResults(this.scene.leftPadd, this.scene.rightPadd, rounds);
+					if (newRound(this.scene, playerIndex, rounds, roundIndex)) {
 						roundIndex += 1;
 						playerIndex += 2;
 					}
@@ -112,17 +102,17 @@ export class Pong {
 				}
 			}
 			
-			drawMatchHistoryTree(this.canvas, playersColors, roundsColors);
-			if (this.state === State.end) this.endGame(rounds, roundIndex);
+			if (this.scene.state === State.end) this.endGame(rounds, roundIndex);
 			this.time = Date.now();
 		});
 		//	Rendering loop
 		this.engine.runRenderLoop(() => {
-			if (!this.scene.id || this.state === State.end) {
+			if (!this.scene.id || this.scene.state === State.end) {
 				console.log("GAME-STATE: end");
 				this.engine.stopRenderLoop();
 			}
 			this.scene.id.render();
+			drawMatchHistoryTree(this.canvasUI, playersColors, roundsColors);
 		});
 	}
 
@@ -152,26 +142,28 @@ export class Pong {
 			paddle.move(side, Pong.MAP_HEIGHT / 2, this.time);
 
 		//	Update visual-scoring in the scene
-		this.scene.leftPadd.scoreText.text = this.scene.leftPadd.player.score.toString();
-		this.scene.rightPadd.scoreText.text = this.scene.rightPadd.player.score.toString();
+		// this.scene.leftPadd.scoreText.text = this.scene.leftPadd.player.score.toString();
+		// this.scene.rightPadd.scoreText.text = this.scene.rightPadd.player.score.toString();
 
 		return status;
 	}
 
 	launch(count: number): void {
 		if (count <= 0) {
-			this.state = State.play;
+			this.scene.state = State.play;
 			this.isLaunched = true;
 			this.scene.ball.launch();
 			return ;
 		}
-		this.state = State.launch;
+		this.scene.state = State.launch;
 		
 		const keys = [
 			{ frame: 0, value: 60 },
 			{ frame: 30, value: 30 }
 		];
-		const timer = createText(count.toString(), this.options.ballColor, 60, "200px", "0px", this.gui);
+		this.gui = AdvancedDynamicTexture.CreateFullscreenUI("UI");
+
+		const timer = createText(count.toString(), this.scene.options.ballColor, 60, "200px", "0px", this.gui);
 		const animation = createAnimation("timer", "fontSize", keys);
 		
 		timer.animations = [animation];
@@ -193,7 +185,7 @@ export class Pong {
 		this.scene.camera.animations = [];
 		this.scene.camera.animations.push(animation);
 		this.scene.id.beginAnimation(this.scene.camera, 0, 60, false);
-		this.state = State.pause;
+		this.scene.state = State.pause;
 	}
 
 	endGame(rounds: Array<IRound>, roundIndex:number ) {

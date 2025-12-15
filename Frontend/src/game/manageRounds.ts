@@ -1,21 +1,22 @@
-import { IRound, State } from "./Data";
-import { Pong } from "./Pong";
+import { IRound, State, IScene } from "./Data";
+import { IPaddle, Pong } from "./Pong";
 
 export { monitoringRounds, saveResults, newRound, drawMatchHistoryTree }
 
 /***********************************************************************************************************/
-/** MATCH SYSTEM *******************************************************************************************/
+/** MATCHES SYSTEM *****************************************************************************************/
 /***********************************************************************************************************/
 
 /**
  * 	- Check if any of the players have reached the maximum score
  */
-function monitoringRounds(roundIndex: number): boolean {
-	if (!this.leftPadd.player || !this.rightPadd.player) return false;
+function monitoringRounds(scene: IScene, roundIndex: number): boolean
+{
+	if (!scene || !scene.leftPadd.player || !scene.rightPadd.player) return false;
 
-	if (this.leftPadd.player.score == Pong.MAX_SCORE || this.rightPadd.player.score == Pong.MAX_SCORE) {
+	if (scene.leftPadd.player.score == Pong.MAX_SCORE || scene.rightPadd.player.score == Pong.MAX_SCORE) {
 		console.log("GAME-STATE: a player has won the round");
-		if (roundIndex >= Pong.MAX_ROUNDS) this.state = State.end;
+		if (roundIndex >= Pong.MAX_ROUNDS) scene.state = State.end;
 		return true;
 	}
 	return false;
@@ -24,24 +25,25 @@ function monitoringRounds(roundIndex: number): boolean {
 /**
  * 	- Save current round's results
  */
-function saveResults(rounds: Array<IRound>): Array<IRound> {
-	if (!this.leftPadd.player || !this.rightPadd.player) return rounds;
+function saveResults(leftPadd: IPaddle, rightPadd: IPaddle, rounds: Array<IRound>): Array<IRound>
+{
+	if (!leftPadd.player || !rightPadd.player) return rounds;
 
 	console.log("GAME-STATE: saving results");
 	let results: IRound;
-	if (this.leftPadd.player.score == Pong.MAX_SCORE) {
+	if (leftPadd.player.score == Pong.MAX_SCORE) {
 		results = {
-			winner: this.leftPadd.player,
-			maxScore: this.leftPadd.player.score,
-			loser: this.rightPadd.player,
-			minScore: this.rightPadd.player.score
+			winner: leftPadd.player,
+			maxScore: leftPadd.player.score,
+			loser: rightPadd.player,
+			minScore: rightPadd.player.score
 		};
 	} else {
 		results = {
-			winner: this.rightPadd.player,
-			maxScore: this.rightPadd.player.score,
-			loser: this.leftPadd.player,
-			minScore: this.leftPadd.player.score
+			winner: rightPadd.player,
+			maxScore: rightPadd.player.score,
+			loser: leftPadd.player,
+			minScore: leftPadd.player.score
 		};
 	}
 	if (!rounds)
@@ -51,44 +53,55 @@ function saveResults(rounds: Array<IRound>): Array<IRound> {
 	return rounds;
 }
 
-function newRound(playerIndex: number, rounds: IRound[], roundIndex: number): number {
+function newRound(scene: IScene, playerIndex: number, rounds: IRound[], roundIndex: number): number
+{
 	console.log("GAME-STATE: new round");
 
+	const leftPadd = scene.leftPadd;
+	const rightPadd = scene.rightPadd;
+	const nbOfPlayers = scene.options.nbOfPlayers;
+
 	//	Reset data
-	this.leftPadd.paddle.resetPosition(Pong.MAP_WIDTH, "left");
-	this.rightPadd.paddle.resetPosition(Pong.MAP_WIDTH, "right");
-	this.ball.reset(true);
+	if (leftPadd.paddle) leftPadd.paddle.resetPosition(Pong.MAP_WIDTH, "left");
+	if (rightPadd.paddle) rightPadd.paddle.resetPosition(Pong.MAP_WIDTH, "right");
+	scene.ball.reset(true);
 
 	console.log(rounds);
 
 	//	Who's playing now ?
-	if (this.options.nbOfPlayer == 4 && roundIndex == (Pong.MAX_ROUNDS - 1)) {
-		console.log("NEW round 4 players and last round");
-		this.leftPadd.player = rounds[0].winner;
-		this.rightPadd.player = rounds[1].winner;
-	} else if (this.options.nbOfPlayer == 8 && roundIndex == (Pong.MAX_ROUNDS / 2)) {
-		this.leftPadd.player = rounds[0].winner;
-		this.rightPadd.player = rounds[1].winner;
-	} else if (this.options.nbOfPlayer == 8 && roundIndex == (Pong.MAX_ROUNDS / 2) + 1) {
-		this.leftPadd.player = rounds[2].winner;
-		this.rightPadd.player = rounds[3].winner;
-	} else if (this.options.nbOfPlayer == 8 && roundIndex == (Pong.MAX_ROUNDS - 1)) {
-		this.leftPadd.player = rounds[4].winner;
-		this.rightPadd.player = rounds[5].winner;
+	if (nbOfPlayers == 4 && roundIndex == (Pong.MAX_ROUNDS - 1)) {
+		console.log(Pong.MAX_ROUNDS - 1);
+		leftPadd.player = rounds[0].winner;
+		rightPadd.player = rounds[1].winner;
+	} else if (nbOfPlayers == 8 && roundIndex == (Pong.MAX_ROUNDS / 2)) {
+		console.log( (Pong.MAX_ROUNDS / 2));
+
+		leftPadd.player = rounds[0].winner;
+		rightPadd.player = rounds[1].winner;
+	} else if (nbOfPlayers == 8 && roundIndex == (Pong.MAX_ROUNDS / 2) + 1) {
+		console.log( (Pong.MAX_ROUNDS / 2) + 1);
+
+		leftPadd.player = rounds[2].winner;
+		rightPadd.player = rounds[3].winner;
+	} else if (nbOfPlayers == 8 && roundIndex == (Pong.MAX_ROUNDS - 1)) {
+		console.log( (Pong.MAX_ROUNDS - 1));
+
+		leftPadd.player = rounds[4].winner;
+		rightPadd.player = rounds[5].winner;
 	} else {
-		if (playerIndex >= this.options.nbOfPlayer || roundIndex >= Pong.MAX_ROUNDS) return 0;
-		console.log("NEW round first");
-		this.leftPadd.player = this.players[playerIndex];
+		if (playerIndex >= nbOfPlayers || roundIndex >= Pong.MAX_ROUNDS) return 0;
+		console.log("begin round");
+		leftPadd.player = scene.players[playerIndex];
 		playerIndex++;
-		this.rightPadd.player = this.players[playerIndex];
+		rightPadd.player = scene.players[playerIndex];
 		playerIndex++;
 	}
 
 	//	Update each player's name and score
-	this.leftPadd.nameText.text = this.leftPadd.player.name;
-	this.rightPadd.nameText.text = this.rightPadd.player.name;
-	this.leftPadd.scoreText.text = "0";
-	this.rightPadd.scoreText.text = "0";
+	// leftPadd.nameText.text = leftPadd.player.name;
+	// rightPadd.nameText.text = rightPadd.player.name;
+	// leftPadd.scoreText.text = "0";
+	// rightPadd.scoreText.text = "0";
 
 	//	Update gameHistoryTree -- TO DO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	return 1;

@@ -8,12 +8,24 @@ enum State {
 	opening, launch, play, pause, end
 };
 
+interface IOptions {
+	level: Level;
+	nbOfPlayers: number;
+	ballColor: string;
+	paddColor: string;
+	mapColor: string;
+	players: string[];
+};
+
 interface IScene {
 	id: Scene;
+	state: State;
 	camera: ArcRotateCamera;
 	ball: Ball;
 	leftPadd: IPaddle;
 	rightPadd: IPaddle;
+	options: IOptions;
+	players: Array<IPlayer>;
 };
 
 interface IPlayer {
@@ -32,13 +44,4 @@ interface IRound {
 
 enum Level {
 	easy, medium, hard
-};
-
-interface IOptions {
-	level: Level;
-	nbOfPlayer: number;
-	ballColor: string;
-	paddColor: string;
-	mapColor: string;
-	players: string[];
 };

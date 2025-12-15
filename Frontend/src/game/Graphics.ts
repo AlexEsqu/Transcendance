@@ -118,18 +118,24 @@ function createAnimation(name: string, target: string, keys: IAnimationKey[]): A
 /**
  * 	- Create the main scene and all its elements
  */
-function loadGame(engine: Engine, canvas: HTMLCanvasElement, options: IOptions): IScene
+function loadGame(engine: Engine, canvas: HTMLCanvasElement, options: IOptions, gui): IScene
 {
 	if (!engine || !canvas || !options) return null;
 	
-	let scene: IScene;
+	let scene: IScene = { id: null, camera: null, ball: null, 
+		leftPadd: { paddle: null, player: null, scoreText: null, nameText: null }, 
+		rightPadd: { paddle: null, player: null, scoreText: null, nameText: null },
+		options: options,
+		players: null,
+		state: 0
+	};
 
 	scene.id = new Scene(engine);
 	if (!scene.id) {
 		console.error("can't load game scene");
 		return null;
 	}
-	
+
 	//	Remove default background color
 	scene.id.clearColor = new Color4(0, 0, 0, 0);
 
@@ -151,11 +157,12 @@ function loadGame(engine: Engine, canvas: HTMLCanvasElement, options: IOptions):
 	//	Creates 2 paddles, one for each players and 2DText for visual scoring
 	scene.leftPadd.paddle = new Paddle(scene.id, "left", Pong.MAP_WIDTH, options.level, options.paddColor);
 	scene.rightPadd.paddle = new Paddle(scene.id, "right", Pong.MAP_WIDTH, options.level, options.paddColor);
+	
 	// const line = createText("|", "white", 38, "-150px", "0px", this.gui);
-	// this.leftPadd.scoreText = createText("0", "white", 38, "-150px", "-50px", this.gui);
-	// this.rightPadd.scoreText = createText("0", "white", 38, "-150px", "50px", this.gui);
-	// this.leftPadd.nameText = createText("", "white", 28, "-150px", "-200px", this.gui);
-	// this.rightPadd.nameText = createText("", "white", 28, "-150px", "200x", this.gui);
+	// scene.leftPadd.scoreText = createText("0", "white", 38, "-150px", "-50px", gui);
+	// scene.rightPadd.scoreText = createText("0", "white", 38, "-150px", "50px", gui);
+	// scene.leftPadd.nameText = createText("", "white", 28, "-150px", "-200px", gui);
+	// scene.rightPadd.nameText = createText("", "white", 28, "-150px", "200x", gui);
 
 	console.log("GAME-STATE: loaded");
 	return scene;
