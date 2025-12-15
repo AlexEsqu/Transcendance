@@ -18,9 +18,14 @@ window.addEventListener('popstate', (event) => {
 
 function renderPageState(state: { page: string })
 {
-	document.body.innerHTML = "";
+	const main = document.querySelector('main');
+	if (main)
+		main.innerHTML = '';
 
 	switch (state.page) {
+
+		// LOGIN
+
 		case 'landing':
 			displayAliasQueryPage();
 			break;
@@ -33,10 +38,15 @@ function renderPageState(state: { page: string })
 		case 'login':
 			displayLoginPage();
 			break;
+
+		// GAME
+
 		case 'game':
-			displayNavBar();
 			displayGameWindow();
 			break;
+
+		// SETTINGS
+
 		case 'dashboard':
 			displayDashboardPage();
 			break;
@@ -49,6 +59,8 @@ function renderPageState(state: { page: string })
 		case 'deleteAccount':
 			displayDeletePage();
 			break;
+
+
 		default:
 			displayAliasQueryPage();
 	}

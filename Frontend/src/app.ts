@@ -17,37 +17,25 @@ const userState = UserState.getInstance();
 console.log(`User is :`);
 console.log(userState)
 
-// userState.subscribe((user) =>
-// {
-// 	console.log('User changed:', user?.getName() || 'No user');
-
-// 	if (user)
-// 	{
-// 		// User logged in - show nav bar if it doesn't exist
-// 		const navExists = document.querySelector('nav');
-// 		if (!navExists)
-// 			displayNavBar();
-
-// 		// Update nav content
-// 		updateNavFromUserData(user);
-// 	}
-// 	else
-// 	{
-// 		// User logged out - remove nav and show login
-// 		const nav = document.querySelector('nav');
-// 		if (nav) nav.remove();
-// 		displayAliasQueryPage();
-// 	}
-// });
-
-if (userState.getUser())
+userState.subscribe((user) =>
 {
-	// user logged in, can display game
-	goToPage('game');
-}
-else
-{
-	// User logged out, show login page
-	goToPage('landing');
-}
+	console.log('User changed:', user?.getName() || 'No user');
+	const navExists = document.querySelector('nav');
 
+	// User logged in - show nav bar if it doesn't exist
+	if (user)
+	{
+		if (!navExists)
+			displayNavBar();
+		updateNavFromUserData(user);
+	}
+
+	// User logged out - remove nav and show login
+	else
+	{
+		const nav = document.querySelector('nav');
+		if (navExists)
+			nav.remove();
+		displayAliasQueryPage();
+	}
+});

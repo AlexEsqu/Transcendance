@@ -34,3 +34,4 @@ async function injectHTMLPage(url: string, destination: HTMLElement): Promise<vo
 		destination.innerHTML = '<p>Failed to load content</p>';
 	}
 }
+

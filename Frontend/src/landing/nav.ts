@@ -8,62 +8,40 @@ export { displayNavBar, goToPage, updateNavFromUserData }
 
 async function displayNavBar()
 {
+	const navExists = document.querySelector('nav');
+	if (navExists)
+		return;
+
 	document.body.insertAdjacentHTML("beforeend", navHTML);
 
-	// add button events
 	setLogoutButton();
 	setSettingButton();
-
-	// subscribe to changes in the user object so they update the nav bar
-	// userState.subscribe(updateNavFromUserData);
-
-	const currentUser = userState.getUser();
-	if (currentUser) {
-		updateNavFromUserData(currentUser);
-	}
 }
 
-function updateNavFromUserData(user: User | null): void
-{
-	console.log('updateNavFromUseData called with user:', user?.getName() || 'null');
+function updateNavFromUserData(user: User | null): void {
+	if (!user) return;
 
-	if (!user)
-	{
-		goToPage('landing');
-		return;
-	}
-
-	if (user instanceof RegisteredUser)
-		setDeleteUserButton();
-
+	// Update username
 	const userNameElement = document.getElementById('user-name-nav');
-	userNameElement.textContent = user.getName();
+	if (userNameElement) {
+		userNameElement.textContent = user.getName();
+	}
 
+	// Update avatar
 	const avatarImage = document.getElementById('user-avatar-nav') as HTMLImageElement;
-	avatarImage.src = user.getAvatarPath();
-}
+	if (avatarImage) {
+		avatarImage.src = user.getAvatarPath();
+	}
 
-function setDeleteUserButton()
-{
-	const deleteUserButton = document.getElementById('delete-user-btn');
-	deleteUserButton.style.display = "block";
-
-	deleteUserButton.addEventListener('click', async () =>
-	{
-		if (confirm('Are you sure you want to delete your account?'))
-		{
-			try
-			{
-				await userState.deleteAccount();
-				goToPage('landing');
-			}
-			catch (error)
-			{
-				console.error('Failed to delete account:', error);
-				alert('Failed to delete account');
-			}
+	// Show/hide delete button based on user type
+	const deleteButton = document.getElementById('delete-user-btn');
+	if (deleteButton) {
+		if (user instanceof RegisteredUser) {
+			deleteButton.style.display = 'block';
+		} else {
+			deleteButton.style.display = 'none';
 		}
-	});
+	}
 }
 
 function setLogoutButton()
@@ -98,12 +76,6 @@ function setSettingButton()
 
 function goToPage(pageName: string)
 {
-	const currentHash = window.location.hash.replace('#', '');
-	if (currentHash === pageName) {
-		console.log('Already on page:', pageName);
-		return;
-	}
-
 	const pageState = { page: pageName };
 	window.history.pushState(pageState, '', `#${pageState.page}`);
 	renderPageState(pageState);

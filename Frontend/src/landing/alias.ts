@@ -14,10 +14,21 @@ import avatarFormHtml from "../pages/forms/avatarForm.html"
 
 export { displayAliasQueryPage, displayLoginPage, displayRegisterPage, displayGuestPage}
 
+function getMainElement(): HTMLElement {
+	let main = document.querySelector('main');
+	if (!main)
+	{
+		main = document.createElement('main');
+		document.body.appendChild(main);
+	}
+	return main as HTMLElement;
+}
+
 // replaces the document body with a menu page to choose to login, register or play as guest
 function displayAliasQueryPage() : void
 {
-	document.body.innerHTML = landingHtml;
+	const main = getMainElement();
+	main.innerHTML = landingHtml;
 
 	const GuestButton = document.getElementById('btn-guestin')
 	GuestButton.addEventListener("click", function ()
@@ -49,8 +60,9 @@ function displayAliasQueryPage() : void
 
 function displayGuestPage() : void
 {
-	document.body.innerHTML = '';
-	document.body.insertAdjacentHTML('afterbegin', formHtml);
+	const main = document.querySelector('main');
+	main.insertAdjacentHTML('afterbegin', formHtml);
+
 	const container = document.getElementById('form-container');
 	container.insertAdjacentHTML('beforeend', guestFormHtml);
 
@@ -71,8 +83,9 @@ function displayGuestPage() : void
 
 function displayRegisterPage() : void
 {
-	document.body.innerHTML = '';
-	document.body.insertAdjacentHTML('afterbegin', formHtml);
+	const main = getMainElement();
+	main.innerHTML = formHtml;
+
 	const container = document.getElementById('form-container');
 	container.insertAdjacentHTML('beforeend', registerFormHtml);
 
@@ -103,8 +116,9 @@ function displayRegisterPage() : void
 
 function displayLoginPage() : void
 {
-	document.body.innerHTML = '';
-	document.body.insertAdjacentHTML('afterbegin', formHtml);
+	const main = getMainElement();
+	main.innerHTML = formHtml;
+
 	const container = document.getElementById('form-container');
 	container.insertAdjacentHTML('beforeend', loginFormHtml);
 
