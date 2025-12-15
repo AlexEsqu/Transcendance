@@ -14,7 +14,6 @@ class App {
 		this.setupStartButton();
 
 		this.pong = new Pong("game-canvas", options, () => this.showStartButton());
-		this.pong.loadGame();
 		this.pong.runGame();
 	}
 
@@ -60,11 +59,11 @@ function launchPongGame(options: IOptions): void
 	const gameWindow = document.getElementById("game-canvas") as HTMLCanvasElement;
 	gameWindow.width = window.innerWidth;
 	gameWindow.height = window.innerHeight;
+	if (!gameWindow.getContext) {
+		console.error("canvas context not found");
+		return ;
+	}
 	const app = new App(gameWindow, options);
-	// btnStart.addEventListener('click', (e) => {
-	// 	startBtnDisplay.remove();
-	// 	app.play();
-	// });
 }
 
 function generatePlayersInputs(nbOfPlayers: number): void
@@ -151,7 +150,9 @@ function selectGameOptions(): Promise<IOptions>
 	});
 }
 
-export function displayGameWindow() : void {
+
+export function displayGameWindow(): void
+{
 	selectGameOptions().then(options => {
 		launchPongGame(options);
 	});

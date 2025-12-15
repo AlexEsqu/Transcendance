@@ -1,9 +1,14 @@
-import { Scene, Mesh, MeshBuilder, Vector3, Color3, StandardMaterial, ArcRotateCamera, DirectionalLight, GroundMesh, Animation, IAnimationKey } from '@babylonjs/core';
+import { Engine, Scene, Mesh, MeshBuilder, Vector3, Color3, GlowLayer, Color4, StandardMaterial, ArcRotateCamera, GroundMesh, Animation, IAnimationKey } from '@babylonjs/core';
 import { AdvancedDynamicTexture, TextBlock } from "@babylonjs/gui";
+import { Ball } from './Ball';
+import { Paddle } from './Paddle';
+import { Pong } from './Pong';
+import { IOptions, IScene } from './Data';
 
-export { createBall, createPaddle, createCamera, createText, createMap, createAnimation, createLight }
+export { createBall, createPaddle, createCamera, createText, createMap, createAnimation, loadGame }
 
-function createMaterial(scene: Scene, color: Color3): StandardMaterial {
+function createMaterial(scene: Scene, color: Color3): StandardMaterial
+{
 	if (!scene || scene === undefined) return null;
 	if (color === undefined) color = new Color3(0.031, 0.031, 0.141);
 
@@ -18,7 +23,8 @@ function createMaterial(scene: Scene, color: Color3): StandardMaterial {
 }
 
 // { diameter: Ball.RADIUS * 2, segments: 2, updatable: true },
-function createBall(scene: Scene, radius: number, colorHex: string): Mesh {
+function createBall(scene: Scene, radius: number, colorHex: string): Mesh
+{
 	if (!scene || scene === undefined) return null;
 
 	const mesh: Mesh = MeshBuilder.CreateSphere(
@@ -36,16 +42,8 @@ function createBall(scene: Scene, radius: number, colorHex: string): Mesh {
 	return mesh;
 }
 
-function createLight(scene: Scene, colorHex: string): DirectionalLight {
-	if (!scene || scene === undefined) return null;
-
-	const light = new DirectionalLight("light", new Vector3(0, -10, 0), scene);
-	light.diffuse = new Color3().fromHexString(colorHex);
-	light.specular = light.diffuse.scale(0.9);
-	return light;
-}
-
-function createPaddle(scene: Scene, height: number, width: number, depth: number, colorHex: string): Mesh {
+function createPaddle(scene: Scene, height: number, width: number, depth: number, colorHex: string): Mesh
+{
 	if (!scene || scene === undefined) return null;
 
 	const mesh: Mesh = MeshBuilder.CreateBox(
@@ -61,7 +59,8 @@ function createPaddle(scene: Scene, height: number, width: number, depth: number
 	return mesh;
 }
 
-function createCamera(scene: Scene, canvas): ArcRotateCamera {
+function createCamera(scene: Scene, canvas): ArcRotateCamera
+{
 	if (!scene || scene === undefined) return null;
 	
 	const camera: ArcRotateCamera = new ArcRotateCamera(
@@ -88,7 +87,8 @@ function createText(text: string, color: string, fontSize: number, topPx: string
 	return block;
 }
 
-function createMap(scene: Scene, height: number, width: number, colorHex: string): Mesh {
+function createMap(scene: Scene, height: number, width: number, colorHex: string): Mesh
+{
 	if (!scene || scene === undefined) return null;
 
 	const map: GroundMesh = MeshBuilder.CreateGround(
@@ -102,7 +102,8 @@ function createMap(scene: Scene, height: number, width: number, colorHex: string
 	return map;
 }
 
-function createAnimation(name: string, target: string, keys: IAnimationKey[]): Animation {
+function createAnimation(name: string, target: string, keys: IAnimationKey[]): Animation
+{
 	const animation = new Animation(
 		name,
 		target,
@@ -114,3 +115,48 @@ function createAnimation(name: string, target: string, keys: IAnimationKey[]): A
 	return animation;
 }
 
+/**
+ * 	- Create the main scene and all its elements
+ */
+function loadGame(engine: Engine, canvas: HTMLCanvasElement, options: IOptions): IScene
+{
+	if (!engine || !canvas || !options) return null;
+	
+	let scene: IScene;
+
+	scene.id = new Scene(engine);
+	if (!scene.id) {
+		console.error("can't load game scene");
+		return null;
+	}
+	
+	//	Remove default background color
+	scene.id.clearColor = new Color4(0, 0, 0, 0);
+
+	scene.camera = createCamera(scene.id, canvas);
+
+	//	Create a glow layer to add a bloom effect around meshes
+	const glowLayer: GlowLayer = new GlowLayer("glow", scene.id, { mainTextureRatio: 0.6 });
+	glowLayer.intensity = 0.7;
+	glowLayer.blurKernelSize = 64;
+
+	const map: Mesh = createMap(scene.id, Pong.MAP_HEIGHT, Pong.MAP_WIDTH, options.mapColor);
+
+	// Exclude map from bloom effect
+	// glowLayer.addExcludedMesh(map);
+
+	//	Create the ball
+	scene.ball = new Ball(scene.id, options.level, options.ballColor);
+
+	//	Creates 2 paddles, one for each players and 2DText for visual scoring
+	scene.leftPadd.paddle = new Paddle(scene.id, "left", Pong.MAP_WIDTH, options.level, options.paddColor);
+	scene.rightPadd.paddle = new Paddle(scene.id, "right", Pong.MAP_WIDTH, options.level, options.paddColor);
+	// const line = createText("|", "white", 38, "-150px", "0px", this.gui);
+	// this.leftPadd.scoreText = createText("0", "white", 38, "-150px", "-50px", this.gui);
+	// this.rightPadd.scoreText = createText("0", "white", 38, "-150px", "50px", this.gui);
+	// this.leftPadd.nameText = createText("", "white", 28, "-150px", "-200px", this.gui);
+	// this.rightPadd.nameText = createText("", "white", 28, "-150px", "200x", this.gui);
+
+	console.log("GAME-STATE: loaded");
+	return scene;
+}
