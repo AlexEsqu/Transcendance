@@ -65,7 +65,7 @@ export function buildServer({
 	server.register(cors, {
 		origin: "*",
 		credentials: true,
-		methods: ["GET", "POST", "PUT", "DELETE"],
+		methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
 	});
 	server.register(matchesRoutes);
 	server.register(userRoutes);
