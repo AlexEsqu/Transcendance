@@ -5,7 +5,6 @@ import mockApiKey from "./mocks/mockValidateApiKey.js";
 import { users } from "./mocks/mockObjects.js";
 let server;
 
-
 beforeAll(async () => {
 	server = buildServer({
 		dbOverride: mockDb,
@@ -107,10 +106,7 @@ describe("POST /users/me/friends", () => {
 			},
 		});
 		expect(response.statusCode).toBe(404);
-		expect(response.json()).toHaveProperty(
-			"error",
-			"Friend user id not found"
-		);
+		expect(response.json()).toHaveProperty("error", "Not Found");
 	});
 
 	it("returns 400 for same user", async () => {
@@ -126,9 +122,7 @@ describe("POST /users/me/friends", () => {
 			},
 		});
 		expect(response.statusCode).toBe(400);
-		expect(response.json()).toMatchObject({
-			error: "User id and friend_id cannot be the same",
-		});
+		expect(response.json()).toHaveProperty("error", "Bad Request");
 	});
 });
 
@@ -174,10 +168,7 @@ describe("DELETE /users/me/friends", () => {
 			},
 		});
 		expect(response.statusCode).toBe(404);
-		expect(response.json()).toHaveProperty(
-			"error",
-			"Friend user id not found"
-		);
+		expect(response.json()).toHaveProperty("error", "Not Found");
 	});
 
 	it("returns 400 for same user", async () => {
@@ -194,7 +185,7 @@ describe("DELETE /users/me/friends", () => {
 		});
 		expect(response.statusCode).toBe(400);
 		expect(response.json()).toMatchObject({
-			error: "User id and friend_id cannot be the same",
+			error: "Bad request",
 		});
 	});
 });

@@ -84,7 +84,6 @@ describe("GET /users/:id/matches", () => {
 		});
 
 		expect(res.statusCode).toBe(404);
-
-		expect(res.json()).toEqual({ error: "User not found" });
+		expect(res.json()).toHaveProperty("error", "Not Found");
 	});
 });

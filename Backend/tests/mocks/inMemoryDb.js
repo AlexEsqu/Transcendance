@@ -17,6 +17,7 @@ export default fp(async (server) => {
       last_activity DATETIME,
       username TEXT NOT NULL UNIQUE,
       password_hash TEXT NOT NULL,
+	  email TEXT NOT NULL UNIQUE,
       refresh_token_hash TEXT,
       avatar TEXT
     )
@@ -54,18 +55,11 @@ export default fp(async (server) => {
 	// --- INSERT TEST USERS ------------------------------------------
 
 	for (let i = 0; i < users.length; i++) {
-		users[i] = await addUser(server, {
-			username: users[i].username,
-			password: users[i].password,
-			avatar: users[i].avatar,
-			refreshTokenHash: null,
-			is_active: users[i].is_active,
-		});
+		users[i] = await addUser(server, users[i]);
 	}
-// --- INSERT TEST MATCHES ------------------------------------------
+	// --- INSERT TEST MATCHES ------------------------------------------
 
-for (let i = 0; i < matches.length; i++) {
-  matches[i] = await addMatch(server, matches[i]);
-}
-	
+	for (let i = 0; i < matches.length; i++) {
+		matches[i] = await addMatch(server, matches[i]);
+	}
 });

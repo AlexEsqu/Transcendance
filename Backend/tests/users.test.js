@@ -93,7 +93,8 @@ describe("GET /users/:id", () => {
 			url: `/users/${userId}`,
 		});
 		expect(response.statusCode).toBe(404);
-		expect(response.json()).toMatchObject({ error: "User not found" });
+		expect(response.json()).toHaveProperty("error", "Not Found");
+
 	});
 
 	it("returns 400 for bad request", async () => {
