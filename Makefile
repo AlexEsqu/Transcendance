@@ -57,4 +57,7 @@ fclean:
 	docker system prune -af
 	docker volume prune -af
 
+tests:
+	docker exec -it fastify npm run test
+
 re: fclean build up
