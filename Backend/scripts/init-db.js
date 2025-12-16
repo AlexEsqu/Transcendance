@@ -10,6 +10,7 @@ db.prepare(`
 		last_activity DATETIME,
         username TEXT NOT NULL UNIQUE,
         password_hash TEXT NOT NULL,
+		email TEXT NOT NULL UNIQUE,
         refresh_token_hash TEXT,
         avatar TEXT
     );
