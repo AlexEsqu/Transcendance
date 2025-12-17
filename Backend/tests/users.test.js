@@ -24,7 +24,7 @@ export function loginUser(user) {
 			method: "POST",
 			url: "/users/auth/login",
 			payload: {
-				username: `${user.username}`,
+				login: `${user.username}`,
 				password: `${user.password}`,
 			},
 		});
@@ -39,7 +39,7 @@ beforeAll(async () => {
 	const response = await server.inject({
 		method: "POST",
 		url: "/users/auth/login",
-		payload: { username: users[0].username, password: users[0].password },
+		payload: { login: users[0].username, password: users[0].password },
 	});
 	expect(response.statusCode).toBe(200);
 	accessToken = response.json().accessToken;

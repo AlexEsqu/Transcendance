@@ -28,7 +28,7 @@ beforeAll(async () => {
 		method: "POST",
 		url: "/users/auth/login",
 		payload: {
-			username: users[0].username,
+			login: users[0].username,
 			password: users[0].password,
 		},
 	});
