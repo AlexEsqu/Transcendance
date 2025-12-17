@@ -1,6 +1,7 @@
 import { RegisteredUser, GuestUser, User } from "../users/User";
 
-export { Subscriber, UserState }
+export type { Subscriber }
+export { UserState }
 
 type Subscriber = (user: User | null) => void;
 

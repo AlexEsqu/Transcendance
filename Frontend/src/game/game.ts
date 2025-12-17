@@ -36,16 +36,16 @@ function launchPongGame(options: IOptions): void {
 	//	Display start button and game window
 	document.body.insertAdjacentHTML("beforeend", gameHtml);
 
-	const startBtnDisplay: HTMLElement = document.getElementById("game-start");
-	const btnStart: HTMLElement = document.getElementById('btn-startplay');
+	const startBtnDisplay: HTMLElement | null = document.getElementById("game-start");
+	const btnStart: HTMLElement | null = document.getElementById('btn-startplay');
+	const gameWindow: HTMLElement | null = document.getElementById("game-canvas");
 
-	if (!btnStart || !startBtnDisplay) {
+	if (!btnStart || !startBtnDisplay || !gameWindow) {
 		console.error("'start' UI not found, can't load game");
 		return ;
 	}
 
 	//	Launch Pong game when user click on start button
-	const gameWindow = document.getElementById("game-canvas");
 	const app = new App(gameWindow, options);
 	btnStart.addEventListener('click', (e) => {
 		startBtnDisplay.remove();
@@ -53,20 +53,20 @@ function launchPongGame(options: IOptions): void {
 	});
 }
 
-function selectGameOptions(): Promise<IOptions> {
+function selectGameOptions(): Promise<IOptions | null> {
 	document.body.insertAdjacentHTML("beforeend", optionsHtml);
 
-	const optionsMenuDisplay: HTMLElement = document.getElementById("game-options");
-	const btnSubmit: HTMLButtonElement = document.getElementById('btn-submit') as HTMLButtonElement;
-	const slctMode: HTMLSelectElement = document.getElementById('mode') as HTMLSelectElement;
-	const slctLevel: HTMLSelectElement = document.getElementById('level') as HTMLSelectElement;
+	const optionsMenuDisplay: HTMLElement | null = document.getElementById("game-options");
+	const btnSubmit: HTMLButtonElement | null = document.getElementById('btn-submit') as HTMLButtonElement;
+	const slctMode: HTMLSelectElement | null = document.getElementById('mode') as HTMLSelectElement;
+	const slctLevel: HTMLSelectElement | null = document.getElementById('level') as HTMLSelectElement;
 	const ballColorInput = document.getElementById('ball-color-input') as HTMLInputElement;
 	const backColorInput = document.getElementById('back-color-input') as HTMLInputElement;
 	const paddColorInput = document.getElementById('padd-color-input') as HTMLInputElement;
 
 	if (!btnSubmit || !slctMode || !slctLevel || !optionsMenuDisplay) {
 		console.error("'options' UI not found, can't load game");
-		return null;
+		return Promise.resolve(null);
 	}
 
 	//	Store selected options when user click on submit button
@@ -102,7 +102,8 @@ export function displayGameWindow() : void
 	//	Select between 2 games --> TO DO
 	//	Launch selected game with custom options
 	selectGameOptions().then(options => {
-		launchPongGame(options);
+		if (options)
+			launchPongGame(options);
 	});
 }
 

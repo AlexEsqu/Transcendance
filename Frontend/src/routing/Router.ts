@@ -1,7 +1,8 @@
 import { UserState } from "../auth/UserState";
 import { User, RegisteredUser } from "../users/User";
 
-export { Router, Route, getPageHtmlFunction }
+export { Router }
+export type { Route, getPageHtmlFunction }
 
 // all page must provide a function to get their HTML content as string
 type getPageHtmlFunction = () => string;
@@ -58,7 +59,7 @@ class Router
 		const user = this.userState.getUser();
 
 		// if route requires a user, defaulting to the connection page
-		if (route.needUser && !user)
+		if (route && route.needUser && !user)
 		{
 			window.history.replaceState(null, '', '/connection');
 			this.render();
@@ -66,7 +67,7 @@ class Router
 		}
 
 		// if route requires a registerd user, defaulting to the connection page
-		if (route.needRegisteredUser && !(user instanceof RegisteredUser))
+		if (route && route.needRegisteredUser && !(user instanceof RegisteredUser))
 		{
 			window.history.replaceState(null, '', '/connection');
 			this.render();
@@ -83,15 +84,18 @@ class Router
 	}
 
 
-	private handleClickInSinglePage(event: MouseEvent)
+	private handleClickInSinglePage = (event: MouseEvent) =>
 	{
-		const link = event.target as HTMLElement;
-		if (link.matches('[data-link]'))
+		const link = (event.target as Element | null)?.closest('a[data-link]') as HTMLAnchorElement | null;
+		if (!link)
+			return;
+
+		const href = link.getAttribute('href');
+
+		if (href)
 		{
 			event.preventDefault();
-			const href = link.getAttribute('href');
-			if (href)
-				this.navigateTo(href);
+			this.navigateTo(href);
 		}
 	}
 
