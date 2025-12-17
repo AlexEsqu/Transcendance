@@ -2,10 +2,10 @@ import { userState, router } from "../app";
 
 import connectionHtml from "../pages/connection.html?raw";
 
-import formHtml from "../pages/form.html";
-import guestFormHtml from "../pages/forms/guestForm.html"
-import loginFormHtml from "../pages/forms/loginForm.html"
-import registerFormHtml from "../pages/forms/registerForm.html"
+import formHtml from "../pages/form.html?raw";
+import guestFormHtml from "../pages/forms/guestForm.html?raw"
+import loginFormHtml from "../pages/forms/loginForm.html?raw"
+import registerFormHtml from "../pages/forms/registerForm.html?raw"
 
 export {
 	getConnectionLandingHtml,
@@ -67,24 +67,11 @@ function initConnectionPageListeners(): void
 
 			default:
 			{
-				onConnectionLandingLoaded();
 				return;
 			}
 
 		}
 	});
-}
-
-function onConnectionLandingLoaded(): void
-{
-	const guestBtn = document.getElementById('btn-guestin');
-	guestBtn?.addEventListener('click', () => router.navigateTo('/connection/alias'));
-
-	const loginBtn = document.getElementById('btn-login');
-	loginBtn?.addEventListener('click', () => router.navigateTo('/connection/login'));
-
-	const registerBtn = document.getElementById('btn-register');
-	registerBtn?.addEventListener('click', () => router.navigateTo('/connection/register'));
 }
 
 function onAliasLoaded(): void

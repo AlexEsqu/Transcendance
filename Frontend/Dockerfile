@@ -9,7 +9,7 @@ WORKDIR /app
 COPY ./package.json ./package.json
 COPY ./src/ ./src/
 COPY ./tsconfig.json ./tsconfig.json
-COPY ./webpack.config.js ./webpack.config.js
+COPY ./vite.config.js ./vite.config.js
 
 # install Javascript package manager, with -y flag to skip the questionnaire
 # uses the package.json file in the volume to install required package

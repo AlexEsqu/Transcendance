@@ -33,6 +33,7 @@ class Router
 		window.addEventListener('popstate', () => this.render());
 
 		// prevent page refresh to stay on single page app
+		document.body.removeEventListener('click', this.handleClickInSinglePage);
 		document.body.addEventListener('click', this.handleClickInSinglePage);
 	}
 
@@ -43,6 +44,7 @@ class Router
 
 	navigateTo(path: string)
 	{
+		console.log(`navigating to ${path}`)
 		window.history.pushState(null, '', path);
 		this.render();
 	}
@@ -51,10 +53,13 @@ class Router
 	{
 		const currentPath = window.location.pathname;
 		let route = this.routes.find(route => route.path === currentPath);
+		console.log(`current route is ${route}`)
 
 		// if no route found, defaulting to the connection page
 		if (!route)
 			route = this.routes.find(route => route.path === '/connection');
+
+		console.log(route && `current route is ${route.needRegisteredUser}`)
 
 		const user = this.userState.getUser();
 
@@ -77,6 +82,8 @@ class Router
 		if (!route)
 			return;
 
+		console.log(route && `current route is ${route.path}`)
+
 		this.rootElement.innerHTML = route.getPage();
 
 		const event = new CustomEvent('pageLoaded', { detail: route.path });
@@ -86,16 +93,16 @@ class Router
 
 	private handleClickInSinglePage = (event: MouseEvent) =>
 	{
-		const link = (event.target as Element | null)?.closest('a[data-link]') as HTMLAnchorElement | null;
-		if (!link)
-			return;
-
-		const href = link.getAttribute('href');
-
-		if (href)
+		console.log('in handle click redirect')
+		const link = (event.target as Element | null)?.closest('[data-link]') as HTMLAnchorElement | null;
+		if (link)
 		{
 			event.preventDefault();
-			this.navigateTo(href);
+			console.log('in custom routing')
+			const href = link.getAttribute('href');
+			console.log(href)
+			if (href)
+				this.navigateTo(href);
 		}
 	}
 
