@@ -2,7 +2,7 @@ import { Scene, Vector3, Mesh } from '@babylonjs/core';
 import { Paddle } from "./Paddle";
 import { Pong, IPlayer } from "./Pong";
 import { createBall } from './Graphics';
-import { Level } from '../landing/game';
+import { Level } from './game';
 
 export class Ball {
 	static START_SPEED = 7;
@@ -25,7 +25,7 @@ export class Ball {
 	}
 
 	/**
-	 * 	- Move the ball according to its velocity 
+	 * 	- Move the ball according to its velocity
 	 */
 	move(lastFrameTime: number): void {
 		const deltaTime: number = (Date.now() - lastFrameTime) / 1000;
@@ -97,14 +97,14 @@ export class Ball {
 
 		const paddMaxZ: number = paddle.mesh.position.z + (Paddle.WIDTH / 2);
 		const paddMinZ: number = paddle.mesh.position.z - (Paddle.WIDTH / 2);
-		
+
 		//	Check if the ball touches the paddle front (X-axis)
 		if (side === "right" && this.ball.maxX <= paddle.mesh.position.x - (Paddle.DEPTH / 2))
 			return false;
 		else if (this.ball.minX >= paddle.mesh.position.x + (Paddle.DEPTH / 2))
 			return false;
 
-		//	Check if the ball fits in the paddle's coordinates range (Z-axis) 
+		//	Check if the ball fits in the paddle's coordinates range (Z-axis)
 		if (this.ball.maxZ <= paddMaxZ + Ball.RADIUS && this.ball.minZ >= paddMinZ - Ball.RADIUS) {
 			if (side === "right")
 				this.mesh.position.x = this.ball.minX - Ball.RADIUS - 0.001;

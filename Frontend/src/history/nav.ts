@@ -1,7 +1,7 @@
 import navHTML from "../pages/nav.html"
-import { displayAliasQueryPage } from "./alias"
-import { renderPageState } from "./history"
-import { User, GuestUser, RegisteredUser } from "./User"
+import { displayConnectionPage } from "../connection/connection"
+import { renderPageState } from "../history/history"
+import { User, GuestUser, RegisteredUser } from "../user/User"
 import { userState } from "../app"
 
 export { displayNavBar, goToPage, updateNavFromUserData }
@@ -53,7 +53,7 @@ function setLogoutButton()
 		try
 		{
 			await userState.logout();
-			goToPage('landing');
+			goToPage('connection');
 		}
 		catch (error)
 		{
@@ -68,15 +68,14 @@ function setSettingButton()
 
 	settingUserButton.addEventListener('click', () =>
 	{
-		const pageState = { page: 'dashboard' };
-		window.history.pushState(pageState, '', `#${pageState.page}`);
+		const pageState = '/setting/dashboard';
+		window.history.pushState(pageState, '', pageState);
 		renderPageState(pageState);
 	});
 }
 
 function goToPage(pageName: string)
 {
-	const pageState = { page: pageName };
-	window.history.pushState(pageState, '', `#${pageState.page}`);
-	renderPageState(pageState);
+	window.history.pushState(pageName, '', pageName);
+	renderPageState(pageName);
 }

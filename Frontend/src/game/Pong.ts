@@ -3,7 +3,7 @@ import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
 import { Engine, Scene, Color4, GlowLayer, Mesh } from '@babylonjs/core';
 import { sendMatchesPostRequest } from "./sendMatches";
-import { IOptions, Level } from "../landing/game";
+import { IOptions, Level } from "./game";
 import { Ball } from "./Ball";
 import { Paddle } from "./Paddle";
 import { createCamera, createVisualScoring, createMap, createLight } from './Graphics';

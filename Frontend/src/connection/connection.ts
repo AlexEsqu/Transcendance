@@ -1,8 +1,9 @@
 import { userState } from "../app";
-import { User, GuestUser, RegisteredUser } from "./User"
-import { renderPageState } from "./history";
+import { User, GuestUser, RegisteredUser } from "../user/User"
+import { renderPageState } from "../history/history";
+import { goToPage } from "../history/nav";
 
-import landingHtml from "../pages/landing.html";
+import connectionHtml from "../pages/connection.html";
 import formHtml from "../pages/form.html";
 
 import guestFormHtml from "../pages/forms/guestForm.html"
@@ -12,7 +13,7 @@ import registerFormHtml from "../pages/forms/registerForm.html"
 import renameFormHtml from "../pages/forms/renameForm.html"
 import avatarFormHtml from "../pages/forms/avatarForm.html"
 
-export { displayAliasQueryPage, displayLoginPage, displayRegisterPage, displayGuestPage}
+export { displayConnectionPage, displayLoginPage, displayRegisterPage, displayGuestPage}
 
 function getMainElement(): HTMLElement {
 	let main = document.querySelector('main');
@@ -25,36 +26,30 @@ function getMainElement(): HTMLElement {
 }
 
 // replaces the document body with a menu page to choose to login, register or play as guest
-function displayAliasQueryPage() : void
+function displayConnectionPage() : void
 {
 	const main = getMainElement();
-	main.innerHTML = landingHtml;
+	main.innerHTML = connectionHtml;
 
 	const GuestButton = document.getElementById('btn-guestin')
 	GuestButton.addEventListener("click", function ()
 	{
 		console.log("clicking alias button");
-		let pageState = { page: 'loginAsGuest'};
-		window.history.pushState(pageState, '', '#' + pageState.page)
-		renderPageState(pageState);
+		goToPage('/connection/alias');
 	})
 
 	const loginButton = document.getElementById('btn-login')
 	loginButton.addEventListener("click", function ()
 	{
 		console.log("clicking login button");
-		let pageState = { page: 'login'};
-		window.history.pushState(pageState, '', '#' + pageState.page);
-		renderPageState(pageState);
+		goToPage('/connection/login');
 	})
 
 	const registerButton = document.getElementById('btn-register')
 	registerButton.addEventListener("click", function ()
 	{
 		console.log("clicking register button");
-		let pageState = { page: 'register'};
-		window.history.pushState(pageState, '', '#' + pageState.page);
-		renderPageState(pageState);
+		goToPage('/connection/register');
 	})
 }
 

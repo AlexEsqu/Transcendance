@@ -1,7 +1,7 @@
 import { createPaddle } from './Graphics';
 import { Vector3, Mesh } from '@babylonjs/core';
 import { Ball } from "./Ball";
-import { Level } from '../landing/game';
+import { Level } from './game';
 
 export class Paddle {
 	static WIDTH = 1.25;
@@ -62,7 +62,7 @@ export class Paddle {
 
 		const padPosZ: number = this.mesh.position.z;
 		const half: number = Paddle.WIDTH / 2;
-	
+
 		if (ballPosZ <= padPosZ + half && ballPosZ >= padPosZ - half) return ;
 		if (ballPosZ > padPosZ)
 			this.move("up", posLimit, lastFrameTime);

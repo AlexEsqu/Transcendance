@@ -1,4 +1,4 @@
-import { RegisteredUser, GuestUser, User } from "./User";
+import { RegisteredUser, GuestUser, User } from "../user/User";
 
 export { Subscriber, UserState }
 

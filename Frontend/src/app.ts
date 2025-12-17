@@ -1,16 +1,16 @@
 
-import { displayAliasQueryPage } from "./landing/alias"
-import { displayNavBar, goToPage, updateNavFromUserData } from "./landing/nav";
-import { displayGameWindow } from "./landing/game";
-import { GuestUser, RegisteredUser, User } from "./landing/User"
-import { UserState } from "./landing/UserState";
+import { displayConnectionPage } from "./connection/connection"
+import { displayNavBar, goToPage, updateNavFromUserData } from "./history/nav";
+import { displayGameWindow } from "./game/game";
+import { GuestUser, RegisteredUser, User } from "./user/User"
+import { UserState } from "./connection/UserState";
 import "./input.css";
 import { RegisterClass } from "@babylonjs/core";
 
 export { userState }
 
-let pageState = { page: 'landing' };
-window.history.replaceState(pageState, null, '#landing');
+let pageState = '/connection/menu';
+window.history.replaceState(pageState, null, pageState);
 
 const userState = UserState.getInstance();
 
@@ -28,6 +28,7 @@ userState.subscribe((user) =>
 		if (!navExists)
 			displayNavBar();
 		updateNavFromUserData(user);
+		goToPage('/game/play');
 	}
 
 	// User logged out - remove nav and show login
@@ -36,6 +37,6 @@ userState.subscribe((user) =>
 		const nav = document.querySelector('nav');
 		if (navExists)
 			nav.remove();
-		displayAliasQueryPage();
+		displayConnectionPage();
 	}
 });
