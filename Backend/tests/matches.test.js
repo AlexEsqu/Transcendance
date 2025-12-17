@@ -3,13 +3,15 @@ import { buildServer } from "../src/app.js";
 import mockDb from "./mocks/inMemoryDb.js";
 import mockApiKey from "./mocks/mockValidateApiKey.js";
 import { matches } from "./mocks/mockObjects.js";
-
+import mockMailer from "./mocks/mockMailer.js";
 let server;
 
 beforeAll(async () => {
 	server = buildServer({
 		dbOverride: mockDb,
 		apiKeyPluginOverride: mockApiKey,
+		mailerOverride: mockMailer
+		
 	});
 	await server.ready();
 });

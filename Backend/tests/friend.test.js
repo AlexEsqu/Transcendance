@@ -3,12 +3,15 @@ import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import mockDb from "./mocks/inMemoryDb.js";
 import mockApiKey from "./mocks/mockValidateApiKey.js";
 import { users } from "./mocks/mockObjects.js";
+import mockMailer from "./mocks/mockMailer.js";
+
 let server;
 
 beforeAll(async () => {
 	server = buildServer({
 		dbOverride: mockDb,
 		apiKeyPluginOverride: mockApiKey,
+		mailerOverride: mockMailer
 	});
 	await server.ready();
 });

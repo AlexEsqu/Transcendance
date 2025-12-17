@@ -9,7 +9,7 @@ export async function addUser(server, user) {
     VALUES (?, ?, ?, ?, ?,?)
   `);
 
-	stmt.run(user.username, finalHash, user.avatar, user.refreshTokenHash, user.email, 1);
+	stmt.run(user.username, finalHash, user.avatar, user.refreshTokenHash, user.email, user.is_email_verified ? 1 : 0);
 
 	return user;
 }

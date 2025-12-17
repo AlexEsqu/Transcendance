@@ -6,6 +6,7 @@ export const users = [
 		email: "email1@example.com",
 		avatar: "https://example.com/avatar1.jpg",
 		is_active: false,
+		is_email_verified: true,
 	},
 	{
 		id: 2,
@@ -14,6 +15,7 @@ export const users = [
 		email: "email2@example.com",
 		avatar: "https://example.com/avatar2.jpg",
 		is_active: false,
+		is_email_verified: false,
 	},
 	{
 		id: 3,
@@ -22,6 +24,7 @@ export const users = [
 		email: "email3@example.com",
 		avatar: "https://example.com/avatar3.jpg",
 		is_active: false,
+		is_email_verified: false,
 	},
 	{
 		id: 4,
@@ -30,6 +33,7 @@ export const users = [
 		email: "email4@example.com",
 		avatar: "https://example.com/avatar4.jpg",
 		is_active: false,
+		is_email_verified: false,
 	},
 ];
 

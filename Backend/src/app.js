@@ -34,7 +34,8 @@ export function buildServer({
 	dbOverride = null,
 	apiKeyPluginOverride = null,
 	sessionPluginOverride = null,
-	jwtFake = null, // optional fake jwt object { sign, verify }
+	jwtFake = null,
+	mailerOverride = null
 } = {}) {
 	const server = Fastify({
 		https: useHttps
@@ -81,7 +82,7 @@ export function buildServer({
 		prefix: "/avatars/",
 	});
 
-server.register(mailerPlugin);
+server.register(mailerOverride ?? mailerPlugin );
 	
 
 	// Schemas

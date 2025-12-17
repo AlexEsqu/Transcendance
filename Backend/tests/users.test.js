@@ -3,6 +3,7 @@ import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import mockDb from "./mocks/inMemoryDb.js";
 import mockApiKey from "./mocks/mockValidateApiKey.js";
 import { users } from "./mocks/mockObjects.js";
+import mockMailer from "./mocks/mockMailer.js";
 let server;
 
 import fs from "fs";
@@ -12,27 +13,12 @@ beforeAll(async () => {
 	server = buildServer({
 		dbOverride: mockDb,
 		apiKeyPluginOverride: mockApiKey,
+		mailerOverride: mockMailer
 	});
 	await server.ready();
 });
 
 let accessToken;
-
-export function loginUser(user) {
-	it("POST /users/auth/login returns 200 for valid credentials", async () => {
-		const response = await server.inject({
-			method: "POST",
-			url: "/users/auth/login",
-			payload: {
-				login: `${user.username}`,
-				password: `${user.password}`,
-			},
-		});
-		expect(response.statusCode).toBe(200);
-		expect(response.json()).toHaveProperty("accessToken");
-		return response.json().accessToken;
-	});
-}
 
 beforeAll(async () => {
 	users[0].is_active = true;
@@ -94,7 +80,6 @@ describe("GET /users/:id", () => {
 		});
 		expect(response.statusCode).toBe(404);
 		expect(response.json()).toHaveProperty("error", "Not Found");
-
 	});
 
 	it("returns 400 for bad request", async () => {
@@ -109,8 +94,48 @@ describe("GET /users/:id", () => {
 });
 
 describe("POST /users/auth/login", () => {
-	loginUser(users[0]);
+	it("POST /users/auth/login returns 200 for valid credentials", async () => {
+		const response = await server.inject({
+			method: "POST",
+			url: "/users/auth/login",
+			payload: {
+				login: users[0].username,
+				password: users[0].password,
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toHaveProperty("accessToken");
+		return response.json().accessToken;
+	});
 });
+
+describe("POST /users/auth/send-mail-verification", () => {
+	it("returns 400 for already verified", async () => {
+		const response = await server.inject({
+			method: "POST",
+			url: "/users/auth/send-mail-verification",
+			body: {
+				email: users[0].email,
+			}
+		});
+		expect(response.statusCode).toBe(400);
+		expect(response.json()).toHaveProperty("error", "Bad Request");
+	});
+
+	it.skip("returns 200 for successful email sent", async () => {
+		const response = await server.inject({
+			method: "POST",
+			url: "/users/auth/send-mail-verification",
+			body: {
+				email: users[1].email,
+			}
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toHaveProperty("success", true);
+	});
+
+});
+	
 
 describe("PUT /users/me/password", () => {
 	it("returns 401 for not logged in", async () => {
@@ -140,10 +165,7 @@ describe("PUT /users/me/password", () => {
 			},
 		});
 		expect(response.statusCode).toBe(200);
-		expect(response.json()).toHaveProperty(
-			"message",
-			"Updated password successfully"
-		);
+		expect(response.json()).toHaveProperty("message", "Updated password successfully");
 	});
 });
 
