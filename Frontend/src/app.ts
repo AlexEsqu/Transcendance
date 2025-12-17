@@ -1,4 +1,4 @@
-
+import "./style.css"
 import { Router } from './routing/Router';
 import { UserState } from './auth/UserState';
 import {

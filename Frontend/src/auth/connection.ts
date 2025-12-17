@@ -1,6 +1,6 @@
 import { userState, router } from "../app";
 
-import connectionHtml from "../pages/connection.html";
+import connectionHtml from "../pages/connection.html?raw";
 
 import formHtml from "../pages/form.html";
 import guestFormHtml from "../pages/forms/guestForm.html"
@@ -14,7 +14,7 @@ export {
 	getConnectionAliasHtml,
 	initConnectionPageListeners }
 
-	
+
 // FUNCTION TO GET THE RELEVANT HTML BITS
 
 function getConnectionLandingHtml(): string
