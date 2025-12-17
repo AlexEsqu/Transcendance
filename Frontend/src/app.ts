@@ -7,7 +7,7 @@ import {
 	initConnectionPageListeners
 	} from './auth/connection';
 
-import { getDashboardPage, getSettingForm } from "./users/dashboard";
+import { getDashboardPage, getSettingForm, initSettingPageListeners } from "./users/dashboard";
 
 export { userState, router };
 
@@ -23,6 +23,7 @@ router.addRoute('/settings/rename', getSettingForm);
 router.addRoute('/settings/avatar', getSettingForm);
 
 initConnectionPageListeners();
+initSettingPageListeners();
 
 router.render();
 
