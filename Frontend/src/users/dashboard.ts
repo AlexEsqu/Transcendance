@@ -1,4 +1,4 @@
-import { userState  } from "../app"
+import { userState, router } from "../app"
 
 import { getNavBarHtml, initNavBarListeners } from "../routing/nav";
 
@@ -7,6 +7,8 @@ import formHtml from "../pages/form.html?raw";
 import renameFormHtml from "../pages/forms/renameForm.html?raw"
 import avatarFormHtml from "../pages/forms/avatarForm.html?raw"
 import passwordFormHtml from "../pages/forms/passwordForm.html?raw"
+import { RegisterClass } from "@babylonjs/core";
+import { GuestUser, RegisteredUser } from "./User";
 // import emailFormHtml from "../pages/forms/emailForm.html?raw"
 
 export { getDashboardPage, getSettingForm, initSettingPageListeners }
@@ -77,30 +79,68 @@ function initSettingPageListeners(): void
 
 function onRenameLoaded(): void
 {
-	injectForm(renameFormHtml);
+	const user = userState.getUser();
 
+	injectForm(renameFormHtml);
 	const renameForm = document.getElementById('rename-form') as HTMLFormElement | null;
-	renameForm?.addEventListener('submit', (e) =>
+
+	renameForm?.addEventListener('submit', async (e) =>
 		{
 			e.preventDefault();
 			const formData = new FormData(renameForm);
 			const newName = formData.get('input-rename-user') as string | null;
-			// DO RENAME
+
+			if (newName && user instanceof RegisteredUser)
+			{
+				try
+				{
+					await user.rename(newName.trim());
+					alert('Username updated!');
+					router.navigateTo('/settings');
+					router.navigateTo('/settings');
+				}
+				catch (err)
+				{
+					alert('Failed to update username.');
+					console.error(err);
+				}
+			}
+			else if (newName && user instanceof GuestUser)
+			{
+				user.rename(newName);
+				router.navigateTo('/settings');
+			}
 		}
 	);
 }
 
 function onAvatarLoaded(): void
 {
+	const user = userState.getUser();
+	if (!(user instanceof RegisteredUser))
+	{
+		router.navigateTo('/settings');
+		return;
+	}
+
 	injectForm(avatarFormHtml);
 
 	const avatarForm = document.getElementById('avatar-form') as HTMLFormElement | null;
-	avatarForm?.addEventListener('submit', (e) =>
+	avatarForm?.addEventListener('submit', async (e) =>
 		{
 			e.preventDefault();
 			const formData = new FormData(avatarForm);
 			const newAvatarUrl = formData.get('input-avatar-file') as string | null;
-			// DO AVATAR CHANGE
+			if (newAvatarUrl) {
+			try {
+					await user.updateAvatar(newAvatarUrl);
+					alert('Avatar updated!');
+					router.navigateTo('/settings');
+				} catch (err) {
+					alert('Failed to update avatar.');
+					console.error(err);
+				}
+			}
 		}
 	);
 }
