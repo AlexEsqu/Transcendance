@@ -1,7 +1,7 @@
 import { userState } from "../app";
-import { User, GuestUser, RegisteredUser } from "../user/User"
-import { renderPageState } from "../history/history";
-import { goToPage } from "../history/nav";
+import { User, GuestUser, RegisteredUser } from "../users/User"
+import { renderPageState } from "../routing/history";
+import { goToPage } from "../routing/nav";
 
 import connectionHtml from "../pages/connection.html";
 import formHtml from "../pages/form.html";

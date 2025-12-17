@@ -1,9 +1,9 @@
 
-import { displayConnectionPage } from "./connection/connection"
-import { displayNavBar, goToPage, updateNavFromUserData } from "./history/nav";
+import { displayConnectionPage } from "./auth/connection"
+import { displayNavBar, goToPage, updateNavFromUserData } from "./routing/nav";
 import { displayGameWindow } from "./game/game";
-import { GuestUser, RegisteredUser, User } from "./user/User"
-import { UserState } from "./connection/UserState";
+import { GuestUser, RegisteredUser, User } from "./users/User"
+import { UserState } from "./auth/UserState";
 import "./input.css";
 import { RegisterClass } from "@babylonjs/core";
 

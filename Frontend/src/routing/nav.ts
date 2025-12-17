@@ -1,7 +1,7 @@
 import navHTML from "../pages/nav.html"
-import { displayConnectionPage } from "../connection/connection"
-import { renderPageState } from "../history/history"
-import { User, GuestUser, RegisteredUser } from "../user/User"
+import { displayConnectionPage } from "../auth/connection"
+import { renderPageState } from "../routing/history"
+import { User, GuestUser, RegisteredUser } from "../users/User"
 import { userState } from "../app"
 
 export { displayNavBar, goToPage, updateNavFromUserData }

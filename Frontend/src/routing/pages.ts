@@ -1,5 +1,5 @@
-import { displayConnectionPage, displayGuestPage, displayRegisterPage, displayLoginPage } from "../connection/connection";
-import { displayDashboardPage, displayDeletePage, displayRenamePage, displayPasswordPage } from "../user/dashboard"
+import { displayConnectionPage, displayGuestPage, displayRegisterPage, displayLoginPage } from "../auth/connection";
+import { displayDashboardPage, displayDeletePage, displayRenamePage, displayPasswordPage } from "../users/dashboard"
 import { displayGameWindow } from "../game/game";
 
 type Page =
