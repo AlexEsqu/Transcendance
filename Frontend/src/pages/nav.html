@@ -24,12 +24,14 @@
 			id="account-container"
 			class="hidden group-hover:flex flex-col mt-3 ml-3 gap-2 items-start"
 		>
-			<button
+			<a
 				id="user-info-btn"
 				class="text-base text-glow cursor-pointer"
+				href="/settings"
+				data-link
 			>
 				Settings
-			</button>
+			</a>
 			<button
 				id="logout-btn"
 				class="text-base text-glow cursor-pointer"
@@ -59,24 +61,30 @@
 			<div
 				class="hidden group-hover/game:flex flex-col self-end items-end gap-3 mt-4"
 			>
-				<button
+				<a
 					id="pong-vs-ia-btn"
 					class="text-base text-glow cursor-pointer"
+					href="/game"
+					data-link
 				>
 					Pong Match vs IA
-				</button>
-				<button
+				</a>
+				<a
 					id="pong-local-btn"
 					class="text-base text-glow cursor-pointer"
+					href="/game"
+					data-link
 				>
 					Pong Match local
-				</button>
-				<button
+				</a>
+				<a
 					id="pong-tournament-btn"
 					class="text-base text-glow cursor-pointer"
+					href="/game"
+					data-link
 				>
 					Tournament
-				</button>
+				</a>
 			</div>
 		</div>
 	</div>
