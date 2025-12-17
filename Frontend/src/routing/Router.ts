@@ -131,7 +131,8 @@ class Router
 	private initializeHistory()
 	{
 		const initialPath = window.location.pathname;
-		const hasHistory = window.history.state && initialPath != '/' && initialPath != '' && initialPath != '/connection'
+		const hasHistory = window.history.state && initialPath != '/'
+			&& initialPath != '' && initialPath != '/connection'
 
 		let targetPath = '/connection';
 

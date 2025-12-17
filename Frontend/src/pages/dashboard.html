@@ -1,26 +1,32 @@
-<header class="fixed top-0 p-5">
-    <h1>USERNAME's dashboard</h1>
+<header class="fixed top-0 p-5 w-full flex justify-center items-center">
+	<h1>USERNAME's dashboard</h1>
 </header>
 
-<main class="grid grid-cols-3 grid-rows-3 gap-6 text-center min-h-screen p-10 pt-24 pb-16">
+<main class="grid grid-cols-3 grid-rows-3 gap-6 text-center min-h-screen p-10 pt-20 pb-20">
 
-    <!-- Friends: 1/3 width, 2/3 height -->
-    <section class="glow-anim border rounded-md col-span-1 row-span-3 flex flex-col flex-grow p-4">
-        <h2>Friends</h2>
-    </section>
+	<!-- Friends: 1/3 width, 2/3 height -->
+	<section class="glow-anim border rounded-md col-span-1 row-span-3 flex flex-col flex-grow p-4">
+		<h2>Friends</h2>
+	</section>
 
-    <!-- Game Statistics: 2/3 width, 2/3 height -->
-    <section class="glow-anim border rounded-md col-span-2 row-span-2 flex flex-col flex-grow p-4">
-        <h2>Game Statistics</h2>
-    </section>
+	<!-- Game Statistics: 2/3 width, 2/3 height -->
+	<section class="glow-anim border rounded-md col-span-2 row-span-2 flex flex-col flex-grow p-4">
+		<h2>Game Statistics</h2>
+	</section>
 
-    <!-- Options: full width of bottom row -->
-    <section class="glow-anim border rounded-md col-span-2 row-span-1 flex flex-col flex-grow p-4">
-        <h2>Options</h2>
-    </section>
+	<!-- Options: full width of bottom row -->
+	<section class="glow-anim border rounded-md col-span-2 row-span-1 flex-grow p-4">
+		<h2 class="text-center m-2">Options</h2>
+		<div class="flex justify-center flex-wrap">
+			<a href="/settings/avatar" data-link class="text-glow p-5 hover:text-glow-red" id="btn-avatar">Change Avatar</a>
+			<a href="/settings/rename" data-link class="text-glow p-5 hover:text-glow-red" id="btn-rename">Change Username</a>
+			<a href="/settings/email" data-link class="text-glow p-5 hover:text-glow-red" id="btn-email">Change Email</a>
+			<a href="/settings/password" data-link class="text-glow p-5 hover:text-glow-red" id="btn-password">Change Password</a>
+		</div>
+	</section>
 
 </main>
 
-<footer class="fixed bottom-0">
-    <a href="#">Data Protection Policy</a>
+<footer class="fixed bottom-0 p-5 w-full flex justify-center items-center">
+	<a href="#">Data Protection Policy</a>
 </footer>

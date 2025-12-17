@@ -13,7 +13,8 @@ export { getDashboardPage, getSettingForm, initSettingPageListeners }
 
 function getDashboardPage()
 {
-	return dashboardHtml;
+	const name = userState.getUser()?.getName() ?? "Guest";
+	return dashboardHtml.replace('USERNAME', name);
 }
 
 function getSettingForm(): string {
