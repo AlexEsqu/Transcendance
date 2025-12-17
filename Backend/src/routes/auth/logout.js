@@ -29,7 +29,7 @@ export default function logout(server) {
 		},
 		onRequest: [server.authenticateUser, server.authenticateClient, server.authenticateRefreshToken],
 	};
-	server.post("/auth/logout", opts, async (req, reply) => {
+	server.post("/logout", opts, async (req, reply) => {
 		try {
 			//Clear the refresh token from db
 			const { id, username } = req.user;

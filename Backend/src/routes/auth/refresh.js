@@ -32,7 +32,7 @@ function refresh(server) {
 		},
 		onRequest: [server.authenticateUser, server.authenticateClient, server.authenticateRefreshToken],
 	};
-	server.post("/auth/refresh", opts, async (req, reply) => {
+	server.post("/refresh", opts, async (req, reply) => {
 		try {
 			const { refreshToken } = req.cookies;
 

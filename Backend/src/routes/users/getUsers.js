@@ -48,7 +48,7 @@ export function getUser(server) {
 			console.log(user);
 
 			if (!user) {
-				return reply.status(404).send({ error: "User not found" });
+				return reply.status(404).send({ error: "Not Found" , message: "User not found"});
 			}
 			formatUserObject(user);
 			return reply.status(200).send(user);

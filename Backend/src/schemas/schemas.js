@@ -5,7 +5,7 @@ export const errorResponse = {
 		error: { type: "string" },
 		message: { type: "string" },
 	},
-	// required: ["error"],
+	required: ["error"],
 };
 
 export const authCredentialsBody = {
@@ -13,20 +13,20 @@ export const authCredentialsBody = {
 	type: "object",
 	properties: {
 		username: { type: "string" },
-		password: { type: "string" },
+		login: { type: "string" }	
 	},
-	required: ["username", "password"],
+	required: ["password", "login"],
 };
 
 export const SignupBody = {
 	$id: "SignupBody",
 	type: "object",
-
+	required: ["username", "password", "email"],
 	properties: {
 		username: { type: "string", minLength: 3, maxLength: 20 },
 		password: { type: "string", minLength: 8 },
+		email: { type: "string", format: "email" },
 	},
-	required: ["username", "password"],
 };
 
 export const SuccessMessageResponse = {

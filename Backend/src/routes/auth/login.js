@@ -5,7 +5,9 @@ export default function login(server) {
 	const opts = {
 		schema: {
 			description:
-				"Authenticates the user using their username and password. On success, returns a the user's id AND short-lived access token in the response body and sets a long-lived refresh token in the `HttpOnly refreshToken cookie`, which can later be used to obtain new access tokens.",
+				"Authenticates the user using their login (email or username) and password. \
+				On success, returns a the user's id AND short-lived access token in the response body and sets a long-lived refresh token\
+				 in the `HttpOnly refreshToken cookie`, which can later be used to obtain new access tokens. This endpoint requires the client to have validated their email.",
 			tags: ["auth"],
 			body: { $ref: "authCredentialsBody" },
 			response: {
@@ -21,6 +23,10 @@ export default function login(server) {
 					description: "Unauthorized: Invalid credentials",
 					$ref: "errorResponse#",
 				},
+				403: {
+					description: "Forbidden: Email not verified",
+					$ref: "errorResponse#",
+				},
 				500: {
 					description: "Internal Server Error",
 					$ref: "errorResponse#",
@@ -32,24 +38,28 @@ export default function login(server) {
 			},
 		},
 	};
-
-	server.post("/auth/login", opts, async (req, reply) => {
+	server.post("/login", opts, async (req, reply) => {
 		try {
-			const { username, password } = req.body;
-
+			const {login, password } = req.body;
 			//looks for the user in the db if it exists
-			const user = await server.db.prepare(`SELECT password_hash, id FROM users WHERE username = ? `).get(username);
+				
+			const user = await server.db.prepare(`SELECT password_hash, id, username, email_verified FROM users WHERE email = ? OR username = ? `).get(login, login);
+
 			if (!user) {
 				return reply.status(401).send({ error: "Invalid credentials" });
 			}
+			if (!user.email_verified) {
+				return reply.status(403).send({ error: "Email not verified" });
+			}
+			
 			//checks if the password matches
 			const match = await bcrypt.compare(password, user.password_hash);
 
 			if (!match) {
 				return reply.status(401).send({ error: "Invalid credentials" });
 			} else {
-				const accessToken = createAccessToken(server, user.id, username);
-				const refreshToken = createRefreshToken(server, user.id, username);
+				const accessToken = createAccessToken(server, user.id, user.username);
+				const refreshToken = createRefreshToken(server, user.id, user.username);
 
 				const refreshTokenHash = await hashRefreshToken(refreshToken);
 				const addRefreshToken = server.db.prepare(`UPDATE users SET refresh_token_hash = ? WHERE id = ?`);

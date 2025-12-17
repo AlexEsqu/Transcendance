@@ -14,11 +14,11 @@ import clientAuthPlugin from "./plugins/validateApiKey.js";
 import sessionAuthPlugin from "./plugins/validateSessionToken.js";
 import authPlugin from "./plugins/jwt.js";
 import swaggerPlugin from "./plugins/swagger.js";
-
+import mailerPlugin from "./plugins/mailer.js"
 import matchesRoutes from "./routes/matches/index.js";
 import userRoutes from "./routes/users/index.js";
 import authRoutes from "./routes/auth/index.js";
-
+import nodemailer from "nodemailer"
 import {
 	authCredentialsBody,
 	errorResponse,
@@ -80,6 +80,9 @@ export function buildServer({
 		root: path.join(process.env.AVATARS_UPLOAD_PATH || "./uploads"),
 		prefix: "/avatars/",
 	});
+
+server.register(mailerPlugin);
+	
 
 	// Schemas
 	server.addSchema(authCredentialsBody);
