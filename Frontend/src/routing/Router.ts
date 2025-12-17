@@ -18,9 +18,19 @@ interface Route
 
 class Router
 {
-	private routes: Route[] = []; // available routes
-	private userState: UserState; // current user state
-	private rootElement: HTMLElement; // place where to display the html page
+
+	//--------------------------- ATTRIBUTES --------------------------------//
+
+	// available routes
+	private routes: Route[] = [];
+
+	// current user state
+	private userState: UserState;
+
+	// container within which to display the html content
+	private rootElement: HTMLElement;
+
+	//--------------------------- CONSTRUCTORS ------------------------------//
 
 	constructor (userState: UserState, rootSelector: string)
 	{
@@ -37,7 +47,18 @@ class Router
 		document.body.addEventListener('click', this.handleClickInSinglePage);
 	}
 
-	addRoute(path: string, getPage: getPageHtmlFunction, needUser = false, needRegisteredUser = false)
+	//---------------------------- GETTER -----------------------------------//
+
+	//--------------------------- SETTER ------------------------------------//
+
+
+	//-------------------------- NAVIGATION ---------------------------------//
+
+
+	addRoute(path: string,
+			getPage: getPageHtmlFunction,
+			needUser = false,
+			needRegisteredUser = false)
 	{
 		this.routes.push({ path, getPage, needUser, needRegisteredUser });
 	}
@@ -90,6 +111,8 @@ class Router
 		document.dispatchEvent(event);
 	}
 
+
+	//-------------------------- UTILITIES ----------------------------------//
 
 	private handleClickInSinglePage = (event: MouseEvent) =>
 	{

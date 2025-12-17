@@ -1,7 +1,6 @@
 import { Pong } from "./Pong"
 import gameHtml from '../pages/game.html'
 import optionsHtml from '../pages/options.html'
-import { getNavBarHtml } from "../routing/nav";
 
 export enum Level {
 	easy,
@@ -91,7 +90,7 @@ function selectGameOptions(): Promise<IOptions | null> {
 	});
 }
 
-export function displayGameWindow() : void
+export function getGameWindow() : void
 {
 	const main = document.querySelector('main') as HTMLElement;
 	if (!main)

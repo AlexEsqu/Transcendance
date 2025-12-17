@@ -22,8 +22,8 @@ export class Pong {
 
 	canvas: HTMLCanvasElement;
 	engine: Engine;
-	gameScene: Scene;
-	ball: Ball;
+	gameScene: Scene | null;
+	ball: Ball | null;
 	level: Level;
 	robot: boolean;
 	player1: IPlayer;
@@ -78,7 +78,7 @@ export class Pong {
 		this.player2.text = createVisualScoring("0", "white", 32, "-250px", "100px");
 		console.log("Game STATE: loaded");
 		this.engine.runRenderLoop(() => {
-			this.gameScene.render();
+			this.gameScene && this.gameScene.render();
 		})
 	}
 
@@ -177,7 +177,7 @@ export class Pong {
 	handleInput(keys: {}): void {
 		//	Shift+Ctrl+Alt+I == Hide/show the Inspector
 		window.addEventListener("keydown", (ev) => {
-            if (ev.shiftKey && ev.ctrlKey && ev.altKey && (ev.key === "I" || ev.key === "i")) {
+            if (ev.shiftKey && ev.ctrlKey && ev.altKey && (ev.key === "I" || ev.key === "i") && this.gameScene) {
                 if (this.gameScene.debugLayer.isVisible()) {
                     this.gameScene.debugLayer.hide();
                 } else {

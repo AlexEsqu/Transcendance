@@ -9,9 +9,7 @@ import registerFormHtml from "../pages/forms/registerForm.html?raw"
 
 export {
 	getConnectionLandingHtml,
-	getConnectionLoginHtml,
-	getConnectionRegisterHtml,
-	getConnectionAliasHtml,
+	getConnectionForm,
 	initConnectionPageListeners }
 
 
@@ -22,18 +20,8 @@ function getConnectionLandingHtml(): string
 	return connectionHtml;
 }
 
-function getConnectionLoginHtml(): string {
+function getConnectionForm(): string {
 
-	return formHtml;
-}
-
-function getConnectionRegisterHtml(): string
-{
-	return formHtml;
-}
-
-function getConnectionAliasHtml(): string
-{
 	return formHtml;
 }
 
@@ -79,13 +67,13 @@ function onAliasLoaded(): void
 	injectForm(guestFormHtml);
 
 	const guestForm = document.getElementById('guest-form') as HTMLFormElement | null;
-
 	guestForm?.addEventListener('submit', (e) =>
 		{
 			e.preventDefault();
 			const formData = new FormData(guestForm);
 			const alias = formData.get('input-alias') as string | null;
-			if (alias) userState.loginAsGuest(alias);
+			if (alias)
+				userState.loginAsGuest(alias);
 		}
 	);
 }
