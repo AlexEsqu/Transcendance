@@ -5,7 +5,7 @@ import { State, IPlayer, IRound, IOptions, IScene } from "./Data"
 import { Ball } from "./Ball";
 import { Paddle } from './Paddle';
 import { createText, createAnimation, loadGame } from './Graphics';
-import { monitoringRounds, saveResults, newRound, drawMatchHistoryTree } from './manageRounds';
+import { monitoringRounds, saveResults, newRound, drawMatchHistoryTree, drawScore, drawName } from './manageRounds';
 
 export interface IPaddle {
 	paddle: Paddle,
@@ -41,8 +41,7 @@ export class Pong {
 		this.isLaunched = false;
 		this.scene = loadGame(this.engine, this.canvas, options, this.gui);
 		let players = options.players.slice(0, options.nbOfPlayers).map(name => ({ name, id: 0, score: 0 }));
-		if (options.nbOfPlayers === 1) {
-			// special case: player is a robot
+		if (options.nbOfPlayers === 1) { // special case: opponent is a robot
 			this.robot = true;
 			players.push({ id: 0, name: "Robot", score: 0 });
 			players.reverse();
@@ -55,8 +54,6 @@ export class Pong {
 		this.canvasUI.height = window.innerHeight;
 	}
 
-	
-
 	/**
 	 * 	- Start the game by launching the ball and monitoring the score
 	 * 	- Manage user input and render the scene
@@ -67,67 +64,74 @@ export class Pong {
 			return ;
 		}
 
-		let playersColors: Array<string> = [ "rgba(141, 188, 255, 1)" ];
-		let roundsColors: Array<string> = [ "rgb(141, 188, 255, 1)" ];
-		for (let i = 0; i <= 6; i++)
-			playersColors.push("rgb(141, 188, 255, 1)");
-		for (let i = 0; i <= 5; i++)
-			roundsColors.push("rgb(141, 188, 255, 1)");
-
-		newRound(this.scene, 0, null, 0);
-
 		const keys = {};
-		let rounds: Array<IRound> = null;
-		let roundIndex: number = 1;
-		let playerIndex: number = 2;
 		let isNewRound: boolean = true;
+		let rounds: IRound = { results: null, nbOfRounds: 0, playerIndex: 0 };
 
-		//	Manage user input
+		//	Manage user input and update data before render
 		this.handleInput(keys);
 		this.scene.id.registerBeforeRender(() => {
 			if (this.scene.state === State.opening) this.opening();
+			if (this.scene.state === State.end) this.endGame(rounds);
 			if (this.scene.state === State.play && this.isLaunched) {
-				let status = this.updateGame(keys);
-				isNewRound = monitoringRounds(this.scene, roundIndex);
-				if (status && !isNewRound) this.launch(3);
-				if (isNewRound) {
-					this.scene.state = State.pause;
-					this.isLaunched = false;
-					rounds = saveResults(this.scene.leftPadd, this.scene.rightPadd, rounds);
-					if (newRound(this.scene, playerIndex, rounds, roundIndex)) {
-						roundIndex += 1;
-						playerIndex += 2;
-					}
-					if (this.onNewRound) this.onNewRound();
-				}
+				let launch = this.updateGame(keys);
+				isNewRound = monitoringRounds(this.scene, rounds.nbOfRounds);
+				if (launch && !isNewRound) this.launch(3);
 			}
-			
-			if (this.scene.state === State.end) this.endGame(rounds, roundIndex);
+			if (isNewRound) { rounds = this.requestNewRound(rounds); console.log(rounds); }
+			isNewRound = false;
 			this.time = Date.now();
 		});
 		//	Rendering loop
 		this.engine.runRenderLoop(() => {
-			if (!this.scene.id || this.scene.state === State.end) {
-				console.log("GAME-STATE: end");
-				this.engine.stopRenderLoop();
-			}
+			if (!this.scene.id || this.scene.state === State.end) this.engine.stopRenderLoop();
 			this.scene.id.render();
-			drawMatchHistoryTree(this.canvasUI, playersColors, roundsColors);
 		});
+	}
+
+	requestNewRound(rounds: IRound): IRound
+	{
+		this.scene.state = State.pause;
+		this.isLaunched = false;
+
+		let currentNbOfRounds: number = 0;
+		if (rounds) currentNbOfRounds = rounds.nbOfRounds;
+
+		rounds = saveResults(this.scene.leftPadd, this.scene.rightPadd, rounds);
+		rounds = newRound(this.scene, rounds)
+		rounds.nbOfRounds += 1;
+
+		if (currentNbOfRounds < rounds.nbOfRounds) {
+			drawName(this.canvasUI, this.scene.leftPadd.player.name, this.scene.rightPadd.player.name, rounds.nbOfRounds);
+			let playersColors: Array<string> = [ "rgba(141, 188, 255, 1)" ];
+			let roundsColors: Array<string> = [ "rgb(141, 188, 255, 1)" ];
+			for (let i = 0; i <= 6; i++)
+				playersColors.push("rgb(141, 188, 255, 1)");
+			for (let i = 0; i <= 5; i++)
+				roundsColors.push("rgb(141, 188, 255, 1)");
+			drawMatchHistoryTree(this.canvasUI, playersColors, roundsColors, this.scene.options.nbOfPlayers);
+			drawScore(this.canvasUI,  this.scene.leftPadd.player.score,  this.scene.rightPadd.player.score);
+		}
+
+		if (this.onNewRound && rounds.nbOfRounds <= Pong.MAX_ROUNDS) this.onNewRound();
+
+		return rounds;
 	}
 
 	/**
 	 * 	- Listen to new user input and update data accordingly
 	 */
-	updateGame(keys: {}): number {
+	updateGame(keys: {}): number
+	{
 		let status: number = 0;
+		let paddle: Paddle = null;
+		let side: string = "down";
+
 		//	Move and update direction if there has been an impact with the ball
 		this.scene.ball.move(this.time);
 		if (this.scene.ball.update(this.scene.leftPadd, this.scene.rightPadd) == true)
 			status = 1;
 		
-		let paddle: Paddle = null;
-		let side: string = "down";
 		//	If a user presses a key, update the position of its padd
 		if (keys["ArrowDown"] || keys["ArrowUp"]) {
 			paddle = this.scene.rightPadd.paddle;
@@ -136,14 +140,12 @@ export class Pong {
 		if (!this.robot && (keys["s"] || keys["w"])) {
 			paddle = this.scene.leftPadd.paddle;
 			if (keys["w"]) side = "up";
-		} else 
-			this.scene.leftPadd.paddle.autoMove(this.scene.ball, (Pong.MAP_HEIGHT / 2), this.time);
-		if (paddle)
-			paddle.move(side, Pong.MAP_HEIGHT / 2, this.time);
+		}
+		
+		if (this.robot) this.scene.leftPadd.paddle.autoMove(this.scene.ball, (Pong.MAP_HEIGHT / 2), this.time);
+		if (paddle) paddle.move(side, Pong.MAP_HEIGHT / 2, this.time);
 
-		//	Update visual-scoring in the scene
-		// this.scene.leftPadd.scoreText.text = this.scene.leftPadd.player.score.toString();
-		// this.scene.rightPadd.scoreText.text = this.scene.rightPadd.player.score.toString();
+		drawScore(this.canvasUI,  this.scene.leftPadd.player.score,  this.scene.rightPadd.player.score);
 
 		return status;
 	}
@@ -188,13 +190,14 @@ export class Pong {
 		this.scene.state = State.pause;
 	}
 
-	endGame(rounds: Array<IRound>, roundIndex:number ) {
-		if (!rounds || roundIndex < 0) {
+	endGame(rounds: IRound) {
+		if (!rounds || rounds.nbOfRounds < 0) {
 			console.error("results of matches are lost");
 			return ;
 		}
-		console.log("GAME-STATE: the winner is " + rounds[roundIndex - 1].winner.name);
-		console.log("GAME-STATE: the looser is " + rounds[roundIndex - 1].loser.name);
+		console.log("GAME-STATE: the winner is " + rounds[rounds.nbOfRounds - 1].winner.name);
+		console.log("GAME-STATE: the looser is " + rounds[rounds.nbOfRounds - 1].loser.name);
+		console.log("GAME-STATE: end");
 		// sendMatchesPostRequest(rounds[roundIndex - 1], Date.now());
 	}
 
@@ -228,4 +231,3 @@ export class Pong {
 		});
 	}
 }
-

@@ -1,4 +1,4 @@
-import { IRound } from "./Data";
+import { IResult } from "./Data";
 
 export { sendMatchesPostRequest };
 
@@ -10,7 +10,7 @@ interface IJSON {
 	date: string;
 }
 
-function fillMatchesJSON(results: IRound, time?: number): IJSON {
+function fillMatchesJSON(results: IResult, time?: number): IJSON {
 	const date = new Date(time ?? Date.now());
 
 	// get Id from Name
@@ -24,7 +24,7 @@ function fillMatchesJSON(results: IRound, time?: number): IJSON {
 	return matches;
 }
 
-function sendMatchesPostRequest(results: IRound, time?: number) : void {
+function sendMatchesPostRequest(results: IResult, time?: number) : void {
 	if (!results) {
 		console.error("Results are undefined when sending matches POST request");
 		return ;

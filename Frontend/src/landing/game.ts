@@ -32,7 +32,6 @@ class App {
 		this.startBtn.addEventListener('click', () => {
 			this.startBtnDisplay.style.display = 'none';
 			this.play();
-			console.log("LAUNCH GAME");
 		});
 	}
 

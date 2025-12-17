@@ -1,16 +1,25 @@
 <main class="flex-1 flex items-center justify-center w-full">
-  <div class="relative w-full aspect-video">
-    <canvas id="game-canvas" class="absolute inset-0 w-full h-full"></canvas>
-    <canvas id="ui-canvas"   class="absolute inset-100 w-full h-full pointer-events-none"></canvas>
-  </div>
-</main>
 
+	<!-- Button start to launch the game -->
+	<div
+		id="game-start"
+		class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
 
-<!-- Button start to launch the game -->
-<div id="game-start" class="font-mono text-white w-full h-screen flex flex-col items-center fixed mt-[50%] ">
-	<div class="border rounded-md flex flex-col items-center justify-center">
-		<div class='flex flex-col flex-center gap-2 m-2 text-center'>
-			<button class="text-glow p-1 hover:text-glow-red" id="btn-startplay">Start to play</button>
+		<div class="border rounded-md flex flex-col items-center justify-center bg-black">
+			<button
+				class="text-glow p-5 hover:text-glow-red"
+				id="btn-startplay">
+				Start to play</button>
 		</div>
 	</div>
-</div>
+
+	<!-- </div>
+		<canvas id="game-canvas" class="w-full max-w-7xl aspect-video"></canvas>
+		<canvas id="ui-canvas"   class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
+	</div> -->
+	<div class="relative w-full aspect-video">
+		<canvas id="game-canvas" class="absolute inset-0 w-full h-full"></canvas>
+		<canvas id="ui-canvas"   class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
+	</div>
+
+</main>
