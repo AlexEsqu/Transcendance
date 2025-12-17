@@ -1,6 +1,8 @@
 import { UserState } from "../auth/UserState";
 import { User, RegisteredUser } from "../users/User";
 
+export { Router, Route, getPageHtmlFunction }
+
 // all page must provide a function to get their HTML content as string
 type getPageHtmlFunction = () => string;
 
@@ -13,8 +15,7 @@ interface Route
 	needRegisteredUser: boolean;
 }
 
-
-export class Router
+class Router
 {
 	private routes: Route[] = []; // available routes
 	private userState: UserState; // current user state
@@ -24,6 +25,8 @@ export class Router
 	{
 		this.userState = userState;
 		this.rootElement = document.querySelector(rootSelector) as HTMLElement;
+
+		this.initializeHistory();
 
 		// plug into back / forward browser buttons to render the last state
 		window.addEventListener('popstate', () => this.render());
@@ -41,18 +44,6 @@ export class Router
 	{
 		window.history.pushState(null, '', path);
 		this.render();
-	}
-
-	private handleClickInSinglePage(event: MouseEvent)
-	{
-		const link = event.target as HTMLElement;
-		if (link.matches('[data-link]'))
-		{
-			event.preventDefault();
-			const href = link.getAttribute('href');
-			if (href)
-				this.navigateTo(href);
-		}
 	}
 
 	render()
@@ -89,5 +80,27 @@ export class Router
 
 		const event = new CustomEvent('pageLoaded', { detail: route.path });
 		document.dispatchEvent(event);
+	}
+
+
+	private handleClickInSinglePage(event: MouseEvent)
+	{
+		const link = event.target as HTMLElement;
+		if (link.matches('[data-link]'))
+		{
+			event.preventDefault();
+			const href = link.getAttribute('href');
+			if (href)
+				this.navigateTo(href);
+		}
+	}
+
+	private initializeHistory()
+	{
+		const initialPath = window.location.pathname;
+		const shouldDefault = initialPath === '/' || initialPath === '' || !window.history.state;
+
+		const targetPath = shouldDefault ? '/connection' : initialPath;
+		window.history.replaceState({ path: targetPath }, '', targetPath);
 	}
 }

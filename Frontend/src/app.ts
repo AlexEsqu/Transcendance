@@ -1,42 +1,30 @@
 
-import { displayConnectionPage } from "./auth/connection"
-import { displayNavBar, goToPage, updateNavFromUserData } from "./routing/nav";
-import { displayGameWindow } from "./game/game";
-import { GuestUser, RegisteredUser, User } from "./users/User"
-import { UserState } from "./auth/UserState";
-import "./input.css";
-import { RegisterClass } from "@babylonjs/core";
+import { Router } from './routing/Router';
+import { UserState } from './auth/UserState';
+import {
+	getConnectionLandingHtml,
+	getConnectionLoginHtml,
+	getConnectionRegisterHtml,
+	getConnectionAliasHtml,
+	initConnectionPageListeners
+	} from './auth/connection';
 
-export { userState }
-
-let pageState = '/connection/menu';
-window.history.replaceState(pageState, null, pageState);
+export { userState, router };
 
 const userState = UserState.getInstance();
+const router = new Router(userState, '#main');
 
-console.log(`User is :`);
-console.log(userState)
+// Connection routes
+router.addRoute('/connection', getConnectionLandingHtml);
+router.addRoute('/connection/login', getConnectionLoginHtml);
+router.addRoute('/connection/register', getConnectionRegisterHtml);
+router.addRoute('/connection/alias', getConnectionAliasHtml);
 
-userState.subscribe((user) =>
-{
-	console.log('User changed:', user?.getName() || 'No user');
-	const navExists = document.querySelector('nav');
+// Listen and attach events after pages load
+initConnectionPageListeners();
 
-	// User logged in - show nav bar if it doesn't exist
-	if (user)
-	{
-		if (!navExists)
-			displayNavBar();
-		updateNavFromUserData(user);
-		goToPage('/game/play');
-	}
+// Optionally navigate to current path or a default
+router.render();
 
-	// User logged out - remove nav and show login
-	else
-	{
-		const nav = document.querySelector('nav');
-		if (navExists)
-			nav.remove();
-		displayConnectionPage();
-	}
-});
+
+

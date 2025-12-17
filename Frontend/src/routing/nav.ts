@@ -1,81 +1,67 @@
 import navHTML from "../pages/nav.html"
-import { displayConnectionPage } from "../auth/connection"
-import { renderPageState } from "../routing/history"
-import { User, GuestUser, RegisteredUser } from "../users/User"
-import { userState } from "../app"
+import { User, RegisteredUser } from "../users/User"
+import { userState, router } from "../app"
 
-export { displayNavBar, goToPage, updateNavFromUserData }
+export { getNavBarHtml, initNavBarListeners }
 
-async function displayNavBar()
+// return
+function getNavBarHtml()
 {
-	const navExists = document.querySelector('nav');
-	if (navExists)
-		return;
-
-	document.body.insertAdjacentHTML("beforeend", navHTML);
-
-	setLogoutButton();
-	setSettingButton();
+	return navHTML;
 }
 
-function updateNavFromUserData(user: User | null): void {
-	if (!user) return;
+function initNavBarListeners()
+{
+	document.addEventListener('pageLoaded', (event: Event) => {
+		const customEvent = event as CustomEvent<string>;
+		const path = customEvent.detail;
 
-	// Update username
-	const userNameElement = document.getElementById('user-name-nav');
-	if (userNameElement) {
-		userNameElement.textContent = user.getName();
-	}
-
-	// Update avatar
-	const avatarImage = document.getElementById('user-avatar-nav') as HTMLImageElement;
-	if (avatarImage) {
-		avatarImage.src = user.getAvatarPath();
-	}
-
-	// Show/hide delete button based on user type
-	const deleteButton = document.getElementById('delete-user-btn');
-	if (deleteButton) {
-		if (user instanceof RegisteredUser) {
-			deleteButton.style.display = 'block';
-		} else {
-			deleteButton.style.display = 'none';
+		if (path.startsWith('/settings') || path.startsWith('/game'))
+		{
+			attachNavListeners();
+			updateNavFromUserData(userState.getUser());
 		}
-	}
+	});
 }
 
-function setLogoutButton()
+function attachNavListeners()
 {
 	const logoutButton = document.getElementById('logout-btn');
-
-	logoutButton.addEventListener('click', async () =>
+	if (logoutButton)
 	{
-		try
-		{
-			await userState.logout();
-			goToPage('connection');
-		}
-		catch (error)
-		{
-			console.error('Logout failed:', error);
-		}
-	});
+		logoutButton.addEventListener('click', async () => {
+			try {
+				await userState.logout();
+			} catch (error) {
+				console.error('Logout failed:', error);
+			}
+		});
+	}
+
+	const settingButton = document.getElementById('user-info-btn');
+	if (settingButton)
+	{
+		settingButton.addEventListener('click', () => {
+			router.navigateTo('setting');
+		});
+	}
 }
 
-function setSettingButton()
+function updateNavFromUserData(user: User | null): void
 {
-	const settingUserButton = document.getElementById('user-info-btn');
+	if (!user)
+		return;
 
-	settingUserButton.addEventListener('click', () =>
-	{
-		const pageState = '/setting/dashboard';
-		window.history.pushState(pageState, '', pageState);
-		renderPageState(pageState);
-	});
-}
+	const userNameElement = document.getElementById('user-name-nav');
+	if (userNameElement)
+		userNameElement.textContent = user.getName();
 
-function goToPage(pageName: string)
-{
-	window.history.pushState(pageName, '', pageName);
-	renderPageState(pageName);
+	const avatarImage = document.getElementById('user-avatar-nav') as HTMLImageElement;
+	if (avatarImage)
+		avatarImage.src = user.getAvatarPath();
+
+	// only display the delete account button if the user is registered (has an account to delete)
+	const deleteButton = document.getElementById('delete-user-btn');
+	if (deleteButton)
+		deleteButton.style.display = user instanceof RegisteredUser ? 'block' : 'none';
 }

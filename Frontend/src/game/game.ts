@@ -1,7 +1,7 @@
 import { Pong } from "./Pong"
 import gameHtml from '../pages/game.html'
 import optionsHtml from '../pages/options.html'
-import { displayNavBar } from "../routing/nav";
+import { getNavBarHtml } from "../routing/nav";
 
 export enum Level {
 	easy,

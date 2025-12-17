@@ -1,140 +1,159 @@
-import { userState } from "../app";
-import { User, GuestUser, RegisteredUser } from "../users/User"
-import { renderPageState } from "../routing/history";
-import { goToPage } from "../routing/nav";
+import { userState, router } from "../app";
 
 import connectionHtml from "../pages/connection.html";
-import formHtml from "../pages/form.html";
 
+import formHtml from "../pages/form.html";
 import guestFormHtml from "../pages/forms/guestForm.html"
 import loginFormHtml from "../pages/forms/loginForm.html"
-import passwordFormHtml from "../pages/forms/passwordForm.html"
 import registerFormHtml from "../pages/forms/registerForm.html"
-import renameFormHtml from "../pages/forms/renameForm.html"
-import avatarFormHtml from "../pages/forms/avatarForm.html"
 
-export { displayConnectionPage, displayLoginPage, displayRegisterPage, displayGuestPage}
+export {
+	getConnectionLandingHtml,
+	getConnectionLoginHtml,
+	getConnectionRegisterHtml,
+	getConnectionAliasHtml,
+	initConnectionPageListeners }
 
-function getMainElement(): HTMLElement {
-	let main = document.querySelector('main');
-	if (!main)
-	{
-		main = document.createElement('main');
-		document.body.appendChild(main);
-	}
-	return main as HTMLElement;
+	
+// FUNCTION TO GET THE RELEVANT HTML BITS
+
+function getConnectionLandingHtml(): string
+{
+	return connectionHtml;
 }
 
-// replaces the document body with a menu page to choose to login, register or play as guest
-function displayConnectionPage() : void
-{
-	const main = getMainElement();
-	main.innerHTML = connectionHtml;
+function getConnectionLoginHtml(): string {
 
-	const GuestButton = document.getElementById('btn-guestin')
-	GuestButton.addEventListener("click", function ()
-	{
-		console.log("clicking alias button");
-		goToPage('/connection/alias');
-	})
-
-	const loginButton = document.getElementById('btn-login')
-	loginButton.addEventListener("click", function ()
-	{
-		console.log("clicking login button");
-		goToPage('/connection/login');
-	})
-
-	const registerButton = document.getElementById('btn-register')
-	registerButton.addEventListener("click", function ()
-	{
-		console.log("clicking register button");
-		goToPage('/connection/register');
-	})
+	return formHtml;
 }
 
-function displayGuestPage() : void
+function getConnectionRegisterHtml(): string
 {
-	const main = document.querySelector('main');
-	main.insertAdjacentHTML('afterbegin', formHtml);
-
-	const container = document.getElementById('form-container');
-	container.insertAdjacentHTML('beforeend', guestFormHtml);
-
-	const guestForm : HTMLFormElement = document.getElementById('guest-form') as HTMLFormElement;
-	guestForm.addEventListener('submit', function (e)
-	{
-		e.preventDefault();
-		const formData = new FormData(guestForm);
-		const alias = formData.get('input-alias') as string;
-
-		console.log(alias); // TODO : remove
-
-		if (alias) {
-			userState.loginAsGuest(alias);
-		}
-	})
+	return formHtml;
 }
 
-function displayRegisterPage() : void
+function getConnectionAliasHtml(): string
 {
-	const main = getMainElement();
-	main.innerHTML = formHtml;
+	return formHtml;
+}
 
-	const container = document.getElementById('form-container');
-	container.insertAdjacentHTML('beforeend', registerFormHtml);
+// FUNCTION TO ACTIVATE THE EVENT LISTENERS AND POSSIBLE BUTTON INTERACTIONS
+// ONCE THE PAGE IS LOADED
 
-	const registerForm : HTMLFormElement = document.getElementById('register-form') as HTMLFormElement;
+function initConnectionPageListeners(): void
+{
+	document.addEventListener('pageLoaded', (event: Event) => {
+		const { detail: path } = event as CustomEvent<string>;
 
-	registerForm.addEventListener('submit', function (e)
-	{
-		e.preventDefault();
-
-		const formData = new FormData(registerForm);
-		const login = formData.get('input-login') as string;
-		const password = formData.get('input-password') as string;
-		const passwordCheck = formData.get('input-password-check') as string;
-
-		console.log(`User tried to register with ${login}`);
-
-		if (password !== passwordCheck)
+		switch (path)
 		{
-			alert("The passwords don't match...");
-		}
+			case '/connection/alias':
+			{
+				onAliasLoaded();
+				return;
+			}
 
-		else if (login && password)
-		{
-			userState.register(login, password);
+			case '/connection/register':
+			{
+				onRegisterLoaded();
+				return;
+			}
+
+			case '/connection/login':
+			{
+				onLoginLoaded();
+				return;
+			}
+
+			default:
+			{
+				onConnectionLandingLoaded();
+				return;
+			}
+
 		}
-	})
+	});
 }
 
-function displayLoginPage() : void
+function onConnectionLandingLoaded(): void
 {
-	const main = getMainElement();
-	main.innerHTML = formHtml;
+	const guestBtn = document.getElementById('btn-guestin');
+	guestBtn?.addEventListener('click', () => router.navigateTo('/connection/alias'));
 
-	const container = document.getElementById('form-container');
-	container.insertAdjacentHTML('beforeend', loginFormHtml);
+	const loginBtn = document.getElementById('btn-login');
+	loginBtn?.addEventListener('click', () => router.navigateTo('/connection/login'));
 
-	const loginForm : HTMLFormElement = document.getElementById('login-form') as HTMLFormElement;
+	const registerBtn = document.getElementById('btn-register');
+	registerBtn?.addEventListener('click', () => router.navigateTo('/connection/register'));
+}
 
-	loginForm.addEventListener('submit', function (e)
-	{
-		e.preventDefault();
+function onAliasLoaded(): void
+{
+	injectForm(guestFormHtml);
 
-		const formData = new FormData(loginForm);
-		const login = formData.get('input-login') as string;
-		const password = formData.get('input-password') as string;
+	const guestForm = document.getElementById('guest-form') as HTMLFormElement | null;
 
-		console.log(`User tried to login with ${login}`);
-
-		if (login && password)
+	guestForm?.addEventListener('submit', (e) =>
 		{
-			userState.loginAsRegistered(login, password);
+			e.preventDefault();
+			const formData = new FormData(guestForm);
+			const alias = formData.get('input-alias') as string | null;
+			if (alias) userState.loginAsGuest(alias);
 		}
-	})
+	);
+}
+
+function onRegisterLoaded(): void
+{
+	injectForm(registerFormHtml);
+
+	const registerForm = document.getElementById('register-form') as HTMLFormElement | null;
+	registerForm?.addEventListener('submit', async (e) =>
+		{
+			e.preventDefault();
+			const formData = new FormData(registerForm);
+			const login = formData.get('input-login') as string | null;
+			const password = formData.get('input-password') as string | null;
+			const check = formData.get('input-password-check') as string | null;
+
+			if (!login || !password)
+				return;
+
+			if (password !== check)
+			{
+				alert("The passwords don't match...");
+				return;
+			}
+
+			await userState.register(login, password);
+		}
+	);
+}
+
+function onLoginLoaded(): void
+{
+	injectForm(loginFormHtml);
+
+	const loginForm = document.getElementById('login-form') as HTMLFormElement | null;
+	loginForm?.addEventListener('submit', async (e) =>
+		{
+			e.preventDefault();
+
+			const formData = new FormData(loginForm);
+			const login = formData.get('input-login') as string | null;
+			const password = formData.get('input-password') as string | null;
+
+			if (login && password)
+				await userState.loginAsRegistered(login, password);
+		}
+	);
 }
 
 
+// UTILITIES
 
+function injectForm(html: string): void
+{
+	const container = document.getElementById('form-container');
+	if (container) container.insertAdjacentHTML('beforeend', html);
+}

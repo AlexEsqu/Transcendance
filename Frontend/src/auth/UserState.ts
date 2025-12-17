@@ -48,7 +48,7 @@ class UserState
 	//--------------------------- SETTER ------------------------------------//
 
 	// modified User objects and notifies subscribers for state changes
-	public setUser(newUser: User): void
+	public setUser(newUser: User | null): void
 	{
 		this.user = newUser;
 		this.saveToLocalStorage();
