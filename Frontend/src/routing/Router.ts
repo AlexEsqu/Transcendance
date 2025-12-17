@@ -74,13 +74,12 @@ class Router
 	{
 		const currentPath = window.location.pathname;
 		let route = this.routes.find(route => route.path === currentPath);
-		console.log(`current route is ${route}`)
+
+		console.log(route && `route is ${route.path}`)
 
 		// if no route found, defaulting to the connection page
 		if (!route)
 			route = this.routes.find(route => route.path === '/connection');
-
-		console.log(route && `current route is ${route.needRegisteredUser}`)
 
 		const user = this.userState.getUser();
 
@@ -103,7 +102,7 @@ class Router
 		if (!route)
 			return;
 
-		console.log(route && `current route is ${route.path}`)
+		console.log(route && `corrected route is ${route.path}`)
 
 		this.rootElement.innerHTML = route.getPage();
 
@@ -132,9 +131,22 @@ class Router
 	private initializeHistory()
 	{
 		const initialPath = window.location.pathname;
-		const shouldDefault = initialPath === '/' || initialPath === '' || !window.history.state;
+		const hasHistory = window.history.state && initialPath != '/' && initialPath != '' && initialPath != '/connection'
 
-		const targetPath = shouldDefault ? '/connection' : initialPath;
+		let targetPath = '/connection';
+
+		console.log(this.userState.getUser());
+
+		if (this.userState.getUser())
+		{
+			if (hasHistory)
+				targetPath = initialPath;
+			else
+				targetPath = '/settings';
+		}
+
+		console.log(`going to ${targetPath}`);
+
 		window.history.replaceState({ path: targetPath }, '', targetPath);
 	}
 }

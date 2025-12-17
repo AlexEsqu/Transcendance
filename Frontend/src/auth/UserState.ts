@@ -128,8 +128,11 @@ class UserState
 			this.user.avatarPath = data.avatarPath;
 		}
 
-		// this.notifySubscribers();
+		this.notifySubscribers();
+
+		console.log(this.user);
 	}
+
 
 
 	//------------------------ AUTHENTICATION -------------------------------//
