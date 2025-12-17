@@ -1,13 +1,13 @@
-import navHTML from "../pages/nav.html"
+import navHTML from "../pages/nav.html?raw"
 import { User, RegisteredUser } from "../users/User"
 import { userState, router } from "../app"
 
 export { getNavBarHtml, initNavBarListeners }
 
-// return
 function getNavBarHtml()
 {
-	return navHTML;
+	const name = userState.getUser()?.getName() ?? "Guest";
+	return navHTML.replace('USERNAME', name);
 }
 
 function initNavBarListeners()

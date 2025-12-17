@@ -73,15 +73,18 @@ class Router
 	render()
 	{
 		const currentPath = window.location.pathname;
+		const user = this.userState.getUser();
+
 		let route = this.routes.find(route => route.path === currentPath);
 
 		console.log(route && `route is ${route.path}`)
 
+
 		// if no route found, defaulting to the connection page
 		if (!route)
-			route = this.routes.find(route => route.path === '/connection');
+			route = this.routes.find(route => route.path === (user ? '/settings' : '/connection'));
 
-		const user = this.userState.getUser();
+
 
 		// if route requires a user, defaulting to the connection page
 		if (route && route.needUser && !user)

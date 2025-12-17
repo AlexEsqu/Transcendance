@@ -1,5 +1,7 @@
 import { userState  } from "../app"
 
+import { getNavBarHtml, initNavBarListeners } from "../routing/nav";
+
 import dashboardHtml from "../pages/dashboard.html?raw";
 import formHtml from "../pages/form.html?raw";
 import renameFormHtml from "../pages/forms/renameForm.html?raw"
@@ -14,18 +16,21 @@ export { getDashboardPage, getSettingForm, initSettingPageListeners }
 function getDashboardPage()
 {
 	const name = userState.getUser()?.getName() ?? "Guest";
-	return dashboardHtml.replace('USERNAME', name);
+	return (getNavBarHtml() + dashboardHtml).replace('USERNAME', name);
 }
 
-function getSettingForm(): string {
-
-	return formHtml;
+function getSettingForm(): string
+{
+	const name = userState.getUser()?.getName() ?? "Guest";
+	return (getNavBarHtml() + formHtml).replace('USERNAME', name);
 }
 
 // on load function to activate buttons and options
 
 function initSettingPageListeners(): void
 {
+	initNavBarListeners();
+
 	document.addEventListener('pageLoaded', (event: Event) => {
 		const { detail: path } = event as CustomEvent<string>;
 
