@@ -21,8 +21,8 @@ router.addRoute('/settings/avatar', getSettingForm, true, true);
 router.addRoute('/settings/email', getSettingForm, true, true);
 router.addRoute('/settings/password', getSettingForm, true, true);
 
-router.addRoute('/game/play', getGameHtml, true);
-
+router.addRoute('/game', getGameHtml, true);
+router.addRoute('/game/ia', getGameHtml, true);
 
 initConnectionPageListeners();
 initSettingPageListeners();
