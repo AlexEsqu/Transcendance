@@ -84,25 +84,12 @@ function onRenameLoaded(): void
 			const formData = new FormData(renameForm);
 			const newName = formData.get('input-rename-user') as string | null;
 
-			if (newName && user instanceof RegisteredUser)
+			if (newName)
 			{
-				try
-				{
-					await user.rename(newName.trim());
-					alert('Username updated!');
-					router.navigateTo('/settings');
-				}
-				catch (err)
-				{
-					alert('Failed to update username.');
-					console.error(err);
-				}
+				userState.rename(newName);
+				router.render();
 			}
-			else if (newName && user instanceof GuestUser)
-			{
-				user.rename(newName);
-				router.navigateTo('/settings');
-			}
+
 		}
 	);
 }

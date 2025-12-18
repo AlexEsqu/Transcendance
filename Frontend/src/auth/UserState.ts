@@ -237,4 +237,19 @@ class UserState
 		this.setUser(null);
 	}
 
+	//------------------------ METHODS -------------------------------//
+
+	public async rename(newName : string): Promise<void>
+	{
+		if (this.user instanceof RegisteredUser)
+		{
+			await this.user.rename(newName)
+		}
+
+		if (this.user instanceof GuestUser)
+			this.user.rename(newName);
+
+		this.setUser(this.user);
+	}
+
 }
