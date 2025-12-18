@@ -146,7 +146,7 @@ function drawCrown(canvas: HTMLCanvasElement, color: string): void
 	if (!ctx) return ;
 
 	const wCenter: number = (canvas.width / 2);
-	const hCenter: number = (canvas.height / 2) + 300;
+	const hCenter: number = (canvas.height / 2) + 400;
 
 	drawLine(ctx, color, { x: wCenter - 10, y: hCenter + 70 }, { x: wCenter + 10, y: hCenter + 70 });
 	drawLine(ctx, color, { x: wCenter - 10, y: hCenter + 70 }, { x: wCenter - 10, y: hCenter + 50 });
@@ -164,7 +164,7 @@ function drawOneBranch(
 	if (!ctx) return ;
 
 	const wCenter: number = (canvas.width / 2);
-	const hCenter: number = (canvas.height / 2) + 300;
+	const hCenter: number = (canvas.height / 2) + 400;
 	ctx.clearRect(wCenter - 110, 0, 220, hCenter + 100);
 
 	drawCircle(ctx, circleColors[4], { x: wCenter - 30, y: hCenter });
@@ -181,7 +181,7 @@ function drawTwoBranch(
 	if (!ctx) return ;
 
 	const wCenter: number = (canvas.width / 2);
-	let hCenter: number = (canvas.height / 2) + 300;
+	let hCenter: number = (canvas.height / 2) + 400;
 	if (!first) hCenter += 100;
 
 	//	Left side
@@ -217,7 +217,7 @@ function drawScore(canvas: HTMLCanvasElement, score1: number, score2: number): v
 {
 	const ctx = canvas.getContext("2d");
 	const wCenter: number = (canvas.width / 2);
-	const hCenter: number = (canvas.height / 2) - 200;
+	const hCenter: number = (canvas.height / 2) - 300;
 	ctx.clearRect(wCenter - 110, 0, 220, hCenter + 50);
 
 	ctx.font = "50px monospace";
@@ -240,7 +240,7 @@ function drawName(canvas: HTMLCanvasElement, player1: string, player2: string, n
 	if (player2.length > 10) player2 = player2.substring(0, 10);
 
 	const wCenter: number = (canvas.width / 2);
-	const hCenter: number = (canvas.height / 2) - 200;
+	const hCenter: number = (canvas.height / 2) - 300;
 	ctx.clearRect(wCenter - 200, 0, 200, 855);
 	ctx.clearRect(wCenter + 200, 0, 200, 855);
 
@@ -251,6 +251,4 @@ function drawName(canvas: HTMLCanvasElement, player1: string, player2: string, n
 	ctx.fillText(player1, wCenter - 200, hCenter);
 	ctx.fillText(player2, wCenter + 200, hCenter);
 	ctx.fillStyle = "rgba(201, 34, 145, 1)";
-	if (nbRound <= Pong.MAX_ROUNDS)
-		ctx.fillText("Round " + nbRound.toString(), wCenter - 200, 850);
 }

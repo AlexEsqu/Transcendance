@@ -102,14 +102,14 @@ export class Pong {
 		rounds.nbOfRounds += 1;
 
 		if (currentNbOfRounds < rounds.nbOfRounds) {
+			// let playersColors: Array<string> = [ "rgba(141, 188, 255, 1)" ];
+			// let roundsColors: Array<string> = [ "rgb(141, 188, 255, 1)" ];
+			// for (let i = 0; i <= 6; i++)
+			// 	playersColors.push("rgb(141, 188, 255, 1)");
+			// for (let i = 0; i <= 5; i++)
+			// 	roundsColors.push("rgb(141, 188, 255, 1)");
+			// drawMatchHistoryTree(this.canvasUI, playersColors, roundsColors, this.scene.options.nbOfPlayers);
 			drawName(this.canvasUI, this.scene.leftPadd.player.name, this.scene.rightPadd.player.name, rounds.nbOfRounds);
-			let playersColors: Array<string> = [ "rgba(141, 188, 255, 1)" ];
-			let roundsColors: Array<string> = [ "rgb(141, 188, 255, 1)" ];
-			for (let i = 0; i <= 6; i++)
-				playersColors.push("rgb(141, 188, 255, 1)");
-			for (let i = 0; i <= 5; i++)
-				roundsColors.push("rgb(141, 188, 255, 1)");
-			drawMatchHistoryTree(this.canvasUI, playersColors, roundsColors, this.scene.options.nbOfPlayers);
 			drawScore(this.canvasUI,  this.scene.leftPadd.player.score,  this.scene.rightPadd.player.score);
 		}
 
@@ -209,6 +209,11 @@ export class Pong {
 		//	Resize the game with the window
 		window.addEventListener('resize', () => {
 			this.engine.resize();
+			this.canvasUI.width = window.innerWidth;
+			this.canvasUI.height = window.innerHeight;
+			drawName(this.canvasUI, this.scene.leftPadd.player.name, this.scene.rightPadd.player.name, this.scene.options.nbOfPlayers);
+			drawScore(this.canvasUI, this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
+			// drawMatchHistoryTree()
 		});
 		//	Shift+Ctrl+Alt+I == Hide/show the Inspector
 		window.addEventListener("keydown", (ev) => {
