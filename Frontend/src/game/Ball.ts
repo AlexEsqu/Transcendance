@@ -106,8 +106,6 @@ export class Ball {
 			return false;
 
 		//	Check if the ball fits in the paddle's coordinates range (Z-axis)
-		if (this.ball.maxZ <= paddMaxZ + Ball.RADIUS && this.ball.minZ >= paddMinZ - Ball.RADIUS) {
-		//	Check if the ball fits in the paddle's coordinates range (Z-axis)
 		if (this.ball.maxZ <= paddMaxZ + (Ball.RADIUS * 2) && this.ball.minZ >= paddMinZ - (Ball.RADIUS * 2)) {
 			if (side === "right")
 				this.mesh.position.x = this.ball.minX - Ball.RADIUS - 0.001;

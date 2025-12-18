@@ -2,7 +2,8 @@ import { Scene, ArcRotateCamera } from '@babylonjs/core';
 import { Ball } from './Ball';
 import { IPaddle } from './Pong';
 
-export { State, IPlayer, IRound, Level, IOptions, IScene, IResult }
+export { State, Level }
+export type {IPlayer, IRound, IOptions, IScene, IResult }
 
 enum State {
 	opening, launch, play, pause, end
