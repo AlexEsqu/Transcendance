@@ -1,4 +1,4 @@
-import { Vector3, Mesh } from '@babylonjs/core';
+import { Vector3, Mesh, Scene } from '@babylonjs/core';
 import { createPaddle } from './Graphics';
 import { Ball } from "./Ball";
 import { Level } from './Data';
@@ -11,11 +11,13 @@ export class Paddle {
 	static RESPONSIVENESS = -25.0;
 	static BOT_PROBABILITY = 4;
 
-	mesh: Mesh;
+	mesh: Mesh | null;
 
-	constructor(scene, side, mapWidth, level: Level, colorHex: string) {
+	constructor(scene: Scene, side: string, mapWidth: number, level: Level, colorHex: string)
+	{
 		Paddle.BOT_PROBABILITY -= level;
 		this.mesh = createPaddle(scene, Paddle.HEIGHT, Paddle.WIDTH, Paddle.DEPTH, colorHex);
+		if (!this.mesh) return ;
 		this.mesh.rotation.y = Math.PI / 2;
 		this.resetPosition(mapWidth, side);
 	}
@@ -23,7 +25,10 @@ export class Paddle {
 	/**
 	 * 	- Update position in up direction or down, respect map and ball collisions
 	 */
-	move(direction: string, posLimit: number, lastFrameTime: number): void {
+	move(direction: string, posLimit: number, lastFrameTime: number): void
+	{
+		if (!this.mesh) return ;
+
 		const meshTopPos: number = this.mesh.position.z + (Paddle.WIDTH / 2);
 		const meshBottomPos: number = this.mesh.position.z - (Paddle.WIDTH / 2);
 
@@ -39,17 +44,14 @@ export class Paddle {
 			this.mesh.position.z -= step;
 	}
 
-	// checkBallCollision(side: string, newPaddPos: number, ballPos: number): boolean {
-	// 	if ((side === "up" && newPaddPos < ballPos) || (side === "down" && newPaddPos > ballPos))
-	// 		return true;
-	// 	return false;
-	// }
-
 	/**
 	 * 	- If no user is specified, the paddle is controlled by a robot and moves automatically.
 	 * 	- Do not always move, robot's behave is randomized
 	 */
-	autoMove(ball: Ball, posLimit: number, lastFrameTime: number): void {
+	autoMove(ball: Ball, posLimit: number, lastFrameTime: number): void
+	{
+		if (!this.mesh || !ball || !ball.mesh) return ;
+
 		//	Avoid the robot to always move perfectly : 1/BOT_PROBABILITY chance to miss the target
 		if (Math.floor(Math.random() * Paddle.BOT_PROBABILITY) == 1) return ;
 
@@ -69,7 +71,10 @@ export class Paddle {
 			this.move("down", posLimit, lastFrameTime);
 	}
 
-	resetPosition(mapWidth: number, side: string): void {
+	resetPosition(mapWidth: number, side: string): void
+	{
+		if (!this.mesh) return ;
+
 		this.mesh.position = new Vector3((mapWidth / 2), 0.2, 0.0);
 		if (side === "left") this.mesh.position.x = -(mapWidth / 2);
 	}
