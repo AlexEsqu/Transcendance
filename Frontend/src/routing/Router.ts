@@ -89,7 +89,7 @@ class Router
 		// if route requires a user, defaulting to the connection page
 		if (route && route.needUser && !user)
 		{
-			window.history.replaceState(null, '', '/connection');
+			window.history.replaceState(null, '', (user ? '/settings' : '/connection'));
 			this.render();
 			return;
 		}
@@ -97,7 +97,7 @@ class Router
 		// if route requires a registerd user, defaulting to the connection page
 		if (route && route.needRegisteredUser && !(user instanceof RegisteredUser))
 		{
-			window.history.replaceState(null, '', '/connection');
+			window.history.replaceState(null, '', (user ? '/settings' : '/connection'));
 			this.render();
 			return;
 		}

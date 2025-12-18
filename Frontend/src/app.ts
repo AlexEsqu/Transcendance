@@ -18,9 +18,9 @@ router.addRoute('/connection', getConnectionLandingHtml);
 router.addRoute('/connection/login', getConnectionForm);
 router.addRoute('/connection/register', getConnectionForm);
 router.addRoute('/connection/alias', getConnectionForm);
-router.addRoute('/settings', getDashboardPage);
-router.addRoute('/settings/rename', getSettingForm);
-router.addRoute('/settings/avatar', getSettingForm);
+router.addRoute('/settings', getDashboardPage, true);
+router.addRoute('/settings/rename', getSettingForm, true);
+router.addRoute('/settings/avatar', getSettingForm, true, true);
 
 initConnectionPageListeners();
 initSettingPageListeners();

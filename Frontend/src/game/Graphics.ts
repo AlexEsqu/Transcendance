@@ -63,7 +63,7 @@ function createPaddle(scene: Scene, height: number, width: number, depth: number
 
 function createCamera(scene: Scene, canvas): ArcRotateCamera {
 	if (!scene || scene === undefined) return null;
-	
+
 	const camera: ArcRotateCamera = new ArcRotateCamera(
 		'arCamera',
 		-(Math.PI / 2), // alpha
