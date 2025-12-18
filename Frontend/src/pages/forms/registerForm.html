@@ -1,7 +1,7 @@
 <form
 	id="register-form"
 	name="register-form"
-	class="flex flex-col flex-center gap-4 m-6">
+	class="flex flex-col flex-center gap-4 m-6 p-10">
 
 	<label
 		for="input-login"
@@ -13,8 +13,23 @@
 		name="input-login"
 		type="login"
 		required
-		class="pb-5 text-center placeholder:text-center"
-		placeholder="XXXbgd75XXX" />
+		class="pb-5 text-center placeholder:text-center bg-gray-950 "
+		placeholder="XXXbgdu75XXX" />
+
+	<label
+		for="input-email"
+		class="text-center pt-3">
+		Give an email address
+		<br>
+		<span class="text-gray-500">for account verification</span>
+	</label>
+	<input
+		id="input-email"
+		name="input-email"
+		type="email"
+		required
+		class="pb-5 text-center placeholder:text-center bg-gray-950 "
+		placeholder="login@42paris.fr" />
 
 	<label
 		for="input-password"
@@ -26,7 +41,7 @@
 		name="input-password"
 		type="password"
 		required
-		class="pb-5 text-center placeholder:text-center"
+		class="bg-gray-950 pb-5 text-center placeholder:text-center bg-gray-950 "
 		placeholder="********" />
 
 	<label
@@ -39,7 +54,7 @@
 		name="input-password-check"
 		type="password"
 		required
-		class="pb-5 text-center placeholder:text-center"
+		class="bg-gray-950 pb-5 text-center placeholder:text-center bg-gray-950 "
 		placeholder="********" />
 
 	<button

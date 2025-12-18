@@ -2,13 +2,13 @@ export {User, RegisteredUser, GuestUser }
 
 const placeholderAvatar : string = "./placeholder/avatarPlaceholder.png"
 
-const apiKey : string = process.env.APP_SECRET_KEY ?? "oups";
+const apiKey : string = import.meta.env.VITE_APP_SECRET_KEY ?? "oups";
 console.log('API Key loaded:', apiKey ? 'yes' : 'no');
 
 const ENV = {
-  APP_SECRET_KEY: process.env.APP_SECRET_KEY,
-  JWT_SECRET: process.env.JWT_SECRET,
-  NODE_ENV: process.env.NODE_ENV,
+  APP_SECRET_KEY: import.meta.env.VITE_APP_SECRET_KEY,
+  JWT_SECRET: import.meta.env.VITE_JWT_SECRET,
+  NODE_ENV: import.meta.env.MODE,
 };
 
 console.log('Environment:', ENV);

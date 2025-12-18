@@ -1,41 +1,34 @@
+import "./style.css"
+import { Router } from './routing/Router';
+import { UserState } from './auth/UserState';
+import { getConnectionLandingHtml, getConnectionForm, initConnectionPageListeners} from './auth/connection';
+import { getDashboardPage, getSettingForm, initSettingPageListeners } from "./users/dashboard";
+import { getGameHtml, initGamePageListeners } from "./game/gamePages"
 
-import { displayAliasQueryPage } from "./landing/alias"
-import { displayNavBar, goToPage, updateNavFromUserData } from "./landing/nav";
-import { displayGameWindow } from "./landing/game";
-import { GuestUser, RegisteredUser, User } from "./landing/User"
-import { UserState } from "./landing/UserState";
-import "./input.css";
-import { RegisterClass } from "@babylonjs/core";
-
-export { userState }
-
-let pageState = { page: 'landing' };
-window.history.replaceState(pageState, null, '#landing');
+export { userState, router };
 
 const userState = UserState.getInstance();
+const router = new Router(userState, '#main');
 
-console.log(`User is :`);
-console.log(userState)
+router.addRoute('/connection', getConnectionLandingHtml);
+router.addRoute('/connection/login', getConnectionForm);
+router.addRoute('/connection/register', getConnectionForm);
+router.addRoute('/connection/alias', getConnectionForm);
 
-userState.subscribe((user) =>
-{
-	console.log('User changed:', user?.getName() || 'No user');
-	const navExists = document.querySelector('nav');
+router.addRoute('/settings', getDashboardPage, true);
+router.addRoute('/settings/rename', getSettingForm, true);
+router.addRoute('/settings/avatar', getSettingForm, true, true);
+router.addRoute('/settings/email', getSettingForm, true, true);
+router.addRoute('/settings/password', getSettingForm, true, true);
 
-	// User logged in - show nav bar if it doesn't exist
-	if (user)
-	{
-		if (!navExists)
-			displayNavBar();
-		updateNavFromUserData(user);
-	}
+router.addRoute('/game/play', getGameHtml, true);
 
-	// User logged out - remove nav and show login
-	else
-	{
-		const nav = document.querySelector('nav');
-		if (navExists)
-			nav.remove();
-		displayAliasQueryPage();
-	}
-});
+
+initConnectionPageListeners();
+initSettingPageListeners();
+initGamePageListeners();
+
+router.render();
+
+
+

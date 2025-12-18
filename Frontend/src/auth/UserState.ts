@@ -1,6 +1,8 @@
-import { RegisteredUser, GuestUser, User } from "./User";
+import { RegisteredUser, GuestUser, User } from "../users/User";
+import { router } from "../app"
 
-export { Subscriber, UserState }
+export type { Subscriber }
+export { UserState }
 
 type Subscriber = (user: User | null) => void;
 
@@ -48,7 +50,7 @@ class UserState
 	//--------------------------- SETTER ------------------------------------//
 
 	// modified User objects and notifies subscribers for state changes
-	public setUser(newUser: User): void
+	public setUser(newUser: User | null): void
 	{
 		this.user = newUser;
 		this.saveToLocalStorage();
@@ -126,8 +128,11 @@ class UserState
 			this.user.avatarPath = data.avatarPath;
 		}
 
-		// this.notifySubscribers();
+		this.notifySubscribers();
+
+		console.log(this.user);
 	}
+
 
 
 	//------------------------ AUTHENTICATION -------------------------------//
@@ -163,7 +168,7 @@ class UserState
 		this.setUser(user);
 	}
 
-	public async register(username: string, password: string): Promise<void>
+	public async register(username: string, password: string, email: string): Promise<void>
 	{
 		const response = await fetch('https://localhost:8443/users/signup',
 			{
@@ -174,7 +179,7 @@ class UserState
 				},
 				body: JSON.stringify(
 					{
-						username, password
+						username, password, email
 					}
 				),
 			}

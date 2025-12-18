@@ -13,7 +13,7 @@ npm install
 npm run build
 
 # # replacing main process with npm run start
-# exec npm run start
+# npm run start
 
 # for developpment: live reload
-npx webpack serve --config webpack.config.js --mode development --host 0.0.0.0 --port 8080 --hot
+npm run dev
