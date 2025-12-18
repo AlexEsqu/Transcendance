@@ -15,7 +15,7 @@ export { getDashboardPage, getSettingForm, initSettingPageListeners }
 
 // Getting base html
 
-function getDashboardPage()
+function getDashboardPage(): string
 {
 	const name = userState.getUser()?.getName() ?? "Guest";
 	return (getNavBarHtml() + dashboardHtml).replace('USERNAME', name);
@@ -50,17 +50,11 @@ function initSettingPageListeners(): void
 				return;
 			}
 
-			// case '/settings/password':
-			// {
-			// 	onLoginLoaded();
-			// 	return;
-			// }
-
-			// case '/settings/username':
-			// {
-			// 	onLoginLoaded();
-			// 	return;
-			// }
+			case '/settings/password':
+			{
+				onPasswordLoaded();
+				return;
+			}
 
 			// case '/settings/email':
 			// {
@@ -96,7 +90,6 @@ function onRenameLoaded(): void
 				{
 					await user.rename(newName.trim());
 					alert('Username updated!');
-					router.navigateTo('/settings');
 					router.navigateTo('/settings');
 				}
 				catch (err)
@@ -138,6 +131,47 @@ function onAvatarLoaded(): void
 					router.navigateTo('/settings');
 				} catch (err) {
 					alert('Failed to update avatar.');
+					console.error(err);
+				}
+			}
+		}
+	);
+}
+
+function onPasswordLoaded(): void
+{
+	const user = userState.getUser();
+	if (!(user instanceof RegisteredUser))
+	{
+		router.navigateTo('/settings');
+		return;
+	}
+
+	injectForm(passwordFormHtml);
+
+	const passwordForm = document.getElementById('password-form') as HTMLFormElement | null;
+	passwordForm?.addEventListener('submit', async (e) =>
+		{
+			e.preventDefault();
+			const formData = new FormData(passwordForm);
+			const newPassword = formData.get('input-password') as string | null;
+			const newPasswordCheck = formData.get('input-password-check') as string | null;
+			const oldPassword = formData.get('input-old-password') as string | null;
+			if (newPassword === newPasswordCheck)
+			{
+				alert("The new passwords doesn't match...")
+				return;
+			}
+			if (oldPassword && newPassword) {
+				try
+				{
+					await user.changePassword(oldPassword, newPassword);
+					alert('password updated!');
+					router.navigateTo('/settings');
+				}
+				catch (err)
+				{
+					alert('Failed to update password.');
 					console.error(err);
 				}
 			}
