@@ -88,10 +88,11 @@ function onRegisterLoaded(): void
 			e.preventDefault();
 			const formData = new FormData(registerForm);
 			const login = formData.get('input-login') as string | null;
+			const email = formData.get('input-email') as string | null;
 			const password = formData.get('input-password') as string | null;
 			const check = formData.get('input-password-check') as string | null;
 
-			if (!login || !password)
+			if (!login || !password || !email)
 				return;
 
 			if (password !== check)
@@ -100,7 +101,7 @@ function onRegisterLoaded(): void
 				return;
 			}
 
-			await userState.register(login, password);
+			await userState.register(login, password, email);
 		}
 	);
 }
