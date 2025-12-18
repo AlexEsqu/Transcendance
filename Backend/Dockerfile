@@ -22,10 +22,10 @@ RUN if [ ! -f /tmp/certs/server.key ] || [ ! -f /tmp/certs/server.crt ]; then \
     fi
 
 ENV ADDRESS=0.0.0.0
-ENV PORT=8443
+ENV PORT=3000
 ENV SQLITE_PATH=/app/data/database.db
 ENV AVATARS_UPLOAD_PATH=/app/uploads/avatars
-ENV DOMAIN_NAME=https://localhost:8443
+ENV DOMAIN_NAME=http://localhost:3000
 
 
 RUN chmod +x scripts/entrypoint.sh

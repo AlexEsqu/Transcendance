@@ -3,7 +3,6 @@ services:
     build: ./Backend
     container_name: fastify
     ports:
-      - "8443:8443"
       - "3000:3000"
     command: npm run dev
     volumes:

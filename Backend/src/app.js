@@ -14,29 +14,14 @@ import clientAuthPlugin from "./plugins/validateApiKey.js";
 import sessionAuthPlugin from "./plugins/validateSessionToken.js";
 import authPlugin from "./plugins/jwt.js";
 import swaggerPlugin from "./plugins/swagger.js";
-import mailerPlugin from "./plugins/mailer.js"
+import mailerPlugin from "./plugins/mailer.js";
 import matchesRoutes from "./routes/matches/index.js";
 import userRoutes from "./routes/users/index.js";
 import authRoutes from "./routes/auth/index.js";
-import nodemailer from "nodemailer"
-import {
-	authCredentialsBody,
-	errorResponse,
-	SignupBody,
-	SuccessMessageResponse,
-	matchObject,
-	userIdObject,
-	publicUserObject,
-} from "./schemas/schemas.js";
+import nodemailer from "nodemailer";
+import { authCredentialsBody, errorResponse, SignupBody, SuccessMessageResponse, matchObject, userIdObject, publicUserObject } from "./schemas/schemas.js";
 
-export function buildServer({
-	useHttps = false,
-	dbOverride = null,
-	apiKeyPluginOverride = null,
-	sessionPluginOverride = null,
-	jwtFake = null,
-	mailerOverride = null
-} = {}) {
+export function buildServer({ useHttps = null, dbOverride = null, apiKeyPluginOverride = null, sessionPluginOverride = null, jwtFake = null, mailerOverride = null } = {}) {
 	const server = Fastify({
 		https: useHttps
 			? {
@@ -64,9 +49,10 @@ export function buildServer({
 	server.register(fastifyCookie);
 	server.register(swaggerPlugin);
 	server.register(cors, {
-		origin: "*",
-		credentials: true,
+		origin: "http://localhost:8080",
+		credentials: false,
 		methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+		logLevel: "trace"
 	});
 	server.register(matchesRoutes);
 	server.register(userRoutes);
@@ -82,8 +68,7 @@ export function buildServer({
 		prefix: "/avatars/",
 	});
 
-server.register(mailerOverride ?? mailerPlugin );
-	
+	server.register(mailerOverride ?? mailerPlugin);
 
 	// Schemas
 	server.addSchema(authCredentialsBody);
@@ -93,6 +78,6 @@ server.register(mailerOverride ?? mailerPlugin );
 	server.addSchema(matchObject);
 	server.addSchema(userIdObject);
 	server.addSchema(publicUserObject);
-
+	server.listen({ port: 8080 });
 	return server;
 }

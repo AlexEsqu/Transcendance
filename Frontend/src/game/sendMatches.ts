@@ -30,7 +30,7 @@ function sendMatchesPostRequest(results: IResult, time?: number) : void {
 		return ;
 	}
 
-	const matchesURL: string = "https://localhost:8443/matches";
+	const matchesURL: string = "http://localhost:3000/matches";
 	const matchesJSON: IJSON = fillMatchesJSON(results, time);
 	const request = new Request(
 		matchesURL, 

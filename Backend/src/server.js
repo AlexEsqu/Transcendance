@@ -1,7 +1,7 @@
 import { buildServer } from "./app.js";
 
 
-export const server = buildServer({ useHttps: true });
+export const server = buildServer({ useHttps: false });
 
 const start = async () => {
 	try {

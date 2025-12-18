@@ -145,7 +145,7 @@ class UserState
 
 	public async loginAsRegistered(username: string, password: string)
 	{
-		const response = await fetch('https://localhost:8443/users/auth/login',
+		const response = await fetch('http://localhost:3000/users/auth/login',
 			{
 				method: 'POST',
 				headers: {
@@ -170,7 +170,7 @@ class UserState
 
 	public async register(username: string, password: string, email: string): Promise<void>
 	{
-		const response = await fetch('https://localhost:8443/users/signup',
+		const response = await fetch('http://localhost:3000/users/signup',
 			{
 				method: 'POST',
 				headers: {
@@ -199,7 +199,7 @@ class UserState
 	{
 		if (this.user instanceof RegisteredUser)
 		{
-			const response = await fetch('https://localhost:8443/users/auth/logout',
+			const response = await fetch('http://localhost:3000/users/auth/logout',
 				{
 					method: 'POST',
 					headers: {
@@ -220,7 +220,7 @@ class UserState
 	{
 		if (this.user instanceof RegisteredUser)
 		{
-			const response = await fetch('https://localhost:8443/users/me',
+			const response = await fetch('http://localhost:3000/users/me',
 				{
 					method: 'DELETE',
 					headers: {

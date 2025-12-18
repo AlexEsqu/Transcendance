@@ -16,7 +16,11 @@ export function initDB(db) {
         refresh_token_hash TEXT,
 		email_verified INTEGER DEFAULT 0,
 		email_verify_token TEXT,
-		email_verify_expires INTEGER
+		email_verify_expires INTEGER,
+		is_2fa_enabled INTEGER DEFAULT 0,
+		code_hash_2fa TEXT
+		code_expires_2fa INTEGER
+		token_2fa TEXT
     );
 `
 	).run();

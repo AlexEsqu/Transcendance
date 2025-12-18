@@ -48,7 +48,7 @@ class RegisteredUser extends User
 
 	async updateAvatar(imageUrl : string): Promise<void>
 	{
-		const response = await fetch('https://localhost:8443/users/me/avatar',
+		const response = await fetch('http://localhost:3000/users/me/avatar',
 			{
 				method: 'PUT',
 				headers:
@@ -71,7 +71,7 @@ class RegisteredUser extends User
 
 	async rename(newName : string): Promise<void>
 	{
-		const response = await fetch('https://localhost:8443/users/me/username',
+		const response = await fetch('http://localhost:3000/users/me/username',
 			{
 				method: 'PUT',
 				headers:
@@ -94,7 +94,7 @@ class RegisteredUser extends User
 
 	async changePassword(oldPassword: string, newPassword: string): Promise<void>
 	{
-		const response = await fetch('https://localhost:8443/users/me/password', {
+		const response = await fetch('http://localhost:3000/users/me/password', {
 			method: 'PUT',
 			headers: {
 				'Content-Type': 'application/json',
