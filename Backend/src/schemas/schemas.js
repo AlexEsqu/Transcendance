@@ -12,8 +12,8 @@ export const authCredentialsBody = {
 	$id: "authCredentialsBody",
 	type: "object",
 	properties: {
-		username: { type: "string" },
-		login: { type: "string" }	
+		login: { type: "string" },
+		password: { type: "string" },
 	},
 	required: ["password", "login"],
 };
