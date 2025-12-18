@@ -12,7 +12,7 @@ export { monitoringRounds, saveResults, newRound, drawMatchHistoryTree, drawScor
  */
 function monitoringRounds(scene: IScene, nbOfRounds: number): boolean
 {
-	if (!scene || !scene.leftPadd.player || !scene.rightPadd.player) return false;
+	if (!scene || !scene.leftPadd || !scene.leftPadd.player || !scene.rightPadd || !scene.rightPadd.player) return false;
 
 	if (scene.leftPadd.player.score == Pong.MAX_SCORE || scene.rightPadd.player.score == Pong.MAX_SCORE)
 	{
@@ -57,12 +57,14 @@ function saveResults(leftPadd: IPaddle, rightPadd: IPaddle, rounds: IRound): IRo
 
 function newRound(scene: IScene, rounds: IRound): IRound
 {
-	if (!scene || (rounds && rounds.nbOfRounds == Pong.MAX_ROUNDS)) return rounds;
+	if (!scene || (rounds && rounds.nbOfRounds == Pong.MAX_ROUNDS) || !scene.players || !rounds.results) return rounds;
 	console.log("GAME-STATE: new round");
 
 	const leftPadd = scene.leftPadd;
 	const rightPadd = scene.rightPadd;
 	let nbOfPlayers = scene.options.nbOfPlayers;
+
+	if (!leftPadd || !rightPadd ) return rounds;
 
 	//	Who's playing now ?
 	if (nbOfPlayers == 4 && rounds.nbOfRounds >= 0 && rounds.nbOfRounds < 2) nbOfPlayers = 2;
@@ -102,9 +104,9 @@ function newRound(scene: IScene, rounds: IRound): IRound
 	//	Reset data
 	if (leftPadd.paddle) leftPadd.paddle.resetPosition(Pong.MAP_WIDTH, "left");
 	if (rightPadd.paddle) rightPadd.paddle.resetPosition(Pong.MAP_WIDTH, "right");
-	scene.ball.reset(true);
-	leftPadd.player.score = 0;
-	rightPadd.player.score = 0;
+	if (scene.ball) scene.ball.reset(true);
+	if (leftPadd.player) leftPadd.player.score = 0;
+	if (rightPadd.player) rightPadd.player.score = 0;
 	
 	scene.leftPadd = leftPadd;
 	scene.rightPadd = rightPadd;
@@ -213,9 +215,13 @@ function drawMatchHistoryTree(
 	}
 }
 
-function drawScore(canvas: HTMLCanvasElement, score1: number, score2: number): void
+function drawScore(canvas: HTMLCanvasElement | null, score1: number, score2: number): void
 {
+	if (!canvas) return;
+
 	const ctx = canvas.getContext("2d");
+	if (!ctx) return;
+
 	const wCenter: number = (canvas.width / 2);
 	const hCenter: number = (canvas.height / 2) - 300;
 	ctx.clearRect(wCenter - 110, 0, 220, hCenter + 50);

@@ -19,14 +19,14 @@ interface IOptions {
 };
 
 interface IScene {
-	id: Scene;
+	id: Scene | null;
 	state: State;
-	camera: ArcRotateCamera;
-	ball: Ball;
-	leftPadd: IPaddle;
-	rightPadd: IPaddle;
+	camera: ArcRotateCamera | null;
+	ball: Ball | null;
+	leftPadd: IPaddle | null;
+	rightPadd: IPaddle | null;
 	options: IOptions;
-	players: Array<IPlayer>;
+	players: Array<IPlayer> | null;
 };
 
 interface IPlayer {
@@ -36,16 +36,16 @@ interface IPlayer {
 };
 
 interface IResult {
-	winner: IPlayer;
+	winner: IPlayer | null;
 	maxScore: number;
-	loser: IPlayer;
+	loser: IPlayer | null;
 	minScore: number;
 };
 
 interface IRound {
-	results: Array<IResult>,
-	nbOfRounds: number,
-	playerIndex: number
+	results: Array<IResult> | null;
+	nbOfRounds: number;
+	playerIndex: number;
 }
 
 enum Level {
