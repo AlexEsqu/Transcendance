@@ -78,6 +78,6 @@ export function buildServer({ useHttps = null, dbOverride = null, apiKeyPluginOv
 	server.addSchema(matchObject);
 	server.addSchema(userIdObject);
 	server.addSchema(publicUserObject);
-	server.listen({ port: 8080 });
+	// server.listen({ port: 8080 });
 	return server;
 }

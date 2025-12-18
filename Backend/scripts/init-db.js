@@ -4,7 +4,7 @@ import Database from "better-sqlite3";
 export const db = new Database("/app/data/database.db");
 db.pragma("journal_mode = WAL");
 
-export function initDB(db) {
+export async function initDB(db) {
 	db.prepare(`
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -18,8 +18,8 @@ export function initDB(db) {
 		email_verify_token TEXT,
 		email_verify_expires INTEGER,
 		is_2fa_enabled INTEGER DEFAULT 0,
-		code_hash_2fa TEXT
-		code_expires_2fa INTEGER
+		code_hash_2fa TEXT,
+		code_expires_2fa INTEGER,
 		token_2fa TEXT
     );
 `

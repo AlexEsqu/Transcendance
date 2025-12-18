@@ -18,13 +18,6 @@ beforeAll(async () => {
 
 let accessToken;
 
-beforeAll(async () => {
-	server = buildServer({
-		dbOverride: mockDb,
-		apiKeyPluginOverride: mockApiKey,
-	});
-	await server.ready();
-});
 
 beforeAll(async () => {
 	const response = await server.inject({

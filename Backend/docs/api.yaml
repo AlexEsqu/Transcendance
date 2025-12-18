@@ -20,13 +20,13 @@ components:
     def-0:
       type: object
       properties:
-        username:
+        login:
           type: string
         password:
           type: string
       required:
-        - username
         - password
+        - login
       title: authCredentialsBody
     def-1:
       additionalProperties: false
@@ -35,10 +35,16 @@ components:
           type: string
         message:
           type: string
+      required:
+        - error
       type: object
       title: errorResponse
     def-2:
       type: object
+      required:
+        - username
+        - password
+        - email
       properties:
         username:
           type: string
@@ -47,9 +53,9 @@ components:
         password:
           type: string
           minLength: 8
-      required:
-        - username
-        - password
+        email:
+          type: string
+          format: email
       title: SignupBody
     def-3:
       description: OK
@@ -307,48 +313,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/def-1"
-  /users/signup:
-    post:
-      tags:
-        - auth
-      description: Creates a new user account using a username and password. Does not
-        automatically log in the user.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/def-2"
-      responses:
-        "201":
-          description: Signed up user successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/def-3"
-        "400":
-          description: "Bad Request: Invalid input or missing fields"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/def-1"
-        "409":
-          description: "Conflict: Username already exists"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/def-1"
-        "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/def-1"
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/def-1"
   /users/me/password:
     put:
       tags:
@@ -439,6 +403,12 @@ paths:
                 $ref: "#/components/schemas/def-1"
         "401":
           description: "Unauthorized: Invalid credentials"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "413":
+          description: Payload too large
           content:
             application/json:
               schema:
@@ -579,6 +549,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/def-1"
+        "409":
+          description: "Conflict: Friendship already exists"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
         "500":
           description: Internal Server Error
           content:
@@ -704,15 +680,87 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/def-1"
+  /users/me/2fa:
+    put:
+      tags:
+        - user
+      description: Enable or disable 2FA for the authenticated user.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - enabled
+              properties:
+                enabled:
+                  type: boolean
+        required: true
+      security: *a2
+      responses:
+        "200":
+          description: " 2FA status updated successfully "
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-3"
+  /users/signup:
+    post:
+      tags:
+        - auth
+      description: Creates a new user account using a username an email and password.
+        Sends a verification email to the user.				 Does not automatically log
+        in the user.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/def-2"
+      responses:
+        "201":
+          description: Signed up user successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-3"
+        "400":
+          description: "Bad Request: Invalid input or missing fields"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "409":
+          description: "Conflict: Username already exists"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
   /users/auth/login:
     post:
       tags:
         - auth
-      description: Authenticates the user using their username and password. On
-        success, returns a the user's id AND short-lived access token in the
-        response body and sets a long-lived refresh token in the `HttpOnly
-        refreshToken cookie`, which can later be used to obtain new access
-        tokens.
+      description: Authenticates the user using their login (email or username) and
+        password.    If authentication succeeds and two-factor authentication
+        (2FA) is disabled,    the endpoint returns the user's id and a
+        short-lived access token in the response body    and sets a long-lived
+        refresh token in an HttpOnly `refreshToken` cookie.       If 2FA is
+        enabled for the user, the endpoint does not issue tokens
+        immediately.    Instead, a one-time 6-digit verification code is sent to
+        the user's email and    a temporary 2FA continuation token is generated,
+        which must be used to complete    authentication via the 2FA
+        verification endpoint.    `This endpoint requires the client to have a
+        verified email address.`
       requestBody:
         content:
           application/json:
@@ -724,17 +772,43 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  accessToken:
-                    type: string
-                  id:
-                    type: integer
-                required:
-                  - accessToken
-                  - id
+                oneOf:
+                  - description: Login successful
+                    type: object
+                    required:
+                      - accessToken
+                      - id
+                    properties:
+                      accessToken:
+                        type: string
+                      id:
+                        type: integer
+                  - description: Two-factor authentication required
+                    type: object
+                    required:
+                      - twoFactorRequired
+                      - token
+                    properties:
+                      twoFactorRequired:
+                        type: boolean
+                        example: true
+                      token:
+                        type: string
+                        description: 2FA continuation token
+        "302":
+          description: "Redirect: Email not verified"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-3"
         "401":
           description: "Unauthorized: Invalid credentials"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "403":
+          description: "Forbidden: Email not verified"
           content:
             application/json:
               schema:
@@ -815,6 +889,146 @@ paths:
                 $ref: "#/components/schemas/def-3"
         "401":
           description: "Unauthorized: Invalid credentials"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+  /users/auth/verify-email:
+    get:
+      tags:
+        - auth
+      description: "Verifies a user's email address using a `one-time token` sent by
+        email.\t\t\tThe user clicks a verification link received by
+        email.\t\t\tIf the token is valid and not expired, the email is marked
+        as verified\t\t\tand the user is redirected to the frontend
+        application.  \t\t\t"
+      parameters:
+        - schema:
+            type: string
+            example: a3f9c8e2b4d74e0c9f...
+          in: query
+          name: token
+          required: true
+          description: Email verification token sent to the user by email
+      responses:
+        "302":
+          description: Email successfully verified. User is redirected to the frontend.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-3"
+        "400":
+          description: "Bad Request: Invalid input or missing fields"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+  /users/auth/send-mail-verification:
+    post:
+      tags:
+        - auth
+      description: Sends an email verification email to the user's email address
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+        required: true
+      responses:
+        "200":
+          description: "Success: Email verification email sent"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-3"
+        "400":
+          description: "Bad Request: Invalid input or missing fields"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+  /users/auth/login/2fa:
+    post:
+      tags:
+        - auth
+      description: Verify a user's 2FA code sent during login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - code
+              description: 6-digit code sent to user email or app
+              properties:
+                code:
+                  type: string
+                  minLength: 6
+                  maxLength: 6
+        required: true
+        description: 6-digit code sent to user email or app
+      parameters:
+        - schema:
+            type: string
+            example: a3f9c8e2b4d74e0c9f...
+          in: query
+          name: token
+          required: true
+          description: Token generated by the login endpoint
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                description: Login successful
+                type: object
+                required:
+                  - accessToken
+                  - id
+                properties:
+                  accessToken:
+                    type: string
+                  id:
+                    type: integer
+        "401":
+          description: "Unauthorized: Invalid token or code"
           content:
             application/json:
               schema:
