@@ -1,4 +1,4 @@
-import { IPlayer } from "./Pong";
+import { IResult } from "./Data";
 
 export { sendMatchesPostRequest };
 
@@ -10,28 +10,28 @@ interface IJSON {
 	date: string;
 }
 
-function fillMatchesJSON(winner: IPlayer, loser: IPlayer, time?: number): IJSON {
+function fillMatchesJSON(results: IResult, time?: number): IJSON {
 	const date = new Date(time ?? Date.now());
 
+	// get Id from Name
 	let matches: IJSON = {
-		winner_id: winner.id,
-		loser_id: loser.id,
-		winner_score: winner.score,
-		loser_score: loser.score,
+		winner_id: results.winner.id,
+		loser_id: results.loser.id,
+		winner_score: results.maxScore,
+		loser_score: results.minScore,
 		date: date.toISOString()
 	};
 	return matches;
 }
 
-function sendMatchesPostRequest(winner: IPlayer | null | undefined,
-								loser: IPlayer | null | undefined, time?: number) : void {
-	if (!winner || !loser) {
-		console.error("IPlayer is undefined when sending matches POST request");
+function sendMatchesPostRequest(results: IResult, time?: number) : void {
+	if (!results) {
+		console.error("Results are undefined when sending matches POST request");
 		return ;
 	}
 
 	const matchesURL: string = "https://localhost:8443/matches";
-	const matchesJSON: IJSON = fillMatchesJSON(winner, loser, time);
+	const matchesJSON: IJSON = fillMatchesJSON(results, time);
 	const request = new Request(
 		matchesURL, 
 		{

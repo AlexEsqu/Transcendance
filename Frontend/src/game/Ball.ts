@@ -1,12 +1,12 @@
 import { Scene, Vector3, Mesh } from '@babylonjs/core';
 import { Paddle } from "./Paddle";
-import { Pong, IPlayer } from "./Pong";
+import { Pong, IPaddle } from "./Pong";
 import { createBall } from './Graphics';
-import { Level } from './game';
+import { Level } from './Data';
 
 export class Ball {
-	static START_SPEED = 7;
-	static MAX_SPEED = 11;
+	static START_SPEED = 6;
+	static MAX_SPEED = 10;
 	static RADIUS = 0.15;
 
     mesh: Mesh;
@@ -37,18 +37,18 @@ export class Ball {
 	 * 	- Update coordinates of the ball and check for collision.
 	 * 	- Depending on what/where the ball hits an object or a limit, its direction is reversed and gain speed
 	 */
-	update(player1: IPlayer | undefined, player2: IPlayer | undefined): void {
-		if (!player1 || !player2) return ;
+	update(leftPadd: IPaddle, rightPadd: IPaddle): boolean {
+		if (!leftPadd || !rightPadd) return false;
 
 		this.ball.minX = this.mesh.position.x - Ball.RADIUS;
 		this.ball.maxX = this.mesh.position.x + Ball.RADIUS;
 		this.ball.maxZ = this.mesh.position.z + Ball.RADIUS;
 		this.ball.minZ = this.mesh.position.z - Ball.RADIUS;
 
-		if (this.ball.maxX <= 0 && this.isBallHittingPadd(player1, "left") === true)
-			return ;
-		else if (this.isBallHittingPadd(player2, "right") == true)
-			return ;
+		if (this.ball.maxX <= 0 && this.isBallHittingPadd(leftPadd.paddle, "left") === true)
+			return false;
+		else if (this.isBallHittingPadd(rightPadd.paddle, "right") == true)
+			return false;
 
 		const heightLimit: number = Pong.MAP_HEIGHT / 2;
 		const widthLimit: number = Pong.MAP_WIDTH / 2;
@@ -61,12 +61,14 @@ export class Ball {
 				this.mesh.position.z = -(heightLimit) + Ball.RADIUS  - 0.001;
 		}
 		if (this.isBallOutofBounds(this.ball.minX, this.ball.maxX, widthLimit) === true) {
-			if (this.mesh.position.x < 0)
-				player2.score += 1;
+			if (this.mesh.position.x > 0)
+				leftPadd.player.score += 1;
 			else
-				player1.score += 1;
-			this.reset();
+				rightPadd.player.score += 1;
+			this.reset(false);
+			return true;
 		}
+		return false;
 	}
 
 	/**
@@ -91,8 +93,7 @@ export class Ball {
 	 * 	- If the ball is hitting the paddle, invert its direction and return true,
 	 * 		otherwise do nothing and return false.
 	 */
-	isBallHittingPadd(player: IPlayer, side: string): boolean {
-		const paddle = player.paddle;
+	isBallHittingPadd(paddle: Paddle, side: string): boolean {
 		if (!paddle || !paddle.mesh || side === undefined) return false;
 
 		const paddMaxZ: number = paddle.mesh.position.z + (Paddle.WIDTH / 2);
@@ -106,6 +107,8 @@ export class Ball {
 
 		//	Check if the ball fits in the paddle's coordinates range (Z-axis)
 		if (this.ball.maxZ <= paddMaxZ + Ball.RADIUS && this.ball.minZ >= paddMinZ - Ball.RADIUS) {
+		//	Check if the ball fits in the paddle's coordinates range (Z-axis)
+		if (this.ball.maxZ <= paddMaxZ + (Ball.RADIUS * 2) && this.ball.minZ >= paddMinZ - (Ball.RADIUS * 2)) {
 			if (side === "right")
 				this.mesh.position.x = this.ball.minX - Ball.RADIUS - 0.001;
 			else
@@ -140,10 +143,9 @@ export class Ball {
 	/**
 	 * Reset position and direction
 	 */
-	reset(): void {
-		this.mesh.position.x = 0.0;
-		// this.mesh.position.z = 0.0;
+	reset(roundOpening: boolean): void {
 		this.speed = Ball.START_SPEED;
-		this.launch();
+		this.mesh.position.x = 0.0;
+		if (roundOpening === true) this.mesh.position.z = 0.0;
 	}
 }

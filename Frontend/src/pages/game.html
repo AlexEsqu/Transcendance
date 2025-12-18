@@ -5,7 +5,7 @@
 		id="game-start"
 		class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
 
-		<div class="border rounded-md flex flex-col items-center justify-center bg-black">
+		<div class="border rounded-md flex flex-col items-center justify-center bg-black text-white">
 			<button
 				class="text-glow p-5 hover:text-glow-red"
 				id="btn-startplay">
@@ -13,9 +13,13 @@
 		</div>
 	</div>
 
-	</div>
+	<!-- </div>
 		<canvas id="game-canvas" class="w-full max-w-7xl aspect-video"></canvas>
+		<canvas id="ui-canvas"   class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
+	</div> -->
+	<div class="relative w-full aspect-video">
+		<canvas id="game-canvas" class="absolute inset-0 w-full h-full"></canvas>
+		<canvas id="ui-canvas"   class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
 	</div>
-
 
 </main>

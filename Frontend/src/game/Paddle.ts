@@ -1,24 +1,23 @@
-import { createPaddle } from './Graphics';
 import { Vector3, Mesh } from '@babylonjs/core';
+import { createPaddle } from './Graphics';
 import { Ball } from "./Ball";
-import { Level } from './game';
+import { Level } from './Data';
 
 export class Paddle {
 	static WIDTH = 1.25;
 	static HEIGHT = 0.25;
 	static DEPTH = 0.25;
 	static SPEED = 25.0;
-	static RESPONSIVENESS = -19.0;
+	static RESPONSIVENESS = -25.0;
 	static BOT_PROBABILITY = 4;
 
 	mesh: Mesh;
 
 	constructor(scene, side, mapWidth, level: Level, colorHex: string) {
-		Paddle.BOT_PROBABILITY += level;
+		Paddle.BOT_PROBABILITY -= level;
 		this.mesh = createPaddle(scene, Paddle.HEIGHT, Paddle.WIDTH, Paddle.DEPTH, colorHex);
 		this.mesh.rotation.y = Math.PI / 2;
-		this.mesh.position = new Vector3((mapWidth / 2), 0.2, 0.0);
-		if (side === "left") this.mesh.position.x = -(mapWidth / 2);
+		this.resetPosition(mapWidth, side);
 	}
 
 	/**
@@ -68,5 +67,10 @@ export class Paddle {
 			this.move("up", posLimit, lastFrameTime);
 		else
 			this.move("down", posLimit, lastFrameTime);
+	}
+
+	resetPosition(mapWidth: number, side: string): void {
+		this.mesh.position = new Vector3((mapWidth / 2), 0.2, 0.0);
+		if (side === "left") this.mesh.position.x = -(mapWidth / 2);
 	}
 }
