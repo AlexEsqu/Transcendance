@@ -1,9 +1,9 @@
-
 export default function verifyEmail(server) {
 	const opts = {
 		schema: {
 			tags: ["auth"],
-			description: "Verifies a user's email address using a `one-time token` sent by email.\
+			description:
+				"Verifies a user's email address using a `one-time token` sent by email.\
 			The user clicks a verification link received by email.\
 			If the token is valid and not expired, the email is marked as verified\
 			and the user is redirected to the frontend application.\
@@ -44,7 +44,6 @@ export default function verifyEmail(server) {
 					message: "Token is absent in query parameters",
 				});
 			const user = server.db.prepare(`SELECT email_verify_expires, id FROM users WHERE email_verify_token = ?`).get(token);
-
 			if (!user) {
 				return reply.status(400).send({
 					error: "Bad Request",
@@ -52,7 +51,7 @@ export default function verifyEmail(server) {
 				});
 			}
 			if (!user.email_verify_expires || user.email_verify_expires < Date.now()) {
-				reply.status(400).send({
+				return reply.status(400).send({
 					error: "Bad Request",
 					message: "Token is expired",
 				});
