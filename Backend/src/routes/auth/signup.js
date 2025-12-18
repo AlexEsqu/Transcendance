@@ -36,7 +36,7 @@ export default function signup(server) {
 	server.post("/signup", opts, async (request, reply) => {
 		const { username, password, email } = request.body;
 		const token = crypto.randomBytes(32).toString("hex");
-		const expires = Date.now() + 1000 * 60 * 60; // 1 hour
+		const expires = Date.now() + 1000 * 60 * 5; // 5 minutes
 		const verifyUrl = `${process.env.DOMAIN_NAME}/users/auth/verify-email?token=${token}`;
 
 		try {
