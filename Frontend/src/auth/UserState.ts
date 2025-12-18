@@ -141,7 +141,6 @@ class UserState
 	{
 		const guestUser = new GuestUser(username);
 		this.setUser(guestUser);
-		router.navigateTo('/settings');
 	}
 
 	public async loginAsRegistered(username: string, password: string)
@@ -167,10 +166,9 @@ class UserState
 		const data = await response.json();
 		const user = new RegisteredUser(username, data.id, data.accessToken);
 		this.setUser(user);
-		router.navigateTo('/settings');
 	}
 
-	public async register(username: string, password: string): Promise<void>
+	public async register(username: string, password: string, email: string): Promise<void>
 	{
 		const response = await fetch('https://localhost:8443/users/signup',
 			{
@@ -181,7 +179,7 @@ class UserState
 				},
 				body: JSON.stringify(
 					{
-						username, password
+						username, password, email
 					}
 				),
 			}
