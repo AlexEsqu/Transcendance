@@ -37,7 +37,7 @@ export default function signup(server) {
 		const { username, password, email } = request.body;
 		const token = crypto.randomBytes(32).toString("hex");
 		const expires = Date.now() + 1000 * 60 * 5; // 5 minutes
-		const verifyUrl = `${process.env.DOMAIN_NAME}/users/auth/verify-email?token=${token}`;
+		const verifyUrl = `${process.env.API_DOMAIN_NAME}/users/auth/verify-email?token=${token}`;
 
 		try {
 			// Hash password

@@ -34,7 +34,7 @@ export default function sendMailVerification(server) {
 	server.post("/send-mail-verification", opts, async (request, reply) => {
 		const token = crypto.randomBytes(32).toString("hex");
 		const expires = Date.now() + 1000 * 60 * 60; // 1 hour
-		const verifyUrl = `${process.env.DOMAIN_NAME}/users/auth/verify-email?token=${token}`;
+		const verifyUrl = `${process.env.API_DOMAIN_NAME}/users/auth/verify-email?token=${token}`;
 
 		const { email } = request.body;
 		try {

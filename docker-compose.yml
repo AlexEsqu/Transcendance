@@ -17,7 +17,7 @@ services:
       - GMAIL_USER=${GMAIL_USER}
       - GMAIL_APP_PASSWORD=${GMAIL_APP_PASSWORD}
       - OTP_SECRET=${OTP_SECRET}
-
+      - API_DOMAIN_NAME=${API_DOMAIN_NAME}
   typescript:
     build: ./Frontend
     container_name: typescript
@@ -28,6 +28,7 @@ services:
     environment:
       - JWT_SECRET=${JWT_SECRET}
       - APP_SECRET_KEY=${APP_SECRET_KEY}
+      - API_DOMAIN_NAME=${API_DOMAIN_NAME}
 
 volumes:
   sqlite:
