@@ -35,7 +35,7 @@ export default function getUserMatches(server) {
 			const { id } = req.params;
 			const user = server.db.prepare(`SELECT id FROM users WHERE id = ?`).get(id);
 			if (!user) {
-				return reply.status(404).send({ error: "User not found" });
+				return reply.status(404).send({ error: "Not Found" , message: "User not found"});
 			}
 			const stmnt = server.db.prepare(`SELECT * FROM matches WHERE winner_id = ? OR loser_id = ?`);
 			const matches = stmnt.all(id, id);

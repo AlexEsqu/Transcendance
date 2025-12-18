@@ -3,13 +3,15 @@ import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import mockDb from "./mocks/inMemoryDb.js";
 import mockApiKey from "./mocks/mockValidateApiKey.js";
 import { users } from "./mocks/mockObjects.js";
-let server;
+import mockMailer from "./mocks/mockMailer.js";
 
+let server;
 
 beforeAll(async () => {
 	server = buildServer({
 		dbOverride: mockDb,
 		apiKeyPluginOverride: mockApiKey,
+		mailerOverride: mockMailer
 	});
 	await server.ready();
 });
@@ -29,7 +31,7 @@ beforeAll(async () => {
 		method: "POST",
 		url: "/users/auth/login",
 		payload: {
-			username: users[0].username,
+			login: users[0].username,
 			password: users[0].password,
 		},
 	});
@@ -107,10 +109,7 @@ describe("POST /users/me/friends", () => {
 			},
 		});
 		expect(response.statusCode).toBe(404);
-		expect(response.json()).toHaveProperty(
-			"error",
-			"Friend user id not found"
-		);
+		expect(response.json()).toHaveProperty("error", "Not Found");
 	});
 
 	it("returns 400 for same user", async () => {
@@ -126,9 +125,7 @@ describe("POST /users/me/friends", () => {
 			},
 		});
 		expect(response.statusCode).toBe(400);
-		expect(response.json()).toMatchObject({
-			error: "User id and friend_id cannot be the same",
-		});
+		expect(response.json()).toHaveProperty("error", "Bad Request");
 	});
 });
 
@@ -174,10 +171,7 @@ describe("DELETE /users/me/friends", () => {
 			},
 		});
 		expect(response.statusCode).toBe(404);
-		expect(response.json()).toHaveProperty(
-			"error",
-			"Friend user id not found"
-		);
+		expect(response.json()).toHaveProperty("error", "Not Found");
 	});
 
 	it("returns 400 for same user", async () => {
@@ -194,7 +188,7 @@ describe("DELETE /users/me/friends", () => {
 		});
 		expect(response.statusCode).toBe(400);
 		expect(response.json()).toMatchObject({
-			error: "User id and friend_id cannot be the same",
+			error: "Bad request",
 		});
 	});
 });

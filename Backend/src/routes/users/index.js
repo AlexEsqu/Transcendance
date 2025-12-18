@@ -1,5 +1,4 @@
 import { getUser, getUsers } from "./getUsers.js";
-import postUser from "./signup.js";
 import deleteUser from "./deleteUser.js";
 import putUserPassword from "./putUserPassword.js";
 import putUserAvatar from "./putUserAvatar.js";
@@ -12,7 +11,6 @@ import putUsername from "./putUsername.js";
 export default async function userRoutes(server) {
 	server.register(getUsers);
 	server.register(getUser);
-	server.register(postUser, { prefix: "users" });
 	server.register(putUserPassword, { prefix: "users" });
 	server.register(putUserAvatar, { prefix: "users" });
 	server.register(putUsername, { prefix: "users" })
