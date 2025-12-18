@@ -106,16 +106,14 @@ function newRound(scene: IScene, rounds: IRound): IRound
 
 	let leftIndex = 0;
 	let rightIndex = 1;
-	if (rounds.nbOfRounds >= 2) {
-		leftIndex = rounds.nbOfRounds - 2;
-		rightIndex = rounds.nbOfRounds - 1;
+	if (rounds.nbOfRounds >= 1) {
+		leftIndex = rounds.nbOfRounds + 1;
+		rightIndex = rounds.nbOfRounds + 2;
 	}
-	rounds.nodeColor[leftIndex] = leftPadd.player.color;
-	rounds.nodeColor[rightIndex] = rightPadd.player.color;
 
-	for (let i = 0; i < 4; i++)
-		console.log(rounds.nodeColor[i]);
-	
+	if (rounds.nodeColor[leftIndex]) rounds.nodeColor[leftIndex] = leftPadd.player.color;
+	if (rounds.nodeColor[rightIndex]) rounds.nodeColor[rightIndex] = rightPadd.player.color;
+
 	scene.leftPadd = leftPadd;
 	scene.rightPadd = rightPadd;
 
@@ -168,7 +166,7 @@ function drawCrown(canvas: HTMLCanvasElement, color: string): void
 }
 
 function drawOneBranch(
-	canvas: HTMLCanvasElement, rounds: IRound): void
+	canvas: HTMLCanvasElement, rounds: IRound, nbOfPlayer: number): void
 {
 	const ctx = canvas.getContext("2d");
 	if (!ctx) return ;
@@ -178,12 +176,24 @@ function drawOneBranch(
 	const hCenter: number = (canvas.height / 2) + 400;
 	ctx.clearRect(wCenter - 110, 0, 220, hCenter + 100);
 
-	drawCircle(ctx, rounds.nodeColor[4], { x: wCenter - 30, y: hCenter });
-	drawLine(ctx, defaultColor, { x: wCenter - 30, y: hCenter }, { x: wCenter + 30, y: hCenter });
-	drawCircle(ctx, rounds.nodeColor[5], { x: wCenter + 30, y: hCenter });
+	if (nbOfPlayer == 1) {
+		drawCircle(ctx, rounds.nodeColor[0], { x: wCenter - 30, y: hCenter });
+		drawCircle(ctx, rounds.nodeColor[1], { x: wCenter + 30, y: hCenter });
+	} else {
+		if (rounds.results && rounds.nbOfRounds > Pong.MAX_ROUNDS / 2 && rounds.results[0])
+			drawCircle(ctx, rounds.results[0].winner.color, { x: wCenter - 30, y: hCenter });
+		else
+			drawCircle(ctx, rounds.nodeColor[4], { x: wCenter - 30, y: hCenter });
 
-	drawLine(ctx, defaultColor, { x: wCenter, y: hCenter }, { x: wCenter, y: hCenter + 30 });
-	drawCrown(canvas, defaultColor);
+		if (rounds.results && rounds.nbOfRounds > Pong.MAX_ROUNDS / 2 && rounds.results[1])
+			drawCircle(ctx, rounds.results[1].winner.color, { x: wCenter + 30, y: hCenter });
+		else
+			drawCircle(ctx, rounds.nodeColor[5], { x: wCenter + 30, y: hCenter });
+	}
+	drawLine(ctx, defaultColor, { x: wCenter - 15, y: hCenter }, { x: wCenter + 15, y: hCenter });
+
+	// drawLine(ctx, defaultColor, { x: wCenter, y: hCenter }, { x: wCenter, y: hCenter + 30 });
+	// drawCrown(canvas, defaultColor);
 }
 
 function drawTwoBranch(
@@ -199,32 +209,30 @@ function drawTwoBranch(
 
 	//	Left side
 	drawCircle(ctx, rounds.nodeColor[0], { x: wCenter - 100, y: hCenter - 30 });
-	drawLine(ctx, defaultColor, { x: wCenter - 30, y: hCenter }, { x: wCenter - 100, y: hCenter - 30 });
+	drawLine(ctx, defaultColor, { x: wCenter - 45, y: hCenter }, { x: wCenter - 87, y: hCenter - 25});
 
 	drawCircle(ctx, rounds.nodeColor[1], { x: wCenter - 100, y: hCenter + 30 });
-	drawLine(ctx, defaultColor, { x: wCenter - 30, y: hCenter }, { x: wCenter - 100, y: hCenter + 30 });
+	drawLine(ctx, defaultColor, { x: wCenter - 45, y: hCenter }, { x: wCenter - 87, y: hCenter + 25 });
 
 	//	Right side
-	drawCircle(ctx, rounds.nodeColor[2], { x: wCenter + 100, y: hCenter + 30 });
-	drawLine(ctx, defaultColor, { x: wCenter + 30, y: hCenter }, { x: wCenter + 100, y: hCenter + 30 });
+	drawCircle(ctx, rounds.nodeColor[3], { x: wCenter + 100, y: hCenter + 30 });
+	drawLine(ctx, defaultColor, { x: wCenter + 45, y: hCenter }, { x: wCenter + 87, y: hCenter + 25 });
 
-	drawCircle(ctx, rounds.nodeColor[3], { x: wCenter + 100, y: hCenter - 30 });
-	drawLine(ctx, defaultColor, { x: wCenter + 30, y: hCenter }, { x: wCenter + 100, y: hCenter - 30 });
+	drawCircle(ctx, rounds.nodeColor[2], { x: wCenter + 100, y: hCenter - 30 });
+	drawLine(ctx, defaultColor, { x: wCenter + 45, y: hCenter }, { x: wCenter + 87, y: hCenter - 25 });
 }
 
 function drawMatchHistoryTree(
 	canvas: HTMLCanvasElement, rounds: IRound, nbPlayers: number): void
 {
-	if (nbPlayers == 1 || nbPlayers == 2)
-		drawOneBranch(canvas, rounds);
-	else if (nbPlayers == 4) {
-		drawOneBranch(canvas, rounds);
+	if (nbPlayers == 4) {
+		drawOneBranch(canvas, rounds, nbPlayers);
 		drawTwoBranch(canvas, rounds, true);
 	}
 	else if (nbPlayers == 8) {
-		drawOneBranch(canvas, rounds);
+		drawOneBranch(canvas, rounds, nbPlayers);
 		drawTwoBranch(canvas, rounds, true);
-		drawOneBranch(canvas, rounds);
+		drawOneBranch(canvas, rounds, nbPlayers);
 		drawTwoBranch(canvas, rounds, false);
 	}
 }
@@ -257,8 +265,8 @@ function drawName(canvas: HTMLCanvasElement, player1: string, player2: string, n
 
 	const wCenter: number = (canvas.width / 2);
 	const hCenter: number = (canvas.height / 2) - 300;
-	ctx.clearRect(wCenter - 200, 0, 200, 855);
-	ctx.clearRect(wCenter + 200, 0, 200, 855);
+	ctx.clearRect(wCenter - 200, 0, 400, 500);
+	ctx.clearRect(wCenter + 200, 0, 400, 500);
 
 	ctx.font = "20px monospace";
 	ctx.fillStyle = "rgba(141, 188, 255, 1)";
@@ -266,5 +274,4 @@ function drawName(canvas: HTMLCanvasElement, player1: string, player2: string, n
 	ctx.textAlign = "center";
 	ctx.fillText(player1, wCenter - 200, hCenter);
 	ctx.fillText(player2, wCenter + 200, hCenter);
-	ctx.fillStyle = "rgba(201, 34, 145, 1)";
 }

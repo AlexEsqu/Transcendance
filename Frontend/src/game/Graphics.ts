@@ -5,7 +5,7 @@ import { Paddle } from './Paddle';
 import { Pong } from './Pong';
 import { IOptions, IScene } from './Data';
 
-export { createBall, createPaddle, createCamera, createText, createMap, createAnimation, loadGame }
+export { createBall, createPaddle, createCamera, createText, createMap, createAnimation, loadGame, createMaterial }
 
 function createMaterial(scene: Scene, color: Color3): StandardMaterial
 {
@@ -32,11 +32,6 @@ function createBall(scene: Scene, radius: number, colorHex: string): Mesh
 		{ diameter: radius * 2 },
 		scene
 	);
-	// const mesh = MeshBuilder.CreateBox(
-	// 	'ball',
-	// 	{ size: Ball.RADIUS * 2 },
-	// 	scene
-	// );
 	const color : Color3 = new Color3().fromHexString(colorHex);
 	mesh.material = createMaterial(scene, color);
 	return mesh;

@@ -1,9 +1,9 @@
-import { Engine } from '@babylonjs/core';
+import { Engine, Color3 } from '@babylonjs/core';
 import { AdvancedDynamicTexture } from "@babylonjs/gui";
 import { sendMatchesPostRequest } from "./sendMatches";
 import { State, IPlayer, IRound, IOptions, IScene } from "./Data"
 import { Paddle } from './Paddle';
-import { createText, createAnimation, loadGame } from './Graphics';
+import { createText, createAnimation, loadGame, createMaterial } from './Graphics';
 import { monitoringRounds, saveResults, newRound, drawMatchHistoryTree, drawScore, drawName } from './manageRounds';
 
 export interface IPaddle {
@@ -38,10 +38,9 @@ export class Pong {
 		this.isLaunched = false;
 		this.scene = loadGame(this.engine, this.canvas, options, this.gui);
 		let players: Array<IPlayer> = this.initPlayers(options.players, options.nbOfPlayers);
-		// let players = options.players.slice(0, options.nbOfPlayers).map((name) => ({ name, id: 0, score: 0, color: null }));
 		if (options.nbOfPlayers === 1) { // special case: opponent is a robot
 			this.robot = true;
-			players.push({ id: 0, name: "Robot", score: 0, color: "rgb(141, 188, 255)" });
+			players.push({ id: 0, name: "Robot", score: 0, color: "#8dbcff" });
 			players.reverse();
 		}
 		this.scene.players = players;
@@ -60,6 +59,7 @@ export class Pong {
 			if (inputs[i] && inputs[i + 1])
 				players.push({ id: 0, name: inputs[i], score: 0, color: inputs[i + 1]} );
 		}
+
 		return players;
 	}
 
@@ -77,11 +77,12 @@ export class Pong {
 		const keys = {};
 		let isNewRound: boolean = true;
 		let rounds: IRound = { results: null, nbOfRounds: 0, playerIndex: 0, nodeColor: [] };
+		if (this.scene.options.nbOfPlayers == 1) rounds.nodeColor[0] = "rgb(141, 188, 255)";
 		for (let i = 0; i < this.scene.options.nbOfPlayers; i++)
 			rounds.nodeColor[i] = "rgb(141, 188, 255)";
 
 		//	Manage user input and update data before render
-		this.handleInput(keys);
+		this.handleInput(keys, rounds, this.canvas);
 		this.scene.id.registerBeforeRender(() => {
 			if (this.scene.state === State.opening) this.opening();
 			if (this.scene.state === State.end) this.endGame(rounds);
@@ -114,10 +115,11 @@ export class Pong {
 		rounds.nbOfRounds += 1;
 		
 		if (currentNbOfRounds < rounds.nbOfRounds) {
-			// this.updateNodeColor(rounds);
 			drawMatchHistoryTree(this.canvasUI, rounds, this.scene.options.nbOfPlayers);
 			drawName(this.canvasUI, this.scene.leftPadd.player.name, this.scene.rightPadd.player.name, rounds.nbOfRounds);
 			drawScore(this.canvasUI,  this.scene.leftPadd.player.score,  this.scene.rightPadd.player.score);
+			this.scene.leftPadd.paddle.mesh.material = createMaterial(this.scene.id, new Color3().fromHexString(this.scene.leftPadd.player.color));
+			this.scene.rightPadd.paddle.mesh.material = createMaterial(this.scene.id, new Color3().fromHexString(this.scene.rightPadd.player.color));
 		}
 
 		if (this.onNewRound && rounds.nbOfRounds <= Pong.MAX_ROUNDS) this.onNewRound();
@@ -212,7 +214,7 @@ export class Pong {
 	 * 	- Listens to window inputs for each frame.
 	 * 	- Saves keys status (on/off) to update scene objects accordingly.
 	 */
-	handleInput(keys: {}): void {
+	handleInput(keys: {}, rounds: IRound, canvasUI: HTMLCanvasElement): void {
 		//	Resize the game with the window
 		window.addEventListener('resize', () => {
 			this.engine.resize();
@@ -220,7 +222,7 @@ export class Pong {
 			this.canvasUI.height = window.innerHeight;
 			drawName(this.canvasUI, this.scene.leftPadd.player.name, this.scene.rightPadd.player.name, this.scene.options.nbOfPlayers);
 			drawScore(this.canvasUI, this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
-			// drawMatchHistoryTree(this.canvasUI, rounds)
+			drawMatchHistoryTree(this.canvasUI, rounds, this.scene.options.nbOfPlayers);
 		});
 		//	Shift+Ctrl+Alt+I == Hide/show the Inspector
 		window.addEventListener("keydown", (ev) => {
