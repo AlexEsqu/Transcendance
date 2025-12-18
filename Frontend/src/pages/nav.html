@@ -1,4 +1,7 @@
-<nav class="text-white p-4 box-border flex">
+<nav
+	class="text-white p-4 flex flex-between">
+
+
 	<div
 		id="user-menu-container"
 		class="flex"
@@ -6,7 +9,7 @@
 
 		<a
 			id="avatar-btn"
-			class="cursor-pointer min-w-[20px] min-h-[20px] hover-glow-orange border rounded-md bg-gray-950 border-box m-2"
+			class="cursor-pointer w-[130px] h-[130px] hover-glow-orange border rounded-md bg-gray-950 border-box m-2"
 			href="/settings"
 			data-link>
 
@@ -31,7 +34,7 @@
 
 			<div
 				id="user-menu-container"
-				class="mt-3 flex gap-2 items-start"
+				class="mt-5 flex gap-2 items-start"
 			>
 				<!-- <a
 					id="user-info-btn"
@@ -56,40 +59,40 @@
 
 	<div
 		id="game-menu-container"
-		class="text-white p-4 ml-2 box-border"
-	>
-			<!-- <button class="text-glow text-3xl m-0 p-0 leading-[0.7]">
-				GAMES
-			</button> -->
+		class="flex self-end justify-end items-end gap-3 flex-wrap">
 
-			<div
-				class="flex-col items-end gap-3 mt-4"
-			>
-				<a
-					id="pong-vs-ia-btn"
-					class="text-base text-glow cursor-pointer"
-					href="/game"
-					data-link
-				>
-					Pong Match vs IA
-				</a>
-				<a
-					id="pong-local-btn"
-					class="text-base text-glow cursor-pointer"
-					href="/game"
-					data-link
-				>
-					Pong Match local
-				</a>
-				<a
-					id="pong-tournament-btn"
-					class="text-base text-glow cursor-pointer"
-					href="/game"
-					data-link
-				>
-					Tournament
-				</a>
-			</div>
+		<a
+			id="pong-vs-ia-btn"
+			class="text-base text-glow cursor-pointer hover-glow-orange border rounded-md p-3 text-center bg-gray-950 "
+			href="/game/aigame"
+			data-link
+		>
+			Pong Match vs IA
+		</a>
+		<a
+			id="pong-local-btn"
+			class="text-base text-glow cursor-pointer hover-glow-orange border rounded-md p-3 text-center bg-gray-950 "
+			href="/game/localduel"
+			data-link
+		>
+			Pong Match local
+		</a>
+		<a
+			id="pong-tournament-btn"
+			class="text-base text-glow cursor-pointer hover-glow-orange border rounded-md p-3 text-center bg-gray-950 "
+			href="/game/remoteduel"
+			data-link
+		>
+			Pong Match remote
+		</a>
+		<a
+			id="pong-tournament-btn"
+			class="text-base text-glow cursor-pointer hover-glow-orange border rounded-md p-3 text-center bg-gray-950 "
+			href="/game/tournament"
+			data-link
+		>
+			Pong Tournament
+		</a>
 
 	</div>
 </nav>
