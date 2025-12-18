@@ -62,6 +62,7 @@ function launchPongGame(options: IOptions): void
 		console.error("canvas context not found");
 		return ;
 	}
+
 	const app = new App(gameWindow, options);
 }
 
@@ -76,13 +77,25 @@ function generatePlayersInputs(nbOfPlayers: number): void
 	playersContainer.innerHTML = '';
 	for (let i = 1; i <= nbOfPlayers; i++)
 	{
-		const input = document.createElement('input');
-		input.type = 'text';
-		input.id = `player${i}`;
-        input.name = `player${i}`;
-        input.placeholder = nbOfPlayers === 1 ? 'Your name' : `Player ${i}`;
-        input.className = 'w-full bg-transparent text-slate-700 text-sm border border-slate-200 rounded px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400';
-        playersContainer.appendChild(input);
+		const row = document.createElement('div');
+		row.className = 'flex items-center gap-2';
+		
+		const nameInput = document.createElement('input');
+		nameInput.type = 'text';
+		nameInput.id = `player${i}`;
+        nameInput.name = `player${i}`;
+        nameInput.placeholder = nbOfPlayers === 1 ? 'Your name' : `Player ${i}`;
+        nameInput.className = 'flex-1 w-full block bg-transparent text-slate-700 text-sm border border-slate-200 rounded px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400';
+		
+		const colorInput = document.createElement('input');
+		colorInput.type = 'color';
+		colorInput.id = 'padd-color-input';
+		colorInput.value = '#a2c2e8';
+		colorInput.title = 'Choose your color;'
+		colorInput.className = 'p-1 h-5 w-14 block bg-white border border-gray-200 cursor-pointer rounded-lg disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700';
+        row.appendChild(nameInput);
+		row.appendChild(colorInput);
+		playersContainer.appendChild(row);
 	}
 }
 

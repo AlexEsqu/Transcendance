@@ -8,6 +8,10 @@ enum State {
 	opening, launch, play, pause, end
 };
 
+enum Level {
+	easy, medium, hard
+};
+
 interface IOptions {
 	level: Level;
 	nbOfPlayers: number;
@@ -32,6 +36,7 @@ interface IPlayer {
 	id: number;
 	name: string;
 	score: number;
+	color: string;
 };
 
 interface IResult {
@@ -42,11 +47,8 @@ interface IResult {
 };
 
 interface IRound {
-	results: Array<IResult>,
-	nbOfRounds: number,
-	playerIndex: number
+	results: Array<IResult>;
+	nbOfRounds: number;
+	playerIndex: number;
+	nodeColor: string[];
 }
-
-enum Level {
-	easy, medium, hard
-};

@@ -123,8 +123,8 @@ function loadGame(engine: Engine, canvas: HTMLCanvasElement, options: IOptions, 
 	if (!engine || !canvas || !options) return null;
 	
 	let scene: IScene = { id: null, camera: null, ball: null, 
-		leftPadd: { paddle: null, player: null, scoreText: null, nameText: null }, 
-		rightPadd: { paddle: null, player: null, scoreText: null, nameText: null },
+		leftPadd: { paddle: null, player: null }, 
+		rightPadd: { paddle: null, player: null },
 		options: options,
 		players: null,
 		state: 0

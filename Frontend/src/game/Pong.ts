@@ -1,8 +1,7 @@
 import { Engine } from '@babylonjs/core';
-import { AdvancedDynamicTexture, TextBlock } from "@babylonjs/gui";
+import { AdvancedDynamicTexture } from "@babylonjs/gui";
 import { sendMatchesPostRequest } from "./sendMatches";
 import { State, IPlayer, IRound, IOptions, IScene } from "./Data"
-import { Ball } from "./Ball";
 import { Paddle } from './Paddle';
 import { createText, createAnimation, loadGame } from './Graphics';
 import { monitoringRounds, saveResults, newRound, drawMatchHistoryTree, drawScore, drawName } from './manageRounds';
@@ -10,8 +9,6 @@ import { monitoringRounds, saveResults, newRound, drawMatchHistoryTree, drawScor
 export interface IPaddle {
 	paddle: Paddle,
 	player: IPlayer,
-	scoreText: TextBlock,
-	nameText: TextBlock
 };
 
 export class Pong {
@@ -40,10 +37,11 @@ export class Pong {
 		this.onNewRound = onNewRound;
 		this.isLaunched = false;
 		this.scene = loadGame(this.engine, this.canvas, options, this.gui);
-		let players = options.players.slice(0, options.nbOfPlayers).map(name => ({ name, id: 0, score: 0 }));
+		let players: Array<IPlayer> = this.initPlayers(options.players, options.nbOfPlayers);
+		// let players = options.players.slice(0, options.nbOfPlayers).map((name) => ({ name, id: 0, score: 0, color: null }));
 		if (options.nbOfPlayers === 1) { // special case: opponent is a robot
 			this.robot = true;
-			players.push({ id: 0, name: "Robot", score: 0 });
+			players.push({ id: 0, name: "Robot", score: 0, color: "rgb(141, 188, 255)" });
 			players.reverse();
 		}
 		this.scene.players = players;
@@ -53,6 +51,18 @@ export class Pong {
 		this.canvasUI.width = window.innerWidth;
 		this.canvasUI.height = window.innerHeight;
 	}
+	
+	initPlayers(inputs: string[], nbOfPlayer: number): Array<IPlayer>
+	{
+		let players: Array<IPlayer> = [];
+		for (let i = 0; i < nbOfPlayer * 2; i += 2)
+		{
+			if (inputs[i] && inputs[i + 1])
+				players.push({ id: 0, name: inputs[i], score: 0, color: inputs[i + 1]} );
+		}
+		return players;
+	}
+
 
 	/**
 	 * 	- Start the game by launching the ball and monitoring the score
@@ -66,7 +76,9 @@ export class Pong {
 
 		const keys = {};
 		let isNewRound: boolean = true;
-		let rounds: IRound = { results: null, nbOfRounds: 0, playerIndex: 0 };
+		let rounds: IRound = { results: null, nbOfRounds: 0, playerIndex: 0, nodeColor: [] };
+		for (let i = 0; i < this.scene.options.nbOfPlayers; i++)
+			rounds.nodeColor[i] = "rgb(141, 188, 255)";
 
 		//	Manage user input and update data before render
 		this.handleInput(keys);
@@ -98,17 +110,12 @@ export class Pong {
 		if (rounds) currentNbOfRounds = rounds.nbOfRounds;
 
 		rounds = saveResults(this.scene.leftPadd, this.scene.rightPadd, rounds);
-		rounds = newRound(this.scene, rounds)
+		rounds = newRound(this.scene, rounds);
 		rounds.nbOfRounds += 1;
-
+		
 		if (currentNbOfRounds < rounds.nbOfRounds) {
-			// let playersColors: Array<string> = [ "rgba(141, 188, 255, 1)" ];
-			// let roundsColors: Array<string> = [ "rgb(141, 188, 255, 1)" ];
-			// for (let i = 0; i <= 6; i++)
-			// 	playersColors.push("rgb(141, 188, 255, 1)");
-			// for (let i = 0; i <= 5; i++)
-			// 	roundsColors.push("rgb(141, 188, 255, 1)");
-			// drawMatchHistoryTree(this.canvasUI, playersColors, roundsColors, this.scene.options.nbOfPlayers);
+			// this.updateNodeColor(rounds);
+			drawMatchHistoryTree(this.canvasUI, rounds, this.scene.options.nbOfPlayers);
 			drawName(this.canvasUI, this.scene.leftPadd.player.name, this.scene.rightPadd.player.name, rounds.nbOfRounds);
 			drawScore(this.canvasUI,  this.scene.leftPadd.player.score,  this.scene.rightPadd.player.score);
 		}
@@ -213,7 +220,7 @@ export class Pong {
 			this.canvasUI.height = window.innerHeight;
 			drawName(this.canvasUI, this.scene.leftPadd.player.name, this.scene.rightPadd.player.name, this.scene.options.nbOfPlayers);
 			drawScore(this.canvasUI, this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
-			// drawMatchHistoryTree()
+			// drawMatchHistoryTree(this.canvasUI, rounds)
 		});
 		//	Shift+Ctrl+Alt+I == Hide/show the Inspector
 		window.addEventListener("keydown", (ev) => {
