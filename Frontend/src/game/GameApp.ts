@@ -5,8 +5,8 @@ import optionsHtml from '../pages/options.html'
 
 class App {
 	pong: Pong;
-	startBtnDisplay: HTMLElement;
-	startBtn: HTMLElement;
+	startBtnDisplay: HTMLElement | null;
+	startBtn: HTMLElement | null;
 
 	constructor(canvas : HTMLElement, options: IOptions) {
 		this.startBtnDisplay = document.getElementById("game-start");
@@ -30,14 +30,13 @@ class App {
 		}
 
 		this.startBtn.addEventListener('click', () => {
-			this.startBtnDisplay.style.display = 'none';
+			if (this.startBtnDisplay) this.startBtnDisplay.style.display = 'none';
 			this.play();
 		});
 	}
 
 	showStartButton() {
-		if (this.startBtn)
-			this.startBtnDisplay.style.display = 'flex';
+		if (this.startBtnDisplay) this.startBtnDisplay.style.display = 'flex';
 	}
 }
 
@@ -46,8 +45,8 @@ function launchPongGame(options: IOptions): void
 	//	Display start button and game window
 	document.body.insertAdjacentHTML("beforeend", gameHtml);
 
-	const startBtnDisplay: HTMLElement = document.getElementById("game-start");
-	const btnStart: HTMLElement = document.getElementById('btn-startplay');
+	const startBtnDisplay: HTMLElement | null = document.getElementById("game-start");
+	const btnStart: HTMLElement | null = document.getElementById('btn-startplay');
 
 	if (!btnStart || !startBtnDisplay) {
 		console.error("'start' UI not found, can't load game");
@@ -113,7 +112,7 @@ function selectGameOptions(): Promise<IOptions>
 	document.body.insertAdjacentHTML("beforeend", optionsHtml);
 	initializePlayerInputs();
 
-	const optionsMenuDisplay: HTMLElement = document.getElementById("game-options");
+	const optionsMenuDisplay: HTMLElement | null = document.getElementById("game-options");
 	const btnSubmit: HTMLButtonElement = document.getElementById('btn-submit') as HTMLButtonElement;
 	const slctMode: HTMLSelectElement = document.getElementById('mode') as HTMLSelectElement;
 	const slctLevel: HTMLSelectElement = document.getElementById('level') as HTMLSelectElement;
@@ -123,7 +122,7 @@ function selectGameOptions(): Promise<IOptions>
 
 	if (!btnSubmit || !slctMode || !slctLevel || !optionsMenuDisplay) {
 		console.error("'options' UI not found, can't load game");
-		return null;
+		// return ;
 	}
 
 	//	Return selected options when user click on submit button
@@ -143,7 +142,7 @@ function selectGameOptions(): Promise<IOptions>
 				paddColor: paddColor,
 				players: getPlayerNames()
 			};
-			optionsMenuDisplay.remove();
+			if (optionsMenuDisplay) optionsMenuDisplay.remove();
 			resolve(options);
 		});
 	});

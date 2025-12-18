@@ -10,7 +10,10 @@ interface IJSON {
 	date: string;
 }
 
-function fillMatchesJSON(results: IResult, time?: number): IJSON {
+function fillMatchesJSON(results: IResult, time?: number): IJSON | null
+{
+	if (!results || !results.winner || !results.loser) return null;
+
 	const date = new Date(time ?? Date.now());
 
 	// get Id from Name
@@ -24,24 +27,30 @@ function fillMatchesJSON(results: IResult, time?: number): IJSON {
 	return matches;
 }
 
-function sendMatchesPostRequest(results: IResult, time?: number) : void {
+function sendMatchesPostRequest(results: IResult, time?: number): void
+{
 	if (!results) {
 		console.error("Results are undefined when sending matches POST request");
 		return ;
 	}
 
+	if (!process.env.APP_SECRET_KEY) return ;
+	const args = {
+		'Content-Type': 'application/json',
+		'accept': '*/*',
+		'X-App-Secret': process.env.APP_SECRET_KEY
+	};
+	
 	const matchesURL: string = "https://localhost:8443/matches";
-	const matchesJSON: IJSON = fillMatchesJSON(results, time);
+	const matchesJSON: IJSON | null = fillMatchesJSON(results, time);
+	if (!matchesJSON) return ;
+
 	const request = new Request(
 		matchesURL, 
 		{
 			method: 'POST',
 			body: JSON.stringify(matchesJSON),
-			headers: new Headers({
-				'Content-Type': 'application/json',
-				'accept': '*/*',
-				'X-App-Secret': process.env.APP_SECRET_KEY
-			})
+			headers: new Headers(args)
 		}
 	);
 

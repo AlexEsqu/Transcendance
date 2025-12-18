@@ -5,9 +5,9 @@ import { Paddle } from './Paddle';
 import { Pong } from './Pong';
 import { IOptions, IScene } from './Data';
 
-export { createBall, createPaddle, createCamera, createText, createMap, createAnimation, loadGame }
+export { createBall, createPaddle, createCamera, createMap, createAnimation, loadGame, createText }
 
-function createMaterial(scene: Scene, color: Color3): StandardMaterial
+function createMaterial(scene: Scene, color: Color3): StandardMaterial | null
 {
 	if (!scene || scene === undefined) return null;
 	if (color === undefined) color = new Color3(0.031, 0.031, 0.141);
@@ -23,7 +23,7 @@ function createMaterial(scene: Scene, color: Color3): StandardMaterial
 }
 
 // { diameter: Ball.RADIUS * 2, segments: 2, updatable: true },
-function createBall(scene: Scene, radius: number, colorHex: string): Mesh
+function createBall(scene: Scene, radius: number, colorHex: string): Mesh | null
 {
 	if (!scene || scene === undefined) return null;
 
@@ -32,17 +32,12 @@ function createBall(scene: Scene, radius: number, colorHex: string): Mesh
 		{ diameter: radius * 2 },
 		scene
 	);
-	// const mesh = MeshBuilder.CreateBox(
-	// 	'ball',
-	// 	{ size: Ball.RADIUS * 2 },
-	// 	scene
-	// );
 	const color : Color3 = new Color3().fromHexString(colorHex);
 	mesh.material = createMaterial(scene, color);
 	return mesh;
 }
 
-function createPaddle(scene: Scene, height: number, width: number, depth: number, colorHex: string): Mesh
+function createPaddle(scene: Scene, height: number, width: number, depth: number, colorHex: string): Mesh | null
 {
 	if (!scene || scene === undefined) return null;
 
@@ -59,7 +54,7 @@ function createPaddle(scene: Scene, height: number, width: number, depth: number
 	return mesh;
 }
 
-function createCamera(scene: Scene, canvas): ArcRotateCamera
+function createCamera(scene: Scene, canvas: HTMLCanvasElement): ArcRotateCamera | null
 {
 	if (!scene || scene === undefined) return null;
 
@@ -76,7 +71,8 @@ function createCamera(scene: Scene, canvas): ArcRotateCamera
 	return camera;
 }
 
-function createText(text: string, color: string, fontSize: number, topPx: string, leftPx: string, gui: AdvancedDynamicTexture): TextBlock {
+function createText(text: string, color: string, fontSize: number, topPx: string, leftPx: string, gui: AdvancedDynamicTexture): TextBlock
+{
 	const block: TextBlock = new TextBlock();
 	block.text = text;
 	block.color = color;
@@ -87,7 +83,7 @@ function createText(text: string, color: string, fontSize: number, topPx: string
 	return block;
 }
 
-function createMap(scene: Scene, height: number, width: number, colorHex: string): Mesh
+function createMap(scene: Scene, height: number, width: number, colorHex: string): Mesh | null
 {
 	if (!scene || scene === undefined) return null;
 
@@ -118,13 +114,13 @@ function createAnimation(name: string, target: string, keys: IAnimationKey[]): A
 /**
  * 	- Create the main scene and all its elements
  */
-function loadGame(engine: Engine, canvas: HTMLCanvasElement, options: IOptions, gui): IScene
+function loadGame(engine: Engine, canvas: HTMLCanvasElement, options: IOptions): IScene | null
 {
 	if (!engine || !canvas || !options) return null;
 	
 	let scene: IScene = { id: null, camera: null, ball: null, 
-		leftPadd: { paddle: null, player: null, scoreText: null, nameText: null }, 
-		rightPadd: { paddle: null, player: null, scoreText: null, nameText: null },
+		leftPadd: { paddle: null, player: null }, 
+		rightPadd: { paddle: null, player: null },
 		options: options,
 		players: null,
 		state: 0
@@ -146,7 +142,7 @@ function loadGame(engine: Engine, canvas: HTMLCanvasElement, options: IOptions, 
 	glowLayer.intensity = 0.7;
 	glowLayer.blurKernelSize = 64;
 
-	const map: Mesh = createMap(scene.id, Pong.MAP_HEIGHT, Pong.MAP_WIDTH, options.mapColor);
+	const map: Mesh | null = createMap(scene.id, Pong.MAP_HEIGHT, Pong.MAP_WIDTH, options.mapColor);
 
 	// Exclude map from bloom effect
 	// glowLayer.addExcludedMesh(map);
@@ -155,15 +151,9 @@ function loadGame(engine: Engine, canvas: HTMLCanvasElement, options: IOptions, 
 	scene.ball = new Ball(scene.id, options.level, options.ballColor);
 
 	//	Creates 2 paddles, one for each players and 2DText for visual scoring
-	scene.leftPadd.paddle = new Paddle(scene.id, "left", Pong.MAP_WIDTH, options.level, options.paddColor);
-	scene.rightPadd.paddle = new Paddle(scene.id, "right", Pong.MAP_WIDTH, options.level, options.paddColor);
+	if (scene.leftPadd) scene.leftPadd.paddle = new Paddle(scene.id, "left", Pong.MAP_WIDTH, options.level, options.paddColor);
+	if (scene.rightPadd) scene.rightPadd.paddle = new Paddle(scene.id, "right", Pong.MAP_WIDTH, options.level, options.paddColor);
 	
-	// const line = createText("|", "white", 38, "-150px", "0px", this.gui);
-	// scene.leftPadd.scoreText = createText("0", "white", 38, "-150px", "-50px", gui);
-	// scene.rightPadd.scoreText = createText("0", "white", 38, "-150px", "50px", gui);
-	// scene.leftPadd.nameText = createText("", "white", 28, "-150px", "-200px", gui);
-	// scene.rightPadd.nameText = createText("", "white", 28, "-150px", "200x", gui);
-
 	console.log("GAME-STATE: loaded");
 	return scene;
 }
