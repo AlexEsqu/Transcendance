@@ -45,6 +45,14 @@ class Router
 		// prevent page refresh to stay on single page app
 		document.body.removeEventListener('click', this.handleClickInSinglePage);
 		document.body.addEventListener('click', this.handleClickInSinglePage);
+
+		// automatically kicks out user if log out, or display dashboard if log in
+		this.userState.subscribe((user) => {
+			if (!user && window.location.pathname !== '/connection')
+				this.navigateTo('/connection');
+			if (user && window.location.pathname.includes('/connection'))
+				this.navigateTo('/settings');
+		});
 	}
 
 	//---------------------------- GETTER -----------------------------------//
