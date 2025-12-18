@@ -60,8 +60,8 @@ function updateNavFromUserData(user: User | null): void
 	if (avatarImage)
 		avatarImage.src = user.getAvatarPath();
 
-	// only display the delete account button if the user is registered (has an account to delete)
-	const deleteButton = document.getElementById('delete-user-btn');
-	if (deleteButton)
-		deleteButton.style.display = user instanceof RegisteredUser ? 'block' : 'none';
+	// // only display the delete account button if the user is registered (has an account to delete)
+	// const deleteButton = document.getElementById('delete-user-btn');
+	// if (deleteButton)
+	// 	deleteButton.style.display = user instanceof RegisteredUser ? 'block' : 'none';
 }

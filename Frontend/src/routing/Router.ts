@@ -82,23 +82,22 @@ class Router
 
 		// if no route found, defaulting to the connection page
 		if (!route)
-			route = this.routes.find(route => route.path === (user ? '/settings' : '/connection'));
-
-
+		{
+			this.redirectToDefaultPage();
+			return;
+		}
 
 		// if route requires a user, defaulting to the connection page
 		if (route && route.needUser && !user)
 		{
-			window.history.replaceState(null, '', (user ? '/settings' : '/connection'));
-			this.render();
+			this.redirectToDefaultPage();
 			return;
 		}
 
 		// if route requires a registerd user, defaulting to the connection page
 		if (route && route.needRegisteredUser && !(user instanceof RegisteredUser))
 		{
-			window.history.replaceState(null, '', (user ? '/settings' : '/connection'));
-			this.render();
+			this.redirectToDefaultPage();
 			return;
 		}
 
@@ -152,5 +151,12 @@ class Router
 		console.log(`going to ${targetPath}`);
 
 		window.history.replaceState({ path: targetPath }, '', targetPath);
+	}
+
+	private redirectToDefaultPage()
+	{
+		const user = this.userState.getUser();
+		window.history.replaceState(null, '', (user ? '/settings' : '/connection'));
+		this.render();
 	}
 }

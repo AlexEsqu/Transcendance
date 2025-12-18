@@ -1,34 +1,33 @@
-<!-- <header class="flex justify-center items-center m-0">
-	<h1 class="text-3xl m-5">USERNAME's dashboard</h1>
-</header> -->
+<main class="flex flex-col flex-1 flex-between box-border p-5 h-[80vh] m-0">
 
-<main class="flex flex-col box-border p-5 h-[80vh]">
+	<div class="border-box flex h-[80%] gap-4">
 
-	<div class="flex h-30 h-[70%]">
-
-		<section class="glow-anim border rounded-md flex flex-col  w-[33%] h-[100%] mr-6 p-4">
-			<h2>Friends</h2>
+		<section class="glow-anim border rounded-md flex flex-col w-[33%] h-[100%] mr-6 p-4">
+			<h2 class="text-xl">Friends</h2>
 		</section>
 
 		<section class="glow-anim border rounded-md flex flex-col w-[66%] h-[100%] p-4">
-			<h2>Game Statistics</h2>
+			<h2 class="text-xl">Game Statistics</h2>
 		</section>
 	</div>
 
-	<section class="flex flex-col justify-start items-center w-full mt-6 p-4 h-[30%]">
+	<section class="border-box flex flex-col justify-start items-center w-full mt-2 h-[20%]">
 		<h2 class="text-center m-5 text-xl">Options</h2>
-		<div class="flex flex-wrap gap-4 justify-center w-full">
-			<a href="/settings/avatar" data-link class="flex justify-center flex-wrap hover-glow-orange border rounded-md p-5 text-center flex-1" id="btn-avatar">
+		<div class="border-box  flex flex-wrap gap-4 justify-center w-full ">
+			<a href="/settings/avatar" data-link class="flex justify-center flex-wrap hover-glow-orange border rounded-md p-4 text-center flex-1" id="btn-avatar">
 				Change Avatar
 			</a>
-			<a href="/settings/rename" data-link class="flex justify-center flex-wrap hover-glow-orange border rounded-md p-5 text-center flex-1" id="btn-rename">
+			<a href="/settings/rename" data-link class="flex justify-center flex-wrap hover-glow-orange border rounded-md p-4 text-center flex-1" id="btn-rename">
 				Change Username
 			</a>
-			<a href="/settings/email" data-link class="flex justify-center flex-wrap hover-glow-orange border rounded-md p-5 text-center flex-1" id="btn-email">
+			<a href="/settings/email" data-link class="flex justify-center flex-wrap hover-glow-orange border rounded-md p-4 text-center flex-1" id="btn-email">
 				Change Email
 			</a>
-			<a href="/settings/password" data-link class="flex justify-center flex-wrap hover-glow-orange border rounded-md p-5 text-center flex-1" id="btn-password">
+			<a href="/settings/password" data-link class="flex justify-center flex-wrap hover-glow-orange border rounded-md p-4 text-center flex-1" id="btn-password">
 				Change Password
+			</a>
+			<a href="/settings/delete" data-link class="flex justify-center flex-wrap hover-glow-orange border rounded-md p-4 text-center flex-1" id="btn-password">
+				Delete Account
 			</a>
 
 		</div>
@@ -36,6 +35,6 @@
 
 </main>
 
-<footer class="flex justify-center items-center m-0">
-	<a href="#">Data Protection Policy</a>
+<footer class="flex justify-center items-end m-0 p-0 border-box">
+	<a class="m-0 p-0" href="#">Data Protection Policy</a>
 </footer>
