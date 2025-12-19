@@ -78,7 +78,7 @@ export class Pong {
 		let isNewRound: boolean = true;
 		let rounds: IRound = { results: null, nbOfRounds: 0, playerIndex: 0, nodeColor: [] };
 		if (this.scene.options.nbOfPlayers == 1) rounds.nodeColor[0] = "rgb(141, 188, 255)";
-		for (let i = 0; i < this.scene.options.nbOfPlayers; i++)
+		for (let i = 0; i < this.scene.options.nbOfPlayers + 2; i++)
 			rounds.nodeColor[i] = "rgb(141, 188, 255)";
 
 		//	Manage user input and update data before render

@@ -113,6 +113,8 @@ function newRound(scene: IScene, rounds: IRound): IRound
 
 	if (rounds.nodeColor[leftIndex]) rounds.nodeColor[leftIndex] = leftPadd.player.color;
 	if (rounds.nodeColor[rightIndex]) rounds.nodeColor[rightIndex] = rightPadd.player.color;
+	console.log(rounds.nodeColor[rightIndex]);
+	console.log(rightIndex);
 
 	scene.leftPadd = leftPadd;
 	scene.rightPadd = rightPadd;
@@ -176,20 +178,16 @@ function drawOneBranch(
 	const hCenter: number = (canvas.height / 2) + 400;
 	ctx.clearRect(wCenter - 110, 0, 220, hCenter + 100);
 
-	if (nbOfPlayer == 1) {
-		drawCircle(ctx, rounds.nodeColor[0], { x: wCenter - 30, y: hCenter });
-		drawCircle(ctx, rounds.nodeColor[1], { x: wCenter + 30, y: hCenter });
-	} else {
-		if (rounds.results && rounds.nbOfRounds > Pong.MAX_ROUNDS / 2 && rounds.results[0])
-			drawCircle(ctx, rounds.results[0].winner.color, { x: wCenter - 30, y: hCenter });
-		else
-			drawCircle(ctx, rounds.nodeColor[4], { x: wCenter - 30, y: hCenter });
-
-		if (rounds.results && rounds.nbOfRounds > Pong.MAX_ROUNDS / 2 && rounds.results[1])
-			drawCircle(ctx, rounds.results[1].winner.color, { x: wCenter + 30, y: hCenter });
-		else
-			drawCircle(ctx, rounds.nodeColor[5], { x: wCenter + 30, y: hCenter });
+	if (rounds.results && rounds.nbOfRounds == Pong.MAX_ROUNDS && rounds.results[0] && rounds.results[1]) {
+		drawCircle(ctx, rounds.results[0].winner.color, { x: wCenter - 30, y: hCenter });
+		drawCircle(ctx, rounds.results[1].winner.color, { x: wCenter + 30, y: hCenter });
 	}
+	else {
+		drawCircle(ctx, rounds.nodeColor[4], { x: wCenter - 30, y: hCenter });
+		drawCircle(ctx, rounds.nodeColor[5], { x: wCenter + 30, y: hCenter });
+	}
+
+	
 	drawLine(ctx, defaultColor, { x: wCenter - 15, y: hCenter }, { x: wCenter + 15, y: hCenter });
 
 	// drawLine(ctx, defaultColor, { x: wCenter, y: hCenter }, { x: wCenter, y: hCenter + 30 });
