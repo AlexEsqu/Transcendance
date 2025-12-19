@@ -5,7 +5,7 @@ import { IPaddle } from './Pong';
 export { State, IPlayer, IRound, Level, IOptions, IScene, IResult }
 
 enum State {
-	opening, launch, play, pause, end
+	opening, launch, play, pause, end, stop
 };
 
 enum Level {

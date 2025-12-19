@@ -17,7 +17,7 @@ function monitoringRounds(scene: IScene, nbOfRounds: number): boolean
 	if (scene.leftPadd.player.score == Pong.MAX_SCORE || scene.rightPadd.player.score == Pong.MAX_SCORE)
 	{
 		console.log("GAME-STATE: a player has won the round");
-		if (nbOfRounds >= Pong.MAX_ROUNDS) scene.state = State.end;
+		if (nbOfRounds > Pong.MAX_ROUNDS) scene.state = State.end;
 		return true;
 	}
 	return false;
@@ -113,8 +113,6 @@ function newRound(scene: IScene, rounds: IRound): IRound
 
 	if (rounds.nodeColor[leftIndex]) rounds.nodeColor[leftIndex] = leftPadd.player.color;
 	if (rounds.nodeColor[rightIndex]) rounds.nodeColor[rightIndex] = rightPadd.player.color;
-	console.log(rounds.nodeColor[rightIndex]);
-	console.log(rightIndex);
 
 	scene.leftPadd = leftPadd;
 	scene.rightPadd = rightPadd;
@@ -186,9 +184,8 @@ function drawOneBranch(
 		drawCircle(ctx, rounds.nodeColor[4], { x: wCenter - 30, y: hCenter });
 		drawCircle(ctx, rounds.nodeColor[5], { x: wCenter + 30, y: hCenter });
 	}
-
-	
 	drawLine(ctx, defaultColor, { x: wCenter - 15, y: hCenter }, { x: wCenter + 15, y: hCenter });
+
 
 	// drawLine(ctx, defaultColor, { x: wCenter, y: hCenter }, { x: wCenter, y: hCenter + 30 });
 	// drawCrown(canvas, defaultColor);
@@ -239,7 +236,7 @@ function drawScore(canvas: HTMLCanvasElement, score1: number, score2: number): v
 {
 	const ctx = canvas.getContext("2d");
 	const wCenter: number = (canvas.width / 2);
-	const hCenter: number = (canvas.height / 2) - 300;
+	const hCenter: number = (canvas.height / 2) - 200;
 	ctx.clearRect(wCenter - 110, 0, 220, hCenter + 50);
 
 	ctx.font = "50px monospace";
@@ -262,7 +259,7 @@ function drawName(canvas: HTMLCanvasElement, player1: string, player2: string, n
 	if (player2.length > 10) player2 = player2.substring(0, 10);
 
 	const wCenter: number = (canvas.width / 2);
-	const hCenter: number = (canvas.height / 2) - 300;
+	const hCenter: number = (canvas.height / 2) - 200;
 	ctx.clearRect(wCenter - 200, 0, 400, 500);
 	ctx.clearRect(wCenter + 200, 0, 400, 500);
 

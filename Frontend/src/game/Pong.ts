@@ -82,7 +82,7 @@ export class Pong {
 			rounds.nodeColor[i] = "rgb(141, 188, 255)";
 
 		//	Manage user input and update data before render
-		this.handleInput(keys, rounds, this.canvas);
+		this.handleInput(keys, rounds);
 		this.scene.id.registerBeforeRender(() => {
 			if (this.scene.state === State.opening) this.opening();
 			if (this.scene.state === State.end) this.endGame(rounds);
@@ -97,7 +97,7 @@ export class Pong {
 		});
 		//	Rendering loop
 		this.engine.runRenderLoop(() => {
-			if (!this.scene.id || this.scene.state === State.end) this.engine.stopRenderLoop();
+			if (!this.scene.id || this.scene.state === State.stop) this.engine.stopRenderLoop();
 			this.scene.id.render();
 		});
 	}
@@ -123,6 +123,7 @@ export class Pong {
 		}
 
 		if (this.onNewRound && rounds.nbOfRounds <= Pong.MAX_ROUNDS) this.onNewRound();
+		else monitoringRounds(this.scene, rounds.nbOfRounds);
 
 		return rounds;
 	}
@@ -199,22 +200,41 @@ export class Pong {
 		this.scene.state = State.pause;
 	}
 
-	endGame(rounds: IRound) {
+	endGame(rounds: IRound): void
+	{
 		if (!rounds || rounds.nbOfRounds < 0) {
 			console.error("results of matches are lost");
 			return ;
 		}
-		console.log("GAME-STATE: the winner is " + rounds[rounds.nbOfRounds - 1].winner.name);
-		console.log("GAME-STATE: the looser is " + rounds[rounds.nbOfRounds - 1].loser.name);
 		console.log("GAME-STATE: end");
-		// sendMatchesPostRequest(rounds[roundIndex - 1], Date.now());
+	
+		// sendMatchesPostRequest(rounds.results[rounds.nbOfRounds - 1], Date.now());
+
+		const wCenter: number = (this.canvasUI.width / 2);
+		const hCenter: number = (this.canvasUI.height / 2) - 250;
+		const ctx = this.canvasUI.getContext("2d");
+		if (!ctx) return ;
+
+		ctx.clearRect(0, 0, this.canvasUI.width, this.canvasUI.height);
+		ctx.font = "38px monospace";
+		ctx.textBaseline = "middle";
+		ctx.textAlign = "center";
+		
+		ctx.fillStyle = "rgba(141, 188, 255, 0.7)";
+		ctx.fillText("Winner:  ", wCenter - 100, hCenter);
+		ctx.fillText(rounds.results[rounds.nbOfRounds - 2].winner.name, wCenter + 50, hCenter);
+
+		ctx.fillText("Loser: ", wCenter - 100, hCenter + 50);
+		ctx.fillText(rounds.results[rounds.nbOfRounds - 2].loser.name, wCenter + 85, hCenter + 50);
+
+		if (this.scene) this.scene.state = State.stop;
 	}
 
 	/**
 	 * 	- Listens to window inputs for each frame.
 	 * 	- Saves keys status (on/off) to update scene objects accordingly.
 	 */
-	handleInput(keys: {}, rounds: IRound, canvasUI: HTMLCanvasElement): void {
+	handleInput(keys: {}, rounds: IRound): void {
 		//	Resize the game with the window
 		window.addEventListener('resize', () => {
 			this.engine.resize();
