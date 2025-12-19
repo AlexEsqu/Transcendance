@@ -18,6 +18,9 @@ services:
       - GMAIL_APP_PASSWORD=${GMAIL_APP_PASSWORD}
       - OTP_SECRET=${OTP_SECRET}
       - API_DOMAIN_NAME=${API_DOMAIN_NAME}
+      - FRONTEND_DOMAIN_NAME=${FRONTEND_DOMAIN_NAME}
+      - FT_CLIENT_ID=${FT_CLIENT_ID}
+      - FT_CLIENT_SECRET=${FT_CLIENT_SECRET}
   typescript:
     build: ./Frontend
     container_name: typescript

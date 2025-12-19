@@ -25,6 +25,8 @@ ENV ADDRESS=0.0.0.0
 ENV PORT=3000
 ENV SQLITE_PATH=/app/data/database.db
 ENV AVATARS_UPLOAD_PATH=/app/uploads/avatars
-
+# ENV FT_CLIENT_ID=${FT_CLIENT_ID}
+# ENV FT_CLIENT_SECRET=${FT_CLIENT_SECRET}
+ENV FT_OAUTH_URL=https://api.intra.42.fr/oauth/authorize
 RUN chmod +x scripts/entrypoint.sh
 ENTRYPOINT ["./scripts/entrypoint.sh"]

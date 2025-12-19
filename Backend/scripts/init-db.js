@@ -20,7 +20,8 @@ export async function initDB(db) {
 		is_2fa_enabled INTEGER DEFAULT 0,
 		code_hash_2fa TEXT,
 		code_expires_2fa INTEGER,
-		token_2fa TEXT
+		token_2fa TEXT,
+		ft_id INTEGER UNIQUE,
     );
 `
 	).run();
