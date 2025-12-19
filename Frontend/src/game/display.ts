@@ -42,17 +42,11 @@ function initGamePageListeners(): void
 			{
 				const options = loadOptions()
 				if (options)
-					launchPongGame(options)
+					onGameLoaded();
 				else
 					router.navigateTo('/game/options')
 				return;
 			}
-
-			// case '/game/local':
-			// {
-			// 	onLocalGameLoaded();
-			// 	return;
-			// }
 
 			// case '/game/tournament':
 			// {
@@ -62,6 +56,7 @@ function initGamePageListeners(): void
 
 			case '/game/error':
 			{
+				// TO DO
 				return;
 			}
 
@@ -151,7 +146,7 @@ function onGameOptionLoaded(): void
 	})
 }
 
-function onAIGameLoaded(): void
+function onGameLoaded(): void
 {
 	const options = loadOptions()
 	if (options)
