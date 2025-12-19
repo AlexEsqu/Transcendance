@@ -1,7 +1,7 @@
 import { Pong } from "../game/Pong"
 import { IOptions, Level } from "../game/Data"
-import gameHtml from '../pages/game.html'
-import optionsHtml from '../pages/options.html'
+import gameHtml from '../pages/game.html?raw'
+import optionsHtml from '../pages/options.html?raw'
 
 class App {
 	pong: Pong;
@@ -94,22 +94,22 @@ function getPlayerNames(): string[] {
 }
 
 function initializePlayerInputs(): void {
-    const modeSelect = document.getElementById('mode') as HTMLSelectElement;
-    if (!modeSelect) {
-        console.error("'mode' select not found");
-        return;
-    }
+	const modeSelect = document.getElementById('mode') as HTMLSelectElement;
+	if (!modeSelect) {
+		console.error("'mode' select not found");
+		return;
+	}
 
-    generatePlayersInputs(parseInt(modeSelect.value));
-    modeSelect.addEventListener('change', function() {
-        const numberOfPlayers = parseInt(this.value);
-        generatePlayersInputs(numberOfPlayers);
-    });
+	generatePlayersInputs(parseInt(modeSelect.value));
+	modeSelect.addEventListener('change', function() {
+		const numberOfPlayers = parseInt(this.value);
+		generatePlayersInputs(numberOfPlayers);
+	});
 }
 
-function selectGameOptions(): Promise<IOptions>
+export function selectGameOptions(): Promise<IOptions>
 {
-	document.body.insertAdjacentHTML("beforeend", optionsHtml);
+	// document.body.insertAdjacentHTML("beforeend", optionsHtml);
 	initializePlayerInputs();
 
 	const optionsMenuDisplay: HTMLElement | null = document.getElementById("game-options");
@@ -122,7 +122,7 @@ function selectGameOptions(): Promise<IOptions>
 
 	if (!btnSubmit || !slctMode || !slctLevel || !optionsMenuDisplay) {
 		console.error("'options' UI not found, can't load game");
-		// return ;
+		return Promise.reject();
 	}
 
 	//	Return selected options when user click on submit button

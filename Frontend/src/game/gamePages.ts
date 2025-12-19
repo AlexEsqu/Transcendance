@@ -1,16 +1,22 @@
 import { userState } from "../app";
 import { getNavBarHtml, initNavBarListeners } from "../routing/nav";
-import { displayGameWindow } from "./GameApp"
+import { displayGameWindow, selectGameOptions } from "./GameApp"
 
-import gameHtml from '../pages/game.html'
-import optionsHtml from '../pages/options.html'
+import gameHtml from '../pages/game.html?raw'
+import optionsHtml from '../pages/options.html?raw'
 
-export { getGameHtml, initGamePageListeners };
+export { getGameHtml, getGameOptionHtml, initGamePageListeners };
 
 function getGameHtml(): string
 {
 	const name = userState.getUser()?.getName() ?? "Guest";
 	return (getNavBarHtml() + gameHtml).replace('USERNAME', name);
+}
+
+function getGameOptionHtml(): string
+{
+	const name = userState.getUser()?.getName() ?? "Guest";
+	return (getNavBarHtml() + optionsHtml).replace('USERNAME', name);
 }
 
 function initGamePageListeners(): void
@@ -22,7 +28,14 @@ function initGamePageListeners(): void
 
 		switch (path)
 		{
-			case '/game/ia':
+
+			case '/game':
+			{
+				onOptionLoaded();
+				return;
+			}
+
+			case '/game/ai':
 			{
 				onAIGameLoaded();
 				return;
@@ -40,13 +53,24 @@ function initGamePageListeners(): void
 			// 	return;
 			// }
 
+			case '/game/error':
+			{
+				return;
+			}
+
 			default:
 			{
-				onAIGameLoaded();
+				return;
 			}
 
 		}
 	});
+}
+
+
+function onOptionLoaded(): void
+{
+	selectGameOptions();
 }
 
 function onAIGameLoaded(): void
