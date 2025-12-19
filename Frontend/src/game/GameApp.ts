@@ -3,6 +3,8 @@ import { IOptions, Level } from "../game/Data"
 import gameHtml from '../pages/game.html?raw'
 import optionsHtml from '../pages/options.html?raw'
 
+import { loadOptions } from "./options"
+
 class App {
 	pong: Pong;
 	startBtnDisplay: HTMLElement | null;
@@ -40,10 +42,10 @@ class App {
 	}
 }
 
-function launchPongGame(options: IOptions): void
+export function launchPongGame(options: IOptions): void
 {
 	//	Display start button and game window
-	document.body.insertAdjacentHTML("beforeend", gameHtml);
+	// document.body.insertAdjacentHTML("beforeend", gameHtml);
 
 	const startBtnDisplay: HTMLElement | null = document.getElementById("game-start");
 	const btnStart: HTMLElement | null = document.getElementById('btn-startplay');
@@ -62,96 +64,4 @@ function launchPongGame(options: IOptions): void
 		return ;
 	}
 	const app = new App(gameWindow, options);
-}
-
-function generatePlayersInputs(nbOfPlayers: number): void
-{
-	const playersContainer = document.getElementById('players-container');
-	if (!playersContainer) {
-		console.error("'players-container' not found");
-		return ;
-	}
-
-	playersContainer.innerHTML = '';
-	for (let i = 1; i <= nbOfPlayers; i++)
-	{
-		const input = document.createElement('input');
-		input.type = 'text';
-		input.id = `player${i}`;
-        input.name = `player${i}`;
-        input.placeholder = nbOfPlayers === 1 ? 'Your name' : `Player ${i}`;
-        input.className = 'w-full bg-transparent text-slate-700 text-sm border border-slate-200 rounded px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400';
-        playersContainer.appendChild(input);
-	}
-}
-
-function getPlayerNames(): string[] {
-    const playersContainer = document.getElementById('players-container');
-    if (!playersContainer) return [];
-
-    const inputs = playersContainer.querySelectorAll('input');
-    return Array.from(inputs).map(input => (input as HTMLInputElement).value || `Player ${input.id.replace('player', '')}`);
-}
-
-function initializePlayerInputs(): void {
-	const modeSelect = document.getElementById('mode') as HTMLSelectElement;
-	if (!modeSelect) {
-		console.error("'mode' select not found");
-		return;
-	}
-
-	generatePlayersInputs(parseInt(modeSelect.value));
-	modeSelect.addEventListener('change', function() {
-		const numberOfPlayers = parseInt(this.value);
-		generatePlayersInputs(numberOfPlayers);
-	});
-}
-
-export function selectGameOptions(): Promise<IOptions>
-{
-	// document.body.insertAdjacentHTML("beforeend", optionsHtml);
-	initializePlayerInputs();
-
-	const optionsMenuDisplay: HTMLElement | null = document.getElementById("game-options");
-	const btnSubmit: HTMLButtonElement = document.getElementById('btn-submit') as HTMLButtonElement;
-	const slctMode: HTMLSelectElement = document.getElementById('mode') as HTMLSelectElement;
-	const slctLevel: HTMLSelectElement = document.getElementById('level') as HTMLSelectElement;
-	const ballColorInput = document.getElementById('ball-color-input') as HTMLInputElement;
-	const backColorInput = document.getElementById('back-color-input') as HTMLInputElement;
-	const paddColorInput = document.getElementById('padd-color-input') as HTMLInputElement;
-
-	if (!btnSubmit || !slctMode || !slctLevel || !optionsMenuDisplay) {
-		console.error("'options' UI not found, can't load game");
-		return Promise.reject();
-	}
-
-	//	Return selected options when user click on submit button
-	return new Promise((resolve) => {
-		btnSubmit.addEventListener('click', (e) => {
-			e.preventDefault();
-			const nbPlayer: number = parseInt(slctMode.value);
-			const level: Level = parseInt(slctLevel.value) as Level;
-			const ballColor: string = ballColorInput.value;
-			const backColor: string = backColorInput.value;
-			const paddColor: string = paddColorInput.value;
-			const options: IOptions = {
-				level: level,
-				nbOfPlayers: nbPlayer,
-				ballColor: ballColor,
-				mapColor: backColor,
-				paddColor: paddColor,
-				players: getPlayerNames()
-			};
-			if (optionsMenuDisplay) optionsMenuDisplay.remove();
-			resolve(options);
-		});
-	});
-}
-
-
-export function displayGameWindow(): void
-{
-	selectGameOptions().then(options => {
-		launchPongGame(options);
-	});
 }
