@@ -162,7 +162,7 @@ class UserState
 
 		const data = await response.json();
 		if (!response.ok)
-			throw new Error(data.message);
+			throw new Error(data.message || data.error || 'Login Failed');
 
 		const user = new RegisteredUser(login, data.id, data.accessToken);
 		this.setUser(user);
@@ -187,7 +187,7 @@ class UserState
 
 		const data = await response.json();
 		if (!response.ok)
-			throw new Error(data.message);
+			throw new Error(data.message || data.error || 'Register Failed');
 	}
 
 	public async logout(): Promise<void>
@@ -204,8 +204,9 @@ class UserState
 				}
 			);
 
+			const data = await response.json();
 			if (!response.ok)
-				throw new Error('Logout failed');
+				throw new Error(data.message || data.error || 'Logout Failed');
 		}
 
 		this.setUser(null);

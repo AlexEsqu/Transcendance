@@ -115,7 +115,6 @@ function onAvatarLoaded(): void
 			try {
 					await user.updateAvatar(newAvatarUrl);
 					alert('Avatar updated!');
-					router.navigateTo('/settings');
 				} catch (err) {
 					alert('Failed to update avatar.');
 					console.error(err);
@@ -154,7 +153,6 @@ function onPasswordLoaded(): void
 				{
 					await user.changePassword(oldPassword, newPassword);
 					alert('password updated!');
-					router.navigateTo('/settings');
 				}
 				catch (err)
 				{

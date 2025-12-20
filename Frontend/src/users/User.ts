@@ -86,8 +86,9 @@ class RegisteredUser extends User
 				})
 			});
 
+		const data = await response.json();
 		if (!response.ok)
-			throw new Error('Renaming failed');
+			throw new Error(data.message || 'Renaming failed');
 
 		this.name = newName;
 	}
@@ -105,8 +106,9 @@ class RegisteredUser extends User
 			})
 		});
 
+		const data = await response.json();
 		if (!response.ok)
-			throw new Error('Password change failed');
+			throw new Error(data.message || 'Password change failed');
 	}
 }
 
