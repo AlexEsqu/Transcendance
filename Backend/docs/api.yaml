@@ -16,16 +16,158 @@ components:
       type: apiKey
       in: header
       name: X-App-Secret
-  schemas: {}
+  schemas:
+    def-0:
+      type: object
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+      required:
+        - password
+        - login
+      title: authCredentialsBody
+    def-1:
+      additionalProperties: false
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+      required:
+        - error
+      type: object
+      title: errorResponse
+    def-2:
+      type: object
+      required:
+        - username
+        - password
+        - email
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 20
+        password:
+          type: string
+          minLength: 8
+        email:
+          type: string
+          format: email
+      title: SignupBody
+    def-3:
+      description: OK
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required:
+        - success
+        - message
+      title: SuccessMessageResponse
+    def-4:
+      type: object
+      required:
+        - winner_id
+        - loser_id
+        - winner_score
+        - loser_score
+        - date
+      properties:
+        winner_id:
+          type: integer
+        loser_id:
+          type: integer
+        winner_score:
+          type: integer
+        loser_score:
+          type: integer
+        date:
+          type: string
+          format: date-time
+      title: matchObject
+    def-5:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+      title: userIdObject
+    def-6:
+      type: object
+      required:
+        - id
+        - username
+        - avatar
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        avatar:
+          type:
+            - "null"
+            - string
+        is_active:
+          type: boolean
+      title: publicUserObject
 paths:
-  /users:
-    get:
+  /matches:
+    post:
       tags:
-        - user
-      description: Returns a list of all registered users. `This endpoint requires
-        client authentication.`
+        - matches
+      description: Records a completed match between two users, including winner,
+        loser, scores, and match date. `This endpoint requires client
+        authentication.`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/def-4"
       security: &a1
         - AppClientAuth: []
+      responses:
+        "200":
+          description: Uploaded new match successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-3"
+        "400":
+          description: "Bad Request: Invalid input or missing fields"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "401":
+          description: "Unauthorized: Invalid credentials"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+    get:
+      tags:
+        - matches
+      description: Returns a list of all matches. `This endpoint requires client
+        authentication.`
+      security: *a1
       responses:
         "200":
           description: Default Response
@@ -34,24 +176,34 @@ paths:
               schema:
                 type: array
                 items:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                    username:
-                      type: string
-                    avatar_url:
-                      type: string
-  /users/{id}:
+                  $ref: "#/components/schemas/def-4"
+        "401":
+          description: "Unauthorized: Invalid credentials"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+  /users/{id}/matches:
     get:
       tags:
-        - user
-      description: Returns an object of an user using the id passed in parameters.
-        `This endpoint requires client authentication.`
+        - matches
+      description: Returns a list of all the matches of a user using the user_id
+        parameter. `This endpoint requires client authentication.`
       parameters:
         - schema:
             type: integer
-            minimum: 1
           in: path
           name: id
           required: true
@@ -62,149 +214,107 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  id:
-                    type: integer
-                  username:
-                    type: string
-                  avatar_url:
-                    type: string
-  /users/signup:
-    post:
-      tags:
-        - auth
-      description: Creates a new user account using a username and password. Does not
-        automatically log in the user.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - username
-                - password
-              properties:
-                username:
-                  type: string
-                  minLength: 3
-                  maxLength: 20
-                password:
-                  type: string
-                  minLength: 8
-        required: true
-      responses:
-        "200":
-          description: Default Response
-  /users/auth/login:
-    post:
-      tags:
-        - auth
-      description: Authenticates the user using their username and password. On
-        success, returns a short-lived access token in the response body and
-        sets a long-lived refresh token in the `HttpOnly refreshToken cookie`,
-        which can later be used to obtain new access tokens.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                password:
-                  type: string
-              required:
-                - username
-                - password
-        required: true
-      responses:
-        "200":
-          description: Default Response
-  /users/auth/refresh:
-    post:
-      tags:
-        - auth
-      description: Uses the refresh token to issue a new access token. The endpoint
-        verifies the refresh token, checks that it is not expired or revoked.
-        This endpoint requires `client authentification` AND `user
-        authentification` AND the refresh cookie stored in the `HttpOnly
-        refreshToken cookie`
-      security: &a2
-        - BearerAuth: []
-        - cookieAuth: []
-        - AppClientAuth: []
-      responses:
-        "200":
-          description: New access token
-          content:
-            application/json:
-              schema:
-                description: New access token
-                type: object
-                properties:
-                  accessToken:
-                    type: string
-                required:
-                  - accessToken
+                type: array
+                items:
+                  $ref: "#/components/schemas/def-4"
         "401":
-          description: Unauthorized
+          description: "Unauthorized: Invalid credentials"
           content:
             application/json:
               schema:
-                description: Unauthorized
-  /users/auth/logout:
-    post:
-      tags:
-        - auth
-      description: Logs the user out by invalidating the refresh token stored in the
-        `HttpOnly refreshToken cookie`. After logout, the user must
-        reauthenticate with their username and password to obtain new tokens.
-        This endpoint requires client authentification AND user authentification
-        AND the refresh cookie stored in the HttpOnly refreshToken cookie
-      security: *a2
-      responses:
-        "200":
-          description: Default Response
-  /users/me:
-    delete:
-      tags:
-        - user
-      description: Deletes the user account and all its data. `This endpoint requires
-        client AND user authentication.`
-      security: &a3
-        - BearerAuth: []
-        - AppClientAuth: []
-      responses:
-        "200":
-          description: Default Response
-    patch:
+                $ref: "#/components/schemas/def-1"
+        "404":
+          description: "Not Found: User not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+  /users:
+    get:
       tags:
         - user
-      description: Modifies the data of the user. `This endpoint requires client AND
-        user authentication.`
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                profilePictureUrl:
-                  type: string
-              additionalProperties: false
-      security: *a3
+      description: Returns a list of all registered users. `This endpoint requires
+        client authentication.`
+      security: *a1
       responses:
         "200":
           description: Default Response
           content:
             application/json:
               schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/def-6"
+  /users/{id}:
+    get:
+      tags:
+        - user
+      description: Returns an object of an user using the id passed in parameters.
+        `This endpoint requires client authentication.`
+      parameters:
+        - schema:
+            type: integer
+          in: path
+          name: id
+          required: true
+      security: *a1
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-6"
+        "400":
+          description: "Bad Request: Invalid input or missing fields"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "401":
+          description: "Unauthorized: Invalid credentials"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "404":
+          description: "Not Found: User not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                description: Internal Server Error
                 type: object
                 properties:
-                  success:
-                    type: boolean
+                  error:
+                    type: string
+                  message:
+                    type: string
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
   /users/me/password:
-    patch:
+    put:
       tags:
         - user
       description: Modifies the password of the user. `This endpoint requires client
@@ -225,61 +335,716 @@ paths:
                   minLength: 8
               additionalProperties: false
         required: true
-      security: *a3
+      security: &a2
+        - BearerAuth: []
+          AppClientAuth: []
       responses:
         "200":
-          description: Default Response
+          description: Updated password successfully
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-  /matches:
-    post:
+                $ref: "#/components/schemas/def-3"
+        "400":
+          description: "Bad Request: Invalid input or missing fields"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "401":
+          description: "Unauthorized: Invalid credentials"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+  /users/me/avatar:
+    put:
       tags:
-        - matches
-      description: Records a completed match between two users, including winner,
-        loser, scores, and match date. `This endpoint requires client
-        authentication.`
+        - user
+      description: Modifies the avatar of the user. `This endpoint requires client AND
+        user authentication.`
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - avatar
+              properties:
+                avatar:
+                  type: string
+                  format: binary
+        required: true
+      security: *a2
+      responses:
+        "200":
+          description: Updated avatar successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-3"
+        "400":
+          description: "Bad Request: Invalid input or missing fields"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "401":
+          description: "Unauthorized: Invalid credentials"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "413":
+          description: Payload too large
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+    delete:
+      tags:
+        - user
+      description: Deletes the avatar of the user. `This endpoint requires client AND
+        user authentication.`
+      security: *a2
+      responses:
+        "204":
+          description: "Success: Avatar deleted successfully"
+        "401":
+          description: "Unauthorized: Invalid credentials"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+  /users/me/username:
+    put:
+      tags:
+        - user
+      description: Modifies the username of the user. `This endpoint requires client
+        AND user authentication.`
       requestBody:
         content:
           application/json:
             schema:
               type: object
               required:
-                - winner_id
-                - loser_id
-                - winner_score
-                - loser_score
-                - date
+                - new_username
               properties:
-                winner_id:
-                  type: integer
-                loser_id:
-                  type: integer
-                winner_score:
-                  type: integer
-                loser_score:
-                  type: integer
-                date:
+                new_username:
                   type: string
-                  format: date-time
+                  minLength: 3
+                  maxLength: 20
+              additionalProperties: false
         required: true
-      security: *a1
+      security: *a2
       responses:
         "200":
-          description: Default Response
+          description: Updated username successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-3"
+        "400":
+          description: "Bad Request: Invalid input or missing fields"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "401":
+          description: "Unauthorized: Invalid credentials"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "409":
+          description: "Conflict: Username is taken already"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+  /users/me/friends:
+    post:
+      tags:
+        - user
+      description: Adds a new friend to the authenticated user's friend list.						The
+        new friend's `id` provided in the request body is validated before the
+        friendship record is created.						`This endpoint requires client
+        authentication AND user authentication.`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/def-5"
+      security: *a2
+      responses:
+        "201":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-3"
+        "400":
+          description: "Bad Request: Invalid input or missing fields"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "401":
+          description: "Unauthorized: Invalid credentials"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "404":
+          description: "Not Found: User not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "409":
+          description: "Conflict: Friendship already exists"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+    delete:
+      tags:
+        - user
+      description: Deletes a friend from the authenticated user's friend list using
+        the id passed in the body.						`This endpoint requires client
+        authentication AND user authentication.`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/def-5"
+      security: *a2
+      responses:
+        "204":
+          description: "Success: Friend deleted successfully"
+        "400":
+          description: "Bad Request: Invalid input or missing fields"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "401":
+          description: "Unauthorized: Invalid credentials"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "404":
+          description: "Not Found: User not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
     get:
       tags:
-        - matches
-      description: Returns a list of all matches. `This endpoint requires client
-        authentication.`
-      security: *a1
+        - user
+      description: Returns the complete list of friends of the authenticated
+        user.				Returns basic profile information for each friend.				`This
+        endpoint requires client authentication AND user authentication.`
+      security: *a2
       responses:
         "200":
           description: Default Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/def-6"
+        "401":
+          description: "Unauthorized: Invalid credentials"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "404":
+          description: "Not Found: User not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+  /users/me:
+    delete:
+      tags:
+        - user
+      description: Deletes the user account and all its data. `This endpoint requires
+        client AND user authentication.`
+      security: *a2
+      responses:
+        "204":
+          description: "Success: User deleted successfully"
+        "401":
+          description: "Unauthorized: Invalid credentials"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+  /users/me/2fa:
+    put:
+      tags:
+        - user
+      description: Enable or disable 2FA for the authenticated user.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - enabled
+              properties:
+                enabled:
+                  type: boolean
+        required: true
+      security: *a2
+      responses:
+        "200":
+          description: " 2FA status updated successfully "
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-3"
+  /users/signup:
+    post:
+      tags:
+        - auth
+      description: Creates a new user account using a username an email and password.
+        Sends a verification email to the user.				 Does not automatically log
+        in the user.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/def-2"
+      responses:
+        "201":
+          description: Signed up user successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-3"
+        "400":
+          description: "Bad Request: Invalid input or missing fields"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "409":
+          description: "Conflict: Username already exists"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+  /users/auth/login:
+    post:
+      tags:
+        - auth
+      description: Authenticates the user using their login (email or username) and
+        password.    If authentication succeeds and two-factor authentication
+        (2FA) is disabled,    the endpoint returns the user's id and a
+        short-lived access token in the response body    and sets a long-lived
+        refresh token in an HttpOnly `refreshToken` cookie.       If 2FA is
+        enabled for the user, the endpoint does not issue tokens
+        immediately.    Instead, a one-time 6-digit verification code is sent to
+        the user's email and    a temporary 2FA continuation token is generated,
+        which must be used to complete    authentication via the 2FA
+        verification endpoint.    `This endpoint requires the client to have a
+        verified email address.`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/def-0"
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - description: Login successful
+                    type: object
+                    required:
+                      - accessToken
+                      - id
+                    properties:
+                      accessToken:
+                        type: string
+                      id:
+                        type: integer
+                  - description: Two-factor authentication required
+                    type: object
+                    required:
+                      - twoFactorRequired
+                      - token
+                    properties:
+                      twoFactorRequired:
+                        type: boolean
+                        example: true
+                      token:
+                        type: string
+                        description: 2FA continuation token
+        "302":
+          description: "Redirect: Email not verified"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-3"
+        "401":
+          description: "Unauthorized: Invalid credentials"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "403":
+          description: "Forbidden: Email not verified"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+  /users/auth/refresh:
+    post:
+      tags:
+        - auth
+      description: Uses the refresh token to issue a new access token. The endpoint
+        verifies the refresh token, checks that it is not expired or revoked.
+        This endpoint requires `client authentification` AND `user
+        authentification` AND the refresh cookie stored in the `HttpOnly
+        refreshToken cookie`
+      security: &a3
+        - BearerAuth: []
+          cookieAuth: []
+          AppClientAuth: []
+      responses:
+        "200":
+          description: Returns new access token
+          content:
+            application/json:
+              schema:
+                description: Returns new access token
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                required:
+                  - accessToken
+        "401":
+          description: "Unauthorized: Invalid credentials"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+  /users/auth/logout:
+    post:
+      tags:
+        - auth
+      description: Logs the user out by invalidating the refresh token stored in
+        the 				`HttpOnly refreshToken cookie`. After logout, the user must
+        reauthenticate with their				 username and password to obtain new
+        tokens. This endpoint requires client authentification 				 AND user
+        authentification AND the refresh cookie stored in the HttpOnly
+        refreshToken cookie
+      security: *a3
+      responses:
+        "200":
+          description: "Success: User successfully logged out"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-3"
+        "401":
+          description: "Unauthorized: Invalid credentials"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+  /users/auth/verify-email:
+    get:
+      tags:
+        - auth
+      description: "Verifies a user's email address using a `one-time token` sent by
+        email.\t\t\tThe user clicks a verification link received by
+        email.\t\t\tIf the token is valid and not expired, the email is marked
+        as verified\t\t\tand the user is redirected to the frontend
+        application.  \t\t\t"
+      parameters:
+        - schema:
+            type: string
+            example: a3f9c8e2b4d74e0c9f...
+          in: query
+          name: token
+          required: true
+          description: Email verification token sent to the user by email
+      responses:
+        "302":
+          description: Email successfully verified. User is redirected to the frontend.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-3"
+        "400":
+          description: "Bad Request: Invalid input or missing fields"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+  /users/auth/send-mail-verification:
+    post:
+      tags:
+        - auth
+      description: Sends an email verification email to the user's email address
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+        required: true
+      responses:
+        "200":
+          description: "Success: Email verification email sent"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-3"
+        "400":
+          description: "Bad Request: Invalid input or missing fields"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+  /users/auth/login/2fa:
+    post:
+      tags:
+        - auth
+      description: Verify a user's 2FA code sent during login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - code
+              description: 6-digit code sent to user email or app
+              properties:
+                code:
+                  type: string
+                  minLength: 6
+                  maxLength: 6
+        required: true
+        description: 6-digit code sent to user email or app
+      parameters:
+        - schema:
+            type: string
+            example: a3f9c8e2b4d74e0c9f...
+          in: query
+          name: token
+          required: true
+          description: Token generated by the login endpoint
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                description: Login successful
+                type: object
+                required:
+                  - accessToken
+                  - id
+                properties:
+                  accessToken:
+                    type: string
+                  id:
+                    type: integer
+        "401":
+          description: "Unauthorized: Invalid token or code"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
 tags:
   - name: auth
     description: Auth endpoints

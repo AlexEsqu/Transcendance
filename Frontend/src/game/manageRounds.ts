@@ -12,7 +12,7 @@ export { monitoringRounds, saveResults, newRound, drawMatchHistoryTree, drawScor
  */
 function monitoringRounds(scene: IScene, nbOfRounds: number): boolean
 {
-	if (!scene || !scene.leftPadd.player || !scene.rightPadd.player) return false;
+	if (!scene || !scene.leftPadd || !scene.leftPadd.player || !scene.rightPadd || !scene.rightPadd.player) return false;
 
 	if (scene.leftPadd.player.score == Pong.MAX_SCORE || scene.rightPadd.player.score == Pong.MAX_SCORE)
 	{
@@ -57,12 +57,14 @@ function saveResults(leftPadd: IPaddle, rightPadd: IPaddle, rounds: IRound): IRo
 
 function newRound(scene: IScene, rounds: IRound): IRound
 {
-	if (!scene || (rounds && rounds.nbOfRounds == Pong.MAX_ROUNDS)) return rounds;
+	if (!scene || (rounds && rounds.nbOfRounds == Pong.MAX_ROUNDS) || !scene.players || !rounds.results) return rounds;
 	console.log("GAME-STATE: new round");
 
 	const leftPadd = scene.leftPadd;
 	const rightPadd = scene.rightPadd;
 	let nbOfPlayers = scene.options.nbOfPlayers;
+
+	if (!leftPadd || !rightPadd || !leftPadd.player || !rightPadd.player ) return rounds;
 
 	//	Who's playing now ?
 	if (nbOfPlayers == 4 && rounds.nbOfRounds >= 0 && rounds.nbOfRounds < 2) nbOfPlayers = 2;
@@ -72,20 +74,20 @@ function newRound(scene: IScene, rounds: IRound): IRound
 	{
 		case 4:
 			if (rounds.nbOfRounds == Pong.MAX_ROUNDS - 1) {
-				leftPadd.player = rounds.results[0].winner;
-				rightPadd.player = rounds.results[1].winner;
+				if (rounds.results[0].winner) leftPadd.player = rounds.results[0].winner;
+				if (rounds.results[1].winner) rightPadd.player = rounds.results[1].winner;
 			}
 			break ;
 		case 8:
 			if (rounds.nbOfRounds == Pong.MAX_ROUNDS / 2) {
-				leftPadd.player = rounds.results[0].winner;
-				rightPadd.player = rounds.results[1].winner;
+				if (rounds.results[0].winner) leftPadd.player = rounds.results[0].winner;
+				if (rounds.results[1].winner) rightPadd.player = rounds.results[1].winner;
 			} else if (rounds.nbOfRounds == (Pong.MAX_ROUNDS / 2) + 1) {
-				leftPadd.player = rounds.results[2].winner;
-				rightPadd.player = rounds.results[3].winner;
+				if (rounds.results[2].winner) leftPadd.player = rounds.results[2].winner;
+				if (rounds.results[3].winner) rightPadd.player = rounds.results[3].winner;
 			} else if (rounds.nbOfRounds == Pong.MAX_ROUNDS - 1) {
-				leftPadd.player = rounds.results[4].winner;
-				rightPadd.player = rounds.results[5].winner;
+				if (rounds.results[4].winner) leftPadd.player = rounds.results[4].winner;
+				if (rounds.results[5].winner) rightPadd.player = rounds.results[5].winner;
 			}
 			break ;
 		default:
@@ -100,9 +102,9 @@ function newRound(scene: IScene, rounds: IRound): IRound
 	//	Reset data
 	if (leftPadd.paddle) leftPadd.paddle.resetPosition(Pong.MAP_WIDTH, "left");
 	if (rightPadd.paddle) rightPadd.paddle.resetPosition(Pong.MAP_WIDTH, "right");
-	scene.ball.reset(true);
-	leftPadd.player.score = 0;
-	rightPadd.player.score = 0;
+	if (scene.ball) scene.ball.reset(true);
+	if (leftPadd.player) leftPadd.player.score = 0;
+	if (rightPadd.player) rightPadd.player.score = 0;
 
 	let leftIndex = 0;
 	let rightIndex = 1;
@@ -176,11 +178,11 @@ function drawOneBranch(
 	const hCenter: number = (canvas.height / 2) + 400;
 	ctx.clearRect(wCenter - 110, 0, 220, hCenter + 100);
 
-	if (rounds.results && rounds.nbOfRounds == Pong.MAX_ROUNDS && rounds.results[0] && rounds.results[1]) {
+	if (rounds.results && rounds.nbOfRounds == Pong.MAX_ROUNDS && rounds.results[0].winner && rounds.results[1].winner) {
 		drawCircle(ctx, rounds.results[0].winner.color, { x: wCenter - 30, y: hCenter });
 		drawCircle(ctx, rounds.results[1].winner.color, { x: wCenter + 30, y: hCenter });
 	}
-	else {
+	else if (rounds.nodeColor[4] && rounds.nodeColor[5]) {
 		drawCircle(ctx, rounds.nodeColor[4], { x: wCenter - 30, y: hCenter });
 		drawCircle(ctx, rounds.nodeColor[5], { x: wCenter + 30, y: hCenter });
 	}
@@ -232,9 +234,13 @@ function drawMatchHistoryTree(
 	}
 }
 
-function drawScore(canvas: HTMLCanvasElement, score1: number, score2: number): void
+function drawScore(canvas: HTMLCanvasElement | null, score1: number, score2: number): void
 {
+	if (!canvas) return;
+
 	const ctx = canvas.getContext("2d");
+	if (!ctx) return;
+
 	const wCenter: number = (canvas.width / 2);
 	const hCenter: number = (canvas.height / 2) - 200;
 	ctx.clearRect(wCenter - 110, 0, 220, hCenter + 50);

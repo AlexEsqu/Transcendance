@@ -7,8 +7,8 @@ import { createText, createAnimation, loadGame, createMaterial } from './Graphic
 import { monitoringRounds, saveResults, newRound, drawMatchHistoryTree, drawScore, drawName } from './manageRounds';
 
 export interface IPaddle {
-	paddle: Paddle,
-	player: IPlayer,
+	paddle: Paddle  | null,
+	player: IPlayer | null,
 };
 
 export class Pong {
@@ -19,13 +19,13 @@ export class Pong {
 
 	canvas: HTMLCanvasElement;
 	engine: Engine;
-	gui: AdvancedDynamicTexture;
+	gui: AdvancedDynamicTexture | null;
 	robot: boolean;
-	time: number;
+	time?: number;
 	isLaunched: boolean;
 	onNewRound?: () => void;
-	scene: IScene;
-	canvasUI: HTMLCanvasElement;
+	scene: IScene | null;
+	canvasUI?: HTMLCanvasElement;
 
 	constructor(canvasId: string, options: IOptions, onNewRound?: () => void) {
 		this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
@@ -36,7 +36,8 @@ export class Pong {
 		if (options.nbOfPlayers >= 4) Pong.MAX_ROUNDS = options.nbOfPlayers - 1;
 		this.onNewRound = onNewRound;
 		this.isLaunched = false;
-		this.scene = loadGame(this.engine, this.canvas, options, this.gui);
+		this.scene = loadGame(this.engine, this.canvas, options);
+		if (!this.scene) return ;
 		let players: Array<IPlayer> = this.initPlayers(options.players, options.nbOfPlayers);
 		if (options.nbOfPlayers === 1) { // special case: opponent is a robot
 			this.robot = true;
@@ -69,12 +70,12 @@ export class Pong {
 	 * 	- Manage user input and render the scene
 	 */
 	runGame(): void {
-		if (!this.engine || !this.scene) {
+		if (!this.engine || !this.scene || !this.scene.id) {
 			console.error("while loading 'Pong' game");
 			return ;
 		}
 
-		const keys = {};
+		const keys: Record<string, boolean> = {};
 		let isNewRound: boolean = true;
 		let rounds: IRound = { results: null, nbOfRounds: 0, playerIndex: 0, nodeColor: [] };
 		if (this.scene.options.nbOfPlayers == 1) rounds.nodeColor[0] = "rgb(141, 188, 255)";
@@ -84,9 +85,9 @@ export class Pong {
 		//	Manage user input and update data before render
 		this.handleInput(keys, rounds);
 		this.scene.id.registerBeforeRender(() => {
-			if (this.scene.state === State.opening) this.opening();
-			if (this.scene.state === State.end) this.endGame(rounds);
-			if (this.scene.state === State.play && this.isLaunched) {
+			if (this.scene && this.scene.state === State.opening) this.opening();
+			if (this.scene && this.scene.state === State.end) this.endGame(rounds);
+			if (this.scene && this.scene.state === State.play && this.isLaunched) {
 				let launch = this.updateGame(keys);
 				isNewRound = monitoringRounds(this.scene, rounds.nbOfRounds);
 				if (launch && !isNewRound) this.launch(3);
@@ -97,13 +98,14 @@ export class Pong {
 		});
 		//	Rendering loop
 		this.engine.runRenderLoop(() => {
-			if (!this.scene.id || this.scene.state === State.stop) this.engine.stopRenderLoop();
-			this.scene.id.render();
+			if (this.scene &&( !this.scene.id || this.scene.state === State.stop)) this.engine.stopRenderLoop();
+			if (this.scene && this.scene.id) this.scene.id.render();
 		});
 	}
 
 	requestNewRound(rounds: IRound): IRound
 	{
+		if (!this.scene || !this.scene.id || !this.canvasUI || !this.scene.leftPadd || !this.scene.rightPadd) return rounds;
 		this.scene.state = State.pause;
 		this.isLaunched = false;
 
@@ -114,7 +116,11 @@ export class Pong {
 		rounds = newRound(this.scene, rounds);
 		rounds.nbOfRounds += 1;
 		
-		if (currentNbOfRounds < rounds.nbOfRounds) {
+		if (currentNbOfRounds < rounds.nbOfRounds 
+			&& this.scene.leftPadd.player && this.scene.rightPadd.player
+			&& this.scene.leftPadd.paddle && this.scene.rightPadd.paddle
+			&& this.scene.leftPadd.paddle.mesh && this.scene.rightPadd.paddle.mesh)
+		{
 			drawMatchHistoryTree(this.canvasUI, rounds, this.scene.options.nbOfPlayers);
 			drawName(this.canvasUI, this.scene.leftPadd.player.name, this.scene.rightPadd.player.name, rounds.nbOfRounds);
 			drawScore(this.canvasUI,  this.scene.leftPadd.player.score,  this.scene.rightPadd.player.score);
@@ -131,59 +137,65 @@ export class Pong {
 	/**
 	 * 	- Listen to new user input and update data accordingly
 	 */
-	updateGame(keys: {}): number
+	updateGame(keys: Record<string, boolean>): number
 	{
 		let status: number = 0;
-		let paddle: Paddle = null;
+		let paddle: Paddle | null = null;
 		let side: string = "down";
 
-		//	Move and update direction if there has been an impact with the ball
-		this.scene.ball.move(this.time);
-		if (this.scene.ball.update(this.scene.leftPadd, this.scene.rightPadd) == true)
-			status = 1;
-		
-		//	If a user presses a key, update the position of its padd
-		if (keys["ArrowDown"] || keys["ArrowUp"]) {
-			paddle = this.scene.rightPadd.paddle;
-			if (keys["ArrowUp"]) side = "up";
+		if (this.scene && keys && this.scene.ball && this.time && this.canvasUI
+			&& this.scene.leftPadd && this.scene.leftPadd.paddle && this.scene.rightPadd && this.scene.rightPadd.paddle
+			&& this.scene.leftPadd.player && this.scene.rightPadd.player) {
+			//	Move and update direction if there has been an impact with the ball
+			this.scene.ball.move(this.time);
+			if (this.scene.ball.update(this.scene.leftPadd, this.scene.rightPadd) == true)
+				status = 1;
+	
+			//	If a user presses a key, update the position of its padd
+			if (keys["ArrowDown"] || keys["ArrowUp"]) {
+				paddle = this.scene.rightPadd.paddle;
+				if (keys["ArrowUp"]) side = "up";
+			}
+			if (!this.robot && (keys["s"] || keys["w"])) {
+				paddle = this.scene.leftPadd.paddle;
+				if (keys["w"]) side = "up";
+			}
+	
+			if (this.robot) this.scene.leftPadd.paddle.autoMove(this.scene.ball, (Pong.MAP_HEIGHT / 2), this.time);
+			if (paddle) paddle.move(side, Pong.MAP_HEIGHT / 2, this.time);
+	
+			drawScore(this.canvasUI,  this.scene.leftPadd.player.score,  this.scene.rightPadd.player.score);
 		}
-		if (!this.robot && (keys["s"] || keys["w"])) {
-			paddle = this.scene.leftPadd.paddle;
-			if (keys["w"]) side = "up";
-		}
-		
-		if (this.robot) this.scene.leftPadd.paddle.autoMove(this.scene.ball, (Pong.MAP_HEIGHT / 2), this.time);
-		if (paddle) paddle.move(side, Pong.MAP_HEIGHT / 2, this.time);
-
-		drawScore(this.canvasUI,  this.scene.leftPadd.player.score,  this.scene.rightPadd.player.score);
 
 		return status;
 	}
 
 	launch(count: number): void {
-		if (count <= 0) {
+		if (count <= 0 && this.scene && this.scene.ball) {
 			this.scene.state = State.play;
 			this.isLaunched = true;
 			this.scene.ball.launch();
 			return ;
 		}
-		this.scene.state = State.launch;
-		
+		if (this.scene) this.scene.state = State.launch;
+
 		const keys = [
 			{ frame: 0, value: 60 },
 			{ frame: 30, value: 30 }
 		];
 		this.gui = AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
-		const timer = createText(count.toString(), this.scene.options.ballColor, 60, "200px", "0px", this.gui);
-		const animation = createAnimation("timer", "fontSize", keys);
-		
-		timer.animations = [animation];
-		this.scene.id.beginAnimation(timer, 0, 30, false, 1, () => {
-			this.gui.removeControl(timer);
-			count--;
-			this.launch(count);
-		});
+		if (this.scene && this.scene.options && this.scene.id) {
+			const timer = createText(count.toString(), this.scene.options.ballColor, 60, "200px", "0px", this.gui);
+			const animation = createAnimation("timer", "fontSize", keys);
+	
+			timer.animations = [animation];
+			this.scene.id.beginAnimation(timer, 0, 30, false, 1, () => {
+				if (this.gui) this.gui.removeControl(timer);
+				count--;
+				this.launch(count);
+			});
+		}
 	}
 
 	opening(): void {
@@ -194,10 +206,12 @@ export class Pong {
 		];
 		const animation = createAnimation("cameraBetaAnim", "beta", keys);
 
-		this.scene.camera.animations = [];
-		this.scene.camera.animations.push(animation);
-		this.scene.id.beginAnimation(this.scene.camera, 0, 60, false);
-		this.scene.state = State.pause;
+		if (this.scene && this.scene.camera && this.scene.id) {
+			this.scene.camera.animations = [];
+			this.scene.camera.animations.push(animation);
+			this.scene.id.beginAnimation(this.scene.camera, 0, 60, false);
+			this.scene.state = State.pause;
+		}
 	}
 
 	endGame(rounds: IRound): void
@@ -210,6 +224,8 @@ export class Pong {
 	
 		// sendMatchesPostRequest(rounds.results[rounds.nbOfRounds - 1], Date.now());
 
+		if (!this.canvasUI || !this.scene) return ;
+
 		const wCenter: number = (this.canvasUI.width / 2);
 		const hCenter: number = (this.canvasUI.height / 2) - 250;
 		const ctx = this.canvasUI.getContext("2d");
@@ -219,37 +235,43 @@ export class Pong {
 		ctx.font = "38px monospace";
 		ctx.textBaseline = "middle";
 		ctx.textAlign = "center";
-		
 		ctx.fillStyle = "rgba(141, 188, 255, 0.7)";
+		
+		const index = rounds.nbOfRounds - 2;
+		
 		ctx.fillText("Winner:  ", wCenter - 100, hCenter);
-		ctx.fillText(rounds.results[rounds.nbOfRounds - 2].winner.name, wCenter + 50, hCenter);
+		if (rounds.results && rounds.results[index].winner && rounds.results[index].winner.name)
+			ctx.fillText(rounds.results[index].winner.name, wCenter + 50, hCenter);
 
 		ctx.fillText("Loser: ", wCenter - 100, hCenter + 50);
-		ctx.fillText(rounds.results[rounds.nbOfRounds - 2].loser.name, wCenter + 85, hCenter + 50);
+		if (rounds.results && rounds.results[index].loser && rounds.results[index].loser.name)
+			ctx.fillText(rounds.results[index].loser.name, wCenter + 85, hCenter + 50);
 
-		if (this.scene) this.scene.state = State.stop;
+		this.scene.state = State.stop;
 	}
 
 	/**
 	 * 	- Listens to window inputs for each frame.
 	 * 	- Saves keys status (on/off) to update scene objects accordingly.
 	 */
-	handleInput(keys: {}, rounds: IRound): void {
+	handleInput(keys: Record<string, boolean>, rounds: IRound): void {
 		//	Resize the game with the window
 		window.addEventListener('resize', () => {
 			this.engine.resize();
-			this.canvasUI.width = window.innerWidth;
-			this.canvasUI.height = window.innerHeight;
-			drawName(this.canvasUI, this.scene.leftPadd.player.name, this.scene.rightPadd.player.name, this.scene.options.nbOfPlayers);
-			drawScore(this.canvasUI, this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
-			drawMatchHistoryTree(this.canvasUI, rounds, this.scene.options.nbOfPlayers);
+			if (this.canvasUI && this.scene && this.scene.leftPadd && this.scene.leftPadd.player && this.scene.rightPadd && this.scene.rightPadd.player) {
+				this.canvasUI.width = window.innerWidth;
+				this.canvasUI.height = window.innerHeight;
+				drawName(this.canvasUI, this.scene.leftPadd.player.name, this.scene.rightPadd.player.name, this.scene.options.nbOfPlayers);
+				drawScore(this.canvasUI, this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
+				drawMatchHistoryTree(this.canvasUI, rounds, this.scene.options.nbOfPlayers);
+			}
 		});
 		//	Shift+Ctrl+Alt+I == Hide/show the Inspector
 		window.addEventListener("keydown", (ev) => {
             if (ev.shiftKey && ev.ctrlKey && ev.altKey && (ev.key === "I" || ev.key === "i")) {
-                if (this.scene.id.debugLayer.isVisible()) {
+                if (this.scene && this.scene.id && this.scene.id.debugLayer.isVisible()) {
                     this.scene.id.debugLayer.hide();
-                } else {
+                } else if (this.scene && this.scene.id) {
                     this.scene.id.debugLayer.show();
                 }
             }

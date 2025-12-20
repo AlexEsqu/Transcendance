@@ -1,0 +1,1 @@
+Usage : docker exec -it fastify npm run test

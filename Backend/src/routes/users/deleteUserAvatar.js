@@ -1,4 +1,3 @@
-import db from "/app/src/database.js";
 import fs from "fs";
 
 export default function deleteUserAvatar(server) {
@@ -8,23 +7,38 @@ export default function deleteUserAvatar(server) {
 			description: "Deletes the avatar of the user. `This endpoint requires client AND user authentication.`",
 			security: server.security.UserAuth,
 			response: {
-				204: { type: "null" },
+				204: {
+					description: "Success: Avatar deleted successfully",
+					type: "null",
+				},
+				401: {
+					description: "Unauthorized: Invalid credentials",
+					$ref: "errorResponse#",
+				},
+				500: {
+					description: "Internal Server Error",
+					$ref: "errorResponse#",
+				},
+				default: {
+					description: "Unexpected error",
+					$ref: "errorResponse#",
+				},
 			},
 		},
-		onRequest: [server.authenticateUser],
+		onRequest: [server.authenticateUser, server.authenticateClient],
 	};
 	server.delete("/me/avatar", opts, async (req, reply) => {
 		try {
 			const id = req.user.id;
 
 			//retrive avatar path
-			const { avatar_path } = db.prepare(`SELECT avatar_path FROM users WHERE id = ?`).get(id);
+			const { avatar } = server.db.prepare(`SELECT avatar FROM users WHERE id = ?`).get(id);
 
-			if (avatar_path) {
-				db.prepare(`UPDATE users SET avatar_path = NULL WHERE id = ?`).run(id);
+			if (avatar) {
+				server.db.prepare(`UPDATE users SET avatar = NULL WHERE id = ?`).run(id);
 
-				fs.unlink(avatar_path, (err) => {
-					console.log(avatar_path + " was deleted");
+				fs.unlink(avatar, () => {
+					console.log(avatar + " was deleted");
 				});
 			}
 			reply.status(204).send();

@@ -1,30 +1,34 @@
+import "./style.css"
+import { Router } from './routing/Router';
+import { UserState } from './auth/UserState';
+import { getConnectionLandingHtml, getConnectionForm, initConnectionPageListeners} from './auth/connection';
+import { getDashboardPage, getSettingForm, initSettingPageListeners } from "./users/dashboard";
+import { getGameHtml, initGamePageListeners } from "./game/gamePages"
 
-import { displayAliasQueryPage } from "./landing/alias"
-import { displayNavBar } from "./landing/nav";
-import { displayGameWindow } from "./landing/game";
-import { User, localStorageKeyForGuestUser, localStorageKeyForRegisteredUser } from "./landing/user"
-import "./input.css";
+export { userState, router };
 
-export { displayGamePage, User }
+const userState = UserState.getInstance();
+const router = new Router(userState, '#main');
 
-let pageState = { page: 'welcome' };
-window.history.replaceState(pageState, null, '#welcome');
+router.addRoute('/connection', getConnectionLandingHtml);
+router.addRoute('/connection/login', getConnectionForm);
+router.addRoute('/connection/register', getConnectionForm);
+router.addRoute('/connection/alias', getConnectionForm);
 
-// checking if a registered or guest user object is stored in the localStorage, not diplaying the game until they do
-const userJSON : string | null = localStorage.getItem(localStorageKeyForRegisteredUser) ?? localStorage.getItem(localStorageKeyForGuestUser);
+router.addRoute('/settings', getDashboardPage, true);
+router.addRoute('/settings/rename', getSettingForm, true);
+router.addRoute('/settings/avatar', getSettingForm, true, true);
+router.addRoute('/settings/email', getSettingForm, true, true);
+router.addRoute('/settings/password', getSettingForm, true, true);
 
-function displayGamePage() : void
-{
-	document.body.innerHTML = "";
-	const userJSON : string | null = localStorage.getItem(localStorageKeyForRegisteredUser) ?? localStorage.getItem(localStorageKeyForGuestUser);
-	const user: User = JSON.parse(userJSON);
-	displayNavBar();
-	displayGameWindow();
-}
+router.addRoute('/game/play', getGameHtml, true);
 
-if (userJSON)
-	displayGamePage();
-else
-	displayAliasQueryPage();
+
+initConnectionPageListeners();
+initSettingPageListeners();
+initGamePageListeners();
+
+router.render();
+
 
 

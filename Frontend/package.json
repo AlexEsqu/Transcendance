@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "build": "webpack",
-    "start": "webpack-dev-server --mode development --host 0.0.0.0 --port 8080"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "dev:css": "tailwindcss -c ./tailwind.config.js -i ./src/input.css -o ./public/style.css --watch"
   },
   "keywords": [],
   "author": "",
@@ -12,24 +14,24 @@
   "devDependencies": {
     "@babylonjs/core": "^8.37.0",
     "@babylonjs/inspector": "^8.37.0",
+    "@vitejs/plugin-vue": "^6.0.3",
+    "autoprefixer": "^10.4.23",
     "css-loader": "^7.1.2",
-    "html-webpack-plugin": "^5.6.4",
     "postcss": "^8.5.6",
     "postcss-loader": "^8.2.0",
     "postcss-preset-env": "^10.4.0",
     "raw-loader": "^4.0.2",
     "style-loader": "^4.0.0",
-	  "tailwindcss": "^3.4.18",
+    "tailwindcss": "^3.4.19",
     "ts-loader": "^9.5.4",
     "typescript": "^5.9.3",
-    "webpack": "^5.103.0",
-    "webpack-cli": "^6.0.1",
-    "webpack-dev-server": "^5.2.2"
+    "vite": "^7.3.0"
   },
   "dependencies": {
     "@tailwindcss/cli": "^4.1.17",
     "babylonjs-gltf2interface": "^8.37.0",
     "csstype": "^3.2.3"
   },
-  "description": ""
+  "description": "",
+  "type": "commonjs"
 }

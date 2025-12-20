@@ -1,4 +1,7 @@
-import { server } from "./app.js";
+import { buildServer } from "./app.js";
+
+
+export const server = buildServer({ useHttps: false });
 
 const start = async () => {
 	try {
@@ -7,7 +10,7 @@ const start = async () => {
 			host: process.env.ADDRESS,
 		});
 	} catch (err) {
-		server.log.error(err);
+		console.log(err);
 		process.exit(1);
 	}
 };
