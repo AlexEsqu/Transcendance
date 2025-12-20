@@ -2,17 +2,6 @@ export {User, RegisteredUser, GuestUser }
 
 const placeholderAvatar : string = "/assets/placeholder/avatarPlaceholder.png"
 
-const apiKey : string = import.meta.env.VITE_APP_SECRET_KEY ?? "oups";
-console.log('API Key loaded:', apiKey ? 'yes' : 'no');
-
-const ENV = {
-  APP_SECRET_KEY: import.meta.env.VITE_APP_SECRET_KEY,
-  JWT_SECRET: import.meta.env.VITE_JWT_SECRET,
-  NODE_ENV: import.meta.env.MODE,
-};
-
-console.log('Environment:', ENV);
-
 abstract class User {
 	name: string;
 	avatarPath: string;
@@ -44,71 +33,6 @@ class RegisteredUser extends User
 		super(name);
 		this.id = id;
 		this.accessToken = accessToken;
-	}
-
-	async updateAvatar(imageUrl : string): Promise<void>
-	{
-		const response = await fetch('http://localhost:3000/users/me/avatar',
-			{
-				method: 'PUT',
-				headers:
-				{
-					'accept': 'application/json',
-					'Content-Type': 'application/json',
-					'Authorization': `Bearer ${this.accessToken}`,
-					'X-App-Secret': `${apiKey}`
-				},
-				body: JSON.stringify({
-					'profilePictureUrl': `${imageUrl}`
-				})
-			});
-
-		if (!response.ok)
-			throw new Error(`Avatar update failed: ${response.status}`);
-
-		this.avatarPath = imageUrl;
-	}
-
-	async rename(newName : string): Promise<void>
-	{
-		const response = await fetch('http://localhost:3000/users/me/username',
-			{
-				method: 'PUT',
-				headers:
-				{
-					'accept': 'application/json',
-					'Content-Type': 'application/json',
-					'Authorization': `Bearer ${this.accessToken}`,
-					'X-App-Secret': `${apiKey}`
-				},
-				body: JSON.stringify({
-					username: newName
-				})
-			});
-
-		const data = await response.json();
-		if (!response.ok)
-			throw new Error(data.message || 'Renaming failed');
-
-		this.name = newName;
-	}
-
-	async changePassword(oldPassword: string, newPassword: string): Promise<void>
-	{
-		const response = await fetch('http://localhost:3000/users/me/password', {
-			method: 'PUT',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${this.accessToken}`,
-			},
-			body: JSON.stringify({
-				oldPassword, newPassword
-			})
-		});
-
-		const data = await response.json();
-		if (!response.ok)
-			throw new Error(data.message || 'Password change failed');
 	}
 }
 
