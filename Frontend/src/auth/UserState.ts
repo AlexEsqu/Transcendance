@@ -143,7 +143,7 @@ class UserState
 		this.setUser(guestUser);
 	}
 
-	public async loginAsRegistered(login: string, password: string)
+	public async loginAsRegistered(login: string, password: string): Promise<void>
 	{
 		const response = await fetch('http://localhost:3000/users/auth/login',
 			{
@@ -160,10 +160,10 @@ class UserState
 			}
 		);
 
-		if (!response.ok)
-			throw new Error('Login failed');
-
 		const data = await response.json();
+		if (!response.ok)
+			throw new Error(data.message);
+
 		const user = new RegisteredUser(login, data.id, data.accessToken);
 		this.setUser(user);
 	}
@@ -185,14 +185,9 @@ class UserState
 			}
 		);
 
+		const data = await response.json();
 		if (!response.ok)
-		{
-			if (response.status === 409)
-				throw new Error('Username already exists');
-			throw new Error('Registration failed');
-		}
-
-		await this.loginAsRegistered(username, password);
+			throw new Error(data.message);
 	}
 
 	public async logout(): Promise<void>
