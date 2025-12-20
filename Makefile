@@ -11,6 +11,7 @@ WEB_DIR				=	pages
 
 FRONT_SERVICES		=	typescript
 BACK_SERVICES		=	fastify
+GAME_SERVICES		=	gameServer
 
 USER := $(shell whoami)
 
