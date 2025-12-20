@@ -1,6 +1,6 @@
 export {User, RegisteredUser, GuestUser }
 
-const placeholderAvatar : string = "./placeholder/avatarPlaceholder.png"
+const placeholderAvatar : string = "/assets/placeholder/avatarPlaceholder.png"
 
 const apiKey : string = import.meta.env.VITE_APP_SECRET_KEY ?? "oups";
 console.log('API Key loaded:', apiKey ? 'yes' : 'no');

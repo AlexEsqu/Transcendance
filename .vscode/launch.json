@@ -4,24 +4,19 @@
 	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
 	"version": "0.2.0",
 	"configurations": [
-	{
-		"name": "Launch Chrome",
-		"request": "launch",
-		"type": "chrome",
-		"url": "http://localhost:8080",
-		"webRoot": "${workspaceFolder}"
-	},
 		{
-			"type": "node",
+			"name": "Debug on Chrome",
 			"request": "launch",
-			"name": "Launch Program",
-			"skipFiles": [
-				"<node_internals>/**"
-			],
-			"program": "${workspaceFolder}/Frontend/src/landing/nav.ts",
-			"outFiles": [
-				"${workspaceFolder}/**/*.js"
-			]
-		}
+			"type": "chrome",
+			"url": "http://localhost:8080",
+			"webRoot": "${workspaceFolder}/Frontend/src"
+		},
+		{
+            "name": "Debug on Firefox",
+            "type": "firefox",
+            "request": "launch",
+            "url": "http://localhost:8080",
+            "webRoot": "${workspaceFolder}/Frontend/src"
+        }
 	]
 }

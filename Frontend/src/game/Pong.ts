@@ -204,11 +204,12 @@ export class Pong {
 				paddle = this.scene.leftPadd.paddle;
 				if (keys["w"]) side = "up";
 			}
-	
+
 			if (this.robot) this.scene.leftPadd.paddle.autoMove(this.scene.ball, (Pong.MAP_HEIGHT / 2), this.time);
 			if (paddle) paddle.move(side, Pong.MAP_HEIGHT / 2, this.time);
-	
-			drawScore(this.canvasUI,  this.scene.leftPadd.player.score,  this.scene.rightPadd.player.score);
+
+			if (this.scene.leftPadd.player && this.scene.rightPadd.player)
+				drawScore(this.canvasUI,  this.scene.leftPadd.player.score,  this.scene.rightPadd.player.score);
 		}
 
 		return isBallOutOfBounds;
@@ -236,7 +237,7 @@ export class Pong {
 		if (this.scene && this.scene.options && this.scene.id) {
 			const timer = createText(countdown.toString(), this.scene.options.ballColor, 60, "200px", "0px", this.gui);
 			const animation = createAnimation("timer", "fontSize", keys);
-	
+
 			timer.animations = [animation];
 			this.scene.id.beginAnimation(timer, 0, 30, false, 1, () => {
 				if (this.gui) this.gui.removeControl(timer);
