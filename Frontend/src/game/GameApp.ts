@@ -44,8 +44,6 @@ class App {
 
 export function launchPongGame(options: IOptions): void
 {
-	//	Display start button and game window
-	// document.body.insertAdjacentHTML("beforeend", gameHtml);
 
 	const startBtnDisplay: HTMLElement | null = document.getElementById("game-start");
 	const btnStart: HTMLElement | null = document.getElementById('btn-startplay');

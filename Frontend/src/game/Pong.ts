@@ -101,7 +101,7 @@ export class Pong {
 			rounds = newRound(this.scene, rounds)
 			rounds.nbOfRounds += 1;
 
-			if (currentNbOfRounds < rounds.nbOfRounds 
+			if (currentNbOfRounds < rounds.nbOfRounds
 				&& this.canvasUI && this.scene && this.scene.leftPadd.player && this.scene.rightPadd.player) {
 				// drawMatchHistoryTree(this.canvasUI, playersColors, roundsColors, this.scene.options.nbOfPlayers);
 				drawName(this.canvasUI, this.scene.leftPadd.player.name, this.scene.rightPadd.player.name, rounds.nbOfRounds);
@@ -124,13 +124,12 @@ export class Pong {
 		let side: string = "down";
 
 		if (this.scene && keys && this.scene.ball && this.time && this.canvasUI
-			&& this.scene.leftPadd && this.scene.leftPadd.paddle && this.scene.rightPadd && this.scene.rightPadd.paddle
-			&& this.scene.leftPadd.player && this.scene.rightPadd.player) {
+			&& this.scene.leftPadd && this.scene.leftPadd.paddle && this.scene.rightPadd && this.scene.rightPadd.paddle) {
 			//	Move and update direction if there has been an impact with the ball
 			this.scene.ball.move(this.time);
 			if (this.scene.ball.update(this.scene.leftPadd, this.scene.rightPadd) == true)
 				status = 1;
-	
+
 			//	If a user presses a key, update the position of its padd
 			if (keys["ArrowDown"] || keys["ArrowUp"]) {
 				paddle = this.scene.rightPadd.paddle;
@@ -140,11 +139,12 @@ export class Pong {
 				paddle = this.scene.leftPadd.paddle;
 				if (keys["w"]) side = "up";
 			}
-	
+
 			if (this.robot) this.scene.leftPadd.paddle.autoMove(this.scene.ball, (Pong.MAP_HEIGHT / 2), this.time);
 			if (paddle) paddle.move(side, Pong.MAP_HEIGHT / 2, this.time);
-	
-			drawScore(this.canvasUI,  this.scene.leftPadd.player.score,  this.scene.rightPadd.player.score);
+
+			if (this.scene.leftPadd.player && this.scene.rightPadd.player)
+				drawScore(this.canvasUI,  this.scene.leftPadd.player.score,  this.scene.rightPadd.player.score);
 		}
 
 		return status;
@@ -168,7 +168,7 @@ export class Pong {
 		if (this.scene && this.scene.options && this.scene.id) {
 			const timer = createText(count.toString(), this.scene.options.ballColor, 60, "200px", "0px", this.gui);
 			const animation = createAnimation("timer", "fontSize", keys);
-	
+
 			timer.animations = [animation];
 			this.scene.id.beginAnimation(timer, 0, 30, false, 1, () => {
 				if (this.gui) this.gui.removeControl(timer);
