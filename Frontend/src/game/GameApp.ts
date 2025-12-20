@@ -63,4 +63,19 @@ export function launchPongGame(options: IOptions): void
 	}
 
 	const app = new App(gameWindow, options);
+	// const url = getWebSocketURL();
+	const url = "ws://localhost:4001/game"
+	const ws = new WebSocket(url);
+	ws.onopen = () => {
+		console.log("Client is connected to the game server");
+	};
+
+	ws.onmessage = (event) => {
+		const gameState = JSON.parse(event.data);
+		console.log("Game server state : ", gameState);
+	};
+
+	ws.onerror = (error) => {
+		console.error(error);
+	};
 }

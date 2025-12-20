@@ -14,6 +14,7 @@ COPY src/ ./src/
 # RUN npm run build
 
 EXPOSE 4001
+
 ENV PORT=4001
 ENV ADDRESS=0.0.0.0
 
