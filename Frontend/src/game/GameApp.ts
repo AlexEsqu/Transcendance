@@ -3,7 +3,7 @@ import { IOptions, Level } from "../game/Data"
 import gameHtml from '../pages/game.html?raw'
 import optionsHtml from '../pages/options.html?raw'
 
-import { loadOptions } from "./options"
+import { clearOptions, loadOptions } from "./options"
 
 class App {
 	pong: Pong;
@@ -34,6 +34,7 @@ class App {
 		this.startBtn.addEventListener('click', () => {
 			if (this.startBtnDisplay) this.startBtnDisplay.style.display = 'none';
 			this.play();
+			clearOptions();
 		});
 	}
 
