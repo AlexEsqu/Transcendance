@@ -2,23 +2,71 @@ import { createAccessToken, createRefreshToken, hashRefreshToken } from "../../s
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 
+export async function generateTokens(server, user, reply) {
+	const accessToken = createAccessToken(server, user.id, user.username);
+	const refreshToken = createRefreshToken(server, user.id, user.username);
+
+	const refreshTokenHash = await hashRefreshToken(refreshToken);
+	const addRefreshToken = server.db.prepare(`UPDATE users SET refresh_token_hash = ? WHERE id = ?`);
+	addRefreshToken.run(refreshTokenHash, user.id);
+	// set cookie
+	reply.setCookie("refreshToken", refreshToken, {
+		httpOnly: true,
+		secure: true,
+		sameSite: "strict",
+		path: "/users/auth",
+		maxAge: 60 * 60 * 24 * 7, // 7 days
+	});
+	const id = user.id;
+
+	reply.send({ accessToken, id });
+}
+
 export default function login(server) {
 	const opts = {
 		schema: {
 			description:
 				"Authenticates the user using their login (email or username) and password. \
-				On success, returns a the user's id AND short-lived access token in the response body and sets a long-lived refresh token\
-				 in the `HttpOnly refreshToken cookie`, which can later be used to obtain new access tokens. This endpoint requires the client to have validated their email.",
+   If authentication succeeds and two-factor authentication (2FA) is disabled, \
+   the endpoint returns the user's id and a short-lived access token in the response body \
+   and sets a long-lived refresh token in an HttpOnly `refreshToken` cookie. \
+   \
+   If 2FA is enabled for the user, the endpoint does not issue tokens immediately. \
+   Instead, a one-time 6-digit verification code is sent to the user's email and \
+   a temporary 2FA continuation token is generated, which must be used to complete \
+   authentication via the 2FA verification endpoint. \
+   `This endpoint requires the client to have a verified email address.`",
+			tags: ["auth"],
+
 			tags: ["auth"],
 			body: { $ref: "authCredentialsBody" },
 			response: {
 				200: {
-					type: "object",
-					properties: {
-						accessToken: { type: "string" },
-						id: { type: "integer" },
-					},
-					required: ["accessToken", "id"],
+					oneOf: [
+						{
+							description: "Login successful",
+							type: "object",
+							required: ["accessToken", "id"],
+							properties: {
+								accessToken: { type: "string" },
+								id: { type: "integer" },
+							},
+						},
+						{
+							description: "Two-factor authentication required",
+							type: "object",
+							required: ["twoFactorRequired", "token"],
+							properties: {
+								twoFactorRequired: { type: "boolean", example: true },
+								token: { type: "string", description: "2FA continuation token" },
+							},
+						},
+					],
+				},
+
+				302: {
+					description: "Redirect: Email not verified",
+					$ref: "SuccessMessageResponse#",
 				},
 				401: {
 					description: "Unauthorized: Invalid credentials",
@@ -45,7 +93,6 @@ export default function login(server) {
 			//looks for the user in the db if it exists
 
 			const user = await server.db.prepare(`SELECT * FROM users WHERE email = ? OR username = ? `).get(login, login);
-
 			if (!user) {
 				return reply.status(401).send({ error: "Invalid credentials" });
 			}
@@ -62,21 +109,22 @@ export default function login(server) {
 			if (user.is_2fa_enabled) {
 				const code = crypto.randomInt(100000, 999999).toString();
 				const codeHash = crypto.createHmac("sha256", process.env.OTP_SECRET).update(code).digest("hex");
-
 				const expires = Date.now() + 1000 * 60 * 5; // 5 minutes
 				const twoFaToken = crypto.randomUUID();
 
-				db.prepare(`UPDATE users SET code_hash_2fa = ?, code_expires_2fa = ?, token_2fa = ? WHERE id = ?`).run(codeHash, expires, twoFaToken, user.id);
-
+				server.db.prepare(`UPDATE users SET code_hash_2fa = ?, code_expires_2fa = ?, token_2fa = ? WHERE id = ?`).run(codeHash, expires, twoFaToken, user.id);
 				await server.mailer.sendMail({
 					from: `"Pong" <${process.env.GMAIL_USER}>`,
-					to: email,
+					to: user.email,
 					subject: "Your 6-digit verification code",
 					html: `
       				<p>Your 6-digit verification code is: ${code}</p>
     				`,
 				});
-				reply.redirect(`/users/auth/login/2fa/?token=${twoFaToken}`);
+				return reply.status(200).send({
+					twoFactorRequired: true,
+					token: twoFaToken,
+				});
 			}
 
 			const accessToken = createAccessToken(server, user.id, user.username);
