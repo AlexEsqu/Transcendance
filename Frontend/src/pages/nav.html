@@ -1,30 +1,30 @@
-<nav class="text-white p-4 box-border">
+<nav
+	class="text-white p-4 flex flex-between h-[20%]">
+
+
 	<div
 		id="user-menu-container"
-		class="group flex"
+		class="flex"
 	>
-		<!-- <div
-			id="avatar-container"
-			class="border border-style-none rounded-md p-5 border-box m-2"
-		> -->
+
 		<a
-					id="avatar-btn"
-					class="text-base text-glow cursor-pointer hover-glow-orange border rounded-md p-3 text-center bg-gray-950 p-5 border-box m-2"
-					href="/settings"
-					data-link
-				>
+			id="avatar-btn"
+			class="cursor-pointer w-[130px] h-[130px] hover-glow-orange border rounded-md bg-gray-950 border-box m-2"
+			href="/settings"
+			data-link>
+
 			<img
 				id="user-avatar-nav"
 				src="./placeholder/avatarPlaceholder.png"
-				class="p-0 m-0 w-20 h-20 "
+				class="p-0 m-0 min-w-[20px] min-h-[20px] object-cover block"
 			/>
-			</a>
-		<!-- </div> -->
+
+		</a>
 
 		<div
 			id="username-container"
-			class="m-2"
-		>
+			class="m-2">
+
 			<div
 				id="user-name-nav"
 				class="text-glow text-6xl m-0 p-0 self-start"
@@ -34,7 +34,7 @@
 
 			<div
 				id="user-menu-container"
-				class="mt-3 flex gap-2 items-start"
+				class="mt-5 flex gap-2 items-start"
 			>
 				<!-- <a
 					id="user-info-btn"
@@ -44,55 +44,37 @@
 				>
 					Settings
 				</a> -->
+
 				<button
 					id="logout-btn"
 					class="text-base text-glow cursor-pointer hover-glow-orange border rounded-md p-3 text-center bg-gray-950 "
 				>
 					Logout
 				</button>
+
 			</div>
+
 		</div>
 	</div>
 
 	<div
 		id="game-menu-container"
-		class="fixed text-white top-0 right-0 p-4 ml-2 box-border"
-	>
-		<div
-			id="games-dropdown"
-			class="text-glow text-xl m-3 p-0 relative group/game text-right"
+		class="flex self-end justify-end items-end gap-3 flex-wrap">
+
+		<a
+			class="text-base text-glow cursor-pointer hover-glow-orange border rounded-md p-3 text-center bg-gray-950 "
+			href="/game"
+			data-link
 		>
-			<button class="text-glow text-3xl m-0 p-0 leading-[0.7]">
-				GAMES
-			</button>
-			<div
-				class="hidden group-hover/game:flex flex-col self-end items-end gap-3 mt-4"
-			>
-				<a
-					id="pong-vs-ia-btn"
-					class="text-base text-glow cursor-pointer"
-					href="/game"
-					data-link
-				>
-					Pong Match vs IA
-				</a>
-				<a
-					id="pong-local-btn"
-					class="text-base text-glow cursor-pointer"
-					href="/game"
-					data-link
-				>
-					Pong Match local
-				</a>
-				<a
-					id="pong-tournament-btn"
-					class="text-base text-glow cursor-pointer"
-					href="/game"
-					data-link
-				>
-					Tournament
-				</a>
-			</div>
-		</div>
+			Pong
+		</a>
+		<a
+			class="text-base text-glow cursor-pointer hover-glow-orange border rounded-md p-3 text-center bg-gray-950 "
+			href="/game/tournament"
+			data-link
+		>
+			Pong Tournament
+		</a>
+
 	</div>
 </nav>
