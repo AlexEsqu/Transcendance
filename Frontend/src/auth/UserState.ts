@@ -143,7 +143,7 @@ class UserState
 		this.setUser(guestUser);
 	}
 
-	public async loginAsRegistered(username: string, password: string)
+	public async loginAsRegistered(login: string, password: string)
 	{
 		const response = await fetch('http://localhost:3000/users/auth/login',
 			{
@@ -154,7 +154,7 @@ class UserState
 				},
 				body: JSON.stringify(
 					{
-						username, password
+						login, password
 					}
 				),
 			}
@@ -164,7 +164,7 @@ class UserState
 			throw new Error('Login failed');
 
 		const data = await response.json();
-		const user = new RegisteredUser(username, data.id, data.accessToken);
+		const user = new RegisteredUser(login, data.id, data.accessToken);
 		this.setUser(user);
 	}
 
