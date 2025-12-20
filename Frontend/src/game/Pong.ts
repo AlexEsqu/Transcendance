@@ -7,7 +7,7 @@ import { createText, createAnimation, loadGame, createMaterial } from './Graphic
 import { monitoringRounds, saveResults, newRound, drawMatchHistoryTree, drawScore, drawName } from './manageRounds';
 
 export interface IPaddle {
-	paddle: Paddle  | null,
+	paddle: Paddle,
 	player: IPlayer | null,
 };
 
@@ -27,7 +27,8 @@ export class Pong {
 	scene: IScene | null;
 	canvasUI?: HTMLCanvasElement;
 
-	constructor(canvasId: string, options: IOptions, onNewRound?: () => void) {
+	constructor(canvasId: string, options: IOptions, onNewRound?: () => void)
+	{
 		this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
 		this.engine = new Engine(this.canvas, true);
 		this.gui = null;
@@ -66,10 +67,10 @@ export class Pong {
 
 
 	/**
-	 * 	- Start the game by launching the ball and monitoring the score
-	 * 	- Manage user input and render the scene
+	 * 	- Main loop that displays/renders the game scene and listens for events and inputs to update each frame
 	 */
-	runGame(): void {
+	runGame(): void
+	{
 		if (!this.engine || !this.scene || !this.scene.id) {
 			console.error("while loading 'Pong' game");
 			return ;
@@ -90,8 +91,10 @@ export class Pong {
 			if (this.scene && this.scene.state === State.play && this.isLaunched) {
 				let launch = this.updateGame(keys);
 				isNewRound = monitoringRounds(this.scene, rounds.nbOfRounds);
+				//	If 'updateGame' has detected that the ball is out of bounds, must relaunch the ball from the middle of the map
 				if (launch && !isNewRound) this.launch(3);
 			}
+			//	If 'monitoringRounds' has detected that a player has reached the max score
 			if (isNewRound) { rounds = this.requestNewRound(rounds); console.log(rounds); }
 			isNewRound = false;
 			this.time = Date.now();
@@ -103,15 +106,27 @@ export class Pong {
 		});
 	}
 
+	/**
+	 * 	- Save the results of the previous match, if needed and/or assign new players their paddles, also reset data if needed
+	 */
 	requestNewRound(rounds: IRound): IRound
 	{
+<<<<<<< Updated upstream
 		if (!this.scene || !this.scene.id || !this.canvasUI || !this.scene.leftPadd || !this.scene.rightPadd) return rounds;
+=======
+		if (!this.scene) {
+			console.error("'scene' object is null");
+			return rounds;
+		}
+
+>>>>>>> Stashed changes
 		this.scene.state = State.pause;
 		this.isLaunched = false;
 
 		let currentNbOfRounds: number = 0;
 		if (rounds) currentNbOfRounds = rounds.nbOfRounds;
 
+<<<<<<< Updated upstream
 		rounds = saveResults(this.scene.leftPadd, this.scene.rightPadd, rounds);
 		rounds = newRound(this.scene, rounds);
 		rounds.nbOfRounds += 1;
@@ -126,8 +141,25 @@ export class Pong {
 			drawScore(this.canvasUI,  this.scene.leftPadd.player.score,  this.scene.rightPadd.player.score);
 			this.scene.leftPadd.paddle.mesh.material = createMaterial(this.scene.id, new Color3().fromHexString(this.scene.leftPadd.player.color));
 			this.scene.rightPadd.paddle.mesh.material = createMaterial(this.scene.id, new Color3().fromHexString(this.scene.rightPadd.player.color));
+=======
+		//	Save the results of the previous match, if there was one
+		if (this.scene.leftPadd && this.scene.rightPadd)
+			rounds = saveResults(this.scene.leftPadd, this.scene.rightPadd, rounds);
+		//	Assign new players to their paddles for the next match and reset data (paddle & ball)
+		rounds = newRound(this.scene, rounds)
+		rounds.nbOfRounds += 1;
+
+		// Display names and score of the new players
+		if (currentNbOfRounds < rounds.nbOfRounds && this.canvasUI && this.scene.leftPadd && this.scene.rightPadd) {
+			// drawMatchHistoryTree(this.canvasUI, playersColors, roundsColors, this.scene.options.nbOfPlayers);
+			if (this.scene.leftPadd.player?.name && this.scene.rightPadd.player?.name)
+				drawName(this.canvasUI, this.scene.leftPadd.player.name, this.scene.rightPadd.player.name, rounds.nbOfRounds);
+			if (this.scene.leftPadd.player?.score && this.scene.rightPadd.player?.score)
+				drawScore(this.canvasUI,  this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
+>>>>>>> Stashed changes
 		}
 
+		//	Display start button to launch the game for a new round
 		if (this.onNewRound && rounds.nbOfRounds <= Pong.MAX_ROUNDS) this.onNewRound();
 		else monitoringRounds(this.scene, rounds.nbOfRounds);
 
@@ -135,22 +167,34 @@ export class Pong {
 	}
 
 	/**
-	 * 	- Listen to new user input and update data accordingly
+	 * 	- Listen to new user inputs and update every paddle's data accordingly
+	 * 	- Returns '1' if it has been detected that the ball is out of bounds, otherwise 0
 	 */
 	updateGame(keys: Record<string, boolean>): number
 	{
-		let status: number = 0;
+		let isBallOutOfBounds: number = 0;
 		let paddle: Paddle | null = null;
 		let side: string = "down";
 
 		if (this.scene && keys && this.scene.ball && this.time && this.canvasUI
+<<<<<<< Updated upstream
 			&& this.scene.leftPadd && this.scene.leftPadd.paddle && this.scene.rightPadd && this.scene.rightPadd.paddle
 			&& this.scene.leftPadd.player && this.scene.rightPadd.player) {
 			//	Move and update direction if there has been an impact with the ball
+=======
+			&& this.scene.leftPadd && this.scene.leftPadd.paddle && this.scene.rightPadd && this.scene.rightPadd.paddle) {
+			//	Update ball's position according to its direction and velocity
+>>>>>>> Stashed changes
 			this.scene.ball.move(this.time);
+			//	Check for collisions and invert ball's direction if so
 			if (this.scene.ball.update(this.scene.leftPadd, this.scene.rightPadd) == true)
+<<<<<<< Updated upstream
 				status = 1;
 	
+=======
+				isBallOutOfBounds = 1;
+
+>>>>>>> Stashed changes
 			//	If a user presses a key, update the position of its padd
 			if (keys["ArrowDown"] || keys["ArrowUp"]) {
 				paddle = this.scene.rightPadd.paddle;
@@ -167,11 +211,15 @@ export class Pong {
 			drawScore(this.canvasUI,  this.scene.leftPadd.player.score,  this.scene.rightPadd.player.score);
 		}
 
-		return status;
+		return isBallOutOfBounds;
 	}
 
-	launch(count: number): void {
-		if (count <= 0 && this.scene && this.scene.ball) {
+	/**
+	 * 	- Start the ball motion after the animation-countdown
+	 */
+	launch(countdown: number): void
+	{
+		if (countdown <= 0 && this.scene && this.scene.ball) {
 			this.scene.state = State.play;
 			this.isLaunched = true;
 			this.scene.ball.launch();
@@ -186,18 +234,21 @@ export class Pong {
 		this.gui = AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
 		if (this.scene && this.scene.options && this.scene.id) {
-			const timer = createText(count.toString(), this.scene.options.ballColor, 60, "200px", "0px", this.gui);
+			const timer = createText(countdown.toString(), this.scene.options.ballColor, 60, "200px", "0px", this.gui);
 			const animation = createAnimation("timer", "fontSize", keys);
 	
 			timer.animations = [animation];
 			this.scene.id.beginAnimation(timer, 0, 30, false, 1, () => {
 				if (this.gui) this.gui.removeControl(timer);
-				count--;
-				this.launch(count);
+				countdown--;
+				this.launch(countdown);
 			});
 		}
 	}
 
+	/**
+	 * 	- Camera tilt animation when the game launches
+	 */
 	opening(): void {
 		console.log("GAME-STATE: opening");
 		const keys = [

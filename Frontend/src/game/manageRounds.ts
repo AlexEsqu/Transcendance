@@ -8,7 +8,7 @@ export { monitoringRounds, saveResults, newRound, drawMatchHistoryTree, drawScor
 /***********************************************************************************************************/
 
 /**
- * 	- Check if any of the players have reached the maximum score
+ * 	- Returns 'true' if one of the players has reached the maximum score, otherwise false
  */
 function monitoringRounds(scene: IScene, nbOfRounds: number): boolean
 {
@@ -17,7 +17,12 @@ function monitoringRounds(scene: IScene, nbOfRounds: number): boolean
 	if (scene.leftPadd.player.score == Pong.MAX_SCORE || scene.rightPadd.player.score == Pong.MAX_SCORE)
 	{
 		console.log("GAME-STATE: a player has won the round");
+<<<<<<< Updated upstream
 		if (nbOfRounds > Pong.MAX_ROUNDS) scene.state = State.end;
+=======
+		//	The game should stop if all the rounds have been played!
+		if (nbOfRounds >= Pong.MAX_ROUNDS) scene.state = State.end;
+>>>>>>> Stashed changes
 		return true;
 	}
 	return false;
@@ -57,19 +62,29 @@ function saveResults(leftPadd: IPaddle, rightPadd: IPaddle, rounds: IRound): IRo
 
 function newRound(scene: IScene, rounds: IRound): IRound
 {
-	if (!scene || (rounds && rounds.nbOfRounds == Pong.MAX_ROUNDS) || !scene.players || !rounds.results) return rounds;
-	console.log("GAME-STATE: new round");
+	if (!scene || (rounds && rounds.nbOfRounds == Pong.MAX_ROUNDS)) return rounds;
 
 	const leftPadd = scene.leftPadd;
 	const rightPadd = scene.rightPadd;
+
+	if (!leftPadd || !rightPadd) {
+		console.error("objects are missing to launch a new round");
+		return rounds;
+	}
+	console.log("GAME-STATE: new round");
+	
 	let nbOfPlayers = scene.options.nbOfPlayers;
+<<<<<<< Updated upstream
 
 	if (!leftPadd || !rightPadd || !leftPadd.player || !rightPadd.player ) return rounds;
 
+=======
+>>>>>>> Stashed changes
 	//	Who's playing now ?
 	if (nbOfPlayers == 4 && rounds.nbOfRounds >= 0 && rounds.nbOfRounds < 2) nbOfPlayers = 2;
-	else if (nbOfPlayers == 8 && rounds.nbOfRounds >= 0 && rounds.nbOfRounds < 4) nbOfPlayers = 2;
+	// else if (nbOfPlayers == 8 && rounds.nbOfRounds >= 0 && rounds.nbOfRounds < 4) nbOfPlayers = 2;
 
+<<<<<<< Updated upstream
 	switch (nbOfPlayers)
 	{
 		case 4:
@@ -97,12 +112,37 @@ function newRound(scene: IScene, rounds: IRound): IRound
 			rightPadd.player = scene.players[rounds.playerIndex];
 			rounds.playerIndex++;
 			break ;
+=======
+	//	
+	if (nbOfPlayers == 4 && rounds.results && rounds.nbOfRounds == Pong.MAX_ROUNDS - 1) {
+		// console.log("4 players last round");
+		if (rounds.results[0]) leftPadd.player = rounds.results[0].winner;
+		if (rounds.results[1]) rightPadd.player = rounds.results[1].winner;
+	} else if (scene.players) {
+		// console.log("default assign");
+		if (nbOfPlayers != 1 && rounds.playerIndex >= scene.options.nbOfPlayers) return rounds;
+		leftPadd.player = scene.players[rounds.playerIndex];
+		rounds.playerIndex++;
+		rightPadd.player = scene.players[rounds.playerIndex];
+		rounds.playerIndex++;
+>>>>>>> Stashed changes
 	}
+	/** Condition if 8 players for a tournament */
+	// if (nbOfPlayers == 8 && rounds.nbOfRounds == Pong.MAX_ROUNDS / 2) {
+	// 	leftPadd.player = rounds.results[0].winner;
+	// 	rightPadd.player = rounds.results[1].winner;
+	// } else if (rounds.nbOfRounds == (Pong.MAX_ROUNDS / 2) + 1) {
+	// 	leftPadd.player = rounds.results[2].winner;
+	// 	rightPadd.player = rounds.results[3].winner;
+	// } else if (rounds.nbOfRounds == Pong.MAX_ROUNDS - 1) {
+	// 	leftPadd.player = rounds.results[4].winner;
+	// 	rightPadd.player = rounds.results[5].winner;
+	// }
 
 	//	Reset data
-	if (leftPadd.paddle) leftPadd.paddle.resetPosition(Pong.MAP_WIDTH, "left");
-	if (rightPadd.paddle) rightPadd.paddle.resetPosition(Pong.MAP_WIDTH, "right");
 	if (scene.ball) scene.ball.reset(true);
+	leftPadd.paddle.resetPosition(Pong.MAP_WIDTH, "left");
+	rightPadd.paddle.resetPosition(Pong.MAP_WIDTH, "right");
 	if (leftPadd.player) leftPadd.player.score = 0;
 	if (rightPadd.player) rightPadd.player.score = 0;
 
