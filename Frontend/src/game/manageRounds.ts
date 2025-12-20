@@ -9,6 +9,7 @@ export { monitoringRounds, saveResults, newRound, drawMatchHistoryTree, drawScor
 
 /**
  * 	- Returns 'true' if one of the players has reached the maximum score, otherwise false
+ * 	- Returns 'true' if one of the players has reached the maximum score, otherwise false
  */
 function monitoringRounds(scene: IScene, nbOfRounds: number): boolean
 {
@@ -17,12 +18,8 @@ function monitoringRounds(scene: IScene, nbOfRounds: number): boolean
 	if (scene.leftPadd.player.score == Pong.MAX_SCORE || scene.rightPadd.player.score == Pong.MAX_SCORE)
 	{
 		console.log("GAME-STATE: a player has won the round");
-<<<<<<< Updated upstream
-		if (nbOfRounds > Pong.MAX_ROUNDS) scene.state = State.end;
-=======
 		//	The game should stop if all the rounds have been played!
 		if (nbOfRounds >= Pong.MAX_ROUNDS) scene.state = State.end;
->>>>>>> Stashed changes
 		return true;
 	}
 	return false;
@@ -72,60 +69,23 @@ function newRound(scene: IScene, rounds: IRound): IRound
 		return rounds;
 	}
 	console.log("GAME-STATE: new round");
-	
-	let nbOfPlayers = scene.options.nbOfPlayers;
-<<<<<<< Updated upstream
 
-	if (!leftPadd || !rightPadd || !leftPadd.player || !rightPadd.player ) return rounds;
-
-=======
->>>>>>> Stashed changes
 	//	Who's playing now ?
+	let nbOfPlayers = scene.options.nbOfPlayers;
 	if (nbOfPlayers == 4 && rounds.nbOfRounds >= 0 && rounds.nbOfRounds < 2) nbOfPlayers = 2;
 	// else if (nbOfPlayers == 8 && rounds.nbOfRounds >= 0 && rounds.nbOfRounds < 4) nbOfPlayers = 2;
 
-<<<<<<< Updated upstream
-	switch (nbOfPlayers)
-	{
-		case 4:
-			if (rounds.nbOfRounds == Pong.MAX_ROUNDS - 1) {
-				if (rounds.results[0].winner) leftPadd.player = rounds.results[0].winner;
-				if (rounds.results[1].winner) rightPadd.player = rounds.results[1].winner;
-			}
-			break ;
-		case 8:
-			if (rounds.nbOfRounds == Pong.MAX_ROUNDS / 2) {
-				if (rounds.results[0].winner) leftPadd.player = rounds.results[0].winner;
-				if (rounds.results[1].winner) rightPadd.player = rounds.results[1].winner;
-			} else if (rounds.nbOfRounds == (Pong.MAX_ROUNDS / 2) + 1) {
-				if (rounds.results[2].winner) leftPadd.player = rounds.results[2].winner;
-				if (rounds.results[3].winner) rightPadd.player = rounds.results[3].winner;
-			} else if (rounds.nbOfRounds == Pong.MAX_ROUNDS - 1) {
-				if (rounds.results[4].winner) leftPadd.player = rounds.results[4].winner;
-				if (rounds.results[5].winner) rightPadd.player = rounds.results[5].winner;
-			}
-			break ;
-		default:
-			if (rounds.playerIndex >= scene.options.nbOfPlayers) return rounds;
-			leftPadd.player = scene.players[rounds.playerIndex];
-			rounds.playerIndex++;
-			rightPadd.player = scene.players[rounds.playerIndex];
-			rounds.playerIndex++;
-			break ;
-=======
-	//	
 	if (nbOfPlayers == 4 && rounds.results && rounds.nbOfRounds == Pong.MAX_ROUNDS - 1) {
 		// console.log("4 players last round");
 		if (rounds.results[0]) leftPadd.player = rounds.results[0].winner;
 		if (rounds.results[1]) rightPadd.player = rounds.results[1].winner;
 	} else if (scene.players) {
-		// console.log("default assign");
+		console.log("default assign");
 		if (nbOfPlayers != 1 && rounds.playerIndex >= scene.options.nbOfPlayers) return rounds;
 		leftPadd.player = scene.players[rounds.playerIndex];
 		rounds.playerIndex++;
 		rightPadd.player = scene.players[rounds.playerIndex];
 		rounds.playerIndex++;
->>>>>>> Stashed changes
 	}
 	/** Condition if 8 players for a tournament */
 	// if (nbOfPlayers == 8 && rounds.nbOfRounds == Pong.MAX_ROUNDS / 2) {
@@ -139,6 +99,8 @@ function newRound(scene: IScene, rounds: IRound): IRound
 	// 	rightPadd.player = rounds.results[5].winner;
 	// }
 
+	console.log(leftPadd);
+	console.log(rightPadd);
 	//	Reset data
 	if (scene.ball) scene.ball.reset(true);
 	leftPadd.paddle.resetPosition(Pong.MAP_WIDTH, "left");
@@ -146,15 +108,15 @@ function newRound(scene: IScene, rounds: IRound): IRound
 	if (leftPadd.player) leftPadd.player.score = 0;
 	if (rightPadd.player) rightPadd.player.score = 0;
 
-	let leftIndex = 0;
-	let rightIndex = 1;
-	if (rounds.nbOfRounds >= 1) {
-		leftIndex = rounds.nbOfRounds + 1;
-		rightIndex = rounds.nbOfRounds + 2;
-	}
+	// let leftIndex = 0;
+	// let rightIndex = 1;
+	// if (rounds.nbOfRounds >= 1) {
+	// 	leftIndex = rounds.nbOfRounds + 1;
+	// 	rightIndex = rounds.nbOfRounds + 2;
+	// }
 
-	if (rounds.nodeColor[leftIndex]) rounds.nodeColor[leftIndex] = leftPadd.player.color;
-	if (rounds.nodeColor[rightIndex]) rounds.nodeColor[rightIndex] = rightPadd.player.color;
+	// if (rounds.nodeColor[leftIndex]) rounds.nodeColor[leftIndex] = leftPadd.player.color;
+	// if (rounds.nodeColor[rightIndex]) rounds.nodeColor[rightIndex] = rightPadd.player.color;
 
 	scene.leftPadd = leftPadd;
 	scene.rightPadd = rightPadd;

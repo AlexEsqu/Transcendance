@@ -5,6 +5,7 @@ import { State, IPlayer, IRound, IOptions, IScene } from "./Data"
 import { Paddle } from './Paddle';
 import { createText, createAnimation, loadGame, createMaterial } from './Graphics';
 import { monitoringRounds, saveResults, newRound, drawMatchHistoryTree, drawScore, drawName } from './manageRounds';
+import { Ball } from './Ball';
 
 export interface IPaddle {
 	paddle: Paddle,
@@ -40,12 +41,17 @@ export class Pong {
 		this.scene = loadGame(this.engine, this.canvas, options);
 		if (!this.scene) return ;
 		let players: Array<IPlayer> = this.initPlayers(options.players, options.nbOfPlayers);
+		if (players.length != options.nbOfPlayers) {
+			console.error("players init failed, players are missing");
+			return ;
+		}
 		if (options.nbOfPlayers === 1) { // special case: opponent is a robot
 			this.robot = true;
 			players.push({ id: 0, name: "Robot", score: 0, color: "#8dbcff" });
 			players.reverse();
 		}
 		this.scene.players = players;
+		console.log(this.scene.players);
 		this.scene.state = State.opening;
 		this.time = Date.now();
 		this.canvasUI = document.getElementById("ui-canvas") as HTMLCanvasElement;
@@ -53,15 +59,17 @@ export class Pong {
 		this.canvasUI.height = window.innerHeight;
 	}
 	
+	//	J'ai mis en commentaire ici car manifestement il n'y a pas de couleur pour le joueur
 	initPlayers(inputs: string[], nbOfPlayer: number): Array<IPlayer>
 	{
 		let players: Array<IPlayer> = [];
 		for (let i = 0; i < nbOfPlayer * 2; i += 2)
 		{
-			if (inputs[i] && inputs[i + 1])
-				players.push({ id: 0, name: inputs[i], score: 0, color: inputs[i + 1]} );
+			// if (inputs[i] && inputs[i + 1])
+			// 	players.push({ id: 0, name: inputs[i], score: 0, color: inputs[i + 1]} );
+			if (inputs[i])
+				players.push({ id: 0, name: inputs[i], score: 0, color: "#"} );
 		}
-
 		return players;
 	}
 
@@ -71,17 +79,14 @@ export class Pong {
 	 */
 	runGame(): void
 	{
-		if (!this.engine || !this.scene || !this.scene.id) {
-			console.error("while loading 'Pong' game");
+		if (!this.engine || !this.scene || !this.scene.id || (this.scene.players && this.scene.players.length <= 1)) {
+			console.error("error occured while loading 'Pong' game");
 			return ;
 		}
 
 		const keys: Record<string, boolean> = {};
 		let isNewRound: boolean = true;
 		let rounds: IRound = { results: null, nbOfRounds: 0, playerIndex: 0, nodeColor: [] };
-		if (this.scene.options.nbOfPlayers == 1) rounds.nodeColor[0] = "rgb(141, 188, 255)";
-		for (let i = 0; i < this.scene.options.nbOfPlayers + 2; i++)
-			rounds.nodeColor[i] = "rgb(141, 188, 255)";
 
 		//	Manage user input and update data before render
 		this.handleInput(keys, rounds);
@@ -111,37 +116,17 @@ export class Pong {
 	 */
 	requestNewRound(rounds: IRound): IRound
 	{
-<<<<<<< Updated upstream
-		if (!this.scene || !this.scene.id || !this.canvasUI || !this.scene.leftPadd || !this.scene.rightPadd) return rounds;
-=======
 		if (!this.scene) {
 			console.error("'scene' object is null");
 			return rounds;
 		}
 
->>>>>>> Stashed changes
 		this.scene.state = State.pause;
 		this.isLaunched = false;
 
 		let currentNbOfRounds: number = 0;
 		if (rounds) currentNbOfRounds = rounds.nbOfRounds;
 
-<<<<<<< Updated upstream
-		rounds = saveResults(this.scene.leftPadd, this.scene.rightPadd, rounds);
-		rounds = newRound(this.scene, rounds);
-		rounds.nbOfRounds += 1;
-		
-		if (currentNbOfRounds < rounds.nbOfRounds 
-			&& this.scene.leftPadd.player && this.scene.rightPadd.player
-			&& this.scene.leftPadd.paddle && this.scene.rightPadd.paddle
-			&& this.scene.leftPadd.paddle.mesh && this.scene.rightPadd.paddle.mesh)
-		{
-			drawMatchHistoryTree(this.canvasUI, rounds, this.scene.options.nbOfPlayers);
-			drawName(this.canvasUI, this.scene.leftPadd.player.name, this.scene.rightPadd.player.name, rounds.nbOfRounds);
-			drawScore(this.canvasUI,  this.scene.leftPadd.player.score,  this.scene.rightPadd.player.score);
-			this.scene.leftPadd.paddle.mesh.material = createMaterial(this.scene.id, new Color3().fromHexString(this.scene.leftPadd.player.color));
-			this.scene.rightPadd.paddle.mesh.material = createMaterial(this.scene.id, new Color3().fromHexString(this.scene.rightPadd.player.color));
-=======
 		//	Save the results of the previous match, if there was one
 		if (this.scene.leftPadd && this.scene.rightPadd)
 			rounds = saveResults(this.scene.leftPadd, this.scene.rightPadd, rounds);
@@ -156,7 +141,6 @@ export class Pong {
 				drawName(this.canvasUI, this.scene.leftPadd.player.name, this.scene.rightPadd.player.name, rounds.nbOfRounds);
 			if (this.scene.leftPadd.player?.score && this.scene.rightPadd.player?.score)
 				drawScore(this.canvasUI,  this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
->>>>>>> Stashed changes
 		}
 
 		//	Display start button to launch the game for a new round
@@ -172,45 +156,37 @@ export class Pong {
 	 */
 	updateGame(keys: Record<string, boolean>): number
 	{
+		if (!this.scene) return 0;
+
 		let isBallOutOfBounds: number = 0;
 		let paddle: Paddle | null = null;
 		let side: string = "down";
 
-		if (this.scene && keys && this.scene.ball && this.time && this.canvasUI
-<<<<<<< Updated upstream
-			&& this.scene.leftPadd && this.scene.leftPadd.paddle && this.scene.rightPadd && this.scene.rightPadd.paddle
-			&& this.scene.leftPadd.player && this.scene.rightPadd.player) {
-			//	Move and update direction if there has been an impact with the ball
-=======
-			&& this.scene.leftPadd && this.scene.leftPadd.paddle && this.scene.rightPadd && this.scene.rightPadd.paddle) {
-			//	Update ball's position according to its direction and velocity
->>>>>>> Stashed changes
-			this.scene.ball.move(this.time);
-			//	Check for collisions and invert ball's direction if so
-			if (this.scene.ball.update(this.scene.leftPadd, this.scene.rightPadd) == true)
-<<<<<<< Updated upstream
-				status = 1;
-	
-=======
-				isBallOutOfBounds = 1;
-
->>>>>>> Stashed changes
-			//	If a user presses a key, update the position of its padd
-			if (keys["ArrowDown"] || keys["ArrowUp"]) {
-				paddle = this.scene.rightPadd.paddle;
-				if (keys["ArrowUp"]) side = "up";
-			}
-			if (!this.robot && (keys["s"] || keys["w"])) {
-				paddle = this.scene.leftPadd.paddle;
-				if (keys["w"]) side = "up";
-			}
-
-			if (this.robot) this.scene.leftPadd.paddle.autoMove(this.scene.ball, (Pong.MAP_HEIGHT / 2), this.time);
-			if (paddle) paddle.move(side, Pong.MAP_HEIGHT / 2, this.time);
-
-			if (this.scene.leftPadd.player && this.scene.rightPadd.player)
-				drawScore(this.canvasUI,  this.scene.leftPadd.player.score,  this.scene.rightPadd.player.score);
+		if (!this.scene.ball || !this.time || !this.scene.leftPadd || !this.scene.rightPadd) {
+			console.error("objects are missing to run and update the game, can't continue");
+			return 0;
 		}
+		//	Update ball's position according to its direction and velocity
+		this.scene.ball.move(this.time);
+		//	Check for collisions and invert ball's direction if so
+		if (this.scene.ball.update(this.scene.leftPadd, this.scene.rightPadd) == true)
+			isBallOutOfBounds = 1;
+
+		//	If a user presses a key, update the position of its padd
+		if ((keys["ArrowDown"] || keys["ArrowUp"])) {
+			paddle = this.scene.rightPadd.paddle;
+			if (keys["ArrowUp"]) side = "up";
+		}
+		if (!this.robot && (keys["s"] || keys["w"])) {
+			paddle = this.scene.leftPadd.paddle;
+			if (keys["w"]) side = "up";
+		}
+
+		if (this.robot) this.scene.leftPadd.paddle.autoMove(this.scene.ball, (Pong.MAP_HEIGHT / 2), this.time);
+		if (paddle) paddle.move(side, Pong.MAP_HEIGHT / 2, this.time);
+
+		if (this.canvasUI && this.scene.leftPadd.player && this.scene.rightPadd.player)
+			drawScore(this.canvasUI,  this.scene.leftPadd.player.score,  this.scene.rightPadd.player.score);
 
 		return isBallOutOfBounds;
 	}
@@ -220,6 +196,8 @@ export class Pong {
 	 */
 	launch(countdown: number): void
 	{
+		if (!this.scene || !this.scene.leftPadd?.player || !this.scene.rightPadd?.player) return ;
+
 		if (countdown <= 0 && this.scene && this.scene.ball) {
 			this.scene.state = State.play;
 			this.isLaunched = true;
