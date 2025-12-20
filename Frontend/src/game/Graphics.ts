@@ -5,7 +5,7 @@ import { Paddle } from './Paddle';
 import { Pong } from './Pong';
 import { IOptions, IScene } from './Data';
 
-export { createBall, createPaddle, createCamera, createMap, createAnimation, loadGame, createText }
+export { createBall, createPaddle, createCamera, createText, createMap, createAnimation, loadGame, createMaterial }
 
 function createMaterial(scene: Scene, color: Color3): StandardMaterial | null
 {
@@ -118,42 +118,53 @@ function loadGame(engine: Engine, canvas: HTMLCanvasElement, options: IOptions):
 {
 	if (!engine || !canvas || !options) return null;
 	
-	let scene: IScene = { id: null, camera: null, ball: null, 
-		leftPadd: { paddle: null, player: null }, 
-		rightPadd: { paddle: null, player: null },
-		options: options,
-		players: null,
-		state: 0
-	};
 
-	scene.id = new Scene(engine);
-	if (!scene.id) {
-		console.error("can't load game scene");
+	
+
+	const id = new Scene(engine) as Scene;
+	if (!id) {
+		console.error("failed to create 'Scene', can't load game");
 		return null;
 	}
 
 	//	Remove default background color
-	scene.id.clearColor = new Color4(0, 0, 0, 0);
+	id.clearColor = new Color4(0, 0, 0, 0);
 
-	scene.camera = createCamera(scene.id, canvas);
+	const camera = createCamera(id, canvas);
 
 	//	Create a glow layer to add a bloom effect around meshes
-	const glowLayer: GlowLayer = new GlowLayer("glow", scene.id, { mainTextureRatio: 0.6 });
+	const glowLayer: GlowLayer = new GlowLayer("glow", id, { mainTextureRatio: 0.6 });
 	glowLayer.intensity = 0.7;
 	glowLayer.blurKernelSize = 64;
 
-	const map: Mesh | null = createMap(scene.id, Pong.MAP_HEIGHT, Pong.MAP_WIDTH, options.mapColor);
+	const map: Mesh | null = createMap(id, Pong.MAP_HEIGHT, Pong.MAP_WIDTH, options.mapColor);
 
 	// Exclude map from bloom effect
 	// glowLayer.addExcludedMesh(map);
 
 	//	Create the ball
-	scene.ball = new Ball(scene.id, options.level, options.ballColor);
+	const ball = new Ball(id, options.level, options.ballColor);
+	if (!ball) {
+		console.error("GAME-ERROR: failed to create 'Ball', can't load game");
+		return null;
+	}
 
-	//	Creates 2 paddles, one for each players and 2DText for visual scoring
-	if (scene.leftPadd) scene.leftPadd.paddle = new Paddle(scene.id, "left", Pong.MAP_WIDTH, options.level, options.paddColor);
-	if (scene.rightPadd) scene.rightPadd.paddle = new Paddle(scene.id, "right", Pong.MAP_WIDTH, options.level, options.paddColor);
+	//	Creates 2 paddles, one for each players
+	const leftPadd = new Paddle(id, "left", Pong.MAP_WIDTH, options.level, options.paddColor);
+	const rightPadd = new Paddle(id, "right", Pong.MAP_WIDTH, options.level, options.paddColor);
+	if (!leftPadd || !rightPadd) {
+		console.error("GAME-ERROR: failed to create 'Paddle', can't load game");
+		return null;
+	}
 	
+	const scene: IScene = { id: id, camera: camera, ball: ball, 
+		leftPadd: { paddle: leftPadd, player: null }, 
+		rightPadd: { paddle: rightPadd, player: null },
+		options: options,
+		players: null,
+		state: 0
+	};
+
 	console.log("GAME-STATE: loaded");
 	return scene;
 }

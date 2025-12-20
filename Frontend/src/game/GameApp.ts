@@ -61,5 +61,6 @@ export function launchPongGame(options: IOptions): void
 		console.error("canvas context not found");
 		return ;
 	}
+
 	const app = new App(gameWindow, options);
 }

@@ -6,7 +6,11 @@ export { State, Level }
 export type {IPlayer, IRound, IOptions, IScene, IResult }
 
 enum State {
-	opening, launch, play, pause, end
+	opening, launch, play, pause, end, stop
+};
+
+enum Level {
+	easy, medium, hard
 };
 
 interface IOptions {
@@ -33,6 +37,7 @@ interface IPlayer {
 	id: number;
 	name: string;
 	score: number;
+	color: string;
 };
 
 interface IResult {
@@ -46,8 +51,5 @@ interface IRound {
 	results: Array<IResult> | null;
 	nbOfRounds: number;
 	playerIndex: number;
+	nodeColor: string[];
 }
-
-enum Level {
-	easy, medium, hard
-};

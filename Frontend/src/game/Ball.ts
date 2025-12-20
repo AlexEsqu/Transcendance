@@ -19,9 +19,20 @@ export class Ball {
 		Ball.START_SPEED += level;
 		Ball.MAX_SPEED += level;
 		this.mesh = createBall(scene, Ball.RADIUS, color);
-		if (!this.mesh) return ;
+		if (!this.mesh) {
+			console.error("'ball' mesh failed to be created");
+			return ;
+		}
 		this.mesh.position = new Vector3(0.0, 0.2, 0.0);
+		if (!this.mesh.position) {
+			console.error("'ball' mesh's position Vector3 failed to be created");
+			return ;
+		}
 		this.direction = new Vector3(0.5, 0.0, 0.0).normalize();
+		if (!this.direction) {
+			console.error("'ball' direction Vector3 failed to be created");
+			return ;
+		}
 		this.ball = { minX: 0.0, maxX: 0.0, minZ: 0.0, maxZ: 0.0 };
 		this.speed = Ball.START_SPEED;
 	}
@@ -44,7 +55,8 @@ export class Ball {
 	 */
 	update(leftPadd: IPaddle | null, rightPadd: IPaddle | null): boolean
 	{
-		if (!leftPadd || !rightPadd || leftPadd.paddle || !rightPadd.paddle || !this.mesh || !rightPadd.player || !leftPadd.player || !this.ball || !this.direction) return false;
+		if (!this.direction || !this.mesh || !this.ball) return false;
+		if (!leftPadd || !rightPadd || !leftPadd.paddle || !rightPadd.paddle || !leftPadd.player|| !rightPadd.player) return false;
 
 		this.ball.minX = this.mesh.position.x - Ball.RADIUS;
 		this.ball.maxX = this.mesh.position.x + Ball.RADIUS;
