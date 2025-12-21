@@ -8,6 +8,15 @@
     background-color: oklch(21.997% 0.02211 272.648);
   }
 
+  .glow-select:hover, .glow-select:active, .glow-select:focus {
+    box-shadow: 0 0 8px 2px #2ed2ff66, 0 0 20px 6px #2ed2ffcc;
+    transition: box-shadow 0.3s;
+    border-color: #2ed2ff66;
+    border-style: solid;
+    animation: text-glow 2s ease-in-out infinite alternate;
+    outline: none;
+  }
+
 
   .glow {
     -webkit-box-shadow: 0 0 110px 11px oklch(68.5% 0.169 237.323);
@@ -51,7 +60,7 @@
     to   { text-shadow: 0 0 25px rgba(255, 0, 0, 0.8), 0 0 25px rgba(255, 100, 100, 0.6); }
   }
 
-  .hover-glow-orange:hover {
+  .big-glow:hover {
     box-shadow: 0 0 8px 2px #2ed2ff66, 0 0 20px 6px #2ed2ffcc;
     transition: box-shadow 0.3s;
     border-color: #2ed2ff66;
