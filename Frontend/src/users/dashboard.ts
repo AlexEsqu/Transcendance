@@ -83,7 +83,7 @@ function onRenameLoaded(): void
 		{
 			e.preventDefault();
 			const formData = new FormData(renameForm);
-			const newName = formData.get('input-rename-user') as string | null;
+			const newName = formData.get('input-new-name') as string | null;
 
 			if (newName)
 			{

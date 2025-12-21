@@ -4,6 +4,11 @@
 @tailwind utilities;
 
 @layer utilities {
+  .input-field {
+    background-color: oklch(21.997% 0.02211 272.648);
+  }
+
+
   .glow {
     -webkit-box-shadow: 0 0 110px 11px oklch(68.5% 0.169 237.323);
     -moz-box-shadow: 0 0 110px 11px oklch(60.9% 0.126 221.723);

@@ -1,16 +1,18 @@
 <form
 	id="rename-form"
 	name="rename-form"
-	class="flex flex-col flex-center justify-between gap-5 m-6 pt-0 px-5 pb-5">
+	autocomplete="off"
+	class="flex flex-col flex-center justify-between gap-5 m-6 p-5 text-center">
 
-	<label for="input-rename-user"></label>
+	<label for="input-new-name">New Username:</label>
 	<input
 		id="input-rename-user"
-		name="input-rename-user"
+		name="input-new-name"
 		type="text"
 		required
-		class="bg-gray-950 text-glow p-5 placeholder:text-center placeholder:text-glow"
-		placeholder="NEW NAME" />
+		class="input-field p-5 placeholder:text-center"
+		autocomplete="off"
+		placeholder="Alice" />
 
 	<button
 		id="btn-submit-rename-user"
