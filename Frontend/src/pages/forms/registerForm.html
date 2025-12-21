@@ -1,68 +1,68 @@
 <form
 	id="register-form"
 	name="register-form"
-	class="flex flex-col flex-center gap-4 m-6 p-10">
+	class="flex flex-col flex-center justify-between gap-5 m-6 pt-0 px-5 pb-5">
 
-	<label
-		for="input-login"
-		class="text-center pt-3">
-		Choose a login
-	</label>
-	<input
-		id="input-login"
-		name="input-login"
-		type="login"
-		required
-		class="pb-5 text-center placeholder:text-center bg-gray-950 "
-		placeholder="XXXbgdu75XXX" />
+	<div id="inputs" class="flex flex-col flex-center gap-5 p-4 text-center" >
+		<label
+			for="input-login"
+			class="pt-3">
+			Username:
+		</label>
+		<input
+			id="input-login"
+			name="input-login"
+			type="login"
+			required
+			class="bg-zinc-900 p-3 placeholder:text-center"
+			placeholder="XXXbgdu75XXX" />
 
-	<label
-		for="input-email"
-		class="text-center pt-3">
-		Give an email address
-		<br>
-		<span class="text-gray-500">for account verification</span>
-	</label>
-	<input
-		id="input-email"
-		name="input-email"
-		type="email"
-		required
-		class="pb-5 text-center placeholder:text-center bg-gray-950 "
-		placeholder="login@42paris.fr" />
+		<label
+			for="input-email"
+			class="pt-3">
+			Email:
+		</label>
+		<input
+			id="input-email"
+			name="input-email"
+			type="email"
+			required
+			class="bg-zinc-900 p-3 placeholder:text-center"
+			placeholder="login@42paris.fr" />
 
-	<label
-		for="input-password"
-		class="text-center pt-3">
-		Choose a password
-	</label>
-	<input
-		id="input-password"
-		name="input-password"
-		type="password"
-		required
-		class="bg-gray-950 pb-5 text-center placeholder:text-center bg-gray-950 "
-		placeholder="********" />
+		<label
+			for="input-password"
+			class="pt-3">
+			Password:
+		</label>
+		<input
+			id="input-password"
+			name="input-password"
+			type="password"
+			required
+			class="bg-zinc-900 p-3 placeholder:text-center"
+			placeholder="********" />
 
-	<label
-		for="input-password-check"
-		class="text-center pt-3">
-		Check your password
-	</label>
-	<input
-		id="input-password-check"
-		name="input-password-check"
-		type="password"
-		required
-		class="bg-gray-950 pb-5 text-center placeholder:text-center bg-gray-950 "
-		placeholder="********" />
+		<label
+			for="input-password-check"
+			class="pt-3">
+			Password check:
+		</label>
+		<input
+			id="input-password-check"
+			name="input-password-check"
+			type="password"
+			required
+			class="bg-zinc-900 p-3 placeholder:text-center"
+			placeholder="********" />
+	</div>
 
 	<button
 		id="btn-submit-register"
 		name="btn-submit-register"
 		type="submit"
-		class="text-glow p-5 hover:text-glow-red">
-		Register
+		class="p-4 mt-12 hover:text-glow border border-slate-500">
+		Register as User
 	</button>
 
 </form>
