@@ -32,9 +32,9 @@ services:
     volumes:
       - ./Frontend:/app
     environment:
-      - JWT_SECRET=${JWT_SECRET}
-      - APP_SECRET_KEY=${APP_SECRET_KEY}
-      - API_DOMAIN_NAME=${API_DOMAIN_NAME}
+      - VITE_JWT_SECRET=${JWT_SECRET}
+      - VITE_APP_SECRET_KEY=${APP_SECRET_KEY}
+      - VITE_API_DOMAIN_NAME=${API_DOMAIN_NAME}
     networks:
       - app-network
 
@@ -51,6 +51,7 @@ services:
       - typescript
     networks:
       - app-network
+  
 
 volumes:
   sqlite:
