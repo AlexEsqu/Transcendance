@@ -13,7 +13,7 @@ export async function generateTokens(server, user, reply) {
 	reply.setCookie("refreshToken", refreshToken, {
 		httpOnly: true,
 		secure: false,
-		sameSite: "lax",
+		sameSite: "none",
 		path: "/",
 		maxAge: 60 * 60 * 24 * 7, // 7 days
 	});
@@ -38,8 +38,6 @@ export default function login(server) {
    a temporary 2FA continuation token is generated, which must be used to complete \
    authentication via the 2FA verification endpoint. \
    `This endpoint requires the client to have a verified email address.`",
-			tags: ["auth"],
-
 			tags: ["auth"],
 			body: { $ref: "authCredentialsBody" },
 			response: {
@@ -128,7 +126,7 @@ export default function login(server) {
 				});
 			}
 			const tokens = await generateTokens(server, user, reply);
-			return reply.send(tokens);
+			return reply.status(200).send(tokens);
 		} catch (err) {
 			console.log(err);
 			return reply.status(500).send({ error: "Internal server error" });

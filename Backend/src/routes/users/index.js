@@ -10,15 +10,15 @@ import putUsername from "./putUsername.js";
 import toggle_2fa from "./2fa.js";
 
 export default async function userRoutes(server) {
-	server.register(getUsers);
-	server.register(getUser);
-	server.register(putUserPassword, { prefix: "users" });
-	server.register(putUserAvatar, { prefix: "users" });
-	server.register(putUsername, { prefix: "users" });
-	server.register(deleteUserAvatar, { prefix: "users" });
-	server.register(addFriend, { prefix: "users" });
-	server.register(deleteFriend, { prefix: "users" });
-	server.register(deleteUser, { prefix: "users" });
-	server.register(getFriends, { prefix: "users" });
-	server.register(toggle_2fa, { prefix: "users" });
+	server.register(getUsers, { prefix: "api" });
+	server.register(getUser, { prefix: "api" });
+	server.register(putUserPassword, { prefix: "api/users" });
+	server.register(putUserAvatar, { prefix: "api/users" });
+	server.register(putUsername, { prefix: "api/users" });
+	server.register(deleteUserAvatar, { prefix: "api/users" });
+	server.register(addFriend, { prefix: "api/users" });
+	server.register(deleteFriend, { prefix: "api/users" });
+	server.register(deleteUser, { prefix: "api/users" });
+	server.register(getFriends, { prefix: "api/users" });
+	server.register(toggle_2fa, { prefix: "api/users" });
 }
