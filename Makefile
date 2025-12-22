@@ -11,6 +11,7 @@ WEB_DIR				=	pages
 
 FRONT_SERVICES		=	typescript
 BACK_SERVICES		=	fastify
+REVERSE_PROXY		=	nginx
 
 USER := $(shell whoami)
 
