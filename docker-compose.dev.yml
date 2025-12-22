@@ -48,7 +48,6 @@ services:
     networks:
       - app-network
 
-
 volumes:
   sqlite:
   user_avatars:

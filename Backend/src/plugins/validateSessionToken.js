@@ -10,7 +10,7 @@ export default fp(async (server) => {
 			}
 
 			// Verify JWT structure and signature
-			const payload = await server.jwt.verify(refreshToken);
+			const payload = server.jwt.verify(refreshToken);
 
 			// Ensure token has an id
 			if (!payload.id) {

@@ -4,8 +4,6 @@ services:
     build: ./Backend
     container_name: fastify
     command: npm run start
-    ports:
-      - "3000"
     volumes:
       - ./Backend/src:/app/src
       - ./Backend/scripts:/app/scripts
@@ -27,8 +25,6 @@ services:
   typescript:
     build: ./Frontend
     container_name: typescript
-    ports:
-      - "8080"
     volumes:
       - ./Frontend:/app
     environment:
@@ -51,7 +47,6 @@ services:
       - typescript
     networks:
       - app-network
-  
 
 volumes:
   sqlite:
