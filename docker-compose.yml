@@ -3,9 +3,9 @@ services:
   fastify:
     build: ./Backend
     container_name: fastify
-    ports:
-      - "3000:3000"
     command: npm run start
+    ports:
+      - "3000"
     volumes:
       - ./Backend/src:/app/src
       - ./Backend/scripts:/app/scripts
@@ -28,7 +28,7 @@ services:
     build: ./Frontend
     container_name: typescript
     ports:
-    - "8080:8080"
+      - "8080"
     volumes:
       - ./Frontend:/app
     environment:
