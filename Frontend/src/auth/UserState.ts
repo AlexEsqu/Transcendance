@@ -3,8 +3,10 @@ import { router } from "../app"
 
 const apiKey : string = import.meta.env.VITE_APP_SECRET_KEY ?? "";
 const jwtKey : string = import.meta.env.VITE_JWT_SECRET ?? "";
+const apiDomainName : string = import.meta.env.VITE_API_DOMAIN_NAME ?? "";
 console.log(apiKey);
 console.log(jwtKey);
+console.log(apiDomainName);
 
 export type { Subscriber }
 export { UserState }
@@ -152,7 +154,7 @@ class UserState
 
 	public async loginAsRegistered(login: string, password: string): Promise<void>
 	{
-		const response = await fetch('http://localhost:3000/users/auth/login',
+		const response = await fetch(`${apiDomainName}/users/auth/login`,
 			{
 				method: 'POST',
 				headers: {
@@ -177,7 +179,7 @@ class UserState
 
 	public async register(username: string, password: string, email: string): Promise<void>
 	{
-		const response = await fetch('http://localhost:3000/users/signup',
+		const response = await fetch(`${apiDomainName}/users/signup`,
 			{
 				method: 'POST',
 				headers: {
@@ -201,7 +203,7 @@ class UserState
 	{
 		if (this.user instanceof RegisteredUser)
 		{
-			const response = await this.fetchWithTokenRefresh('http://localhost:3000/users/auth/logout',
+			const response = await this.fetchWithTokenRefresh(`${apiDomainName}/users/auth/logout`,
 				{
 					method: 'POST',
 					headers: {
@@ -223,7 +225,7 @@ class UserState
 	{
 		if (this.user instanceof RegisteredUser)
 		{
-			const response = await this.fetchWithTokenRefresh('http://localhost:3000/users/me',
+			const response = await this.fetchWithTokenRefresh(`${apiDomainName}/users/me`,
 				{
 					method: 'DELETE',
 					headers: {
@@ -248,7 +250,7 @@ class UserState
 		if (!(this.user instanceof RegisteredUser))
 			return false;
 
-		const response = await fetch('http://localhost:3000/users/auth/refresh',
+		const response = await fetch(`${apiDomainName}/users/auth/refresh`,
 		{
 			method: 'POST',
 			headers:
@@ -313,7 +315,7 @@ class UserState
 	{
 		if (this.user instanceof RegisteredUser)
 		{
-			const response = await this.fetchWithTokenRefresh('http://localhost:3000/users/me/username',
+			const response = await this.fetchWithTokenRefresh(`${apiDomainName}/users/me/username`,
 			{
 				method: 'PUT',
 				headers:
@@ -346,7 +348,7 @@ class UserState
 	{
 		if (this.user instanceof RegisteredUser)
 		{
-			const response = await this.fetchWithTokenRefresh('http://localhost:3000/users/me/avatar',
+			const response = await this.fetchWithTokenRefresh(`${apiDomainName}/users/me/avatar`,
 			{
 				method: 'PUT',
 				headers:
@@ -379,7 +381,7 @@ class UserState
 	{
 		if (this.user instanceof RegisteredUser)
 		{
-			const response = await fetch('http://localhost:3000/users/me/password', {
+			const response = await fetch(`${apiDomainName}/users/me/password`, {
 				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json',
