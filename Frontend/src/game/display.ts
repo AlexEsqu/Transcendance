@@ -109,7 +109,11 @@ function getPlayerNames(): string[] {
 		throw new Error("No players found");
 
 	const inputs = playersContainer.querySelectorAll('input');
-	return Array.from(inputs).map(input => (input as HTMLInputElement).value || `Player ${input.id.replace('player', '')}`);
+	const result = Array.from(inputs).map(input => (input as HTMLInputElement).value || `Player ${input.id.replace('player', '')}`);
+	if ( result[0] && result[0] === 'Player 1')
+		result[0] = userState.getUser()?.getName() ?? 'Player 1';
+
+	return result;
 }
 
 function onGameOptionLoaded(): void
@@ -151,7 +155,7 @@ function onGameLoaded(): void
 	const options = loadOptions()
 	if (options)
 	{
-		
+
 		launchPongGame(options)
 	}
 	else
