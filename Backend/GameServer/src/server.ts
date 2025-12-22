@@ -1,5 +1,3 @@
-'use scrict'
-
 import Fastify from 'fastify';
 import websocket from '@fastify/websocket';
 import { registerWaitingRoomRoutes } from './routes/waitingRoom.route.js'
@@ -23,7 +21,7 @@ const launchGameServer = async () => {
 		await registerWaitingRoomRoutes(gameServer, gameControl);
 		await registerGameRoutes(gameServer, gameControl);
 
-		//	Listen on port
+		//	Listen on portP
 		await gameServer.listen({ port: PORT, host: HOST }, (address) => {
 			console.log("GAME-SERVER: listening");
 		});

@@ -1,5 +1,5 @@
 import { STATE } from '../config/constant.js'
-import { GameLoop } from '../services/GameLoop.js'
+import { GameLoop } from './GameLoop.js'
 
 export class Room
 {

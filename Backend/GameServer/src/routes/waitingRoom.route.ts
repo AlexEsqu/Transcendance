@@ -1,5 +1,7 @@
-import Fastify, { fastify } from 'fastify';
-import { handleMessage, handleDisconnection } from '../handlers/waitingRoom.handlers.js'
+import fastify from 'fastify';
+import { handleMessage, handleDisconnection } from '../handlers/waitingRoom.handlers.js';
+import websocket from '@fastify/websocket';
+
 
 /************************************************************************************************************
  * 		Declare routes/endpoints								 											*

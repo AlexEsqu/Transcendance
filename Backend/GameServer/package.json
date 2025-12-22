@@ -2,11 +2,12 @@
 	"name": "pong-game-server",
 	"version": "1.0.0",
 	"main": "index.js",
-	"description": "",
+	"description": "A game server using fastify/websocket, Typescript and Vite",
 	"type": "module",
 	"scripts": {
-		"dev": "nodemon src/server.js",
-		"start": "node src/server.js"
+		"dev": "nodemon --exec tsx src/server.ts",
+		"build": "tsc",
+		"start": "node dist/server.js"
 	},
 	"keywords": [],
 	"author": "",
@@ -14,11 +15,14 @@
 	"dependencies": {
 		"fastify": "^5.6.2",
 		"@fastify/websocket": "^11.2.0",
-		"ws": "^8.18.3"
+		"ws": "^8.18.3",
+		"typescript": "^5.9.3"
 	},
 	"devDependencies": {
 		"@types/node": "^20.0.0",
 		"@types/ws": "^8.5.0",
+		"ts-loader": "^9.5.4",
+		"tsx": "^4.7.0",
 		"nodemon": "^3.1.11"
 	}
 }
