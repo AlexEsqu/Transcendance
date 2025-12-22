@@ -1,7 +1,7 @@
-import { BALL, PADDLE, STATE } from '../config/*'
-// import { STATE } from '../config/constant';
+import { BALL, PADDLE } from '../config/data.js'
+import { STATE } from '../config/constant.js';
 
-export class gameLoop
+export class GameLoop
 {
 	constructor()
 	{

@@ -1,4 +1,4 @@
-import { handleMessage, handleDesconnection } from '../handlers/game.handlers'
+// import { handleMessage, handleDesconnection } from '../handlers/game.handlers.js'
 
 /************************************************************************************************************
  * 		Declare routes/endpoints								 											*
@@ -24,7 +24,7 @@ export async function registerGameRoutes(gameServer, GameControl)
 
 		//	Handle: closing client connection
 		connection.socket.on('close', () => {
-			handleDesconnection(player);
+			handleDisconnection(player);
 		});
 
 		//	Handle: errors!!

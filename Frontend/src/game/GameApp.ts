@@ -64,10 +64,19 @@ export function launchPongGame(options: IOptions): void
 
 	const app = new App(gameWindow, options);
 	// const url = getWebSocketURL();
-	const url = "ws://localhost:4001/game"
+	const url = "ws://localhost:4001/waitingRoom"
 	const ws = new WebSocket(url);
 	ws.onopen = () => {
 		console.log("Client is connected to the game server");
+		const testJSONForm = {
+			type: 'duo',
+			nbOfPlayers: 2,
+			id: 1,
+			color: '#324ea8'
+		}
+		const data = JSON.stringify(testJSONForm);
+		console.log(data);
+		ws.send(data);
 	};
 
 	ws.onmessage = (event) => {

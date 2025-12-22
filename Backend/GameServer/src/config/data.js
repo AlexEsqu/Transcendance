@@ -17,7 +17,9 @@ let PLAYER = {
 	id: -1,
 	socket: -1,
 	ip: 'null',
-	score: 0,
-	color: '#324ea8',
+	type: 1,
 	isReady: false,
+	roomId: -1,
+	score: 0,
+	color: '#324ea8'
 };
