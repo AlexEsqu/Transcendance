@@ -84,7 +84,7 @@ function generatePlayersInputs(nbOfPlayers: number): void
 		input.id = `player${i}`;
 		input.name = `player${i}`;
 		input.placeholder = nbOfPlayers === 1 ? 'Your name' : `Player ${i}`;
-		input.className = 'w-full bg-transparent text-slate-700 text-sm border border-slate-200 rounded px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400';
+		input.className = 'input-field p-2 placeholder:text-center';
 		playersContainer.appendChild(input);
 	}
 }
@@ -150,7 +150,10 @@ function onGameLoaded(): void
 {
 	const options = loadOptions()
 	if (options)
+	{
+		
 		launchPongGame(options)
+	}
 	else
 		router.navigateTo('/game/error')
 }

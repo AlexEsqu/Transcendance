@@ -5,7 +5,14 @@
 
 @layer utilities {
   .input-field {
-    background-color: oklch(21.997% 0.02211 272.648);
+    background-color: rgb(23, 26, 37);
+  }
+
+  .gentle-select {
+    background: rgb(23, 26, 37);
+    text-align: center;
+    padding: 10px;
+    border-radius: 0;
   }
 
   .glow-select:hover, .glow-select:active, .glow-select:focus {
@@ -15,6 +22,7 @@
     border-style: solid;
     animation: text-glow 2s ease-in-out infinite alternate;
     outline: none;
+    background-color: #0C0D11;
   }
 
 
