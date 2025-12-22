@@ -30,13 +30,13 @@ function refresh(server) {
 				},
 			},
 		},
-		onRequest: [server.authenticateUser, server.authenticateClient, server.authenticateRefreshToken],
+		onRequest: [server.authenticateClient, server.authenticateRefreshToken],
 	};
 	server.post("/refresh", opts, async (req, reply) => {
 		try {
 			const { refreshToken } = req.cookies;
 
-			const { id, username } = await server.jwt.verify(refreshToken);
+			const { id, username } = req.user;
 
 			// Create new access token
 			const newAccessToken = createAccessToken(server, id, username);
@@ -51,9 +51,9 @@ function refresh(server) {
 			// Send new refresh token to user
 			reply.setCookie("refreshToken", newRefreshToken, {
 				httpOnly: true,
-				secure: true,
-				sameSite: "strict",
-				path: "/users/auth",
+				secure: false,
+				sameSite: "lax",
+				path: "/",
 				maxAge: 60 * 60 * 24 * 7, // 7 days
 			});
 

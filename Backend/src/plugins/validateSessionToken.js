@@ -14,27 +14,27 @@ export default fp(async (server) => {
 
 			// Ensure token has an id
 			if (!payload.id) {
-				return reply.status(401).send({ error: "Invalid refresh token" });
+				return reply.status(401).send({error:"Unauthorized" ,message: "Invalid refresh token" });
 			}
 
 			// Get stored hash from DB
 			const row = server.db.prepare(`SELECT refresh_token_hash FROM users WHERE id = ?`).get(payload.id);
 
 			if (!row?.refresh_token_hash) {
-				return reply.status(401).send({ error: "Unauthorized" });
+				return reply.status(401).send({ error: "Unauthorized", message: "Invalid refresh token" });
 			}
 
 			// Compare token to stored hash
 			const match = await bcrypt.compare(refreshToken, row.refresh_token_hash);
 
 			if (!match) {
-				return reply.status(401).send({ error: "Unauthorized" });
+				return reply.status(401).send({ error: "Unauthorized", message: "Invalid refresh token" });
 			}
 
-			request.userId = payload.id;
+			request.user = { id, username }
 		} catch (err) {
 			if (err.name === "TokenExpiredError") {
-				return reply.status(401).send({ error: "Refresh token expired" });
+				return reply.status(401).send({ error:"Unauthorized" ,message: "Refresh token expired" });
 			}
 
 			// Log unexpected errors only
@@ -42,7 +42,7 @@ export default fp(async (server) => {
 				console.log(err);
 			}
 
-			return reply.status(401).send({ error: "Invalid refresh token" });
+			return reply.status(401).send({error:"Unauthorized" , message: "Invalid refresh token" });
 		}
 	});
 });

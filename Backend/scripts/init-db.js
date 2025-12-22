@@ -21,10 +21,8 @@ export async function initDB(db) {
 		code_hash_2fa TEXT,
 		code_expires_2fa INTEGER,
 		token_2fa TEXT,
-		ft_id INTEGER UNIQUE,
-    );
-`
-	).run();
+		ft_id INTEGER UNIQUE);
+`).run();
 
 	db.prepare(
 		`

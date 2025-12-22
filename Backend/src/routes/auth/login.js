@@ -12,14 +12,16 @@ export async function generateTokens(server, user, reply) {
 	// set cookie
 	reply.setCookie("refreshToken", refreshToken, {
 		httpOnly: true,
-		secure: true,
-		sameSite: "strict",
-		path: "/users/auth",
+		secure: false,
+		sameSite: "lax",
+		path: "/",
 		maxAge: 60 * 60 * 24 * 7, // 7 days
 	});
-	const id = user.id;
 
-	reply.send({ accessToken, id });
+	return {
+		accessToken: accessToken,
+		id: user.id,
+	};
 }
 
 export default function login(server) {
@@ -63,7 +65,6 @@ export default function login(server) {
 						},
 					],
 				},
-
 				302: {
 					description: "Redirect: Email not verified",
 					$ref: "SuccessMessageResponse#",
@@ -126,24 +127,8 @@ export default function login(server) {
 					token: twoFaToken,
 				});
 			}
-
-			const accessToken = createAccessToken(server, user.id, user.username);
-			const refreshToken = createRefreshToken(server, user.id, user.username);
-
-			const refreshTokenHash = await hashRefreshToken(refreshToken);
-			const addRefreshToken = server.db.prepare(`UPDATE users SET refresh_token_hash = ? WHERE id = ?`);
-			addRefreshToken.run(refreshTokenHash, user.id);
-			// set cookie
-			reply.setCookie("refreshToken", refreshToken, {
-				httpOnly: true,
-				secure: true,
-				sameSite: "strict",
-				path: "/users/auth",
-				maxAge: 60 * 60 * 24 * 7, // 7 days
-			});
-			const id = user.id;
-
-			reply.send({ accessToken, id });
+			const tokens = await generateTokens(server, user, reply);
+			return reply.send(tokens);
 		} catch (err) {
 			console.log(err);
 			return reply.status(500).send({ error: "Internal server error" });

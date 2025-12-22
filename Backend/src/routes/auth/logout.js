@@ -37,11 +37,12 @@ export default function logout(server) {
 			server.db.prepare(`UPDATE users SET refresh_token_hash = null WHERE id = ?`).run(id);
 
 			//Clear the refresh token from cookies
-			reply.clearCookie("refreshToken", {
+			reply.clearCookie("refreshToken",{
 				httpOnly: true,
-				secure: true,
-				sameSite: "strict",
-				path: "/users/auth",
+				secure: false,
+				sameSite: "lax",
+				path: "/",
+				maxAge: 60 * 60 * 24 * 7, // 7 days
 			});
 
 			// Send confirmation
