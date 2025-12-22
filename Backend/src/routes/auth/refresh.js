@@ -47,7 +47,14 @@ function refresh(server) {
 			console.log("upadting refresh token");
 			// Save new refresh token hash in DB
 			server.db.prepare(`UPDATE users SET refresh_token_hash = ? WHERE id = ?`).run(newRefreshTokenHash, id);
-
+			// Send new refresh token to user
+			reply.clearCookie("refreshToken", {
+				httpOnly: true,
+				secure: true, // REQUIRED (HTTPS)
+				sameSite: "lax",
+				path: "/",
+				maxAge: 60 * 60 * 24 * 7, // 7 days
+			});
 			// Send new refresh token to user
 			reply.setCookie("refreshToken", newRefreshToken, {
 				httpOnly: true,
