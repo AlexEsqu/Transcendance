@@ -108,6 +108,8 @@ function getPlayerNames(): string[] {
 	if (!playersContainer)
 		throw new Error("No players found");
 
+	userState.refreshUser();
+
 	const inputs = playersContainer.querySelectorAll('input');
 	const result = Array.from(inputs).map(input => (input as HTMLInputElement).value || `Player ${input.id.replace('player', '')}`);
 	if ( result[0] && result[0] === 'Player 1')

@@ -404,4 +404,37 @@ class UserState
 		}
 	}
 
+	public async refreshUser(): Promise<void>
+	{
+		if (!(this.user instanceof RegisteredUser))
+		{
+			console.log("No registered user to refresh");
+			return;
+		}
+
+		if (this.user.id === null || this.user.id === undefined)
+			throw new Error("User id is missing");
+
+		const response = await fetch(`${apiDomainName}/users/${this.user.id}`,
+			{
+				method: 'GET',
+				headers:
+				{
+					'accept': 'application/json',
+					'X-App-Secret': `${apiKey}`,
+					'Authorization': `Bearer ${this.user.accessToken}`
+				}
+			}
+		);
+
+		const data = await response.json();
+		console.log(data);
+		if (!response.ok)
+			throw new Error(data.message || data.error || `Failed to fetch user (${response.status})`);
+
+		this.user.name = data.username ?? data.name ?? this.user.name;
+		this.user.avatarPath = data.avatar ?? this.user.avatarPath;
+		this.setUser(this.user);
+	}
+
 }

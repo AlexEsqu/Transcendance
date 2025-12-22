@@ -49,8 +49,6 @@ function updateNavFromUserData(user: User | null): void
 		userNameElement.textContent = user.getName();
 
 	const avatarImage = document.getElementById('user-avatar-nav') as HTMLImageElement;
-	console.log('user avatar is');
-	console.log(user.getAvatarPath());
 	if (avatarImage)
 		avatarImage.src = user.getAvatarPath();
 
