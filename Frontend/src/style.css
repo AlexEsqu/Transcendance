@@ -76,6 +76,15 @@
     animation: text-glow 2s ease-in-out infinite alternate;
   }
 
+  .player1 {
+      text-shadow: 0 0 4px #00fff7, 0 0 8px #00fff744;
+      letter-spacing: 0.125rem;
+  }
+  .player2 {
+      text-shadow: 0 0 4px #ffa600, 0 0 8px #ff950044;
+      letter-spacing: 0.1255rem;
+  }
+
   /* hack to get the autofill backgrounds to not be too ugly */
   input:-webkit-autofill,
   input:-webkit-autofill:enabled,
@@ -94,4 +103,8 @@
     box-shadow: 0 0 0px 1000px #785100c7 inset;
     background-color: #785100c7;
   }
+
+
 }
+
+
