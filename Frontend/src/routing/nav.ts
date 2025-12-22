@@ -37,14 +37,6 @@ function attachNavListeners()
 			}
 		});
 	}
-
-	const settingButton = document.getElementById('user-info-btn');
-	if (settingButton)
-	{
-		settingButton.addEventListener('click', () => {
-			router.navigateTo('setting');
-		});
-	}
 }
 
 function updateNavFromUserData(user: User | null): void
@@ -57,6 +49,8 @@ function updateNavFromUserData(user: User | null): void
 		userNameElement.textContent = user.getName();
 
 	const avatarImage = document.getElementById('user-avatar-nav') as HTMLImageElement;
+	console.log('user avatar is');
+	console.log(user.getAvatarPath());
 	if (avatarImage)
 		avatarImage.src = user.getAvatarPath();
 

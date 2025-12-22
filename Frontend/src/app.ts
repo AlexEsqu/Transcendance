@@ -3,7 +3,8 @@ import { Router } from './routing/Router';
 import { UserState } from './auth/UserState';
 import { getConnectionLandingHtml, getConnectionForm, initConnectionPageListeners} from './auth/connection';
 import { getDashboardPage, getSettingForm, initSettingPageListeners } from "./users/dashboard";
-import { getGameHtml, initGamePageListeners } from "./game/gamePages"
+import { getGameHtml, getGameOptionHtml, initGamePageListeners } from "./game/display"
+import { getErrorPage } from "./error/error";
 
 export { userState, router };
 
@@ -21,8 +22,10 @@ router.addRoute('/settings/avatar', getSettingForm, true, true);
 router.addRoute('/settings/email', getSettingForm, true, true);
 router.addRoute('/settings/password', getSettingForm, true, true);
 
-router.addRoute('/game/play', getGameHtml, true);
+router.addRoute('/game/options', getGameOptionHtml, true);
+router.addRoute('/game', getGameHtml, true);
 
+router.addRoute('/error', getErrorPage);
 
 initConnectionPageListeners();
 initSettingPageListeners();

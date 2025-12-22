@@ -27,8 +27,8 @@
   }
 
   @keyframes text-glow {
-    from { text-shadow: 0 0 5px rgba(46,210,255,0.4), 0 0 10px rgba(46,210,255,0.3); }
-    to   { text-shadow: 0 0 15px rgba(46,210,255,0.8), 0 0 25px rgba(46,210,255,0.6); }
+    from { text-shadow: 0 0 5px #2ed2ff66, 0 0 10px rgba(46,210,255,0.3); }
+    to   { text-shadow: 0 0 15px #2ed2ffcc, 0 0 25px rgba(46,210,255,0.6); }
   }
 
   .text-glow-red {
@@ -47,10 +47,10 @@
   }
 
   .hover-glow-orange:hover {
-    box-shadow: 0 0 8px 2px #ff9800, 0 0 20px 6px #ff9800aa;
+    box-shadow: 0 0 8px 2px #2ed2ff66, 0 0 20px 6px #2ed2ffcc;
     border-radius: 6px;
     transition: box-shadow 0.3s;
-    border-color: #ff9800;
+    border-color: #2ed2ff66;
     border-style: solid;
   }
 }

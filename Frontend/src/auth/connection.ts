@@ -101,7 +101,16 @@ function onRegisterLoaded(): void
 				return;
 			}
 
-			await userState.register(login, password, email);
+			try
+			{
+				await userState.register(login, password, email);
+			}
+			catch (error)
+			{
+				const msg = error instanceof Error ? error.message : "Unknown error";
+				window.sessionStorage.setItem("errorMessage", msg);
+				router.navigateTo("/error");
+			}
 		}
 	);
 }
@@ -120,7 +129,19 @@ function onLoginLoaded(): void
 			const password = formData.get('input-password') as string | null;
 
 			if (login && password)
-				await userState.loginAsRegistered(login, password);
+			{
+				try
+				{
+					await userState.loginAsRegistered(login, password);
+				}
+				catch (error)
+				{
+					const msg = error instanceof Error ? error.message : "Unknown error";
+					console.log(`error message is ${msg}`);
+					window.sessionStorage.setItem("errorMessage", msg);
+					router.navigateTo("/error");
+				}
+			}
 		}
 	);
 }
