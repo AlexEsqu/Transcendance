@@ -94,17 +94,17 @@ export default function login(server) {
 
 			const user = await server.db.prepare(`SELECT * FROM users WHERE email = ? OR username = ? `).get(login, login);
 			if (!user) {
-				return reply.status(401).send({ error: "Invalid credentials" });
+				return reply.status(401).send({ error: "Unauthorized", message: "Invalid credentials" });
 			}
 			if (!user.email_verified) {
-				return reply.status(403).send({ error: "Email not verified" });
+				return reply.status(403).send({ error: "Forbidden", message: "Email not verified" });
 			}
 
 			//checks if the password matches
 			const match = await bcrypt.compare(password, user.password_hash);
 
 			if (!match) {
-				return reply.status(401).send({ error: "Invalid credentials" });
+				return reply.status(401).send({ error: "Unauthorized", message: "Invalid credentials" });
 			}
 			if (user.is_2fa_enabled) {
 				const code = crypto.randomInt(100000, 999999).toString();
