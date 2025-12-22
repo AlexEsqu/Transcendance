@@ -1,5 +1,5 @@
-import { BALL, PADDLE } from '../config/data.js'
-import { STATE } from '../config/constant.js';
+import { BALL, PADDLE } from '../config/gameData.js'
+import { STATE } from '../config/schemas.js';
 
 export class GameLoop
 {

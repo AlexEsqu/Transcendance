@@ -1,4 +1,4 @@
-import { STATE } from '../config/constant.js'
+import { STATE } from '../config/schemas.js'
 import { GameLoop } from './GameLoop.js'
 
 export class Room

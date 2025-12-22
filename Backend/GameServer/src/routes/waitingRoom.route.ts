@@ -1,7 +1,7 @@
-import fastify from 'fastify';
+import fastify, { FastifyInstance } from 'fastify';
 import { handleMessage, handleDisconnection } from '../handlers/waitingRoom.handlers.js';
-import websocket from '@fastify/websocket';
-
+import { GameControl } from '../controllers/GameControl.js'
+import { IPlayer } from '../config/gameData'
 
 /************************************************************************************************************
  * 		Declare routes/endpoints								 											*
@@ -9,33 +9,31 @@ import websocket from '@fastify/websocket';
 
 // ROUTE DECLARATION : fastify.get('path', [options], () => { handler });
 
-export async function registerWaitingRoomRoutes(gameServer, gameControl)
+export async function registerWaitingRoomRoutes(gameServer: FastifyInstance, gameControl: GameControl)
 {
-	// const options = {
-	// 	maxPayload: 1024,
-	// 	// verifyClient: function that can be used to verify client
-	// };
 	await gameServer.register(async function (fastify) {
 		fastify.get('/waitingRoom', { websocket: true }, (socket, request) => {
+			if (!socket) throw new Error("Websocket is missing");
+			
 			//	Handle: first connection of a client
-			// const playerId = handleNewConnection(connection, request, gameControl); 
-				console.log("HERE");
-			if (!socket) return ;
+			console.log("GAME-SERVER: new connection from a client ", socket);
 
-			//	Handle: receiving message from a client
-			socket.on('message', (message) => {
-				console.log("HELLO");
-				handleMessage(message, gameControl);
+			//	Handler: receiving message from a client
+			socket.on('message', (message: Buffer) => {
+				console.log("GAME-SERVER: received a message from the client ", socket);
+				handleMessage(socket, message, gameControl);
 			});
 	
-			//	Handle: closing client connection
+			//	Handle: ending client connection properly for the server
 			socket.on('close', () => {
+				console.log("GAME-SERVER: closed connection from client ", socket);
 				handleDisconnection(playerId);
 			});
 	
 			//	Handle: errors!!
-			socket.on('error', (error) => {
+			socket.on('error', (error: Error) => {
 				console.error("WS-ERROR: ", error);
+				throw new Error(error.toString());
 			});
 		});
 	});

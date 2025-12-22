@@ -2,7 +2,7 @@
 	"name": "pong-game-server",
 	"version": "1.0.0",
 	"main": "index.js",
-	"description": "A game server using fastify/websocket, Typescript and Vite",
+	"description": "A game server using fastify/websocket and Typescript",
 	"type": "module",
 	"scripts": {
 		"dev": "nodemon --exec tsx src/server.ts",

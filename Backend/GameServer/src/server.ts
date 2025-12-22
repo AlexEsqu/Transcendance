@@ -1,29 +1,33 @@
-import Fastify from 'fastify';
+import Fastify, { FastifyInstance } from 'fastify';
 import websocket from '@fastify/websocket';
-import { registerWaitingRoomRoutes } from './routes/waitingRoom.route.js'
-import { registerGameRoutes } from './routes/game.route.js'
-import { GameControl } from './controllers/GameControl.js';
-import { PORT, HOST } from './config/constant.js'
- 
+
+import { registerWaitingRoomRoutes } from './routes/waitingRoom.route'
+import { registerGameRoutes } from './routes/game.route'
+import { GameControl } from './controllers/GameControl';
+
+/************************************************************************************************************
+ * 		Run Game Server																						*
+ ***********************************************************************************************************/
 
 //	Create game server instance
-const gameServer = Fastify({ logger: true });
-
-/*****************************************************************
- * 		Run Game Server											 *
- *****************************************************************/
+const gameServer: FastifyInstance = Fastify({ logger: true });
 
 const launchGameServer = async () => {
 	try {
-		const gameControl = new GameControl();
+		const port = process.env.PORT ?? "4001";
+		const host = process.env.HOST ?? "0.0.0.0";
+
+		const gameControl = new GameControl() as GameControl | null;
+		if (!gameControl) throw new Error("failed to create 'gameControl'");
+
 		//	Register plugins/external routes
 		await gameServer.register(websocket);
 		await registerWaitingRoomRoutes(gameServer, gameControl);
 		await registerGameRoutes(gameServer, gameControl);
 
 		//	Listen on portP
-		await gameServer.listen({ port: PORT, host: HOST }, (address) => {
-			console.log("GAME-SERVER: listening");
+		await gameServer.listen({ port: parseInt(port), host: host }, (address) => {
+			console.log("GAME-SERVER: \$`{address}`\ listening");
 		});
 	} catch (err) {
 		console.error(err);

@@ -1,19 +1,23 @@
-'use strict'
-
-import { PLAYER } from '../config/data.js';
+import { IPLAYER } from '../config/gameData.js';
 import { Room } from '../services/Room.js'
 
 export class GameControl
 {
+	waitingRoom: Map<number, Room>;
+	gamingRooms: Map<number, Room>;
+
 	constructor()
 	{
-		this.waitingRoom = new Map<Room>(0);
-		this.gamingRooms = new Map<Room>(0);
+		this.waitingRoom = new Map();
+		this.gamingRooms = new Map();
 	}
 
 	generatePlayerId(connection, id, type, remoteAddress)
 	{
-		let player = PLAYER;
+		const player: IPLAYER = {
+			id: formid,
+			gameType: gameType
+		};
 
 		player.id = id;
 		player.socket = connection.socket;
