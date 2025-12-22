@@ -1,40 +1,40 @@
 <form
 	id="login-form"
 	name="login-form"
-	class="flex flex-col flex-center gap-4 m-4">
+	class="flex flex-col flex-center justify-between gap-5 m-6 pt-0 px-5 pb-5">
 
 	<label
 		for="input-login"
 		class="text-center pt-3">
-		Input your login or email
+		Username or Email
 	</label>
 	<input
 		id="input-login"
 		name="input-login"
 		type="login"
 		required
-		class="bg-gray-950 text-glow p-5 placeholder:text-center placeholder:text-glow"
+		class="input-field glow-select p-3 placeholder:text-center"
 		placeholder="André De La Jacopière" />
 
 	<label
 		for="input-password"
 		class="text-center pt-3">
-		Input your password
+		Password:
 	</label>
 	<input
 		id="input-password"
 		name="input-password"
 		type="password"
 		required
-		class="bg-gray-950 text-glow p-5 placeholder:text-center focus:border-hidden focus:outile-hidden placeholder:text-glow"
+		class="input-field glow-select p-3 placeholder:text-center"
 		placeholder="********" />
 
 	<button
 		id="btn-submit-login"
 		name="btn-submit-login"
 		type="submit"
-		class="text-glow p-5 hover:text-glow-red">
-		Login
+		class="p-4 mt-12 glow-select border border-slate-500">
+		Login as User
 	</button>
 
 </form>

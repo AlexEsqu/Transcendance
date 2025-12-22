@@ -1,21 +1,22 @@
 <form
 	id="avatar-form"
 	name="avatar-form"
-	class="flex flex-col flex-center gap-4 m-4 text-center">
+	class="flex flex-col flex-center justify-between gap-5  m-6 pt-0 px-5 pb-5">
 
-	<label for="input-avatar-file"></label>
+	<label for="input-avatar-file">Pick a new avatar image</label>
 	<input
 		id="input-avatar-file"
 		name="input-avatar-file"
-		type="image"
-		required
-		class="text-glow p-5 placeholder:text-center placeholder:text-glow bg-gray-950" />
+		type="file"
+		accept="image/*"
+		class="glow-select"
+		required/>
 
 	<button
 		id="btn-submit-avatar"
 		name="btn-submit-avatar"
 		type="submit"
-		class="text-glow p-5 hover:text-glow-red">
+		class="p-4 mt-12 glow-select border border-slate-500">
 		Submit new Avatar
 	</button>
 

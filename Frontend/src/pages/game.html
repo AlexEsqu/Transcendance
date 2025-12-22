@@ -1,23 +1,32 @@
-<main class="flex-1 min-h-0 flex items-center justify-center w-full box-border m-0 p-0">
+<main class="flex-1 min-h-0 flex flex-col items-center justify-center w-full box-border m-0 p-0">
 
-	<!-- Button start to launch the game -->
+	<!-- Modal start to launch the game -->
 	<div
 		id="game-start"
-		class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+		class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-20">
 
-		<div class="border rounded-md flex flex-col items-center justify-center bg-black text-white">
+		<div class="border rounded-md flex flex-col items-center justify-center bg-zinc-950">
 			<button
-				class="text-glow p-5 hover:text-glow-red"
+				class="p-5 glow-select"
 				id="btn-startplay">
 				Start to play</button>
 		</div>
 	</div>
 
-	<!-- </div>
-		<canvas id="game-canvas" class="w-full max-w-7xl aspect-video"></canvas>
-		<canvas id="ui-canvas"   class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
-	</div> -->
+	<div id="match-scoreboard" class="flex items-center justify-center gap-8 shadow-lg w-auto max-w-full">
+		<div class="flex flex-col items-center gap-4 font-bold p-6">
+			<span id="player1-name" class="player1 text-xl">Player 1</span>
+			<span id="player1-score" class="player1 text-5xl ">0</span>
+		</div>
+		<span>VS</span>
+		<div class="flex flex-col items-center gap-4 font-bold   p-6">
+			<span id="player2-name" class="player2 text-xl ">Player 2</span>
+			<span id="player2-score" class="player2 text-5xl ">0</span>
+		</div>
+	</div>
+
 	<div class="relative w-full h-full aspect-video flex items-center justify-center">
+
 		<canvas id="game-canvas" class="w-full h-full"></canvas>
 		<canvas id="ui-canvas"   class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
 	</div>

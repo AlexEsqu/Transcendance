@@ -3,7 +3,8 @@ import { IOptions, Level } from "../game/Data"
 import gameHtml from '../pages/game.html?raw'
 import optionsHtml from '../pages/options.html?raw'
 
-import { loadOptions } from "./options"
+import { clearOptions, loadOptions } from "./options"
+import { userState } from "../app"
 
 class App {
 	pong: Pong;
@@ -34,6 +35,7 @@ class App {
 		this.startBtn.addEventListener('click', () => {
 			if (this.startBtnDisplay) this.startBtnDisplay.style.display = 'none';
 			this.play();
+			clearOptions();
 		});
 	}
 
@@ -52,6 +54,13 @@ export function launchPongGame(options: IOptions): void
 		console.error("'start' UI not found, can't load game");
 		return ;
 	}
+
+	const player1Name = document.getElementById('player1-name');
+	const player2Name = document.getElementById('player2-name');
+	if (player1Name)
+		player1Name.textContent = options.players[0] || 'You';
+	if (player2Name)
+		player2Name.textContent = options.players[1] || "Robot";
 
 	//	Launch Pong game when user click on start button
 	const gameWindow = document.getElementById("game-canvas") as HTMLCanvasElement;

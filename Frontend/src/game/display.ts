@@ -84,7 +84,7 @@ function generatePlayersInputs(nbOfPlayers: number): void
 		input.id = `player${i}`;
 		input.name = `player${i}`;
 		input.placeholder = nbOfPlayers === 1 ? 'Your name' : `Player ${i}`;
-		input.className = 'w-full bg-transparent text-slate-700 text-sm border border-slate-200 rounded px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400';
+		input.className = 'input-field p-2 placeholder:text-center';
 		playersContainer.appendChild(input);
 	}
 }
@@ -109,7 +109,11 @@ function getPlayerNames(): string[] {
 		throw new Error("No players found");
 
 	const inputs = playersContainer.querySelectorAll('input');
-	return Array.from(inputs).map(input => (input as HTMLInputElement).value || `Player ${input.id.replace('player', '')}`);
+	const result = Array.from(inputs).map(input => (input as HTMLInputElement).value || `Player ${input.id.replace('player', '')}`);
+	if ( result[0] && result[0] === 'Player 1')
+		result[0] = userState.getUser()?.getName() ?? 'Player 1';
+
+	return result;
 }
 
 function onGameOptionLoaded(): void
@@ -150,7 +154,10 @@ function onGameLoaded(): void
 {
 	const options = loadOptions()
 	if (options)
+	{
+
 		launchPongGame(options)
+	}
 	else
 		router.navigateTo('/game/error')
 }

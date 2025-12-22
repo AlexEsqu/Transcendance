@@ -138,7 +138,7 @@ function drawCircle(ctx: CanvasRenderingContext2D, color: string, pos: { x: numb
 	ctx.fill();
 }
 
-function drawLine(ctx: CanvasRenderingContext2D, color: string, 
+function drawLine(ctx: CanvasRenderingContext2D, color: string,
 	from: { x: number, y: number }, target: { x: number, y: number }): void
 {
 	if (!ctx || !color || !target) return ;
@@ -238,22 +238,14 @@ function drawMatchHistoryTree(
 
 function drawScore(canvas: HTMLCanvasElement | null, score1: number, score2: number): void
 {
-	if (!canvas) return;
+	const player1Score = document.getElementById('player1-score');
+	const player2Score = document.getElementById('player2-score');
 
-	const ctx = canvas.getContext("2d");
-	if (!ctx) return;
-
-	const wCenter: number = (canvas.width / 2);
-	const hCenter: number = (canvas.height / 2) - 200;
-	ctx.clearRect(wCenter - 110, 0, 220, hCenter + 50);
-
-	ctx.font = "50px monospace";
-	ctx.fillStyle = "rgba(141, 188, 255, 1)";
-	ctx.textBaseline = "middle";
-	ctx.textAlign = "center";
-	ctx.fillText(score1.toString(), wCenter - 70, hCenter);
-	ctx.fillText("|", wCenter, hCenter);
-	ctx.fillText(score2.toString(), wCenter + 70, hCenter);
+	if (player1Score)
+		player1Score.textContent = score1.toString();
+	
+	if (player2Score)
+		player2Score.textContent = score2.toString();
 }
 
 function drawName(canvas: HTMLCanvasElement, player1: string, player2: string, nbRound: number): void
