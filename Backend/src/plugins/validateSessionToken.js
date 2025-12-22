@@ -31,7 +31,7 @@ export default fp(async (server) => {
 				return reply.status(401).send({ error: "Unauthorized", message: "Invalid refresh token" });
 			}
 
-			request.user = { id, username }
+			request.user = { payload }
 		} catch (err) {
 			if (err.name === "TokenExpiredError") {
 				return reply.status(401).send({ error:"Unauthorized" ,message: "Refresh token expired" });
