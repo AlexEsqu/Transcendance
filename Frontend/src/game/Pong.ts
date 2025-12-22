@@ -26,7 +26,6 @@ export class Pong {
 	isLaunched: boolean;
 	onNewRound?: () => void;
 	scene: IScene | null;
-	canvasUI?: HTMLCanvasElement;
 
 	constructor(canvasId: string, options: IOptions, onNewRound?: () => void)
 	{
@@ -54,9 +53,6 @@ export class Pong {
 		console.log(this.scene.players);
 		this.scene.state = State.opening;
 		this.time = Date.now();
-		this.canvasUI = document.getElementById("ui-canvas") as HTMLCanvasElement;
-		this.canvasUI.width = window.innerWidth;
-		this.canvasUI.height = window.innerHeight;
 	}
 
 	//	J'ai mis en commentaire ici car manifestement il n'y a pas de couleur pour le joueur
@@ -97,7 +93,8 @@ export class Pong {
 				let launch = this.updateGame(keys);
 				isNewRound = monitoringRounds(this.scene, rounds.nbOfRounds);
 				//	If 'updateGame' has detected that the ball is out of bounds, must relaunch the ball from the middle of the map
-				if (launch && !isNewRound) this.launch(3);
+				if (launch && !isNewRound)
+					this.launch(3);
 			}
 			//	If 'monitoringRounds' has detected that a player has reached the max score
 			if (isNewRound) { rounds = this.requestNewRound(rounds); console.log(rounds); }
@@ -135,7 +132,8 @@ export class Pong {
 		rounds.nbOfRounds += 1;
 
 		// Display names and score of the new players
-		if (currentNbOfRounds < rounds.nbOfRounds && this.canvasUI && this.scene.leftPadd && this.scene.rightPadd) {
+		if (currentNbOfRounds < rounds.nbOfRounds && this.scene.leftPadd && this.scene.rightPadd)
+		{
 			// drawMatchHistoryTree(this.canvasUI, playersColors, roundsColors, this.scene.options.nbOfPlayers);
 			if (this.scene.leftPadd.player?.name && this.scene.rightPadd.player?.name)
 				drawName(this.scene.leftPadd.player.name, this.scene.rightPadd.player.name, rounds.nbOfRounds);
@@ -144,7 +142,8 @@ export class Pong {
 		}
 
 		//	Display start button to launch the game for a new round
-		if (this.onNewRound && rounds.nbOfRounds <= Pong.MAX_ROUNDS) this.onNewRound();
+		if (this.onNewRound && rounds.nbOfRounds <= Pong.MAX_ROUNDS)
+			this.onNewRound();
 		else monitoringRounds(this.scene, rounds.nbOfRounds);
 
 		return rounds;
@@ -162,7 +161,8 @@ export class Pong {
 		let paddle: Paddle | null = null;
 		let side: string = "down";
 
-		if (!this.scene.ball || !this.time || !this.scene.leftPadd || !this.scene.rightPadd) {
+		if (!this.scene.ball || !this.time || !this.scene.leftPadd || !this.scene.rightPadd)
+		{
 			console.error("objects are missing to run and update the game, can't continue");
 			return 0;
 		}
@@ -173,19 +173,25 @@ export class Pong {
 			isBallOutOfBounds = 1;
 
 		//	If a user presses a key, update the position of its padd
-		if ((keys["ArrowDown"] || keys["ArrowUp"])) {
+		if ((keys["ArrowDown"] || keys["ArrowUp"]))
+		{
 			paddle = this.scene.rightPadd.paddle;
-			if (keys["ArrowUp"]) side = "up";
+			if (keys["ArrowUp"])
+				side = "up";
 		}
-		if (!this.robot && (keys["s"] || keys["w"])) {
+		if (!this.robot && (keys["s"] || keys["w"]))
+		{
 			paddle = this.scene.leftPadd.paddle;
-			if (keys["w"]) side = "up";
+			if (keys["w"])
+				side = "up";
 		}
 
-		if (this.robot) this.scene.leftPadd.paddle.autoMove(this.scene.ball, (Pong.MAP_HEIGHT / 2), this.time);
-		if (paddle) paddle.move(side, Pong.MAP_HEIGHT / 2, this.time);
+		if (this.robot)
+			this.scene.leftPadd.paddle.autoMove(this.scene.ball, (Pong.MAP_HEIGHT / 2), this.time);
+		if (paddle)
+			paddle.move(side, Pong.MAP_HEIGHT / 2, this.time);
 
-		if (this.canvasUI && this.scene.leftPadd.player && this.scene.rightPadd.player)
+		if (this.scene.leftPadd.player && this.scene.rightPadd.player)
 			drawScore(this.scene.leftPadd.player.score,  this.scene.rightPadd.player.score);
 
 		return isBallOutOfBounds;
@@ -252,32 +258,14 @@ export class Pong {
 		}
 		console.log("GAME-STATE: end");
 
-		// sendMatchesPostRequest(rounds.results[rounds.nbOfRounds - 1], Date.now());
-
-		if (!this.canvasUI || !this.scene) return ;
-
-		const wCenter: number = (this.canvasUI.width / 2);
-		const hCenter: number = (this.canvasUI.height / 2) - 250;
-		const ctx = this.canvasUI.getContext("2d");
-		if (!ctx) return ;
-
-		ctx.clearRect(0, 0, this.canvasUI.width, this.canvasUI.height);
-		ctx.font = "38px monospace";
-		ctx.textBaseline = "middle";
-		ctx.textAlign = "center";
-		ctx.fillStyle = "rgba(141, 188, 255, 0.7)";
-
 		const index = rounds.nbOfRounds - 2;
 
-		ctx.fillText("Winner:  ", wCenter - 100, hCenter);
-		if (rounds.results && rounds.results[index].winner && rounds.results[index].winner.name)
-			ctx.fillText(rounds.results[index].winner.name, wCenter + 50, hCenter);
-
-		ctx.fillText("Loser: ", wCenter - 100, hCenter + 50);
-		if (rounds.results && rounds.results[index].loser && rounds.results[index].loser.name)
-			ctx.fillText(rounds.results[index].loser.name, wCenter + 85, hCenter + 50);
-
-		this.scene.state = State.stop;
+		const winnerSpot = document.getElementById('match-results');
+		if (winnerSpot && rounds.results && rounds.results[index]?.winner?.name)
+		{
+			winnerSpot.textContent = `${rounds.results[index].winner.name} wins!`;
+			winnerSpot.classList.remove('invisible');
+		}
 	}
 
 	/**
@@ -288,12 +276,10 @@ export class Pong {
 		//	Resize the game with the window
 		window.addEventListener('resize', () => {
 			this.engine.resize();
-			if (this.canvasUI && this.scene && this.scene.leftPadd && this.scene.leftPadd.player && this.scene.rightPadd && this.scene.rightPadd.player) {
-				this.canvasUI.width = window.innerWidth;
-				this.canvasUI.height = window.innerHeight;
+			if (this.scene && this.scene.leftPadd && this.scene.leftPadd.player && this.scene.rightPadd && this.scene.rightPadd.player) {
 				drawName(this.scene.leftPadd.player.name, this.scene.rightPadd.player.name, this.scene.options.nbOfPlayers);
 				drawScore(this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
-				drawMatchHistoryTree(this.canvasUI, rounds, this.scene.options.nbOfPlayers);
+				// drawMatchHistoryTree(this.canvasUI, rounds, this.scene.options.nbOfPlayers);
 			}
 		});
 		//	Shift+Ctrl+Alt+I == Hide/show the Inspector
