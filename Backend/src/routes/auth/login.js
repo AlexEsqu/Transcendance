@@ -11,9 +11,9 @@ export async function generateTokens(server, user, reply) {
 	addRefreshToken.run(refreshTokenHash, user.id);
 	// set cookie
 	reply.setCookie("refreshToken", refreshToken, {
-		httpOnly: true,
-		secure: false,
-		sameSite: "none",
+	  httpOnly: true,
+  		secure: true,      // REQUIRED (HTTPS)
+  		sameSite: "lax",
 		path: "/",
 		maxAge: 60 * 60 * 24 * 7, // 7 days
 	});

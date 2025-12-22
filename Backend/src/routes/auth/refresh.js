@@ -51,7 +51,7 @@ function refresh(server) {
 			// Send new refresh token to user
 			reply.setCookie("refreshToken", newRefreshToken, {
 				httpOnly: true,
-				secure: false,
+				secure: true, // REQUIRED (HTTPS)
 				sameSite: "lax",
 				path: "/",
 				maxAge: 60 * 60 * 24 * 7, // 7 days
