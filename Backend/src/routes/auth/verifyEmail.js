@@ -44,6 +44,7 @@ export default function verifyEmail(server) {
 					message: "Token is absent in query parameters",
 				});
 			const user = server.db.prepare(`SELECT email_verify_expires, id FROM users WHERE email_verify_token = ?`).get(token);
+
 			if (!user) {
 				return reply.status(400).send({
 					error: "Bad Request",
@@ -57,7 +58,7 @@ export default function verifyEmail(server) {
 				});
 			}
 			server.db.prepare(`UPDATE users SET email_verify_token = NULL, email_verify_expires = NULL, email_verified = ? WHERE id = ?`).run(1, user.id);
-			return reply.redirect("http://localhost:8080/?verified=true");
+			return reply.redirect(`${process.env.FRONTEND_DOMAIN_NAME}/?verified=true`);
 		} catch (error) {
 			console.error(error);
 			reply.status(500).send({
