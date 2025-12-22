@@ -58,7 +58,7 @@ export class Pong {
 		this.canvasUI.width = window.innerWidth;
 		this.canvasUI.height = window.innerHeight;
 	}
-	
+
 	//	J'ai mis en commentaire ici car manifestement il n'y a pas de couleur pour le joueur
 	initPlayers(inputs: string[], nbOfPlayer: number): Array<IPlayer>
 	{
@@ -138,9 +138,9 @@ export class Pong {
 		if (currentNbOfRounds < rounds.nbOfRounds && this.canvasUI && this.scene.leftPadd && this.scene.rightPadd) {
 			// drawMatchHistoryTree(this.canvasUI, playersColors, roundsColors, this.scene.options.nbOfPlayers);
 			if (this.scene.leftPadd.player?.name && this.scene.rightPadd.player?.name)
-				drawName(this.canvasUI, this.scene.leftPadd.player.name, this.scene.rightPadd.player.name, rounds.nbOfRounds);
+				drawName(this.scene.leftPadd.player.name, this.scene.rightPadd.player.name, rounds.nbOfRounds);
 			if (this.scene.leftPadd.player?.score && this.scene.rightPadd.player?.score)
-				drawScore(this.canvasUI,  this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
+				drawScore(this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
 		}
 
 		//	Display start button to launch the game for a new round
@@ -186,7 +186,7 @@ export class Pong {
 		if (paddle) paddle.move(side, Pong.MAP_HEIGHT / 2, this.time);
 
 		if (this.canvasUI && this.scene.leftPadd.player && this.scene.rightPadd.player)
-			drawScore(this.canvasUI,  this.scene.leftPadd.player.score,  this.scene.rightPadd.player.score);
+			drawScore(this.scene.leftPadd.player.score,  this.scene.rightPadd.player.score);
 
 		return isBallOutOfBounds;
 	}
@@ -251,7 +251,7 @@ export class Pong {
 			return ;
 		}
 		console.log("GAME-STATE: end");
-	
+
 		// sendMatchesPostRequest(rounds.results[rounds.nbOfRounds - 1], Date.now());
 
 		if (!this.canvasUI || !this.scene) return ;
@@ -266,9 +266,9 @@ export class Pong {
 		ctx.textBaseline = "middle";
 		ctx.textAlign = "center";
 		ctx.fillStyle = "rgba(141, 188, 255, 0.7)";
-		
+
 		const index = rounds.nbOfRounds - 2;
-		
+
 		ctx.fillText("Winner:  ", wCenter - 100, hCenter);
 		if (rounds.results && rounds.results[index].winner && rounds.results[index].winner.name)
 			ctx.fillText(rounds.results[index].winner.name, wCenter + 50, hCenter);
@@ -291,8 +291,8 @@ export class Pong {
 			if (this.canvasUI && this.scene && this.scene.leftPadd && this.scene.leftPadd.player && this.scene.rightPadd && this.scene.rightPadd.player) {
 				this.canvasUI.width = window.innerWidth;
 				this.canvasUI.height = window.innerHeight;
-				drawName(this.canvasUI, this.scene.leftPadd.player.name, this.scene.rightPadd.player.name, this.scene.options.nbOfPlayers);
-				drawScore(this.canvasUI, this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
+				drawName(this.scene.leftPadd.player.name, this.scene.rightPadd.player.name, this.scene.options.nbOfPlayers);
+				drawScore(this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
 				drawMatchHistoryTree(this.canvasUI, rounds, this.scene.options.nbOfPlayers);
 			}
 		});

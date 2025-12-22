@@ -155,7 +155,6 @@ function onGameLoaded(): void
 	const options = loadOptions()
 	if (options)
 	{
-
 		launchPongGame(options)
 	}
 	else

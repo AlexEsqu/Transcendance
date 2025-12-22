@@ -236,37 +236,26 @@ function drawMatchHistoryTree(
 	}
 }
 
-function drawScore(canvas: HTMLCanvasElement | null, score1: number, score2: number): void
+// FYI: score1 is the player2
+function drawScore(score1: number, score2: number): void
 {
 	const player1Score = document.getElementById('player1-score');
 	const player2Score = document.getElementById('player2-score');
 
 	if (player1Score)
 		player1Score.textContent = score1.toString();
-	
+
 	if (player2Score)
 		player2Score.textContent = score2.toString();
 }
 
-function drawName(canvas: HTMLCanvasElement, player1: string, player2: string, nbRound: number): void
+function drawName(player1: string, player2: string, nbRound: number): void
 {
-	const ctx = canvas.getContext("2d");
-	if (!ctx || !player2 || !player1) {
-		console.error("can't draw name, element not found");
-		return ;
-	}
-	if (player1.length > 10) player1 = player1.substring(0, 10);
-	if (player2.length > 10) player2 = player2.substring(0, 10);
+	const player1Name = document.getElementById('player1-name');
+	const player2Name = document.getElementById('player2-name');
 
-	const wCenter: number = (canvas.width / 2);
-	const hCenter: number = (canvas.height / 2) - 200;
-	ctx.clearRect(wCenter - 200, 0, 400, 500);
-	ctx.clearRect(wCenter + 200, 0, 400, 500);
-
-	ctx.font = "20px monospace";
-	ctx.fillStyle = "rgba(141, 188, 255, 1)";
-	ctx.textBaseline = "middle";
-	ctx.textAlign = "center";
-	ctx.fillText(player1, wCenter - 200, hCenter);
-	ctx.fillText(player2, wCenter + 200, hCenter);
+	if (player1Name)
+		player1Name.textContent = player1.substring(0, 10) || 'You';
+	if (player2Name)
+		player2Name.textContent = player2.substring(0, 10) || "Robot";
 }

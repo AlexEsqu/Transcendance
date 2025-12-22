@@ -55,13 +55,6 @@ export function launchPongGame(options: IOptions): void
 		return ;
 	}
 
-	const player1Name = document.getElementById('player1-name');
-	const player2Name = document.getElementById('player2-name');
-	if (player1Name)
-		player1Name.textContent = options.players[0] || 'You';
-	if (player2Name)
-		player2Name.textContent = options.players[1] || "Robot";
-
 	//	Launch Pong game when user click on start button
 	const gameWindow = document.getElementById("game-canvas") as HTMLCanvasElement;
 	gameWindow.width = window.innerWidth;
