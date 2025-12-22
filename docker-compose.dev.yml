@@ -21,18 +21,42 @@ services:
       - FRONTEND_DOMAIN_NAME=${FRONTEND_DOMAIN_NAME}
       - FT_CLIENT_ID=${FT_CLIENT_ID}
       - FT_CLIENT_SECRET=${FT_CLIENT_SECRET}
+    networks:
+      - app-network
+
   typescript:
     build: ./Frontend
     container_name: typescript
     ports:
-      - "8080:8080"
+    - "8080:8080"
     volumes:
       - ./Frontend:/app
     environment:
       - JWT_SECRET=${JWT_SECRET}
       - APP_SECRET_KEY=${APP_SECRET_KEY}
       - API_DOMAIN_NAME=${API_DOMAIN_NAME}
+    networks:
+      - app-network
+
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    ports:
+      - "8443:443"   # HTTPS
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/certs:/etc/nginx/certs
+    depends_on:
+      - fastify
+      - typescript
+    networks:
+      - app-network
 
 volumes:
   sqlite:
   user_avatars:
+
+networks:
+  app-network:
+    driver: bridge
+
