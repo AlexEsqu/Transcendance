@@ -10,7 +10,7 @@ INC_DIR				=	inc
 WEB_DIR				=	pages
 
 FRONT_SERVICES		=	typescript
-BACK_SERVICES		=	fastify
+BACK_SERVICES		=	api
 REVERSE_PROXY		=	nginx
 
 USER := $(shell whoami)
@@ -78,7 +78,7 @@ fclean:
 	docker volume prune -af
 
 tests:
-	docker exec -it fastify npm run test
+	docker exec -it ${BACK_SERVICES} npm run test
 
 re: fclean build up
 

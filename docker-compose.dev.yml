@@ -1,7 +1,7 @@
 services:
-  fastify:
+  api:
     build: ./Backend
-    container_name: fastify
+    container_name: api
     command: npm run dev
     volumes:
       - ./Backend/src:/app/src
@@ -43,7 +43,7 @@ services:
       - ./nginx/conf.d:/etc/nginx/conf.d
       - ./nginx/certs:/etc/nginx/certs
     depends_on:
-      - fastify
+      - api
       - typescript
     networks:
       - app-network

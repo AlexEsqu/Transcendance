@@ -1,1 +1,1 @@
-Usage : docker exec -it fastify npm run test
+Usage : docker exec -it api npm run test
