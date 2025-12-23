@@ -168,7 +168,7 @@ function onPasswordLoaded(): void
 
 // UTILITIES
 
-function injectForm(html: string): void
+export function injectForm(html: string): void
 {
 	const container = document.getElementById('form-container');
 	if (container) container.insertAdjacentHTML('beforeend', html);

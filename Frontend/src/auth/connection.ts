@@ -7,9 +7,12 @@ import guestFormHtml from "../pages/forms/guestForm.html?raw"
 import loginFormHtml from "../pages/forms/loginForm.html?raw"
 import registerFormHtml from "../pages/forms/registerForm.html?raw"
 
+import checkEmailHtml from "../pages/info/checkEmail.html?raw"
+
 export {
 	getConnectionLandingHtml,
 	getConnectionForm,
+	getEmailCheck,
 	initConnectionPageListeners }
 
 
@@ -23,6 +26,11 @@ function getConnectionLandingHtml(): string
 function getConnectionForm(): string {
 
 	return formHtml;
+}
+
+function getEmailCheck(): string
+{
+	return checkEmailHtml;
 }
 
 // FUNCTION TO ACTIVATE THE EVENT LISTENERS AND POSSIBLE BUTTON INTERACTIONS
@@ -104,6 +112,7 @@ function onRegisterLoaded(): void
 			try
 			{
 				await userState.register(login, password, email);
+				router.navigateTo("/connection/emailcheck");
 			}
 			catch (error)
 			{
