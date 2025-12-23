@@ -34,10 +34,7 @@ function refresh(server) {
 	};
 	server.post("/refresh", opts, async (req, reply) => {
 		try {
-			const { refreshToken } = req.cookies;
-
 			const { id, username } = req.user;
-
 			// Create new access token
 			const newAccessToken = createAccessToken(server, id, username);
 
