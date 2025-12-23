@@ -32,7 +32,7 @@ export class GameControl
 		return player;
 	}
 
-	addPlayerInWaitingRoom(player: IPlayer)
+	addPlayerInWaitingRoom(player: IPlayer): number | undefined
 	{
 		console.log("GAME-CONTROL : add a new player in a waiting room");
 		
@@ -43,7 +43,7 @@ export class GameControl
 		else //	Or create a new waiting room and add the player in
 			roomId = this.createWaitingRoom(player);
 
-		//	Notify everyone in the waiting
+		//	Notify everyone in the waiting room
 		if (roomId !== undefined)
 			notifyPlayersInRoom(this.waitingRoom.get(roomId), "new player added in the waiting room");
 
@@ -51,6 +51,7 @@ export class GameControl
 		const fullWaitingRoomId: number | undefined = this.checkFullWaitingRoom();
 		if (fullWaitingRoomId !== undefined)
 			this.createGamingRoom(fullWaitingRoomId);
+		return roomId;
 	}
 
 	findWaitingRoomMatch(gameType: GameType, gameLocation: GameLocation): number | undefined
@@ -62,7 +63,7 @@ export class GameControl
 				return key;
 		}
 
-		console.log("GAME-CONTROL: no match with an exisiting free waiting room");
+		console.log("GAME-CONTROL: no match with an existing free waiting room");
 		return undefined;
 	}
 
@@ -100,7 +101,24 @@ export class GameControl
 		this.gamingRooms.set(roomId, room);
 		this.waitingRoom.delete(roomId);
 		console.log("GAME-CONTROL: new gaming room created ", roomId);
-		notifyPlayersInRoom(this.gamingRooms.get(roomId), "New gaiming room created and you're in");
+		notifyPlayersInRoom(this.gamingRooms.get(roomId), "New gaming room created and you're in");
 		return true;
+	}
+
+	deletePlayerFromRoom(playerId: number, roomId: number): void
+	{
+		let room: Room | undefined;
+		if (this.waitingRoom.has(roomId)) {
+			room = this.waitingRoom.get(roomId);
+			console.log("GAME-SERVER: a player has left the waiting room");
+			notifyPlayersInRoom(room, "A player has left the waiting room");
+		}
+		else if (this.gamingRooms.has(roomId)) {
+			room = this.gamingRooms.get(roomId);
+			console.log("GAME-SERVER: a player has left the gaming room");
+			notifyPlayersInRoom(room, "A player has left the gaming room");
+		}
+		if (room && room.players.has(playerId))
+			room.players.delete(playerId);
 	}
 }

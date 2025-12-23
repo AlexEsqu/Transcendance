@@ -13,8 +13,8 @@ export { handleMessage, handleDisconnection}
  * 		Declare handlers for the 'waiting room'								 								*
  ***********************************************************************************************************/
 
-function handleMessage(
-	socket: WSWebSocket, message: Buffer, validateSchema: ValidateFunction, gameControl: GameControl): number
+function handleMessage(socket: WSWebSocket, message: Buffer, 
+	validateSchema: ValidateFunction, gameControl: GameControl): { playerId: number, roomId: number}
 {
 	console.log("GAME-SERVER: handle received message from '/waitingRoom' route");
 	try {
@@ -22,35 +22,24 @@ function handleMessage(
 		const data = JSON.parse(message.toString());
 		if (!validateSchema(data) || data === undefined) {
 			socket.send(JSON.stringify(getJSONError("Bad request", 400)));
-			return -1;
+			return ({ playerId: -1, roomId: -1});
 		}
 
 		//	Add in game controller (manage waiting rooms and gaming rooms)
 		const playerId = gameControl.generatePlayerId(socket, data);
-		gameControl.addPlayerInWaitingRoom(playerId);
-		return playerId.id;
+		const roomId = gameControl.addPlayerInWaitingRoom(playerId) ?? -1;
+
+		return ({ playerId: playerId.id, roomId: roomId});
 
 	} catch (error) {
-		return -1;
+		console.error(error);
+		return ({ playerId: -1, roomId: -1});
 	}
-	return -1;
-	
-
-	//	Notify "in the waiting room"
-	// sendToClient(connection.socket, {
-	// 	message: 'Connected to Pong Game Server'
-	// });
-
-	// switch (message)
-	// {
-	// 	case 'ready':
-	// 		// Save player as ready in the waiting room
-	// 	// case ''
-	// }
 }
 
 
-function handleDisconnection(playerId: number | null, gameControl: GameControl)
+function handleDisconnection(player: { playerId: number, roomId: number }, gameControl: GameControl)
 {
-	console.log("GAME-HANDLER: disconnection of client ", playerId);
+	console.log("GAME-HANDLER: disconnection of client ", player.playerId);
+	gameControl.deletePlayerFromRoom(player.playerId, player.roomId);
 }

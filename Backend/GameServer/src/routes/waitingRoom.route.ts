@@ -22,7 +22,7 @@ export async function registerWaitingRoomRoutes(gameServer: FastifyInstance, gam
 		fastify.get('/waitingRoom', { websocket: true }, (socket: WSWebSocket, request) => {
 			if (!socket) throw new Error("Websocket is missing");
 
-			let playerId: number | null = null;
+			let player = { playerId: -1, roomId: -1 };
 
 			//	Handle: first connection of a client
 			console.log("GAME-SERVER: new connection from a client");
@@ -30,13 +30,13 @@ export async function registerWaitingRoomRoutes(gameServer: FastifyInstance, gam
 			//	Handler: receiving message from a client
 			socket.on('message', (message: Buffer) => {
 				console.log("GAME-SERVER: received a message from the client");
-				playerId = handleMessage(socket, message, validateWaitingMessage, gameControl);
+				player = handleMessage(socket, message, validateWaitingMessage, gameControl);
 			});
 	
 			//	Handle: ending client connection properly for the server
 			socket.on('close', () => {
-				console.log("GAME-SERVER: closed connection from client");
-				handleDisconnection(playerId, gameControl);
+				console.log("GAME-SERVER: client closed connection");
+				handleDisconnection(player, gameControl);
 			});
 	
 			//	Handle: errors!!
