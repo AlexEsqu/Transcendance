@@ -33,7 +33,10 @@ function attachNavListeners()
 			try {
 				await userState.logout();
 			} catch (error) {
-				console.error('Logout failed:', error);
+				const msg = error instanceof Error ? error.message : "Unknown error";
+				console.log(`error message is ${msg}`);
+				window.sessionStorage.setItem("errorMessage", msg);
+				router.navigateTo("/error");
 			}
 		});
 	}
