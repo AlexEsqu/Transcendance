@@ -208,7 +208,8 @@ class UserState
 					method: 'POST',
 					headers: {
 						'accept': 'application/json',
-						'Authorization': `Bearer ${this.user.accessToken}`
+						'Authorization': `Bearer ${this.user.accessToken}`,
+						'X-App-Secret': `${apiKey}`
 					},
 				}
 			);
@@ -230,7 +231,8 @@ class UserState
 					method: 'DELETE',
 					headers: {
 						'accept': 'application/json',
-						'Authorization': `Bearer ${this.user.accessToken}`
+						'Authorization': `Bearer ${this.user.accessToken}`,
+						'X-App-Secret': `${apiKey}`
 					},
 				}
 			);
@@ -264,7 +266,7 @@ class UserState
 
 		if (!response.ok || !data.accessToken)
 		{
-			console.log(data.message);
+			console.log(data.message || data.error || 'Faied to refresh token');
 			return false;
 		}
 
