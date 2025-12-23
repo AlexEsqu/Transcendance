@@ -346,7 +346,7 @@ class UserState
 		this.setUser(this.user);
 	}
 
-	async updateAvatar(image : Object): Promise<void>
+	async updateAvatar(formData : FormData): Promise<void>
 	{
 		if (this.user instanceof RegisteredUser)
 		{
@@ -356,13 +356,11 @@ class UserState
 				headers:
 				{
 					'accept': 'application/json',
-					'Content-Type': 'application/json',
+					'Content-Type': 'multipart/form-data',
 					'Authorization': `Bearer ${this.user.accessToken}`,
 					'X-App-Secret': `${apiKey}`
 				},
-				body: JSON.stringify({
-					'avatar': image
-				})
+				body: formData,
 			});
 
 			const data = await response.json();

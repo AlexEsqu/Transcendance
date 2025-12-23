@@ -74,6 +74,7 @@ back_down:
 	docker compose -f ./docker-compose.dev.yml down ${BACK_SERVICES}
 
 fclean:
+	$(MAKE) clean
 	docker system prune -af
 	docker volume prune -af
 

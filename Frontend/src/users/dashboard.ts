@@ -111,12 +111,14 @@ function onAvatarLoaded(): void
 		{
 			e.preventDefault();
 			const formData = new FormData(avatarForm);
-			const newAvatarFile = formData.get('input-avatar-file') as string | null;
-			if (newAvatarFile) {
-			try {
-					await userState.updateAvatar(newAvatarFile);
+			if (formData) {
+				try
+				{
+					await userState.updateAvatar(formData);
 					alert('Avatar updated!');
-				} catch (err) {
+				}
+				catch (err)
+				{
 					alert('Failed to update avatar.');
 					console.error(err);
 				}
