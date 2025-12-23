@@ -1,7 +1,11 @@
 import fastify, { FastifyInstance } from 'fastify';
-import { handleMessage, handleDisconnection } from '../handlers/waitingRoom.handlers.js';
-import { GameControl } from '../controllers/GameControl.js'
-import { IPlayer } from '../config/gameData'
+import Ajv, { ValidateFunction } from 'ajv';
+import { WebSocket as WSWebSocket } from 'ws';
+
+import { handleMessage, handleDisconnection } from '../handlers/waitingRoom.handlers';
+import { GameControl } from '../services/GameControl';
+import { IPlayer } from '../config/gameData';
+import { waitingSchema } from '../config/schemas';
 
 /************************************************************************************************************
  * 		Declare routes/endpoints								 											*
@@ -11,23 +15,28 @@ import { IPlayer } from '../config/gameData'
 
 export async function registerWaitingRoomRoutes(gameServer: FastifyInstance, gameControl: GameControl)
 {
+	const ajv = new Ajv() as Ajv;
+	const validateWaitingMessage = ajv.compile(waitingSchema) as ValidateFunction;
+
 	await gameServer.register(async function (fastify) {
-		fastify.get('/waitingRoom', { websocket: true }, (socket, request) => {
+		fastify.get('/waitingRoom', { websocket: true }, (socket: WSWebSocket, request) => {
 			if (!socket) throw new Error("Websocket is missing");
-			
+
+			let playerId: number | null = null;
+
 			//	Handle: first connection of a client
-			console.log("GAME-SERVER: new connection from a client ", socket);
+			console.log("GAME-SERVER: new connection from a client");
 
 			//	Handler: receiving message from a client
 			socket.on('message', (message: Buffer) => {
-				console.log("GAME-SERVER: received a message from the client ", socket);
-				handleMessage(socket, message, gameControl);
+				console.log("GAME-SERVER: received a message from the client");
+				playerId = handleMessage(socket, message, validateWaitingMessage, gameControl);
 			});
 	
 			//	Handle: ending client connection properly for the server
 			socket.on('close', () => {
-				console.log("GAME-SERVER: closed connection from client ", socket);
-				handleDisconnection(playerId);
+				console.log("GAME-SERVER: closed connection from client");
+				handleDisconnection(playerId, gameControl);
 			});
 	
 			//	Handle: errors!!

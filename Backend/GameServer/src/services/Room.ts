@@ -1,32 +1,35 @@
-import { STATE } from '../config/schemas.js'
-import { GameLoop } from './GameLoop.js'
+import { GameType, IPlayer } from '../config/gameData.js';
+import { GameLoop } from './GameLoop';
 
 export class Room
 {
-	/**
-	 * @param id : number
-	 * @param players : Array
-	 * @param maxPlayers : number
-	 */
-	constructor(id, players, maxPlayers)
+	id: number;
+	type: GameType;
+	GameLoop: GameLoop | null;
+	players: Map<number, IPlayer> = new Map<number, IPlayer>();
+
+	constructor(roomId: number, players: Map<number, IPlayer> | IPlayer, gameType: GameType)
 	{
-		this.id = id;
-		this.maxPlayers = maxPlayers;
+		this.id = roomId;
+		this.type = gameType;
 		this.GameLoop = null;
-		this.players = null;
-		players.array.forEach((element) => {
-			this.addPlayerInRoom(element);
-		});
+
+		if (players instanceof Map) {
+			for (const [key, value] of players) {
+				this.addPlayerInRoom(value.id, value);
+			}
+		}
+		else
+			this.addPlayerInRoom(players.id, players);
+
 		console.log("GAME-ROOM: new room created");
 	}
 
-	addPlayerInRoom(newPlayer)
+	addPlayerInRoom(playerId: number, player: IPlayer): boolean
 	{
-		if (!newPlayer || newPlayer.id === -1) return false;
-
-		if (this.players.size !== this.maxPlayers) {
-			newPlayer.roomId = this.id;
-			this.players.set(newPlayer.id, newPlayer);
+		if (this.players.size !== this.type) {
+			player.roomId = this.id;
+			this.players.set(playerId, player);
 			console.log("GAME-ROOM: new player added to room ", this.id);
 			return true;
 		}

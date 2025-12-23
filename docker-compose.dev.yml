@@ -41,7 +41,8 @@ services:
       - APP_SECRET_KEY=${APP_SECRET_KEY}
       - API_DOMAIN_NAME=${API_DOMAIN_NAME}
     volumes:
-      - ./Backend/GameServer:/app
+      - ./Backend/GameServer/src:/app/src
+    command: npm run dev
 
 volumes:
   sqlite:

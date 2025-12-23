@@ -1,18 +1,20 @@
-import { BALL, PADDLE } from '../config/gameData.js'
-import { STATE } from '../config/schemas.js';
+import { IBall, IPaddle, IPlayer, State, Level } from '../config/gameData'
 
 export class GameLoop
 {
+	static MAX_ROUNDS = 1;
+
+	// ball: IBall;
+	// leftPadd: IPaddle;
+	// rightPadd: IPaddle;
+	isLaunched: boolean;
+	state: State;
+	time: number;
+
 	constructor()
 	{
-		this.ball = BALL;
-		this.leftPadd = PADDLE;
-		this.rightPadd = PADDLE;
-
-		this.maxRounds = 1;
-
 		this.isLaunched = false;
-		this.state = STATE.init;
+		this.state = State.opening;
 		this.time = Date.now();
 	}
 }

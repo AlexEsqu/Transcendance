@@ -1,4 +1,6 @@
-export { GameType, GameLocation, IBall, IPaddle, IPlayer }
+import { WebSocket as WSWebSocket } from 'ws';
+
+export { GameType, GameLocation, State, Level, IBall, IPaddle, IPlayer }
 
 /************************************************************************************************************
  * 		Declare CONSTANT variables								 											*
@@ -9,11 +11,19 @@ export { GameType, GameLocation, IBall, IPaddle, IPlayer }
  ***********************************************************************************************************/
 
 enum GameType {
-	solo, duo, tournament 
+	solo = 1, duo, tournament 
 };
 
 enum GameLocation {
 	local, remote
+};
+
+enum State {
+	opening, launch, play, pause, end, stop
+};
+
+enum Level {
+	easy, medium, hard
 };
 
 /************************************************************************************************************
@@ -35,12 +45,25 @@ interface IPaddle {
 
 interface IPlayer {
 	id: number;
-	gameType: GameType,
-	socket?: WebSocket
-	isReady: boolean,
-	ip?: string,
-	score: number,
-	roomId?: number,
+	socket: WSWebSocket;
+	gameType: GameType;
+	gameLocation: GameLocation;
+	isReady: boolean;
+	score: number;
+	roomId?: number;
 	color?: string;
 };
 
+interface IResult {
+	winner: IPlayer | null;
+	maxScore: number;
+	loser: IPlayer | null;
+	minScore: number;
+};
+
+interface IRound {
+	results: Array<IResult> | null;
+	nbOfRounds: number;
+	playerIndex: number;
+	nodeColor: string[];
+}

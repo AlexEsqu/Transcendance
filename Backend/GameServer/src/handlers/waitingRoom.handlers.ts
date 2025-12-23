@@ -1,6 +1,8 @@
-import { GameControl } from '../controllers/GameControl.js'
-import { parseJSONMessage } from '../utils/parsing.js'
-import { IPlayer } from '@/config/gameData';
+import Ajv, { ValidateFunction } from 'ajv';
+import { WebSocket as WSWebSocket } from 'ws';
+
+import { GameControl } from '../services/GameControl.js'
+import { getJSONError } from '../errors/input.error';
 // import { sendToClient } from '../utils/broadcast.js'
 
 /***********************************************************************************************************/
@@ -11,16 +13,28 @@ export { handleMessage, handleDisconnection}
  * 		Declare handlers for the 'waiting room'								 								*
  ***********************************************************************************************************/
 
-function handleMessage(socket: WebSocket, message: Buffer, gameControl: GameControl): number
+function handleMessage(
+	socket: WSWebSocket, message: Buffer, validateSchema: ValidateFunction, gameControl: GameControl): number
 {
-	console.log("GAME-SERVER: waitingRoom route -- handleMessage");
+	console.log("GAME-SERVER: handle received message from '/waitingRoom' route");
+	try {
+		//	Must parse and validate received message
+		const data = JSON.parse(message.toString());
+		if (!validateSchema(data) || data === undefined) {
+			socket.send(JSON.stringify(getJSONError("Bad request", 400)));
+			return -1;
+		}
 
-	//	Must parse the type of game (local, 1vs1 or tournament)
-	const playerId: IPlayer = parseJSONMessage(message);
+		//	Add in game controller (manage waiting rooms and gaming rooms)
+		const playerId = gameControl.generatePlayerId(socket, data);
+		gameControl.addPlayerInWaitingRoom(playerId);
+		return playerId.id;
 
-	// const playerId = GameControl.generatePlayerId(connection, remoteAddress, playerData);
-	//	Add in game controller (manage waiting rooms and gaming rooms)
-	// GameControl.addPlayerInWaitingRoom(playerId);
+	} catch (error) {
+		return -1;
+	}
+	return -1;
+	
 
 	//	Notify "in the waiting room"
 	// sendToClient(connection.socket, {
@@ -33,11 +47,10 @@ function handleMessage(socket: WebSocket, message: Buffer, gameControl: GameCont
 	// 		// Save player as ready in the waiting room
 	// 	// case ''
 	// }
-	return playerId.id;
 }
 
 
-function handleDisconnection(player)
+function handleDisconnection(playerId: number | null, gameControl: GameControl)
 {
-	console.log("GAME-HANDLER: disconnection of client ", player.id);
+	console.log("GAME-HANDLER: disconnection of client ", playerId);
 }

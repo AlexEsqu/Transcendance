@@ -69,10 +69,9 @@ export function launchPongGame(options: IOptions): void
 	ws.onopen = () => {
 		console.log("Client is connected to the game server");
 		const testJSONForm = {
-			type: 'duo',
-			nbOfPlayers: 2,
-			id: 1,
-			color: '#324ea8'
+			id: Date.now(),
+			game: 'duo',
+			location: 'remote'
 		}
 		const data = JSON.stringify(testJSONForm);
 		console.log(data);

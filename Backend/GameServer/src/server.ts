@@ -3,14 +3,14 @@ import websocket from '@fastify/websocket';
 
 import { registerWaitingRoomRoutes } from './routes/waitingRoom.route'
 import { registerGameRoutes } from './routes/game.route'
-import { GameControl } from './controllers/GameControl';
+import { GameControl } from './services/GameControl';
 
 /************************************************************************************************************
  * 		Run Game Server																						*
  ***********************************************************************************************************/
 
 //	Create game server instance
-const gameServer: FastifyInstance = Fastify({ logger: true });
+const gameServer: FastifyInstance = Fastify({ logger: {level: 'info'} });
 
 const launchGameServer = async () => {
 	try {

@@ -1,35 +1,42 @@
 // import { handleMessage, handleDesconnection } from '../handlers/game.handlers.js'
 
+import { FastifyInstance } from "fastify";
+import { GameControl } from "../services/GameControl";
+
 /************************************************************************************************************
  * 		Declare routes/endpoints								 											*
  ***********************************************************************************************************/
 
 // ROUTE DECLARATION : fastify.get('path', [options], () => { handler });
 
-export async function registerGameRoutes(gameServer, GameControl)
+export async function registerGameRoutes(gameServer: FastifyInstance, gameControl: GameControl)
 {
-	const options = {
-		maxPayload: 1024,
-		// verifyClient: function that can be used to verify client
-	};
+	await gameServer.register(async function (fastify) {
+		fastify.get('/game', { websocket: true }, (socket, request) => {
+			if (!socket) throw new Error("Websocket is missing");
 
-	gameServer.get('/game', { websocket: true, options: options }, (connection, request) => {
-		//	Handle: first connection of a client
-		//	Validate the request, is roomID registered in GameControl
+			let playerId: number | null = null;
 
-		//	Handle: receiving message from a client
-		connection.socket.on('message', (message) => {
-			handleMessage(player, message, GameControl);
-		});
+			//	Handle: first connection of a client
+			console.log("GAME-SERVER: new connection from a client ", socket);
 
-		//	Handle: closing client connection
-		connection.socket.on('close', () => {
-			handleDisconnection(player);
-		});
-
-		//	Handle: errors!!
-		connection.socket.on('error', (error) => {
-			console.error("WS-ERROR: ", error);
+			//	Handler: receiving message from a client
+			socket.on('message', (message: Buffer) => {
+				console.log("GAME-SERVER: received a message from the client ", socket);
+				// playerId = handleMessage(socket, message, validateWaitingMessage, gameControl);
+			});
+	
+			//	Handle: ending client connection properly for the server
+			socket.on('close', () => {
+				console.log("GAME-SERVER: closed connection from client ", socket);
+				// handleDisconnection(playerId, gameControl);
+			});
+	
+			//	Handle: errors!!
+			socket.on('error', (error: Error) => {
+				console.error("WS-ERROR: ", error);
+				throw new Error(error.toString());
+			});
 		});
 	});
 }
