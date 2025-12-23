@@ -24,7 +24,7 @@ beforeAll(async () => {
 	users[0].is_active = true;
 	const response = await server.inject({
 		method: "POST",
-		url: "/users/auth/login",
+		url: "/api/users/auth/login",
 		payload: { login: users[0].username, password: users[0].password },
 	});
 	expect(response.statusCode).toBe(200);
@@ -39,7 +39,7 @@ describe("GET /users", () => {
 	it("returns all users", async () => {
 		const response = await server.inject({
 			method: "GET",
-			url: "/users",
+			url: "/api/users",
 		});
 
 		expect(response.statusCode).toBe(200);
@@ -60,7 +60,7 @@ describe("GET /users/:id", () => {
 
 		const response = await server.inject({
 			method: "GET",
-			url: `/users/${userId}`,
+			url: `api/users/${userId}`,
 		});
 
 		expect(response.statusCode).toBe(200);
@@ -85,7 +85,7 @@ describe("GET /users/:id", () => {
 	it("returns 400 for bad request", async () => {
 		const response = await server.inject({
 			method: "GET",
-			url: "/users/wkjqbhdijb",
+			url: "/api/users/wkjqbhdijb",
 		});
 
 		expect(response.statusCode).toBe(400);
@@ -97,7 +97,7 @@ describe("POST /users/auth/login", () => {
 	it("POST /users/auth/login returns 200 for valid credentials", async () => {
 		const response = await server.inject({
 			method: "POST",
-			url: "/users/auth/login",
+			url: "/api/users/auth/login",
 			payload: {
 				login: users[0].username,
 				password: users[0].password,
@@ -113,7 +113,7 @@ describe("POST /users/auth/send-mail-verification", () => {
 	it("returns 400 for already verified", async () => {
 		const response = await server.inject({
 			method: "POST",
-			url: "/users/auth/send-mail-verification",
+			url: "/api/users/auth/send-mail-verification",
 			body: {
 				email: users[0].email,
 			}
@@ -125,7 +125,7 @@ describe("POST /users/auth/send-mail-verification", () => {
 	it.skip("returns 200 for successful email sent", async () => {
 		const response = await server.inject({
 			method: "POST",
-			url: "/users/auth/send-mail-verification",
+			url: "/api/users/auth/send-mail-verification",
 			body: {
 				email: users[1].email,
 			}
@@ -141,7 +141,7 @@ describe("PUT /users/me/password", () => {
 	it("returns 401 for not logged in", async () => {
 		const response = await server.inject({
 			method: "PUT",
-			url: "/users/me/password",
+			url: "/api/users/me/password",
 			payload: {
 				oldPassword: "password",
 				newPassword: "newPassword",
@@ -154,7 +154,7 @@ describe("PUT /users/me/password", () => {
 	it("returns 200 for successful password change", async () => {
 		const response = await server.inject({
 			method: "PUT",
-			url: "/users/me/password",
+			url: "/api/users/me/password",
 			headers: {
 				Authorization: `Bearer ${accessToken}`,
 				"X-App-Secret": "bgb",
@@ -173,7 +173,7 @@ describe("PUT /users/me/avatar", () => {
 	it("returns 401 if not logged in", async () => {
 		const response = await server.inject({
 			method: "PUT",
-			url: "/users/me/avatar",
+			url: "/api/users/me/avatar",
 		});
 
 		expect(response.statusCode).toBe(401);
@@ -188,7 +188,7 @@ describe("PUT /users/me/avatar", () => {
 
 		const response = await server.inject({
 			method: "PUT",
-			url: "/users/me/avatar",
+			url: "/api/users/me/avatar",
 			headers: {
 				Authorization: `Bearer ${accessToken}`,
 				"X-App-Secret": "bgb",
@@ -212,7 +212,7 @@ describe("PUT /users/me/avatar", () => {
 
 		const response = await server.inject({
 			method: "PUT",
-			url: "/users/me/avatar",
+			url: "/api/users/me/avatar",
 			headers: {
 				Authorization: `Bearer ${accessToken}`,
 				"X-App-Secret": "bgb",
@@ -232,7 +232,7 @@ describe("DELETE /users/me/avatar", () => {
 	it("returns 401 for not logged in", async () => {
 		const response = await server.inject({
 			method: "DELETE",
-			url: "/users/me/avatar",
+			url: "/api/users/me/avatar",
 		});
 
 		expect(response.statusCode).toBe(401);
@@ -242,7 +242,7 @@ describe("DELETE /users/me/avatar", () => {
 	it("returns 204 for successful avatar deletion", async () => {
 		const response = await server.inject({
 			method: "DELETE",
-			url: "/users/me/avatar",
+			url: "/api/users/me/avatar",
 			headers: {
 				Authorization: `Bearer ${accessToken}`,
 				"X-App-Secret": "bgb",
@@ -257,7 +257,7 @@ describe("PUT /users/me/username", () => {
 	it("returns 401 for not logged in", async () => {
 		const response = await server.inject({
 			method: "PUT",
-			url: "/users/me/username",
+			url: "/api/users/me/username",
 			payload: {
 				newUsername: "newUsername",
 			},
@@ -269,7 +269,7 @@ describe("PUT /users/me/username", () => {
 	it("returns 200 for successful username change", async () => {
 		const response = await server.inject({
 			method: "PUT",
-			url: "/users/me/username",
+			url: "/api/users/me/username",
 			headers: {
 				Authorization: `Bearer ${accessToken}`,
 				"X-App-Secret": "bgb",
@@ -288,7 +288,7 @@ describe("PUT /users/me/username", () => {
 	it("returns 409 for username taken", async () => {
 		const response = await server.inject({
 			method: "PUT",
-			url: "/users/me/username",
+			url: "/api/users/me/username",
 			headers: {
 				Authorization: `Bearer ${accessToken}`,
 				"X-App-Secret": "bgb",
@@ -309,7 +309,7 @@ describe("DELETE /users/me", () => {
 	it("returns 401 for not logged in", async () => {
 		const response = await server.inject({
 			method: "DELETE",
-			url: "/users/me",
+			url: "/api/users/me",
 		});
 		expect(response.statusCode).toBe(401);
 		expect(response.json()).toHaveProperty("error", "Unauthorized");
@@ -318,7 +318,7 @@ describe("DELETE /users/me", () => {
 	it("returns 204 for successful user deletion", async () => {
 		const response = await server.inject({
 			method: "DELETE",
-			url: "/users/me",
+			url: "/api/users/me",
 			headers: {
 				Authorization: `Bearer ${accessToken}`,
 				"X-App-Secret": "bgb",

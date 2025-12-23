@@ -22,7 +22,7 @@ let accessToken;
 beforeAll(async () => {
 	const response = await server.inject({
 		method: "POST",
-		url: "/users/auth/login",
+		url: "/api/users/auth/login",
 		payload: {
 			login: users[0].username,
 			password: users[0].password,
@@ -43,7 +43,7 @@ describe("POST /users/me/friends", () => {
 	it("returns 401 for not logged in", async () => {
 		const response = await server.inject({
 			method: "POST",
-			url: "/users/me/friends",
+			url: "/api/users/me/friends",
 			payload: {
 				id: 0,
 			},
@@ -56,7 +56,7 @@ describe("POST /users/me/friends", () => {
 		const friend_id = users[1].id;
 		const response = await server.inject({
 			method: "POST",
-			url: "/users/me/friends",
+			url: "/api/users/me/friends",
 			headers: {
 				Authorization: `Bearer ${accessToken}`,
 				"X-App-Secret": "bgb",
@@ -76,7 +76,7 @@ describe("POST /users/me/friends", () => {
 		const friend_id = users[1].id;
 		const response = await server.inject({
 			method: "POST",
-			url: "/users/me/friends",
+			url: "/api/users/me/friends",
 			headers: {
 				Authorization: `Bearer ${accessToken}`,
 				"X-App-Secret": "bgb",
@@ -92,7 +92,7 @@ describe("POST /users/me/friends", () => {
 	it("returns 404 for user not found", async () => {
 		const response = await server.inject({
 			method: "POST",
-			url: "/users/me/friends",
+			url: "/api/users/me/friends",
 			headers: {
 				Authorization: `Bearer ${accessToken}`,
 				"X-App-Secret": "bgb",
@@ -108,7 +108,7 @@ describe("POST /users/me/friends", () => {
 	it("returns 400 for same user", async () => {
 		const response = await server.inject({
 			method: "POST",
-			url: "/users/me/friends",
+			url: "/api/users/me/friends",
 			headers: {
 				Authorization: `Bearer ${accessToken}`,
 				"X-App-Secret": "bgb",
@@ -126,7 +126,7 @@ describe("DELETE /users/me/friends", () => {
 	it("returns 401 for not logged in", async () => {
 		const response = await server.inject({
 			method: "DELETE",
-			url: "/users/me/friends",
+			url: "/api/users/me/friends",
 			payload: {
 				id: 0,
 			},
@@ -139,7 +139,7 @@ describe("DELETE /users/me/friends", () => {
 		const friend_id = users[1].id;
 		const response = await server.inject({
 			method: "DELETE",
-			url: "/users/me/friends",
+			url: "/api/users/me/friends",
 			headers: {
 				Authorization: `Bearer ${accessToken}`,
 				"X-App-Secret": "bgb",
@@ -154,7 +154,7 @@ describe("DELETE /users/me/friends", () => {
 	it("returns 404 for user not found", async () => {
 		const response = await server.inject({
 			method: "DELETE",
-			url: "/users/me/friends",
+			url: "/api/users/me/friends",
 			headers: {
 				Authorization: `Bearer ${accessToken}`,
 				"X-App-Secret": "bgb",
@@ -170,7 +170,7 @@ describe("DELETE /users/me/friends", () => {
 	it("returns 400 for same user", async () => {
 		const response = await server.inject({
 			method: "DELETE",
-			url: "/users/me/friends",
+			url: "/api/users/me/friends",
 			headers: {
 				Authorization: `Bearer ${accessToken}`,
 				"X-App-Secret": "bgb",
@@ -190,7 +190,7 @@ describe("GET /users/me/friends", () => {
 	it("returns 401 for not logged in", async () => {
 		const response = await server.inject({
 			method: "GET",
-			url: "/users/me/friends",
+			url: "/api/users/me/friends",
 		});
 		expect(response.statusCode).toBe(401);
 		expect(response.json()).toHaveProperty("error", "Unauthorized");
@@ -200,7 +200,7 @@ describe("GET /users/me/friends", () => {
 		const friend_id = 2;
 		await server.inject({
 			method: "POST",
-			url: "/users/me/friends",
+			url: "/api/users/me/friends",
 			headers: {
 				Authorization: `Bearer ${accessToken}`,
 				"X-App-Secret": "bgb",
@@ -211,7 +211,7 @@ describe("GET /users/me/friends", () => {
 		});
 		await server.inject({
 			method: "POST",
-			url: "/users/me/friends",
+			url: "/api/users/me/friends",
 			headers: {
 				Authorization: `Bearer ${accessToken}`,
 				"X-App-Secret": "bgb",
@@ -222,7 +222,7 @@ describe("GET /users/me/friends", () => {
 		});
 		const response = await server.inject({
 			method: "GET",
-			url: "/users/me/friends",
+			url: "/api/users/me/friends",
 			headers: {
 				Authorization: `Bearer ${accessToken}`,
 				"X-App-Secret": "bgb",

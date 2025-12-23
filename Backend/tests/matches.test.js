@@ -24,7 +24,7 @@ describe("GET /matches", () => {
 	it("returns all seeded matches", async () => {
 		const response = await server.inject({
 			method: "GET",
-			url: "/matches",
+			url: "api/matches",
 		});
 
 		expect(response.statusCode).toBe(200);
@@ -40,7 +40,7 @@ describe("GET /users/:id/matches", () => {
 
 		const res = await server.inject({
 			method: "GET",
-			url: `/users/${userId}/matches`,
+			url: `/api/users/${userId}/matches`,
 		});
 
 		expect(res.statusCode).toBe(200);
@@ -61,7 +61,7 @@ describe("GET /users/:id/matches", () => {
 
 		const res = await server.inject({
 			method: "GET",
-			url: `/users/${userId}/matches`,
+			url: `/api/users/${userId}/matches`,
 		});
 
 		expect(res.statusCode).toBe(200);
@@ -82,7 +82,7 @@ describe("GET /users/:id/matches", () => {
 
 		const res = await server.inject({
 			method: "GET",
-			url: `/users/${userId}/matches`,
+			url: `/api/users/${userId}/matches`,
 		});
 
 		expect(res.statusCode).toBe(404);
