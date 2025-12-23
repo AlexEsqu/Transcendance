@@ -356,7 +356,6 @@ class UserState
 				headers:
 				{
 					'accept': 'application/json',
-					'Content-Type': 'multipart/form-data',
 					'Authorization': `Bearer ${this.user.accessToken}`,
 					'X-App-Secret': `${apiKey}`
 				},
@@ -367,8 +366,7 @@ class UserState
 			if (!response.ok)
 				throw new Error(`Avatar update failed: ${response.status}, ${data.message}`);
 
-			this.user.avatarPath = '';
-			this.setUser(this.user);
+			this.refreshUser();
 		}
 
 		else
