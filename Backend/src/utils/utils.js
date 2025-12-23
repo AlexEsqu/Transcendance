@@ -1,6 +1,6 @@
 export function formatUserObject(user) {
 	if (user.avatar) {
-		user.avatar = user.avatar.replace(process.env.AVATARS_UPLOAD_PATH, `${process.env.API_DOMAIN_NAME}/avatars/`);
+		user.avatar = user.avatar.replace(process.env.AVATARS_UPLOAD_PATH, `${process.env.API_DOMAIN_NAME}/avatars`);
 	}
 	user.is_active = computeActive(user.last_activity);
 	delete user.last_activity;
