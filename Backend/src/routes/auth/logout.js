@@ -7,7 +7,7 @@ export default function logout(server) {
 				`HttpOnly refreshToken cookie`. After logout, the user must reauthenticate with their\
 				 username and password to obtain new tokens. This endpoint requires client authentification \
 				 AND user authentification AND the refresh cookie stored in the HttpOnly refreshToken cookie",
-			security: server.security.UserAndSession,
+			security: server.security.SessionAuth,
 			response: {
 				200: {
 					description: "Success: User successfully logged out",
@@ -27,13 +27,13 @@ export default function logout(server) {
 				},
 			},
 		},
-		onRequest: [server.authenticateUser, server.authenticateClient, server.authenticateRefreshToken],
+		onRequest: [server.authenticateClient, server.authenticateRefreshToken],
 	};
 	server.post("/logout", opts, async (req, reply) => {
 		try {
 			//Clear the refresh token from db
 			const { id, username } = req.user;
-			console.log(id);
+			console.log("Logging out user with id =", id);
 			server.db.prepare(`UPDATE users SET refresh_token_hash = null WHERE id = ?`).run(id);
 
 			//Clear the refresh token from cookies
