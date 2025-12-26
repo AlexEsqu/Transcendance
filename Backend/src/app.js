@@ -63,9 +63,11 @@ export function buildServer({ useHttps = null, dbOverride = null, apiKeyPluginOv
 		allowList: ["127.0.0.1"],
 		ban: 2,
 	});
+	// /app/uploads/avatars
+	console.log(process.env.AVATARS_UPLOAD_PATH);
 	server.register(fastifyStatic, {
-		root: path.join(process.env.AVATARS_UPLOAD_PATH || "./uploads"),
-		prefix: "/avatars/",
+		root: process.env.AVATARS_UPLOAD_PATH ,
+		prefix: "/api/avatars/",
 	});
 
 	server.register(mailerOverride ?? mailerPlugin);

@@ -32,7 +32,7 @@ export function ft_OAuth2(server) {
 				httpOnly: true,
 				secure: true,
 				sameSite: "Lax",
-				path: "/users/auth/oauth/42/callback",
+				path: "api/users/auth/oauth/42/callback",
 				maxAge: 60 * 5, // 1 minute
 			});
 			const oAuthURL = new URL(process.env.FT_OAUTH_URL);
@@ -93,7 +93,7 @@ export function ft_OAuth2_callback(server) {
 		const ft_state = req.query.state;
 		const code = req.query.code;
 		const redirectUrl = encodeURI(`${process.env.API_DOMAIN_NAME}/users/auth/oauth/42/callback`);
-
+		console.log(redirectUrl)
 		const url = "https://api.intra.42.fr/oauth/token";
 		if (cookieState != ft_state) {
 			reply.status(401).send({ error: "Unauthorized", message: "Invalid state" });
@@ -114,7 +114,7 @@ export function ft_OAuth2_callback(server) {
 		});
 		return await get42Token(url, params).then(async (result) => {
 			const user = await get42User(result.access_token);
-			return user
+			return {email: user.email, username: user.login, avatar: user.image.versions.small  }
 		})	
 		
 	});

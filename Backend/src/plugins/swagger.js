@@ -44,7 +44,7 @@ export default fp(async (server) => {
 	});
 
 	server.register(swaggerUI, {
-		routePrefix: "api/docs",
+		routePrefix: "/api/docs",
 		swagger: { url: "api/docs/json" },
 		uiConfig: {
 			deepLinking: false,
