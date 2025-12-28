@@ -32,6 +32,7 @@ function getSettingForm(): string
 function initSettingPageListeners(): void
 {
 	initNavBarListeners();
+
 	console.log(import.meta.env);
 
 	document.addEventListener('pageLoaded', (event: Event) => {
@@ -65,6 +66,7 @@ function initSettingPageListeners(): void
 
 			default:
 			{
+				hideUnavailableOption();
 				return;
 			}
 
@@ -74,8 +76,6 @@ function initSettingPageListeners(): void
 
 function onRenameLoaded(): void
 {
-	const user = userState.getUser();
-
 	injectForm(renameFormHtml);
 	const renameForm = document.getElementById('rename-form') as HTMLFormElement | null;
 
@@ -97,13 +97,6 @@ function onRenameLoaded(): void
 
 function onAvatarLoaded(): void
 {
-	const user = userState.getUser();
-	if (!(user instanceof RegisteredUser))
-	{
-		router.navigateTo('/settings');
-		return;
-	}
-
 	injectForm(avatarFormHtml);
 
 	const avatarForm = document.getElementById('avatar-form') as HTMLFormElement | null;
@@ -129,13 +122,6 @@ function onAvatarLoaded(): void
 
 function onPasswordLoaded(): void
 {
-	const user = userState.getUser();
-	if (!(user instanceof RegisteredUser))
-	{
-		router.navigateTo('/settings');
-		return;
-	}
-
 	injectForm(passwordFormHtml);
 
 	const passwordForm = document.getElementById('password-form') as HTMLFormElement | null;
@@ -174,4 +160,16 @@ export function injectForm(html: string): void
 {
 	const container = document.getElementById('form-container');
 	if (container) container.insertAdjacentHTML('beforeend', html);
+}
+
+function hideUnavailableOption()
+{
+	const user = userState.getUser();
+	const isRegistered = user instanceof RegisteredUser;
+	console.log('hiding');
+	document.querySelectorAll('.need-registered-user').forEach(el =>
+		{
+			(el as HTMLElement).style.display = isRegistered ? 'flex' : 'none';
+		}
+	);
 }

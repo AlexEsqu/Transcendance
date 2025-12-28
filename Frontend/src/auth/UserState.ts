@@ -1,5 +1,5 @@
 import { RegisteredUser, GuestUser, User } from "../users/User";
-import { router } from "../app"
+import { router } from "../app";
 
 const apiKey : string = import.meta.env.VITE_APP_SECRET_KEY ?? "";
 const jwtKey : string = import.meta.env.VITE_JWT_SECRET ?? "";
@@ -379,7 +379,7 @@ class UserState
 	{
 		if (this.user instanceof RegisteredUser)
 		{
-			const response = await fetch(`${apiDomainName}/users/me/password`, {
+			const response = await this.fetchWithTokenRefresh(`${apiDomainName}/users/me/password`, {
 				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json',
@@ -433,6 +433,78 @@ class UserState
 		this.user.name = data.username ?? data.name ?? this.user.name;
 		this.user.avatarPath = data.avatar ?? this.user.avatarPath;
 		this.setUser(this.user);
+
+		this.refreshFriendList();
+	}
+
+	public async refreshFriendList()
+	{
+		if (!(this.user instanceof RegisteredUser))
+		{
+			console.log("No registered user to refresh");
+			return;
+		}
+
+		if (this.user.id === null || this.user.id === undefined)
+			throw new Error("User id is missing");
+
+		const friendList: User[] = [];
+
+		const response = await this.fetchWithTokenRefresh(`${apiDomainName}/users/me/friends`,
+			{
+				method: 'GET',
+				headers:
+				{
+					'accept': 'application/json',
+					'X-App-Secret': `${apiKey}`,
+					'Authorization': `Bearer ${this.user.accessToken}`
+				}
+			}
+		);
+
+		const data = await response.json();
+		console.log(data);
+		if (!response.ok)
+			throw new Error(data.message || data.error || `Failed to fetch user friends (${response.status})`);
+
+		this.user?.setFriends(friendList);
+	}
+
+	public async addToFriendList(friendId: number)
+	{
+		if (!(this.user instanceof RegisteredUser))
+		{
+			console.log("No registered user to refresh");
+			return;
+		}
+
+		if (this.user.id === null || this.user.id === undefined)
+			throw new Error("User id is missing");
+
+		const response = await this.fetchWithTokenRefresh(`${apiDomainName}/users/me/friends`,
+			{
+				method: 'POST',
+				headers:
+				{
+					'accept': 'application/json',
+					'X-App-Secret': `${apiKey}`,
+					'Authorization': `Bearer ${this.user.accessToken}`
+				},
+				body:
+				JSON.stringify(
+					{
+						id: friendId,
+					}
+				)
+			}
+		);
+
+		const data = await response.json();
+		console.log(data);
+		if (!response.ok)
+			throw new Error(data.message || data.error || `Failed to fetch user friends (${response.status})`);
+
+		this.refreshFriendList();
 	}
 
 }

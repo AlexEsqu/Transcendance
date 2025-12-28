@@ -47,6 +47,8 @@ function updateNavFromUserData(user: User | null): void
 	if (!user)
 		return;
 
+	userState.refreshUser();
+
 	const userNameElement = document.getElementById('user-name-nav');
 	if (userNameElement)
 		userNameElement.textContent = user.getName();

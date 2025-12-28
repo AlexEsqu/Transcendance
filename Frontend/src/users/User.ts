@@ -5,11 +5,15 @@ const placeholderAvatar : string = "/assets/placeholder/avatarPlaceholder.png"
 abstract class User {
 	name: string;
 	avatarPath: string;
+	friends: User[];
+	isActive: boolean;
 
 	constructor(name: string)
 	{
 		this.name = name;
 		this.avatarPath = placeholderAvatar;
+		this.friends = [];
+		this.isActive = true;
 	}
 
 	getName(): string
@@ -20,6 +24,16 @@ abstract class User {
 	getAvatarPath(): string
 	{
 		return this.avatarPath;
+	}
+
+	getFriends(): User[]
+	{
+		return this.friends;
+	}
+
+	setFriends(friendArray : User[]): void
+	{
+		this.friends = friendArray;
 	}
 }
 
