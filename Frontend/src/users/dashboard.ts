@@ -66,7 +66,7 @@ function initSettingPageListeners(): void
 
 			default:
 			{
-				hideUnavailableOption();
+				showRegisteredUserOptions();
 				return;
 			}
 
@@ -162,11 +162,10 @@ export function injectForm(html: string): void
 	if (container) container.insertAdjacentHTML('beforeend', html);
 }
 
-function hideUnavailableOption()
+function showRegisteredUserOptions()
 {
 	const user = userState.getUser();
 	const isRegistered = user instanceof RegisteredUser;
-	console.log('hiding');
 	document.querySelectorAll('.need-registered-user').forEach(el =>
 		{
 			(el as HTMLElement).style.display = isRegistered ? 'flex' : 'none';
