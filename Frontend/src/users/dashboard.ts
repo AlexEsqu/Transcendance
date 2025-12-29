@@ -65,8 +65,7 @@ function initSettingPageListeners(): void
 
 			default:
 			{
-				showRegisteredUserOptions();
-				onAddFriendLoaded();
+				onDashboardLoaded()
 				return;
 			}
 
@@ -153,7 +152,18 @@ function onPasswordLoaded(): void
 	);
 }
 
-function onAddFriendLoaded(): void
+
+
+function onDashboardLoaded()
+{
+	showRegisteredUserOptions();
+
+	activateAddFriendButton();
+
+	showUsers();
+}
+
+function activateAddFriendButton(): void
 {
 	// injectForm(newFriendFormHtml);
 	const newFriendForm = document.getElementById('new-friend-form') as HTMLFormElement | null;
@@ -176,6 +186,27 @@ function onAddFriendLoaded(): void
 	);
 }
 
+async function showUsers(): Promise<void>
+{
+	const usersSection = document.querySelector('#user-section');
+	if (!usersSection)
+		return;
+
+	try {
+		const users = await getAllUsers();
+		let html = '<ul class="user-list">';
+		for (const user of users) {
+			console.log(user);
+			const name = user.username ?? "Unknown";
+			html += `<li class="">${name}</li>`;
+		}
+		html += '</ul>';
+		usersSection.innerHTML += html;
+	} catch (err) {
+		usersSection.innerHTML += `<div class="error">Failed to load users.</div>`;
+	}
+}
+
 
 // UTILITIES
 
@@ -196,13 +227,13 @@ function showRegisteredUserOptions()
 	);
 }
 
-async function getUserFromUsername(username: string): Promise<RegisteredUser | null>
+async function getUserFromUsername(username: string): Promise<Object | null>
 {
 	const allUsers = await getAllUsers();
 
 	for (const user of allUsers)
 	{
-		if ( user?.name === username)
+		if ( user?.username === username)
 			return user;
 	}
 
@@ -210,7 +241,7 @@ async function getUserFromUsername(username: string): Promise<RegisteredUser | n
 }
 
 
-async function getAllUsers(): Promise<RegisteredUser[]>
+async function getAllUsers(): Promise<Object[]>
 {
 	const response = await fetch(`${apiDomainName}/users`,
 		{
