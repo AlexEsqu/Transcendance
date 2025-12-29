@@ -46,7 +46,7 @@ export class Pong {
 		}
 		if (options.nbOfPlayers === 1) { // special case: opponent is a robot
 			this.robot = true;
-			players.push({ id: 0, name: "Robot", score: 0, color: "#8dbcff" });
+			players.push({ id: 0, username: "Robot", score: 0, color: "#8dbcff" });
 			players.reverse();
 		}
 		this.scene.players = players;
@@ -62,9 +62,9 @@ export class Pong {
 		for (let i = 0; i < nbOfPlayer * 2; i += 2)
 		{
 			// if (inputs[i] && inputs[i + 1])
-			// 	players.push({ id: 0, name: inputs[i], score: 0, color: inputs[i + 1]} );
+			// 	players.push({ id: 0, username: inputs[i], score: 0, color: inputs[i + 1]} );
 			if (inputs[i])
-				players.push({ id: 0, name: inputs[i], score: 0, color: "#"} );
+				players.push({ id: 0, username: inputs[i], score: 0, color: "#"} );
 		}
 		return players;
 	}
@@ -135,8 +135,8 @@ export class Pong {
 		if (currentNbOfRounds < rounds.nbOfRounds && this.scene.leftPadd && this.scene.rightPadd)
 		{
 			// drawMatchHistoryTree(this.canvasUI, playersColors, roundsColors, this.scene.options.nbOfPlayers);
-			if (this.scene.leftPadd.player?.name && this.scene.rightPadd.player?.name)
-				drawName(this.scene.leftPadd.player.name, this.scene.rightPadd.player.name, rounds.nbOfRounds);
+			if (this.scene.leftPadd.player?.username && this.scene.rightPadd.player?.username)
+				drawName(this.scene.leftPadd.player.username, this.scene.rightPadd.player.username, rounds.nbOfRounds);
 			if (this.scene.leftPadd.player?.score && this.scene.rightPadd.player?.score)
 				drawScore(this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
 		}
@@ -261,9 +261,9 @@ export class Pong {
 		const index = rounds.nbOfRounds - 2;
 
 		const winnerSpot = document.getElementById('match-results');
-		if (winnerSpot && rounds.results && rounds.results[index]?.winner?.name)
+		if (winnerSpot && rounds.results && rounds.results[index]?.winner?.username)
 		{
-			winnerSpot.textContent = `${rounds.results[index].winner.name} wins!`;
+			winnerSpot.textContent = `${rounds.results[index].winner.username} wins!`;
 			winnerSpot.classList.remove('invisible');
 		}
 	}
@@ -277,7 +277,7 @@ export class Pong {
 		window.addEventListener('resize', () => {
 			this.engine.resize();
 			if (this.scene && this.scene.leftPadd && this.scene.leftPadd.player && this.scene.rightPadd && this.scene.rightPadd.player) {
-				drawName(this.scene.leftPadd.player.name, this.scene.rightPadd.player.name, this.scene.options.nbOfPlayers);
+				drawName(this.scene.leftPadd.player.username, this.scene.rightPadd.player.username, this.scene.options.nbOfPlayers);
 				drawScore(this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
 				// drawMatchHistoryTree(this.canvasUI, rounds, this.scene.options.nbOfPlayers);
 			}

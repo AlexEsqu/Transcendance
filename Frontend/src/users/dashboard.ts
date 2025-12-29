@@ -18,14 +18,14 @@ export { getDashboardPage, getSettingForm, initSettingPageListeners }
 
 function getDashboardPage(): string
 {
-	const name = userState.getUser()?.getName() ?? "Guest";
-	return (getNavBarHtml() + dashboardHtml).replace('USERNAME', name);
+	const username = userState.getUser()?.getName() ?? "Guest";
+	return (getNavBarHtml() + dashboardHtml).replace('USERNAME', username);
 }
 
 function getSettingForm(): string
 {
-	const name = userState.getUser()?.getName() ?? "Guest";
-	return (getNavBarHtml() + formHtml).replace('USERNAME', name);
+	const username = userState.getUser()?.getName() ?? "Guest";
+	return (getNavBarHtml() + formHtml).replace('USERNAME', username);
 }
 
 // on load function to activate buttons and options
@@ -197,8 +197,8 @@ async function showUsers(): Promise<void>
 		let html = '<ul class="user-list">';
 		for (const user of users) {
 			console.log(user);
-			const name = user.username ?? "Unknown";
-			html += `<li class="">${name}</li>`;
+			const username = user.username ?? "Unknown";
+			html += `<li class="">${username}</li>`;
 		}
 		html += '</ul>';
 		usersSection.innerHTML += html;

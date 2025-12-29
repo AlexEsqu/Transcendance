@@ -101,10 +101,10 @@ class UserState
 		{
 			localStorage.setItem(localStorageKeyForRegisteredUser, JSON.stringify(
 				{
-					name: this.user.name,
+					username: this.user.username,
 					id: this.user.id,
 					accessToken: this.user.accessToken,
-					avatarPath: this.user.avatarPath
+					avatar: this.user.avatar
 				}
 			));
 		}
@@ -112,8 +112,8 @@ class UserState
 		{
 			localStorage.setItem(localStorageKeyForGuestUser, JSON.stringify(
 				{
-					name: this.user.name,
-					avatarPath: this.user.avatarPath
+					username: this.user.username,
+					avatar: this.user.avatar
 				}
 			));
 		}
@@ -131,7 +131,7 @@ class UserState
 			try
 			{
 				const data = JSON.parse(registeredData);
-				this.user = new RegisteredUser(data.name, data.id, data.accessToken);
+				this.user = new RegisteredUser(data.username, data.id, data.accessToken);
 				this.refreshUser();
 			}
 			catch (error)
@@ -146,8 +146,8 @@ class UserState
 		else if (guestData)
 		{
 			const data = JSON.parse(guestData);
-			const user = new GuestUser(data.name);
-			user.avatarPath = data.avatarPath;
+			const user = new GuestUser(data.username);
+			user.avatar = data.avatar;
 			this.setUser(user);
 		}
 		console.log(this.user);
@@ -347,12 +347,12 @@ class UserState
 			if (!response.ok)
 				throw new Error(data.message || 'Renaming failed');
 
-			this.user.name = newName;
+			this.user.username = newName;
 			router.render();
 		}
 
 		else if (this.user instanceof GuestUser)
-			this.user.name= newName;
+			this.user.username= newName;
 
 		this.setUser(this.user);
 	}
@@ -441,8 +441,8 @@ class UserState
 		if (!response.ok)
 			throw new Error(data.message || data.error || `Failed to fetch user (${response.status})`);
 
-		this.user.name = data.username ?? data.name ?? this.user.name;
-		this.user.avatarPath = data.avatar ?? this.user.avatarPath;
+		this.user.username = data.username ?? data.username ?? this.user.username;
+		this.user.avatar = data.avatar ?? this.user.avatar;
 		this.setUser(this.user);
 
 		this.refreshFriendList();

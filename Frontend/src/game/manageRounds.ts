@@ -112,7 +112,7 @@ function newRound(scene: IScene, rounds: IRound): IRound
 	//	Reset data
 	if (scene.ball)
 		scene.ball.reset(true);
-	
+
 	leftPadd.paddle.resetPosition(Pong.MAP_WIDTH, "left");
 	rightPadd.paddle.resetPosition(Pong.MAP_WIDTH, "right");
 
@@ -264,8 +264,8 @@ function drawScore(score1: number, score2: number): void
 
 function drawName(player1: string, player2: string, nbRound: number): void
 {
-	const player1Name = document.getElementById('player1-name');
-	const player2Name = document.getElementById('player2-name');
+	const player1Name = document.getElementById('player1-username');
+	const player2Name = document.getElementById('player2-username');
 
 	if (player1Name)
 		player1Name.textContent = player1.substring(0, 10) || 'You';

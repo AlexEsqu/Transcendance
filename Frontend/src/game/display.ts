@@ -12,14 +12,14 @@ export { getGameHtml, getGameOptionHtml, initGamePageListeners };
 
 function getGameHtml(): string
 {
-	const name = userState.getUser()?.getName() ?? "Guest";
-	return (getNavBarHtml() + gameHtml).replace('USERNAME', name);
+	const username = userState.getUser()?.getName() ?? "Guest";
+	return (getNavBarHtml() + gameHtml).replace('USERNAME', username);
 }
 
 function getGameOptionHtml(): string
 {
-	const name = userState.getUser()?.getName() ?? "Guest";
-	return (getNavBarHtml() + optionsHtml).replace('USERNAME', name);
+	const username = userState.getUser()?.getName() ?? "Guest";
+	return (getNavBarHtml() + optionsHtml).replace('USERNAME', username);
 }
 
 function initGamePageListeners(): void
@@ -82,8 +82,8 @@ function generatePlayersInputs(nbOfPlayers: number): void
 		const input = document.createElement('input');
 		input.type = 'text';
 		input.id = `player${i}`;
-		input.name = `player${i}`;
-		input.placeholder = nbOfPlayers === 1 ? 'Your name' : `Player ${i}`;
+		input.username = `player${i}`;
+		input.placeholder = nbOfPlayers === 1 ? 'Your username' : `Player ${i}`;
 		input.className = 'input-field p-2 placeholder:text-center';
 		playersContainer.appendChild(input);
 	}

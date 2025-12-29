@@ -98,10 +98,10 @@ function createMap(scene: Scene, height: number, width: number, colorHex: string
 	return map;
 }
 
-function createAnimation(name: string, target: string, keys: IAnimationKey[]): Animation
+function createAnimation(username: string, target: string, keys: IAnimationKey[]): Animation
 {
 	const animation = new Animation(
-		name,
+		username,
 		target,
 		50, // frames per second
 		Animation.ANIMATIONTYPE_FLOAT,
@@ -117,9 +117,9 @@ function createAnimation(name: string, target: string, keys: IAnimationKey[]): A
 function loadGame(engine: Engine, canvas: HTMLCanvasElement, options: IOptions): IScene | null
 {
 	if (!engine || !canvas || !options) return null;
-	
 
-	
+
+
 
 	const id = new Scene(engine) as Scene;
 	if (!id) {
@@ -156,9 +156,9 @@ function loadGame(engine: Engine, canvas: HTMLCanvasElement, options: IOptions):
 		console.error("GAME-ERROR: failed to create 'Paddle', can't load game");
 		return null;
 	}
-	
-	const scene: IScene = { id: id, camera: camera, ball: ball, 
-		leftPadd: { paddle: leftPadd, player: null }, 
+
+	const scene: IScene = { id: id, camera: camera, ball: ball,
+		leftPadd: { paddle: leftPadd, player: null },
 		rightPadd: { paddle: rightPadd, player: null },
 		options: options,
 		players: null,

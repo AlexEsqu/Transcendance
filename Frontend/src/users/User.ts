@@ -3,27 +3,29 @@ export {User, RegisteredUser, GuestUser }
 const placeholderAvatar : string = "/assets/placeholder/avatarPlaceholder.png"
 
 abstract class User {
-	name: string;
-	avatarPath: string;
+	id: number | null;
+	username: string;
+	avatar: string;
 	friends: User[];
-	isActive: boolean;
+	is_active: boolean;
 
-	constructor(name: string)
+	constructor(username: string)
 	{
-		this.name = name;
-		this.avatarPath = placeholderAvatar;
+		this.id = null;
+		this.username = username;
+		this.avatar = placeholderAvatar;
 		this.friends = [];
-		this.isActive = true;
+		this.is_active = true;
 	}
 
 	getName(): string
 	{
-		return this.name;
+		return this.username;
 	}
 
 	getAvatarPath(): string
 	{
-		return this.avatarPath;
+		return this.avatar;
 	}
 
 	getFriends(): User[]
@@ -39,12 +41,11 @@ abstract class User {
 
 class RegisteredUser extends User
 {
-	id: number | null;
 	accessToken: string | null;
 
-	constructor(name: string, id: number, accessToken: string)
+	constructor(username: string, id: number, accessToken: string)
 	{
-		super(name);
+		super(username);
 		this.id = id;
 		this.accessToken = accessToken;
 	}
@@ -59,9 +60,8 @@ class GuestUser extends User
 
 	rename(newName : string): void
 	{
-		this.name = newName;
+		this.username = newName;
 	}
-
 }
 
 

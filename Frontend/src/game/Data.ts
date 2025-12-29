@@ -35,7 +35,7 @@ interface IScene {
 
 interface IPlayer {
 	id: number;
-	name: string;
+	username: string;
 	score: number;
 	color: string;
 };

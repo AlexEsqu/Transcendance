@@ -16,7 +16,7 @@ function fillMatchesJSON(results: IResult, time?: number): IJSON | null
 
 	const date = new Date(time ?? Date.now());
 
-	// get Id from Name
+	// get Id from username
 	let matches: IJSON = {
 		winner_id: results.winner.id,
 		loser_id: results.loser.id,
