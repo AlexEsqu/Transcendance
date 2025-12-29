@@ -1,6 +1,7 @@
 import { userState, router } from "../app"
 
 import { getNavBarHtml, initNavBarListeners } from "../routing/nav";
+import { apiKey, apiDomainName } from '../auth/UserState';
 
 import dashboardHtml from "../pages/dashboard.html?raw";
 import formHtml from "../pages/form.html?raw";
@@ -32,8 +33,6 @@ function getSettingForm(): string
 function initSettingPageListeners(): void
 {
 	initNavBarListeners();
-
-	console.log(import.meta.env);
 
 	document.addEventListener('pageLoaded', (event: Event) => {
 		const { detail: path } = event as CustomEvent<string>;
@@ -67,6 +66,7 @@ function initSettingPageListeners(): void
 			default:
 			{
 				showRegisteredUserOptions();
+				onAddFriendLoaded();
 				return;
 			}
 
@@ -153,6 +153,29 @@ function onPasswordLoaded(): void
 	);
 }
 
+function onAddFriendLoaded(): void
+{
+	// injectForm(newFriendFormHtml);
+	const newFriendForm = document.getElementById('new-friend-form') as HTMLFormElement | null;
+
+	newFriendForm?.addEventListener('submit', async (e) =>
+		{
+			e.preventDefault();
+			const formData = new FormData(newFriendForm);
+			const friendUsername = formData.get('new-friend-input') as string | null;
+
+			if (friendUsername)
+			{
+				const newFriend = await getUserFromUsername(friendUsername);
+
+				console.log(newFriend)
+				// router.render();
+			}
+
+		}
+	);
+}
+
 
 // UTILITIES
 
@@ -171,4 +194,39 @@ function showRegisteredUserOptions()
 			(el as HTMLElement).style.display = isRegistered ? 'flex' : 'none';
 		}
 	);
+}
+
+async function getUserFromUsername(username: string): Promise<RegisteredUser | null>
+{
+	const allUsers = await getAllUsers();
+
+	for (const user of allUsers)
+	{
+		if ( user?.name === username)
+			return user;
+	}
+
+	return null;
+}
+
+
+async function getAllUsers(): Promise<RegisteredUser[]>
+{
+	const response = await fetch(`${apiDomainName}/users`,
+		{
+			method: 'GET',
+			headers: {
+				'accept': 'application/json',
+				'X-App-Secret': `${apiKey}`
+			}
+		}
+	);
+
+	const data = await response.json();
+	if (!response.ok)
+		throw new Error(data.message || data.error || 'Friend fetch Failed');
+
+	console.log('Fetched users:')
+	console.log(data);
+	return data;
 }

@@ -8,14 +8,14 @@
 			"name": "Debug on Chrome",
 			"request": "launch",
 			"type": "chrome",
-			"url": "http://localhost:8080",
+			"url": "https://localhost:8443",
 			"webRoot": "${workspaceFolder}/Frontend/src"
 		},
 		{
             "name": "Debug on Firefox",
             "type": "firefox",
             "request": "launch",
-            "url": "http://localhost:8080",
+            "url": "https://localhost:8443",
             "webRoot": "${workspaceFolder}/Frontend/src"
         }
 	]

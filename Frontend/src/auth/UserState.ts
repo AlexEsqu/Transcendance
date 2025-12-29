@@ -9,7 +9,7 @@ console.log(jwtKey);
 console.log(apiDomainName);
 
 export type { Subscriber }
-export { UserState }
+export { UserState, apiKey, apiDomainName }
 
 type Subscriber = (user: User | null) => void;
 
@@ -123,22 +123,33 @@ class UserState
 	{
 		const registeredData = localStorage.getItem(localStorageKeyForRegisteredUser);
 		const guestData = localStorage.getItem(localStorageKeyForGuestUser);
+		localStorage.removeItem(localStorageKeyForGuestUser);
+		localStorage.removeItem(localStorageKeyForRegisteredUser);
 
 		if (registeredData)
 		{
-			const data = JSON.parse(registeredData);
-			this.user = new RegisteredUser(data.name, data.id, data.accessToken);
-			this.user.avatarPath = data.avatarPath;
+			try
+			{
+				const data = JSON.parse(registeredData);
+				this.user = new RegisteredUser(data.name, data.id, data.accessToken);
+				this.refreshUser();
+			}
+			catch (error)
+			{
+				const msg = error instanceof Error
+					? error.message
+					: "Unknown error when loading user from local storage";
+				console.log(msg);
+				this.setUser(null);
+			}
 		}
 		else if (guestData)
 		{
 			const data = JSON.parse(guestData);
-			this.user = new GuestUser(data.name);
-			this.user.avatarPath = data.avatarPath;
+			const user = new GuestUser(data.name);
+			user.avatarPath = data.avatarPath;
+			this.setUser(user);
 		}
-
-		this.notifySubscribers();
-
 		console.log(this.user);
 	}
 
@@ -413,7 +424,7 @@ class UserState
 		if (this.user.id === null || this.user.id === undefined)
 			throw new Error("User id is missing");
 
-		const response = await fetch(`${apiDomainName}/users/${this.user.id}`,
+		const response = await this.fetchWithTokenRefresh(`${apiDomainName}/users/${this.user.id}`,
 			{
 				method: 'GET',
 				headers:

@@ -1,6 +1,7 @@
 import navHTML from "../pages/nav.html?raw"
 import { User, RegisteredUser } from "../users/User"
 import { userState, router } from "../app"
+import { UserState } from "../auth/UserState";
 
 export { getNavBarHtml, initNavBarListeners }
 
@@ -19,7 +20,7 @@ function initNavBarListeners()
 		if (path.startsWith('/settings') || path.startsWith('/game'))
 		{
 			attachNavListeners();
-			updateNavFromUserData(userState.getUser());
+			updateNavFromUserData();
 		}
 	});
 }
@@ -42,12 +43,11 @@ function attachNavListeners()
 	}
 }
 
-function updateNavFromUserData(user: User | null): void
+function updateNavFromUserData(): void
 {
+	const user = userState.getUser();
 	if (!user)
 		return;
-
-	userState.refreshUser();
 
 	const userNameElement = document.getElementById('user-name-nav');
 	if (userNameElement)

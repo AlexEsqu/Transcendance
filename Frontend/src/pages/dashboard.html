@@ -3,7 +3,30 @@
 	<div class="border-box flex h-[80%] gap-4 justify-between mx-6">
 
 		<section class="flex flex-col w-[34%] h-[100%] p-4 input-field">
-			<h2 class="text-xl">Friends</h2>
+			<h2 class="text-xl mb-6">Friends</h2>
+			<form
+				id="new-friend-form"
+				name="new-friend-form"
+				class="flex flex-col flex-center justify-between gap-5  m-6 pt-0 px-5 pb-5">
+
+				<label for="new-friend-input">Add a friend through their username:</label>
+				<input
+					id="new-friend-input"
+					name="new-friend-input"
+					type="text"
+					accept="text"
+					class="glow-select"
+					required/>
+
+				<button
+					id="btn-submit-new-friend"
+					name="btn-submit-new-friend"
+					type="submit"
+					class="p-4 mt-12 glow-select border border-slate-500">
+					Add as Friend
+				</button>
+
+			</form>
 		</section>
 
 		<section class="flex flex-col w-[64%] h-[100%] p-4 input-field">
