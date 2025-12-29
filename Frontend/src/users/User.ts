@@ -1,9 +1,17 @@
-export {User, RegisteredUser, GuestUser }
+export { User, RegisteredUser, GuestUser }
+export type { BaseUser }
 
 const placeholderAvatar : string = "/assets/placeholder/avatarPlaceholder.png"
 
-abstract class User {
-	id: number | null;
+interface BaseUser {
+	id: number;
+	username: string;
+	avatar: string | null;
+	is_active: boolean;
+}
+
+abstract class User implements BaseUser {
+	id: number;
 	username: string;
 	avatar: string;
 	friends: User[];
@@ -11,7 +19,7 @@ abstract class User {
 
 	constructor(username: string)
 	{
-		this.id = null;
+		this.id = -1;
 		this.username = username;
 		this.avatar = placeholderAvatar;
 		this.friends = [];

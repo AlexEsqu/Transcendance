@@ -8,8 +8,8 @@ import formHtml from "../pages/form.html?raw";
 import renameFormHtml from "../pages/forms/renameForm.html?raw"
 import avatarFormHtml from "../pages/forms/avatarForm.html?raw"
 import passwordFormHtml from "../pages/forms/passwordForm.html?raw"
-import { RegisterClass } from "@babylonjs/core";
-import { GuestUser, RegisteredUser } from "./User";
+import { RegisteredUser } from "./User";
+import type { BaseUser } from './User'
 // import emailFormHtml from "../pages/forms/emailForm.html?raw"
 
 export { getDashboardPage, getSettingForm, initSettingPageListeners }
@@ -227,21 +227,14 @@ function showRegisteredUserOptions()
 	);
 }
 
-async function getUserFromUsername(username: string): Promise<Object | null>
+async function getUserFromUsername(username: string): Promise<BaseUser | null>
 {
 	const allUsers = await getAllUsers();
-
-	for (const user of allUsers)
-	{
-		if ( user?.username === username)
-			return user;
-	}
-
-	return null;
+	return allUsers.find(user => user.username === username) ?? null;
 }
 
 
-async function getAllUsers(): Promise<Object[]>
+async function getAllUsers(): Promise<BaseUser[]>
 {
 	const response = await fetch(`${apiDomainName}/users`,
 		{
