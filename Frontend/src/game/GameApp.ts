@@ -5,7 +5,7 @@ import optionsHtml from '../pages/options.html?raw'
 
 import { loadOptions } from "./options"
 
-class App {
+class GameApp {
 	pong: Pong;
 	startBtnDisplay: HTMLElement | null;
 	startBtn: HTMLElement | null;
@@ -62,28 +62,5 @@ export function launchPongGame(options: IOptions): void
 		return ;
 	}
 
-	const app = new App(gameWindow, options);
-	// const url = getWebSocketURL();
-	const url = "ws://localhost:4001/waitingRoom"
-	const ws = new WebSocket(url);
-	ws.onopen = () => {
-		console.log("Client is connected to the game server");
-		const testJSONForm = {
-			id: Date.now(),
-			game: 'duo',
-			location: 'remote'
-		}
-		const data = JSON.stringify(testJSONForm);
-		console.log(data);
-		ws.send(data);
-	};
-
-	ws.onmessage = (event) => {
-		const gameState = JSON.parse(event.data);
-		console.log("Game server state : ", gameState);
-	};
-
-	ws.onerror = (error) => {
-		console.error(error);
-	};
+	const app = new GameApp(gameWindow, options);
 }
