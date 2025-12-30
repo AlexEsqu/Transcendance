@@ -87,7 +87,6 @@ function newRound(scene: IScene, rounds: IRound): IRound
 	}
 	else if (scene.players)
 	{
-		console.log("default assign");
 		if (nbOfPlayers != 1 && rounds.playerIndex >= scene.options.nbOfPlayers)
 			return rounds;
 		leftPadd.player = scene.players[rounds.playerIndex];
@@ -107,8 +106,6 @@ function newRound(scene: IScene, rounds: IRound): IRound
 	// 	rightPadd.player = rounds.results[5].winner;
 	// }
 
-	console.log(leftPadd);
-	console.log(rightPadd);
 	//	Reset data
 	if (scene.ball)
 		scene.ball.reset(true);

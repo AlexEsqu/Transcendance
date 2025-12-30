@@ -15,7 +15,7 @@ class GameApp {
 		this.startBtnDisplay = document.getElementById("game-start");
 		this.startBtn = document.getElementById('btn-startplay');
 		this.setupStartButton();
-
+		
 		this.pong = new Pong("game-canvas", options, () => this.showStartButton());
 		this.pong.runGame();
 	}
@@ -46,7 +46,6 @@ class GameApp {
 
 export function launchPongGame(options: IOptions): void
 {
-
 	const startBtnDisplay: HTMLElement | null = document.getElementById("game-start");
 	const btnStart: HTMLElement | null = document.getElementById('btn-startplay');
 
@@ -63,6 +62,7 @@ export function launchPongGame(options: IOptions): void
 		console.error("canvas context not found");
 		return ;
 	}
-
+	console.log("OPTIONS");
+	console.log(options);
 	const app = new GameApp(gameWindow, options);
 }

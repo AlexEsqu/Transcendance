@@ -117,9 +117,6 @@ function createAnimation(name: string, target: string, keys: IAnimationKey[]): A
 function loadGame(engine: Engine, canvas: HTMLCanvasElement, options: IOptions): IScene | null
 {
 	if (!engine || !canvas || !options) return null;
-	
-
-	
 
 	const id = new Scene(engine) as Scene;
 	if (!id) {

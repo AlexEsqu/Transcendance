@@ -40,6 +40,7 @@ export class Pong {
 		this.scene = loadGame(this.engine, this.canvas, options);
 		if (!this.scene) return ;
 		let players: Array<IPlayer> = this.initPlayers(options.players, options.nbOfPlayers);
+		console.log(players);
 		if (players.length != options.nbOfPlayers) {
 			console.error("players init failed, players are missing");
 			return ;
@@ -50,21 +51,19 @@ export class Pong {
 			players.reverse();
 		}
 		this.scene.players = players;
-		console.log(this.scene.players);
 		this.scene.state = State.opening;
 		this.time = Date.now();
 	}
 
-	//	J'ai mis en commentaire ici car manifestement il n'y a pas de couleur pour le joueur
 	initPlayers(inputs: string[], nbOfPlayer: number): Array<IPlayer>
 	{
 		let players: Array<IPlayer> = [];
-		for (let i = 0; i < nbOfPlayer * 2; i += 2)
+		for (let i = 0; i < nbOfPlayer; i++)
 		{
-			// if (inputs[i] && inputs[i + 1])
-			// 	players.push({ id: 0, name: inputs[i], score: 0, color: inputs[i + 1]} );
-			if (inputs[i])
-				players.push({ id: 0, name: inputs[i], score: 0, color: "#"} );
+			if (inputs[i] && inputs[i + 1])
+				players.push({ id: 0, name: inputs[i], score: 0, color: inputs[i + 1]} );
+			// if (inputs[i])
+			// 	players.push({ id: 0, name: inputs[i], score: 0, color: "#"} );
 		}
 		return players;
 	}

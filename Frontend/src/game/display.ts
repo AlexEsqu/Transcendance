@@ -6,7 +6,6 @@ import { IOptions } from "./Data";
 
 import gameHtml from '../pages/game.html?raw'
 import optionsHtml from '../pages/options.html?raw'
-import { loadGame } from "./Graphics";
 
 export { getGameHtml, getGameOptionHtml, initGamePageListeners };
 
@@ -72,11 +71,11 @@ function initGamePageListeners(): void
 function generatePlayersInputs(nbOfPlayers: number): void
 {
 	const playersContainer = document.getElementById('players-container');
-	if (!playersContainer) {
+	if (!playersContainer)
 		throw new Error("'players-container' not found");
-	}
 
 	playersContainer.innerHTML = '';
+
 	for (let i = 1; i <= nbOfPlayers; i++)
 	{
 		const input = document.createElement('input');
@@ -89,6 +88,32 @@ function generatePlayersInputs(nbOfPlayers: number): void
 	}
 }
 
+function generatePaddleColorsInputs(nbOfPlayers: number): void
+{
+	const paddleColorsInputs = document.getElementById('paddle-colors-inputs');
+	if (!paddleColorsInputs)
+		throw new Error("'paddle-colors-inputs' not found");
+
+	paddleColorsInputs.innerHTML = '';
+
+	for (let i = 1; i <= nbOfPlayers; i++)
+	{
+		// const input = document.createElement('div');
+		// input.className = 'flex items-center justify-center gap-2';
+
+		const label = document.createElement('label');
+		label.htmlFor = 'paddle-color-${i}';
+		label.className = 'p-1';
+		label.textContent = 'Player ${i}';
+
+		const input = document.createElement('div');
+		input.id = 'paddle-color-${i}';
+		input.name = 'paddle-color-${i}';
+		input.className = 'flex items-center justify-center gap-2';
+
+	}
+}
+
 function initializePlayerInputs(): void
 {
 	const modeSelect = document.getElementById('mode') as HTMLSelectElement;
@@ -96,10 +121,13 @@ function initializePlayerInputs(): void
 		throw new Error("'mode' select not found");
 	}
 
-	generatePlayersInputs(parseInt(modeSelect.value));
+	const nbOfPlayers: number = parseInt(modeSelect.value);
+
+	generatePlayersInputs(nbOfPlayers);
+	generatePaddleColorsInputs(nbOfPlayers);
+
 	modeSelect.addEventListener('change', function() {
-		const numberOfPlayers = parseInt(this.value);
-		generatePlayersInputs(numberOfPlayers);
+		generatePlayersInputs(nbOfPlayers);
 	});
 }
 
@@ -131,23 +159,25 @@ function onGameOptionLoaded(): void
 		// dump all form results in a variable
 		const formData = new FormData(optionsForm) as FormData;
 
-		// idenitfy HTML element
-		const modeSelect = formData.get('mode') as HTMLSelectElement | null;
-		const levelSelect = formData.get('level') as HTMLSelectElement | null;
+		// identify form values
+		const mode = formData.get('mode') as string | null;
+		const level = formData.get('level') as string | null;
 		const ballColor = formData.get('ball-level-input') as string | null;
 		const backColor = formData.get('back-color-input') as string | null;
 		const paddColor = formData.get('padd-color-input') as string | null;
 
 		// extracting data but putting default just in case some is missing
 		const options: IOptions = {
-			level: levelSelect?.value ? parseInt(levelSelect.value) : 0,
-			nbOfPlayers: modeSelect?.value ? parseInt(modeSelect.value) : 1,
+			level: level ? parseInt(level) : 0,
+			nbOfPlayers: mode ? parseInt(mode) : 1,
 			ballColor: ballColor || '#a2c2e8',
 			mapColor: backColor || '#01011a',
 			paddColor: paddColor || '#a2c2e8',
 			players: getPlayerNames()
 		}
 		saveOptions(options);
+		console.log("CVSJDHFLKJSDHFLKSJDHLKJFHSDKFJ");
+		console.log("load option: " + level);
 		router.navigateTo('/game');
 	})
 }

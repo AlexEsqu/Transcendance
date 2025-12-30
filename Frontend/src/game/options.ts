@@ -1,4 +1,4 @@
-import { IOptions, Level } from "./Data";
+import { IOptions } from "./Data";
 
 export {saveOptions, loadOptions, clearOptions }
 

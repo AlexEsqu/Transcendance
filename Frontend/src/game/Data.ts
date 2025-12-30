@@ -14,11 +14,13 @@ enum Level {
 };
 
 interface IOptions {
-	level: Level;
+	gameMode: string;	//	'classic' or 'tournament'
+	matchType: string;	//	'local' or 'remote'
+	level: number;
 	nbOfPlayers: number;
 	ballColor: string;
-	paddColor: string;
 	mapColor: string;
+	paddColors: string[];
 	players: string[];
 };
 
