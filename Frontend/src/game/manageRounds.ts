@@ -19,7 +19,8 @@ function monitoringRounds(scene: IScene, nbOfRounds: number): boolean
 	{
 		console.log("GAME-STATE: a player has won the round");
 		//	The game should stop if all the rounds have been played!
-		if (nbOfRounds >= Pong.MAX_ROUNDS) scene.state = State.end;
+		if (nbOfRounds >= Pong.MAX_ROUNDS)
+			scene.state = State.end;
 		return true;
 	}
 	return false;
@@ -72,16 +73,23 @@ function newRound(scene: IScene, rounds: IRound): IRound
 
 	//	Who's playing now ?
 	let nbOfPlayers = scene.options.nbOfPlayers;
-	if (nbOfPlayers == 4 && rounds.nbOfRounds >= 0 && rounds.nbOfRounds < 2) nbOfPlayers = 2;
+	if (nbOfPlayers == 4 && rounds.nbOfRounds >= 0 && rounds.nbOfRounds < 2)
+		nbOfPlayers = 2;
 	// else if (nbOfPlayers == 8 && rounds.nbOfRounds >= 0 && rounds.nbOfRounds < 4) nbOfPlayers = 2;
 
-	if (nbOfPlayers == 4 && rounds.results && rounds.nbOfRounds == Pong.MAX_ROUNDS - 1) {
+	if (nbOfPlayers == 4 && rounds.results && rounds.nbOfRounds == Pong.MAX_ROUNDS - 1)
+	{
 		// console.log("4 players last round");
-		if (rounds.results[0]) leftPadd.player = rounds.results[0].winner;
-		if (rounds.results[1]) rightPadd.player = rounds.results[1].winner;
-	} else if (scene.players) {
+		if (rounds.results[0])
+			leftPadd.player = rounds.results[0].winner;
+		if (rounds.results[1])
+			rightPadd.player = rounds.results[1].winner;
+	}
+	else if (scene.players)
+	{
 		console.log("default assign");
-		if (nbOfPlayers != 1 && rounds.playerIndex >= scene.options.nbOfPlayers) return rounds;
+		if (nbOfPlayers != 1 && rounds.playerIndex >= scene.options.nbOfPlayers)
+			return rounds;
 		leftPadd.player = scene.players[rounds.playerIndex];
 		rounds.playerIndex++;
 		rightPadd.player = scene.players[rounds.playerIndex];
@@ -102,11 +110,16 @@ function newRound(scene: IScene, rounds: IRound): IRound
 	console.log(leftPadd);
 	console.log(rightPadd);
 	//	Reset data
-	if (scene.ball) scene.ball.reset(true);
+	if (scene.ball)
+		scene.ball.reset(true);
+	
 	leftPadd.paddle.resetPosition(Pong.MAP_WIDTH, "left");
 	rightPadd.paddle.resetPosition(Pong.MAP_WIDTH, "right");
-	if (leftPadd.player) leftPadd.player.score = 0;
-	if (rightPadd.player) rightPadd.player.score = 0;
+
+	if (leftPadd.player)
+		leftPadd.player.score = 0;
+	if (rightPadd.player)
+		rightPadd.player.score = 0;
 
 	// let leftIndex = 0;
 	// let rightIndex = 1;
@@ -138,7 +151,7 @@ function drawCircle(ctx: CanvasRenderingContext2D, color: string, pos: { x: numb
 	ctx.fill();
 }
 
-function drawLine(ctx: CanvasRenderingContext2D, color: string, 
+function drawLine(ctx: CanvasRenderingContext2D, color: string,
 	from: { x: number, y: number }, target: { x: number, y: number }): void
 {
 	if (!ctx || !color || !target) return ;
@@ -236,45 +249,26 @@ function drawMatchHistoryTree(
 	}
 }
 
-function drawScore(canvas: HTMLCanvasElement | null, score1: number, score2: number): void
+// FYI: score1 is the player2
+function drawScore(score1: number, score2: number): void
 {
-	if (!canvas) return;
+	const player1Score = document.getElementById('player1-score');
+	const player2Score = document.getElementById('player2-score');
 
-	const ctx = canvas.getContext("2d");
-	if (!ctx) return;
+	if (player1Score)
+		player1Score.textContent = score1.toString();
 
-	const wCenter: number = (canvas.width / 2);
-	const hCenter: number = (canvas.height / 2) - 200;
-	ctx.clearRect(wCenter - 110, 0, 220, hCenter + 50);
-
-	ctx.font = "50px monospace";
-	ctx.fillStyle = "rgba(141, 188, 255, 1)";
-	ctx.textBaseline = "middle";
-	ctx.textAlign = "center";
-	ctx.fillText(score1.toString(), wCenter - 70, hCenter);
-	ctx.fillText("|", wCenter, hCenter);
-	ctx.fillText(score2.toString(), wCenter + 70, hCenter);
+	if (player2Score)
+		player2Score.textContent = score2.toString();
 }
 
-function drawName(canvas: HTMLCanvasElement, player1: string, player2: string, nbRound: number): void
+function drawName(player1: string, player2: string, nbRound: number): void
 {
-	const ctx = canvas.getContext("2d");
-	if (!ctx || !player2 || !player1) {
-		console.error("can't draw name, element not found");
-		return ;
-	}
-	if (player1.length > 10) player1 = player1.substring(0, 10);
-	if (player2.length > 10) player2 = player2.substring(0, 10);
+	const player1Name = document.getElementById('player1-name');
+	const player2Name = document.getElementById('player2-name');
 
-	const wCenter: number = (canvas.width / 2);
-	const hCenter: number = (canvas.height / 2) - 200;
-	ctx.clearRect(wCenter - 200, 0, 400, 500);
-	ctx.clearRect(wCenter + 200, 0, 400, 500);
-
-	ctx.font = "20px monospace";
-	ctx.fillStyle = "rgba(141, 188, 255, 1)";
-	ctx.textBaseline = "middle";
-	ctx.textAlign = "center";
-	ctx.fillText(player1, wCenter - 200, hCenter);
-	ctx.fillText(player2, wCenter + 200, hCenter);
+	if (player1Name)
+		player1Name.textContent = player1.substring(0, 10) || 'You';
+	if (player2Name)
+		player2Name.textContent = player2.substring(0, 10) || "Robot";
 }

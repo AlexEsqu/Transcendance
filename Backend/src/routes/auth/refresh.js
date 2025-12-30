@@ -6,7 +6,7 @@ function refresh(server) {
 			tags: ["auth"],
 			description:
 				"Uses the refresh token to issue a new access token. The endpoint verifies the refresh token, checks that it is not expired or revoked. This endpoint requires `client authentification` AND `user authentification` AND the refresh cookie stored in the `HttpOnly refreshToken cookie`",
-			security: server.security.UserAndSession,
+			security: server.security.SessionAuth,
 			response: {
 				200: {
 					description: "Returns new access token",
@@ -30,14 +30,11 @@ function refresh(server) {
 				},
 			},
 		},
-		onRequest: [server.authenticateUser, server.authenticateClient, server.authenticateRefreshToken],
+		onRequest: [server.authenticateClient, server.authenticateRefreshToken],
 	};
 	server.post("/refresh", opts, async (req, reply) => {
 		try {
-			const { refreshToken } = req.cookies;
-
-			const { id, username } = await server.jwt.verify(refreshToken);
-
+			const { id, username } = req.user;
 			// Create new access token
 			const newAccessToken = createAccessToken(server, id, username);
 
@@ -47,13 +44,20 @@ function refresh(server) {
 			console.log("upadting refresh token");
 			// Save new refresh token hash in DB
 			server.db.prepare(`UPDATE users SET refresh_token_hash = ? WHERE id = ?`).run(newRefreshTokenHash, id);
-
+			// Send new refresh token to user
+			reply.clearCookie("refreshToken", {
+				httpOnly: true,
+				secure: true, // REQUIRED (HTTPS)
+				sameSite: "lax",
+				path: "/",
+				maxAge: 60 * 60 * 24 * 7, // 7 days
+			});
 			// Send new refresh token to user
 			reply.setCookie("refreshToken", newRefreshToken, {
 				httpOnly: true,
-				secure: true,
-				sameSite: "strict",
-				path: "/users/auth",
+				secure: true, // REQUIRED (HTTPS)
+				sameSite: "lax",
+				path: "/",
 				maxAge: 60 * 60 * 24 * 7, // 7 days
 			});
 

@@ -1,9 +1,7 @@
 services:
-  fastify:
+  api:
     build: ./Backend
-    container_name: fastify
-    ports:
-      - "3000:3000"
+    container_name: api
     command: npm run dev
     volumes:
       - ./Backend/src:/app/src
@@ -18,18 +16,37 @@ services:
       - GMAIL_APP_PASSWORD=${GMAIL_APP_PASSWORD}
       - OTP_SECRET=${OTP_SECRET}
       - API_DOMAIN_NAME=${API_DOMAIN_NAME}
+      - FRONTEND_DOMAIN_NAME=${FRONTEND_DOMAIN_NAME}
+      - FT_CLIENT_ID=${FT_CLIENT_ID}
+      - FT_CLIENT_SECRET=${FT_CLIENT_SECRET}
+    networks:
+      - app-network
 
   typescript:
     build: ./Frontend
     container_name: typescript
-    ports:
-      - "8080:8080"
     volumes:
       - ./Frontend:/app
     environment:
-      - JWT_SECRET=${JWT_SECRET}
-      - APP_SECRET_KEY=${APP_SECRET_KEY}
-      - API_DOMAIN_NAME=${API_DOMAIN_NAME}
+      - VITE_JWT_SECRET=${JWT_SECRET}
+      - VITE_APP_SECRET_KEY=${APP_SECRET_KEY}
+      - VITE_API_DOMAIN_NAME=${API_DOMAIN_NAME}
+    networks:
+      - app-network
+
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    ports:
+      - "8443:443"   # HTTPS
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/certs:/etc/nginx/certs
+    depends_on:
+      - api
+      - typescript
+    networks:
+      - app-network
     
   game_server:
     build: ./Backend/GameServer
@@ -47,3 +64,8 @@ services:
 volumes:
   sqlite:
   user_avatars:
+
+networks:
+  app-network:
+    driver: bridge
+

@@ -49,8 +49,8 @@ export function buildServer({ useHttps = null, dbOverride = null, apiKeyPluginOv
 	server.register(fastifyCookie);
 	server.register(swaggerPlugin);
 	server.register(cors, {
-		origin: "http://localhost:8080",
-		credentials: false,
+		origin: "https://localhost:8443",
+		credentials: true,
 		methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
 		logLevel: "trace"
 	});

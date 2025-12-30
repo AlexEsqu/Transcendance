@@ -32,6 +32,7 @@ function getSettingForm(): string
 function initSettingPageListeners(): void
 {
 	initNavBarListeners();
+	console.log(import.meta.env);
 
 	document.addEventListener('pageLoaded', (event: Event) => {
 		const { detail: path } = event as CustomEvent<string>;
@@ -82,7 +83,7 @@ function onRenameLoaded(): void
 		{
 			e.preventDefault();
 			const formData = new FormData(renameForm);
-			const newName = formData.get('input-rename-user') as string | null;
+			const newName = formData.get('input-new-name') as string | null;
 
 			if (newName)
 			{
@@ -110,13 +111,14 @@ function onAvatarLoaded(): void
 		{
 			e.preventDefault();
 			const formData = new FormData(avatarForm);
-			const newAvatarUrl = formData.get('input-avatar-file') as string | null;
-			if (newAvatarUrl) {
-			try {
-					await user.updateAvatar(newAvatarUrl);
+			if (formData) {
+				try
+				{
+					await userState.updateAvatar(formData);
 					alert('Avatar updated!');
-					router.navigateTo('/settings');
-				} catch (err) {
+				}
+				catch (err)
+				{
 					alert('Failed to update avatar.');
 					console.error(err);
 				}
@@ -152,9 +154,8 @@ function onPasswordLoaded(): void
 			if (oldPassword && newPassword) {
 				try
 				{
-					await user.changePassword(oldPassword, newPassword);
+					await userState.changePassword(oldPassword, newPassword);
 					alert('password updated!');
-					router.navigateTo('/settings');
 				}
 				catch (err)
 				{
@@ -169,7 +170,7 @@ function onPasswordLoaded(): void
 
 // UTILITIES
 
-function injectForm(html: string): void
+export function injectForm(html: string): void
 {
 	const container = document.getElementById('form-container');
 	if (container) container.insertAdjacentHTML('beforeend', html);

@@ -11,15 +11,17 @@ export async function generateTokens(server, user, reply) {
 	addRefreshToken.run(refreshTokenHash, user.id);
 	// set cookie
 	reply.setCookie("refreshToken", refreshToken, {
-		httpOnly: true,
-		secure: true,
-		sameSite: "strict",
-		path: "/users/auth",
+	  httpOnly: true,
+  		secure: true,      // REQUIRED (HTTPS)
+  		sameSite: "lax",
+		path: "/",
 		maxAge: 60 * 60 * 24 * 7, // 7 days
 	});
-	const id = user.id;
 
-	reply.send({ accessToken, id });
+	return {
+		accessToken: accessToken,
+		id: user.id,
+	};
 }
 
 export default function login(server) {
@@ -36,8 +38,6 @@ export default function login(server) {
    a temporary 2FA continuation token is generated, which must be used to complete \
    authentication via the 2FA verification endpoint. \
    `This endpoint requires the client to have a verified email address.`",
-			tags: ["auth"],
-
 			tags: ["auth"],
 			body: { $ref: "authCredentialsBody" },
 			response: {
@@ -63,7 +63,6 @@ export default function login(server) {
 						},
 					],
 				},
-
 				302: {
 					description: "Redirect: Email not verified",
 					$ref: "SuccessMessageResponse#",
@@ -94,17 +93,17 @@ export default function login(server) {
 
 			const user = await server.db.prepare(`SELECT * FROM users WHERE email = ? OR username = ? `).get(login, login);
 			if (!user) {
-				return reply.status(401).send({ error: "Invalid credentials" });
+				return reply.status(401).send({ error: "Unauthorized", message: "Invalid credentials" });
 			}
 			if (!user.email_verified) {
-				return reply.status(403).send({ error: "Email not verified" });
+				return reply.status(403).send({ error: "Forbidden", message: "Email not verified" });
 			}
 
 			//checks if the password matches
 			const match = await bcrypt.compare(password, user.password_hash);
 
 			if (!match) {
-				return reply.status(401).send({ error: "Invalid credentials" });
+				return reply.status(401).send({ error: "Unauthorized", message: "Invalid credentials" });
 			}
 			if (user.is_2fa_enabled) {
 				const code = crypto.randomInt(100000, 999999).toString();
@@ -126,24 +125,8 @@ export default function login(server) {
 					token: twoFaToken,
 				});
 			}
-
-			const accessToken = createAccessToken(server, user.id, user.username);
-			const refreshToken = createRefreshToken(server, user.id, user.username);
-
-			const refreshTokenHash = await hashRefreshToken(refreshToken);
-			const addRefreshToken = server.db.prepare(`UPDATE users SET refresh_token_hash = ? WHERE id = ?`);
-			addRefreshToken.run(refreshTokenHash, user.id);
-			// set cookie
-			reply.setCookie("refreshToken", refreshToken, {
-				httpOnly: true,
-				secure: true,
-				sameSite: "strict",
-				path: "/users/auth",
-				maxAge: 60 * 60 * 24 * 7, // 7 days
-			});
-			const id = user.id;
-
-			reply.send({ accessToken, id });
+			const tokens = await generateTokens(server, user, reply);
+			return reply.status(200).send(tokens);
 		} catch (err) {
 			console.log(err);
 			return reply.status(500).send({ error: "Internal server error" });

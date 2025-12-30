@@ -1,3 +1,4 @@
+// @ts-ignore
 import { defineConfig } from 'vite'
 
 export default defineConfig({
@@ -6,6 +7,11 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 8080,
+	allowedHosts: [
+      "localhost",
+      "typescript",
+      "nginx"
+    ],
   },
   build: {
     outDir: 'dist',

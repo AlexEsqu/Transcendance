@@ -4,22 +4,44 @@
 @tailwind utilities;
 
 @layer utilities {
+  .input-field {
+    background-color: rgb(23, 26, 37);
+  }
+
+  .gentle-select {
+    background: rgb(23, 26, 37);
+    text-align: center;
+    padding: 10px;
+    border-radius: 0;
+  }
+
+  .glow-select:hover, .glow-select:active, .glow-select:focus {
+    box-shadow: 0 0 8px 2px #2ed2ff66, 0 0 20px 6px #2ed2ffcc;
+    transition: box-shadow 0.3s;
+    border-color: #2ed2ff66;
+    border-style: solid;
+    animation: text-glow 2s ease-in-out infinite alternate;
+    outline: none;
+    background-color: #0C0D11;
+  }
+
+
   .glow {
-    -webkit-box-shadow: 0 0 110px 11px rgba(46,210,255,0.73);
-    -moz-box-shadow: 0 0 110px 11px rgba(46,210,255,0.73);
-    box-shadow: 0 0 110px 11px rgba(46,210,255,0.73);
+    -webkit-box-shadow: 0 0 110px 11px oklch(68.5% 0.169 237.323);
+    -moz-box-shadow: 0 0 110px 11px oklch(60.9% 0.126 221.723);
+    box-shadow: 0 0 110px 11px oklch(50% 0.134 242.749);
   }
 
   .glow-anim { animation: glow 2s ease-in-out infinite alternate; }
   @keyframes glow {
-    from { box-shadow: 0 0 12px 4px rgba(46,210,255,0.4); }
-    to   { box-shadow: 0 0 28px 10px rgba(46,210,255,0.75); }
+    from { box-shadow: 0 0 5px 2px oklch(44.3% 0.11 240.79); }
+    to   { box-shadow: 0 0 10px 4px oklch(68.5% 0.169 237.323); }
   }
 
   .text-glow {
-    text-shadow: 0 0 10px rgba(46, 210, 255, 0.8),
-                 0 0 20px rgba(46, 210, 255, 0.6),
-                 0 0 30px rgba(46, 210, 255, 0.4);
+    text-shadow: 0 0 5px rgba(46, 210, 255, 0.8),
+                 0 0 10px rgba(46, 210, 255, 0.6),
+                 0 0 20px rgba(46, 210, 255, 0.4);
   }
 
   .text-glow-anim {
@@ -27,8 +49,8 @@
   }
 
   @keyframes text-glow {
-    from { text-shadow: 0 0 5px #2ed2ff66, 0 0 10px rgba(46,210,255,0.3); }
-    to   { text-shadow: 0 0 15px #2ed2ffcc, 0 0 25px rgba(46,210,255,0.6); }
+    from { text-shadow: 0 0 2px #2ed2ff66, 0 0 10px rgba(46,210,255,0.3); }
+    to   { text-shadow: 0 0 10px #2ed2ffcc, 0 0 25px rgba(46,210,255,0.6); }
   }
 
   .text-glow-red {
@@ -46,11 +68,45 @@
     to   { text-shadow: 0 0 25px rgba(255, 0, 0, 0.8), 0 0 25px rgba(255, 100, 100, 0.6); }
   }
 
-  .hover-glow-orange:hover {
+  .big-glow:hover {
     box-shadow: 0 0 8px 2px #2ed2ff66, 0 0 20px 6px #2ed2ffcc;
-    border-radius: 6px;
     transition: box-shadow 0.3s;
     border-color: #2ed2ff66;
     border-style: solid;
+    animation: text-glow 2s ease-in-out infinite alternate;
   }
+
+  .player1 {
+      /* text-shadow: 0 0 4px #00fff7, 0 0 8px #00fff744; */
+      color: #6dd3f1;
+      letter-spacing: 0.125rem;
+  }
+  .player2 {
+      /* text-shadow: 0 0 4px #ffa600, 0 0 8px #ff950044; */
+      color: #ff9500;
+      letter-spacing: 0.1255rem;
+  }
+
+  /* hack to get the autofill backgrounds to not be too ugly */
+  input:-webkit-autofill,
+  input:-webkit-autofill:enabled,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  textarea:-webkit-autofill,
+  textarea:-webkit-autofill:enabled,
+  textarea:-webkit-autofill:hover,
+  textarea:-webkit-autofill:focus,
+  select:-webkit-autofill,
+  select:-webkit-autofill:enabled,
+  select:-webkit-autofill:hover,
+  select:-webkit-autofill:focus {
+    -webkit-text-fill-color: #fff;
+    -webkit-box-shadow: 0 0 0px 1000px #785100c7 inset;
+    box-shadow: 0 0 0px 1000px #785100c7 inset;
+    background-color: #785100c7;
+  }
+
+
 }
+
+

@@ -5,7 +5,7 @@ export default fp(async (server) => {
 		const apiKey = request.headers["x-app-secret"];
 
 		if (!apiKey || apiKey !== process.env.APP_SECRET_KEY) {
-			reply.code(401).send({ error: "Unauthorized" });
+			reply.code(401).send({ error: "Unauthorized" , message: "Invalid API key"});
 		}
 	});
 

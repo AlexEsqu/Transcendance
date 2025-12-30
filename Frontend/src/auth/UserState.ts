@@ -1,6 +1,13 @@
 import { RegisteredUser, GuestUser, User } from "../users/User";
 import { router } from "../app"
 
+const apiKey : string = import.meta.env.VITE_APP_SECRET_KEY ?? "";
+const jwtKey : string = import.meta.env.VITE_JWT_SECRET ?? "";
+const apiDomainName : string = import.meta.env.VITE_API_DOMAIN_NAME ?? "";
+console.log(apiKey);
+console.log(jwtKey);
+console.log(apiDomainName);
+
 export type { Subscriber }
 export { UserState }
 
@@ -103,10 +110,12 @@ class UserState
 		}
 		else if (this.user instanceof GuestUser)
 		{
-			localStorage.setItem(localStorageKeyForGuestUser, JSON.stringify({
-				name: this.user.name,
-				avatarPath: this.user.avatarPath
-			}));
+			localStorage.setItem(localStorageKeyForGuestUser, JSON.stringify(
+				{
+					name: this.user.name,
+					avatarPath: this.user.avatarPath
+				}
+			));
 		}
 	}
 
@@ -143,9 +152,9 @@ class UserState
 		this.setUser(guestUser);
 	}
 
-	public async loginAsRegistered(username: string, password: string)
+	public async loginAsRegistered(login: string, password: string): Promise<void>
 	{
-		const response = await fetch('http://localhost:3000/users/auth/login',
+		const response = await fetch(`${apiDomainName}/users/auth/login`,
 			{
 				method: 'POST',
 				headers: {
@@ -154,23 +163,23 @@ class UserState
 				},
 				body: JSON.stringify(
 					{
-						username, password
+						login, password
 					}
 				),
 			}
 		);
 
-		if (!response.ok)
-			throw new Error('Login failed');
-
 		const data = await response.json();
-		const user = new RegisteredUser(username, data.id, data.accessToken);
+		if (!response.ok)
+			throw new Error(data.message || data.error || 'Login Failed');
+
+		const user = new RegisteredUser(login, data.id, data.accessToken);
 		this.setUser(user);
 	}
 
 	public async register(username: string, password: string, email: string): Promise<void>
 	{
-		const response = await fetch('http://localhost:3000/users/signup',
+		const response = await fetch(`${apiDomainName}/users/signup`,
 			{
 				method: 'POST',
 				headers: {
@@ -185,32 +194,29 @@ class UserState
 			}
 		);
 
+		const data = await response.json();
 		if (!response.ok)
-		{
-			if (response.status === 409)
-				throw new Error('Username already exists');
-			throw new Error('Registration failed');
-		}
-
-		await this.loginAsRegistered(username, password);
+			throw new Error(data.message || data.error || 'Register Failed');
 	}
 
 	public async logout(): Promise<void>
 	{
 		if (this.user instanceof RegisteredUser)
 		{
-			const response = await fetch('http://localhost:3000/users/auth/logout',
+			const response = await this.fetchWithTokenRefresh(`${apiDomainName}/users/auth/logout`,
 				{
 					method: 'POST',
 					headers: {
 						'accept': 'application/json',
-						'Authorization': `Bearer ${this.user.accessToken}`
+						'Authorization': `Bearer ${this.user.accessToken}`,
+						'X-App-Secret': `${apiKey}`
 					},
 				}
 			);
 
+			const data = await response.json();
 			if (!response.ok)
-				throw new Error('Logout failed');
+				throw new Error(data.message || data.error || 'Logout Failed');
 		}
 
 		this.setUser(null);
@@ -220,21 +226,89 @@ class UserState
 	{
 		if (this.user instanceof RegisteredUser)
 		{
-			const response = await fetch('http://localhost:3000/users/me',
+			const response = await this.fetchWithTokenRefresh(`${apiDomainName}/users/me`,
 				{
 					method: 'DELETE',
 					headers: {
 						'accept': 'application/json',
-						'Authorization': `Bearer ${this.user.accessToken}`
+						'Authorization': `Bearer ${this.user.accessToken}`,
+						'X-App-Secret': `${apiKey}`
 					},
 				}
 			);
 
+			const data = await response.json();
 			if (!response.ok)
-				throw new Error('Delete failed');
+				throw new Error(data.message || data.error || 'Delete account Failed');
 		}
 
 		this.setUser(null);
+	}
+
+	//------------------------ TOKEN REFRESHER -------------------------------//
+
+	public async refreshToken(): Promise<boolean>
+	{
+		if (!(this.user instanceof RegisteredUser))
+			return false;
+
+		const response = await fetch(`${apiDomainName}/users/auth/refresh`,
+		{
+			method: 'POST',
+			headers:
+			{
+				'accept': 'application/json',
+				'Authorization': `Bearer ${this.user.accessToken}`,
+				'X-App-Secret': `${apiKey}`
+			},
+		});
+		const data = await response.json();
+
+		if (!response.ok || !data.accessToken)
+		{
+			console.log(data.message || data.error || 'Faied to refresh token');
+			return false;
+		}
+
+
+		this.user.accessToken = data.accessToken;
+		this.saveToLocalStorage();
+		return true;
+	}
+
+	public async fetchWithTokenRefresh(requestURL: RequestInfo, requestContent: RequestInit = {}): Promise<Response>
+	{
+		if (!(this.user instanceof RegisteredUser))
+			throw new Error("Not authenticated");
+
+		// Typescript annoyance to be able to update the incoming request header with new token
+		let headers: Record<string, string> =
+		{
+			'accept': 'application/json',
+			...(typeof requestContent.headers === 'object'
+				&& !Array.isArray(requestContent.headers)
+				&& !(requestContent.headers instanceof Headers)
+				? requestContent.headers as Record<string, string>
+				: {})
+		};
+		requestContent.headers = headers;
+
+		let response = await fetch(requestURL, requestContent);
+
+		if (response.status === 401)
+		{
+			const refreshed = await this.refreshToken();
+			if (refreshed)
+			{
+				headers['Authorization'] = `Bearer ${this.user.accessToken}`;
+				requestContent.headers = headers;
+				response = await fetch(requestURL, requestContent);
+			}
+			else
+				throw new Error("Failed to refresh token");
+		}
+
+		return response;
 	}
 
 	//------------------------ METHODS -------------------------------//
@@ -243,12 +317,121 @@ class UserState
 	{
 		if (this.user instanceof RegisteredUser)
 		{
-			await this.user.rename(newName)
+			const response = await this.fetchWithTokenRefresh(`${apiDomainName}/users/me/username`,
+			{
+				method: 'PUT',
+				headers:
+				{
+					'accept': 'application/json',
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${this.user.accessToken}`,
+					'X-App-Secret': `${apiKey}`
+				},
+				body: JSON.stringify({
+					new_username: newName
+				})
+			});
+
+			const data = await response.json();
+			if (!response.ok)
+				throw new Error(data.message || 'Renaming failed');
+
+			this.user.name = newName;
+			router.render();
 		}
 
-		if (this.user instanceof GuestUser)
-			this.user.rename(newName);
+		else if (this.user instanceof GuestUser)
+			this.user.name= newName;
 
+		this.setUser(this.user);
+	}
+
+	async updateAvatar(formData : FormData): Promise<void>
+	{
+		if (this.user instanceof RegisteredUser)
+		{
+			const response = await this.fetchWithTokenRefresh(`${apiDomainName}/users/me/avatar`,
+			{
+				method: 'PUT',
+				headers:
+				{
+					'accept': 'application/json',
+					'Authorization': `Bearer ${this.user.accessToken}`,
+					'X-App-Secret': `${apiKey}`
+				},
+				body: formData,
+			});
+
+			const data = await response.json();
+			if (!response.ok)
+				throw new Error(`Avatar update failed: ${response.status}, ${data.message}`);
+
+			this.refreshUser();
+		}
+
+		else
+		{
+			throw new Error(`Avatar update failed: Not a registered User`);
+		}
+	}
+
+	async changePassword(oldPassword: string, newPassword: string): Promise<void>
+	{
+		if (this.user instanceof RegisteredUser)
+		{
+			const response = await fetch(`${apiDomainName}/users/me/password`, {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${this.user.accessToken}`,
+				},
+				body: JSON.stringify({
+					oldPassword, newPassword
+				})
+			});
+
+			const data = await response.json();
+			if (!response.ok)
+				throw new Error(data.message || 'Password change failed');
+
+			// no need to set user since password is entirely handled by backend
+		}
+		else
+		{
+			throw new Error(`Password update failed: Not a registered User`);
+		}
+	}
+
+	public async refreshUser(): Promise<void>
+	{
+		if (!(this.user instanceof RegisteredUser))
+		{
+			console.log("No registered user to refresh");
+			return;
+		}
+
+		if (this.user.id === null || this.user.id === undefined)
+			throw new Error("User id is missing");
+
+		const response = await fetch(`${apiDomainName}/users/${this.user.id}`,
+			{
+				method: 'GET',
+				headers:
+				{
+					'accept': 'application/json',
+					'X-App-Secret': `${apiKey}`,
+					'Authorization': `Bearer ${this.user.accessToken}`
+				}
+			}
+		);
+
+		const data = await response.json();
+		console.log(data);
+		if (!response.ok)
+			throw new Error(data.message || data.error || `Failed to fetch user (${response.status})`);
+
+		this.user.name = data.username ?? data.name ?? this.user.name;
+		this.user.avatarPath = data.avatar ?? this.user.avatarPath;
 		this.setUser(this.user);
 	}
 

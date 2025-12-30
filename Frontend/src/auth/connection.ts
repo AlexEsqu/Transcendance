@@ -7,9 +7,12 @@ import guestFormHtml from "../pages/forms/guestForm.html?raw"
 import loginFormHtml from "../pages/forms/loginForm.html?raw"
 import registerFormHtml from "../pages/forms/registerForm.html?raw"
 
+import checkEmailHtml from "../pages/info/checkEmail.html?raw"
+
 export {
 	getConnectionLandingHtml,
 	getConnectionForm,
+	getEmailCheck,
 	initConnectionPageListeners }
 
 
@@ -23,6 +26,11 @@ function getConnectionLandingHtml(): string
 function getConnectionForm(): string {
 
 	return formHtml;
+}
+
+function getEmailCheck(): string
+{
+	return checkEmailHtml;
 }
 
 // FUNCTION TO ACTIVATE THE EVENT LISTENERS AND POSSIBLE BUTTON INTERACTIONS
@@ -101,7 +109,17 @@ function onRegisterLoaded(): void
 				return;
 			}
 
-			await userState.register(login, password, email);
+			try
+			{
+				await userState.register(login, password, email);
+				router.navigateTo("/connection/emailcheck");
+			}
+			catch (error)
+			{
+				const msg = error instanceof Error ? error.message : "Unknown error";
+				window.sessionStorage.setItem("errorMessage", msg);
+				router.navigateTo("/error");
+			}
 		}
 	);
 }
@@ -120,7 +138,19 @@ function onLoginLoaded(): void
 			const password = formData.get('input-password') as string | null;
 
 			if (login && password)
-				await userState.loginAsRegistered(login, password);
+			{
+				try
+				{
+					await userState.loginAsRegistered(login, password);
+				}
+				catch (error)
+				{
+					const msg = error instanceof Error ? error.message : "Unknown error";
+					console.log(`error message is ${msg}`);
+					window.sessionStorage.setItem("errorMessage", msg);
+					router.navigateTo("/error");
+				}
+			}
 		}
 	);
 }

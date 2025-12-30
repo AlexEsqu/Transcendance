@@ -1,22 +1,24 @@
 <form
 	id="rename-form"
 	name="rename-form"
-	class="flex flex-col flex-center gap-4 m-4 text-center">
+	autocomplete="off"
+	class="flex flex-col flex-center justify-between gap-5 m-6 p-5 text-center">
 
-	<label for="input-rename-user"></label>
+	<label for="input-new-name">New Username:</label>
 	<input
 		id="input-rename-user"
-		name="input-rename-user"
+		name="input-new-name"
 		type="text"
 		required
-		class="bg-gray-950 text-glow p-5 placeholder:text-center placeholder:text-glow"
-		placeholder="NEW NAME" />
+		class="input-field glow-select p-5 placeholder:text-center"
+		autocomplete="off"
+		placeholder="Alice" />
 
 	<button
 		id="btn-submit-rename-user"
 		name="btn-submit-rename-user"
 		type="submit"
-		class="text-glow p-5 hover:text-glow-red">
+		class="p-4 mt-12 glow-select border border-slate-500">
 		Change Username
 	</button>
 
