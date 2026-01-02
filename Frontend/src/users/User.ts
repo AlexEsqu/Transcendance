@@ -14,7 +14,7 @@ abstract class User implements BaseUser {
 	id: number;
 	username: string;
 	avatar: string;
-	friends: User[];
+	friends: BaseUser[];
 	is_active: boolean;
 
 	constructor(username: string)
@@ -36,12 +36,12 @@ abstract class User implements BaseUser {
 		return this.avatar;
 	}
 
-	getFriends(): User[]
+	getFriends(): BaseUser[]
 	{
 		return this.friends;
 	}
 
-	setFriends(friendArray : User[]): void
+	setFriends(friendArray : BaseUser[]): void
 	{
 		this.friends = friendArray;
 	}

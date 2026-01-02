@@ -1,4 +1,4 @@
-import { RegisteredUser, GuestUser, User } from "../users/User";
+import { RegisteredUser, GuestUser, User, BaseUser } from "../users/User";
 import { router } from "../app";
 
 const apiKey : string = import.meta.env.VITE_APP_SECRET_KEY ?? "";
@@ -104,7 +104,8 @@ class UserState
 					username: this.user.username,
 					id: this.user.id,
 					accessToken: this.user.accessToken,
-					avatar: this.user.avatar
+					avatar: this.user.avatar,
+					friends: this.user.friends
 				}
 			));
 		}
@@ -132,6 +133,9 @@ class UserState
 			{
 				const data = JSON.parse(registeredData);
 				this.user = new RegisteredUser(data.username, data.id, data.accessToken);
+				this.user.avatar = data.avatar;
+				this.user.friends = data.friends ?? [];
+				this.notifySubscribers();
 				this.refreshUser();
 			}
 			catch (error)
@@ -443,9 +447,10 @@ class UserState
 
 		this.user.username = data.username ?? data.username ?? this.user.username;
 		this.user.avatar = data.avatar ?? this.user.avatar;
-		this.setUser(this.user);
 
-		this.refreshFriendList();
+		await this.refreshFriendList();
+
+		this.setUser(this.user);
 	}
 
 	public async refreshFriendList()
@@ -458,8 +463,6 @@ class UserState
 
 		if (this.user.id === null || this.user.id === undefined)
 			throw new Error("User id is missing");
-
-		const friendList: User[] = [];
 
 		const response = await this.fetchWithTokenRefresh(`${apiDomainName}/users/me/friends`,
 			{
@@ -474,11 +477,12 @@ class UserState
 		);
 
 		const data = await response.json();
+		console.log(`received friends as:`);
 		console.log(data);
 		if (!response.ok)
 			throw new Error(data.message || data.error || `Failed to fetch user friends (${response.status})`);
 
-		this.user?.setFriends(friendList);
+		this.user.setFriends(data);
 	}
 
 	public async addToFriendList(friendId: number)

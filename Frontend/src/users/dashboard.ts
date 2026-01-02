@@ -205,20 +205,43 @@ function activateAddFriendButton(): void
 async function showUsers(): Promise<void>
 {
 	const usersSection = document.querySelector('#user-section');
-	if (!usersSection)
+	const friendSection = document.querySelector('#friend-section');
+	if (!usersSection || !friendSection)
 		return;
 
 	try
 	{
-		const users = await getAllUsers();
-		let html = '<ul class="">';
-		for (const user of users)
+		const allUsers = await getAllUsers();
+		const userFriendList = userState.getUser()?.getFriends();
+		console.log(`friends are : ${userFriendList}`)
+
+		let usersHtml = '<ul id="user-list" class="">';
+		let friendHtml = '<ul id="friend-list" class="">';
+
+		for (const user of allUsers)
 		{
 			console.log(user);
-			html += getFriendHtml(user);
+			const isFriend = userFriendList ? userFriendList.some(friend => friend.id === user.id) : false;
+
+			if (isFriend)
+			{
+				friendHtml += getFriendHtml(user);
+			}
+
+			else
+			{
+				usersHtml += getUserHtml(user);
+			}
+
 		}
-		html += '</ul>';
-		usersSection.innerHTML += html;
+		usersHtml += '</ul>';
+		friendHtml += '</ul>';
+
+		usersSection.innerHTML += usersHtml;
+		friendSection.innerHTML += friendHtml;
+
+		console.log(`users are : ${usersHtml}`)
+		console.log(`friends are : ${friendHtml}`)
 
 		addFriendListeners();
 	}
@@ -226,6 +249,19 @@ async function showUsers(): Promise<void>
 	{
 		usersSection.innerHTML += `<div class="error">Failed to load users.</div>`;
 	}
+}
+
+function getUserHtml(user : BaseUser)
+{
+	const username = user.username ?? "Mystery Guest";
+	const avatar = user.avatar ?? "/assets/placeholder/avatarPlaceholder.png";
+	const status = user.is_active ? 'active' : 'inactive';
+
+	return friendItemHtml
+		.replace(/FRIEND_STATUS/g, status)
+		.replace(/FRIEND_AVATAR_URL/g, avatar)
+		.replace(/FRIEND_NAME/g, username)
+		.replace(/FRIEND_ID/g, String(user.id));
 }
 
 function getFriendHtml(friend : BaseUser)
