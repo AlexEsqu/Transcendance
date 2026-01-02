@@ -13,16 +13,27 @@ function getNavBarHtml()
 
 function initNavBarListeners()
 {
-	document.addEventListener('pageLoaded', (event: Event) => {
-		const customEvent = event as CustomEvent<string>;
-		const path = customEvent.detail;
-
-		if (path.startsWith('/settings') || path.startsWith('/game'))
+	const refreshAndUpdate = async () =>
+	{
+		try
 		{
-			attachNavListeners();
-			updateNavFromUserData();
+			await UserState.getInstance().refreshUser();
 		}
-	});
+		catch (err)
+		{
+			console.log(err);
+		}
+		attachNavListeners();
+		updateNavFromUserData();
+	};
+
+	document.addEventListener('pageLoaded', () =>
+		{
+			refreshAndUpdate();
+		}
+	);
+
+	UserState.getInstance().subscribe(() => updateNavFromUserData());
 }
 
 function attachNavListeners()
