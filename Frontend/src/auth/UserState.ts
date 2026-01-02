@@ -498,6 +498,7 @@ class UserState
 				headers:
 				{
 					'accept': 'application/json',
+					'Content-Type': 'application/json',
 					'X-App-Secret': `${apiKey}`,
 					'Authorization': `Bearer ${this.user.accessToken}`
 				},

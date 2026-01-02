@@ -211,7 +211,7 @@ async function showUsers(): Promise<void>
 	try
 	{
 		const users = await getAllUsers();
-		let html = '<ul class="user-list">';
+		let html = '<ul class="">';
 		for (const user of users)
 		{
 			console.log(user);
@@ -219,6 +219,8 @@ async function showUsers(): Promise<void>
 		}
 		html += '</ul>';
 		usersSection.innerHTML += html;
+
+		addFriendListeners();
 	}
 	catch (err)
 	{
@@ -229,11 +231,39 @@ async function showUsers(): Promise<void>
 function getFriendHtml(friend : BaseUser)
 {
 	const username = friend.username ?? "Mystery Guest";
-	const isActiveAsString = friend.is_active ? 'active' : 'inactive';
+	const avatar = friend.avatar ?? "/assets/placeholder/avatarPlaceholder.png";
+	const status = friend.is_active ? 'active' : 'inactive';
 
 	return friendItemHtml
-		.replace('status-dot active', `status-dot ${isActiveAsString}`)
-		.replace('FRIENDNAME', username);
+		.replace(/FRIEND_STATUS/g, status)
+		.replace(/FRIEND_AVATAR_URL/g, avatar)
+		.replace(/FRIEND_NAME/g, username)
+		.replace(/FRIEND_ID/g, String(friend.id));
+}
+
+function addFriendListeners(): void
+{
+	document.querySelectorAll('.add-friend-btn').forEach(btn =>
+		{
+			btn.addEventListener('click', async (event) =>
+			{
+				const target = event.currentTarget as HTMLElement;
+				const friendId = target.dataset.friendId;
+				if (!friendId)
+					return;
+
+				try
+				{
+					await userState.addToFriendList(Number(friendId));
+					target.textContent = 'Added!';
+				}
+				catch (error)
+				{
+					const msg = error instanceof Error ? error.message : "Unknown error";
+					console.log(`Failed to add friend: ${msg}`);
+				}
+			});
+	});
 }
 
 
