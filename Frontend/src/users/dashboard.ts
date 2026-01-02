@@ -9,6 +9,7 @@ import renameFormHtml from "../pages/forms/renameForm.html?raw"
 import avatarFormHtml from "../pages/forms/avatarForm.html?raw"
 import passwordFormHtml from "../pages/forms/passwordForm.html?raw"
 import friendItemHtml from "../pages/info/friend.html?raw";
+import userItemHtml from "../pages/info/user.html?raw";
 
 import { RegisteredUser } from "./User";
 import type { BaseUser } from './User'
@@ -243,7 +244,7 @@ async function showUsers(): Promise<void>
 		console.log(`users are : ${usersHtml}`)
 		console.log(`friends are : ${friendHtml}`)
 
-		addFriendListeners();
+		addRemoveButtonListener();
 	}
 	catch (err)
 	{
@@ -257,11 +258,11 @@ function getUserHtml(user : BaseUser)
 	const avatar = user.avatar ?? "/assets/placeholder/avatarPlaceholder.png";
 	const status = user.is_active ? 'active' : 'inactive';
 
-	return friendItemHtml
-		.replace(/FRIEND_STATUS/g, status)
-		.replace(/FRIEND_AVATAR_URL/g, avatar)
-		.replace(/FRIEND_NAME/g, username)
-		.replace(/FRIEND_ID/g, String(user.id));
+	return userItemHtml
+		.replace(/USER_STATUS/g, status)
+		.replace(/USER_AVATAR_URL/g, avatar)
+		.replace(/USER_NAME/g, username)
+		.replace(/USER_ID/g, String(user.id));
 }
 
 function getFriendHtml(friend : BaseUser)
@@ -277,14 +278,14 @@ function getFriendHtml(friend : BaseUser)
 		.replace(/FRIEND_ID/g, String(friend.id));
 }
 
-function addFriendListeners(): void
+function addRemoveButtonListener(): void
 {
 	document.querySelectorAll('.add-friend-btn').forEach(btn =>
 		{
 			btn.addEventListener('click', async (event) =>
 			{
 				const target = event.currentTarget as HTMLElement;
-				const friendId = target.dataset.friendId;
+				const friendId = target.dataset.userId;
 				if (!friendId)
 					return;
 
@@ -297,6 +298,28 @@ function addFriendListeners(): void
 				{
 					const msg = error instanceof Error ? error.message : "Unknown error";
 					console.log(`Failed to add friend: ${msg}`);
+				}
+			});
+	});
+
+	document.querySelectorAll('.remove-friend-btn').forEach(btn =>
+		{
+			btn.addEventListener('click', async (event) =>
+			{
+				const target = event.currentTarget as HTMLElement;
+				const friendId = target.dataset.friendId;
+				if (!friendId)
+					return;
+
+				try
+				{
+					await userState.removeFromFriendList(Number(friendId));
+					target.textContent = 'Removed!';
+				}
+				catch (error)
+				{
+					const msg = error instanceof Error ? error.message : "Unknown error";
+					console.log(`Failed to remove friend: ${msg}`);
 				}
 			});
 	});

@@ -515,7 +515,43 @@ class UserState
 		if (!response.ok)
 			throw new Error(data.message || data.error || `Failed to fetch user friends (${response.status})`);
 
-		this.refreshFriendList();
+		this.refreshUser();
 	}
 
+
+	public async removeFromFriendList(friendId: number)
+	{
+		if (!(this.user instanceof RegisteredUser))
+		{
+			console.log("No registered user to refresh");
+			return;
+		}
+
+		if (this.user.id === null || this.user.id === undefined)
+			throw new Error("User id is missing");
+
+		const response = await this.fetchWithTokenRefresh(`${apiDomainName}/users/me/friends`,
+			{
+				method: 'DELETE',
+				headers:
+				{
+					'accept': 'application/json',
+					'Content-Type': 'application/json',
+					'X-App-Secret': `${apiKey}`,
+					'Authorization': `Bearer ${this.user.accessToken}`
+				},
+				body: JSON.stringify({ id: friendId }),
+			}
+		);
+
+
+		if (!response.ok)
+		{
+			const data = await response.json();
+			console.log(data);
+			throw new Error(data.message || data.error || `Failed to fetch user friends (${response.status})`);
+		}
+
+		this.refreshUser();
+	}
 }
