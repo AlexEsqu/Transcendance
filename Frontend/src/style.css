@@ -107,6 +107,23 @@
   }
 
 
+  /* FRIEND DISPLAY */
+
+  .status-dot {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	display: inline-block;
+  }
+
+  .status-dot.active {
+	background: #10b981;
+  }
+
+  .status-dot.inactive {
+	background: #9ca3af;
+  }
+
 }
 
 

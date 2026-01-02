@@ -501,12 +501,7 @@ class UserState
 					'X-App-Secret': `${apiKey}`,
 					'Authorization': `Bearer ${this.user.accessToken}`
 				},
-				body:
-				JSON.stringify(
-					{
-						id: friendId,
-					}
-				)
+				body: JSON.stringify({ id: friendId }),
 			}
 		);
 

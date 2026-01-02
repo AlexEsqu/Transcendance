@@ -8,6 +8,8 @@ import formHtml from "../pages/form.html?raw";
 import renameFormHtml from "../pages/forms/renameForm.html?raw"
 import avatarFormHtml from "../pages/forms/avatarForm.html?raw"
 import passwordFormHtml from "../pages/forms/passwordForm.html?raw"
+import friendItemHtml from "../pages/info/friend.html?raw";
+
 import { RegisteredUser } from "./User";
 import type { BaseUser } from './User'
 // import emailFormHtml from "../pages/forms/emailForm.html?raw"
@@ -179,7 +181,21 @@ function activateAddFriendButton(): void
 				const newFriend = await getUserFromUsername(friendUsername);
 
 				console.log(newFriend)
-				// router.render();
+
+				if (newFriend && newFriend.id)
+				{
+					try
+					{
+						userState.addToFriendList(newFriend.id);
+					}
+					catch (error)
+					{
+						const msg = error instanceof Error ? error.message : "Unknown error";
+						window.sessionStorage.setItem("errorMessage", msg);
+						router.navigateTo("/error");
+					}
+				}
+
 			}
 
 		}
@@ -192,19 +208,32 @@ async function showUsers(): Promise<void>
 	if (!usersSection)
 		return;
 
-	try {
+	try
+	{
 		const users = await getAllUsers();
 		let html = '<ul class="user-list">';
-		for (const user of users) {
+		for (const user of users)
+		{
 			console.log(user);
-			const username = user.username ?? "Unknown";
-			html += `<li class="">${username}</li>`;
+			html += getFriendHtml(user);
 		}
 		html += '</ul>';
 		usersSection.innerHTML += html;
-	} catch (err) {
+	}
+	catch (err)
+	{
 		usersSection.innerHTML += `<div class="error">Failed to load users.</div>`;
 	}
+}
+
+function getFriendHtml(friend : BaseUser)
+{
+	const username = friend.username ?? "Mystery Guest";
+	const isActiveAsString = friend.is_active ? 'active' : 'inactive';
+
+	return friendItemHtml
+		.replace('status-dot active', `status-dot ${isActiveAsString}`)
+		.replace('FRIENDNAME', username);
 }
 
 
