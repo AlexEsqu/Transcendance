@@ -285,13 +285,13 @@ function addRemoveButtonListener(): void
 			btn.addEventListener('click', async (event) =>
 			{
 				const target = event.currentTarget as HTMLElement;
-				const friendId = target.dataset.userId;
-				if (!friendId)
+				const userId = target.dataset.userId;
+				if (!userId)
 					return;
 
 				try
 				{
-					await userState.addToFriendList(Number(friendId));
+					await userState.addToFriendList(Number(userId));
 					target.textContent = 'Added!';
 				}
 				catch (error)
