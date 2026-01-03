@@ -212,9 +212,11 @@ async function showUsers(): Promise<void>
 
 	try
 	{
-		const allUsers = await getAllUsers();
-		const userFriendList = userState.getUser()?.getFriends();
+		const mainUser = userState.getUser();
+		const userFriendList = mainUser?.getFriends();
 		console.log(`friends are : ${userFriendList}`)
+
+		const allUsers = await getAllUsers();
 
 		let usersHtml = '<ul id="user-list" class="">';
 		let friendHtml = '<ul id="friend-list" class="">';
@@ -222,6 +224,10 @@ async function showUsers(): Promise<void>
 		for (const user of allUsers)
 		{
 			console.log(user);
+
+			if (user.id === mainUser?.id)
+				continue;
+
 			const isFriend = userFriendList ? userFriendList.some(friend => friend.id === user.id) : false;
 
 			if (isFriend)
@@ -240,9 +246,6 @@ async function showUsers(): Promise<void>
 
 		usersSection.innerHTML += usersHtml;
 		friendSection.innerHTML += friendHtml;
-
-		console.log(`users are : ${usersHtml}`)
-		console.log(`friends are : ${friendHtml}`)
 
 		addRemoveButtonListener();
 	}
