@@ -9,7 +9,7 @@ import formHtml from "../pages/form.html?raw";
 import renameFormHtml from "../pages/forms/renameForm.html?raw"
 import avatarFormHtml from "../pages/forms/avatarForm.html?raw"
 import passwordFormHtml from "../pages/forms/passwordForm.html?raw"
-// import emailFormHtml from "../pages/forms/emailForm.html?raw"
+import emailFormHtml from "../pages/forms/emailForm.html?raw"
 
 import { friendTemplate, userTemplate } from "../components/loader";
 
@@ -62,11 +62,11 @@ function initSettingPageListeners(): void
 				return;
 			}
 
-			// case '/settings/email':
-			// {
-			// 	onLoginLoaded();
-			// 	return;
-			// }
+			case '/settings/email':
+			{
+				onEmailLoaded();
+				return;
+			}
 
 			default:
 			{
@@ -153,6 +153,34 @@ function onPasswordLoaded(): void
 					console.error(err);
 				}
 			}
+		}
+	);
+}
+
+function onEmailLoaded(): void
+{
+	injectForm(emailFormHtml);
+	const emailForm = document.getElementById('user-email-form') as HTMLFormElement | null;
+
+	emailForm?.addEventListener('submit', async (e) =>
+		{
+			e.preventDefault();
+			const formData = new FormData(emailForm);
+			const newEmail = formData.get('input-email') as string | null;
+			const newEmailCheck = formData.get('input-email-check') as string | null;
+
+			if (newEmail != newEmailCheck)
+			{
+				alert('the email must match...');
+			}
+
+			if (newEmail)
+			{
+				userState.changeEmail(newEmail);
+				alert('email unsupported so far!');
+				router.render();
+			}
+
 		}
 	);
 }

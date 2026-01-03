@@ -417,6 +417,34 @@ class UserState
 		}
 	}
 
+	async changeEmail(newEmail: string): Promise<void>
+	{
+		// AWAITING API ROUTE
+		// if (this.user instanceof RegisteredUser)
+		// {
+		// 	const response = await this.fetchWithTokenRefresh(`${apiDomainName}/users/me/password`, {
+		// 		method: 'PUT',
+		// 		headers: {
+		// 			'Content-Type': 'application/json',
+		// 			'Authorization': `Bearer ${this.user.accessToken}`,
+		// 		},
+		// 		body: JSON.stringify({
+		// 			oldPassword, newPassword
+		// 		})
+		// 	});
+
+		// 	const data = await response.json();
+		// 	if (!response.ok)
+		// 		throw new Error(data.message || 'Password change failed');
+
+		// 	// no need to set user since password is entirely handled by backend
+		// }
+		// else
+		// {
+		// 	throw new Error(`Password update failed: Not a registered User`);
+		// }
+	}
+
 	public async refreshUser(): Promise<void>
 	{
 		if (!(this.user instanceof RegisteredUser))
