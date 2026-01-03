@@ -4,16 +4,18 @@ import { getNavBarHtml, initNavBarListeners } from "../routing/nav";
 import { apiKey, apiDomainName } from '../auth/UserState';
 
 import dashboardHtml from "../pages/dashboard.html?raw";
+
 import formHtml from "../pages/form.html?raw";
 import renameFormHtml from "../pages/forms/renameForm.html?raw"
 import avatarFormHtml from "../pages/forms/avatarForm.html?raw"
 import passwordFormHtml from "../pages/forms/passwordForm.html?raw"
-import friendItemHtml from "../pages/info/friend.html?raw";
-import userItemHtml from "../pages/info/user.html?raw";
+// import emailFormHtml from "../pages/forms/emailForm.html?raw"
+
+import { friendTemplate, userTemplate } from "../components/loader";
 
 import { RegisteredUser } from "./User";
 import type { BaseUser } from './User'
-// import emailFormHtml from "../pages/forms/emailForm.html?raw"
+
 
 export { getDashboardPage, getSettingForm, initSettingPageListeners }
 
@@ -161,170 +163,190 @@ function onDashboardLoaded()
 {
 	showRegisteredUserOptions();
 
-	activateAddFriendButton();
+	// activateAddFriendButton();
 
-	showUsers();
+	showFriendAndUsers();
+
+	userState.subscribe(() => showFriendAndUsers());
 }
 
-function activateAddFriendButton(): void
+// function activateAddFriendButton(): void
+// {
+// 	// injectForm(newFriendFormHtml);
+// 	const newFriendForm = document.getElementById('new-friend-form') as HTMLFormElement | null;
+
+// 	newFriendForm?.addEventListener('submit', async (e) =>
+// 		{
+// 			e.preventDefault();
+// 			const formData = new FormData(newFriendForm);
+// 			const friendUsername = formData.get('new-friend-input') as string | null;
+
+// 			if (friendUsername)
+// 			{
+// 				const newFriend = await getUserFromUsername(friendUsername);
+
+// 				console.log(newFriend)
+
+// 				if (newFriend && newFriend.id)
+// 				{
+// 					try
+// 					{
+// 						userState.addToFriendList(newFriend.id);
+// 					}
+// 					catch (error)
+// 					{
+// 						const msg = error instanceof Error ? error.message : "Unknown error";
+// 						window.sessionStorage.setItem("errorMessage", msg);
+// 						router.navigateTo("/error");
+// 					}
+// 				}
+
+// 			}
+
+// 		}
+// 	);
+// }
+
+async function showFriendAndUsers(): Promise<void>
 {
-	// injectForm(newFriendFormHtml);
-	const newFriendForm = document.getElementById('new-friend-form') as HTMLFormElement | null;
+	const userList = document.querySelector('#user-list');
+	const friendList = document.querySelector('#friend-list');
 
-	newFriendForm?.addEventListener('submit', async (e) =>
-		{
-			e.preventDefault();
-			const formData = new FormData(newFriendForm);
-			const friendUsername = formData.get('new-friend-input') as string | null;
-
-			if (friendUsername)
-			{
-				const newFriend = await getUserFromUsername(friendUsername);
-
-				console.log(newFriend)
-
-				if (newFriend && newFriend.id)
-				{
-					try
-					{
-						userState.addToFriendList(newFriend.id);
-					}
-					catch (error)
-					{
-						const msg = error instanceof Error ? error.message : "Unknown error";
-						window.sessionStorage.setItem("errorMessage", msg);
-						router.navigateTo("/error");
-					}
-				}
-
-			}
-
-		}
-	);
-}
-
-async function showUsers(): Promise<void>
-{
-	const usersSection = document.querySelector('#user-section');
-	const friendSection = document.querySelector('#friend-section');
-	if (!usersSection || !friendSection)
+	if (!userList || !friendList)
 		return;
+
+	// create fragments in memory to load up all users or friends
+	const userFragment = document.createDocumentFragment();
+	const friendFragment = document.createDocumentFragment();
 
 	try
 	{
 		const mainUser = userState.getUser();
-		const userFriendList = mainUser?.getFriends();
-		console.log(`friends are : ${userFriendList}`)
-
+		const userFriendList = mainUser?.getFriends() ?? [];
 		const allUsers = await getAllUsers();
-
-		let usersHtml = '<ul id="user-list" class="">';
-		let friendHtml = '<ul id="friend-list" class="">';
 
 		for (const user of allUsers)
 		{
-			console.log(user);
-
 			if (user.id === mainUser?.id)
 				continue;
 
 			const isFriend = userFriendList ? userFriendList.some(friend => friend.id === user.id) : false;
 
 			if (isFriend)
-			{
-				friendHtml += getFriendHtml(user);
-			}
-
+				friendFragment.appendChild(createFriendElement(user));
 			else
-			{
-				usersHtml += getUserHtml(user);
-			}
-
+				userFragment.appendChild(createUserElement(user));
 		}
-		usersHtml += '</ul>';
-		friendHtml += '</ul>';
 
-		usersSection.innerHTML += usersHtml;
-		friendSection.innerHTML += friendHtml;
+		// empty out the list if existing data inside
+		userList.innerHTML = '';
+		friendList.innerHTML = '';
 
-		addRemoveButtonListener();
+		// add the fragments in one go
+		userList.appendChild(userFragment);
+		friendList.appendChild(friendFragment);
+
+		// attach listeners
+		attachAddRemoveFriendButtonListener();
 	}
 	catch (err)
 	{
-		usersSection.innerHTML += `<div class="error">Failed to load users.</div>`;
+		console.log(err ?? 'unknown error');
+		userList.innerHTML += `<div class="error">Failed to load users.</div>`;
 	}
 }
 
-function getUserHtml(user : BaseUser)
+// clone the templated friend HTML into a friend li html document
+// granting type safety
+function createFriendElement(friend: BaseUser): HTMLLIElement
 {
-	const username = user.username ?? "Mystery Guest";
-	const avatar = user.avatar ?? "/assets/placeholder/avatarPlaceholder.png";
-	const status = user.is_active ? 'active' : 'inactive';
+	const template = friendTemplate as HTMLTemplateElement;
+	const clone = template.content.cloneNode(true) as DocumentFragment;
 
-	return userItemHtml
-		.replace(/USER_STATUS/g, status)
-		.replace(/USER_AVATAR_URL/g, avatar)
-		.replace(/USER_NAME/g, username)
-		.replace(/USER_ID/g, String(user.id));
+	const li = clone.querySelector('li') as HTMLLIElement;
+	const img = clone.querySelector('.friend-avatar-img') as HTMLImageElement;
+	const statusDot = clone.querySelector('.friend-status-dot') as HTMLElement;
+	const nameSpan = clone.querySelector('.friend-name') as HTMLElement;
+	const removeBtn = clone.querySelector('.remove-friend-btn') as HTMLButtonElement;
+
+	img.src = friend.avatar ?? "/assets/placeholder/avatarPlaceholder.png";
+	img.alt = `${friend.username} avatar`;
+	statusDot.classList.add(`${friend.is_active ? 'active' : 'inactive'}`);
+	nameSpan.textContent = friend.username ?? "Mystery Guest";
+	removeBtn.dataset.friendId = String(friend.id);
+
+	return li;
 }
 
-function getFriendHtml(friend : BaseUser)
+function createUserElement(user: BaseUser): HTMLLIElement
 {
-	const username = friend.username ?? "Mystery Guest";
-	const avatar = friend.avatar ?? "/assets/placeholder/avatarPlaceholder.png";
-	const status = friend.is_active ? 'active' : 'inactive';
+	const template = userTemplate as HTMLTemplateElement;
+	const clone = template.content.cloneNode(true) as DocumentFragment;
 
-	return friendItemHtml
-		.replace(/FRIEND_STATUS/g, status)
-		.replace(/FRIEND_AVATAR_URL/g, avatar)
-		.replace(/FRIEND_NAME/g, username)
-		.replace(/FRIEND_ID/g, String(friend.id));
+	const li = clone.querySelector('li') as HTMLLIElement;
+	const img = clone.querySelector('.user-avatar-img') as HTMLImageElement;
+	const statusDot = clone.querySelector('.user-status-dot') as HTMLElement;
+	const nameSpan = clone.querySelector('.user-name') as HTMLElement;
+	const addBtn = clone.querySelector('.add-friend-btn') as HTMLButtonElement;
+
+	img.src = user.avatar ?? "/assets/placeholder/avatarPlaceholder.png";
+	img.alt = `${user.username} avatar`;
+	statusDot.classList.add(`${user.is_active ? 'active' : 'inactive'}`);
+	nameSpan.textContent = user.username ?? "Mystery Guest";
+	addBtn.dataset.userId = String(user.id);
+
+	return li;
 }
 
-function addRemoveButtonListener(): void
+// attach listener to each friend, in a separate function to optimise
+// speed on large amount of elements, may be overkill here but in the
+// spirit of making a website able to accomodate 50+ players
+function attachAddRemoveFriendButtonListener(): void
 {
 	document.querySelectorAll('.add-friend-btn').forEach(btn =>
+	{
+		btn.addEventListener('click', async (event) =>
 		{
-			btn.addEventListener('click', async (event) =>
-			{
-				const target = event.currentTarget as HTMLElement;
-				const userId = target.dataset.userId;
-				if (!userId)
-					return;
+			const target = event.currentTarget as HTMLButtonElement;
+			const userId = target.dataset.userId;
+			if (!userId)
+				return;
 
-				try
-				{
-					await userState.addToFriendList(Number(userId));
-					target.textContent = 'Added!';
-				}
-				catch (error)
-				{
-					const msg = error instanceof Error ? error.message : "Unknown error";
-					console.log(`Failed to add friend: ${msg}`);
-				}
-			});
+			try
+			{
+				await userState.addToFriendList(Number(userId));
+				target.textContent = 'Added!';
+				target.disabled = true;
+			}
+			catch (error)
+			{
+				const msg = error instanceof Error ? error.message : "Unknown error";
+				console.log(`Failed to add friend: ${msg}`);
+			}
+		});
 	});
 
 	document.querySelectorAll('.remove-friend-btn').forEach(btn =>
+	{
+		btn.addEventListener('click', async (event) =>
 		{
-			btn.addEventListener('click', async (event) =>
-			{
-				const target = event.currentTarget as HTMLElement;
-				const friendId = target.dataset.friendId;
-				if (!friendId)
-					return;
+			const target = event.currentTarget as HTMLButtonElement;
+			const friendId = target.dataset.friendId;
+			if (!friendId)
+				return;
 
-				try
-				{
-					await userState.removeFromFriendList(Number(friendId));
-					target.textContent = 'Removed!';
-				}
-				catch (error)
-				{
-					const msg = error instanceof Error ? error.message : "Unknown error";
-					console.log(`Failed to remove friend: ${msg}`);
-				}
-			});
+			try
+			{
+				await userState.removeFromFriendList(Number(friendId));
+				target.textContent = 'Removed!';
+				target.disabled = true;
+			}
+			catch (error)
+			{
+				const msg = error instanceof Error ? error.message : "Unknown error";
+				console.log(`Failed to remove friend: ${msg}`);
+			}
+		});
 	});
 }
 
