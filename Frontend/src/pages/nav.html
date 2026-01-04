@@ -1,62 +1,30 @@
-<nav
-	class="p-4 flex justify-between box-border flex-shrink-0">
+<nav class="p-4 flex justify-between box-border flex-shrink-0">
+	
+	<div id="user-menu-container" class="flex">
 
+		<a id="avatar-btn" class="cursor-pointer glow-select w-[130px] h-[130px] border-box border border-slate-600 m-2"
+			href="/settings" data-link>
 
-	<div
-		id="user-menu-container"
-		class="flex"
-	>
-
-		<a
-			id="avatar-btn"
-			class="cursor-pointer glow-select w-[130px] h-[130px] border-box border border-slate-600 m-2"
-			href="/settings"
-			data-link>
-
-			<img
-				id="user-avatar-nav"
-				src="/assets/placeholder/avatarPlaceholder.png"
-				class="p-0 m-0 min-w-[20px] min-h-[20px] w-[130px] h-[130px] object-cover block "
-			/>
+			<img id="user-avatar-nav" src="/assets/placeholder/avatarPlaceholder.png"
+				class="p-0 m-0 min-w-[20px] min-h-[20px] w-[130px] h-[130px] object-cover block " />
 
 		</a>
 
-		<div
-			id="username-container"
-			class="m-2">
+		<div id="username-container" class="m-2">
 
-			<div
-				id="user-name-nav"
-				class="text-6xl m-0 p-0 self-start"
-			>
+			<div id="user-name-nav" class="text-6xl m-0 p-0 self-start">
 				USERNAME
 			</div>
 
-			<div
-				id="user-menu-container"
-				class="mt-5 flex gap-2 items-start"
-			>
-				<!-- <a
-					id="user-info-btn"
-					class="text-base text-glow cursor-pointer border rounded-md p-3 text-center bg-gray-950 "
-					href="/settings"
-					data-link
-				>
-					Settings
-				</a> -->
+			<div id="user-menu-container" class="mt-5 flex gap-2 items-start">
 
-				<button
-					id="logout-btn"
-					class="text-base glow-select cursor-pointer border border-slate-600 p-3 text-center "
-				>
+				<button id="logout-btn"
+					class="text-base glow-select cursor-pointer border border-slate-600 p-3 text-center ">
 					Logout
 				</button>
 
-				<a
-					class="text-base glow-select cursor-pointer border border-slate-600 p-3 text-center "
-					href="/game"
-					data-link
-				>
+				<a class="text-base glow-select cursor-pointer border border-slate-600 p-3 text-center " href="/game"
+					data-link>
 					Pong
 				</a>
 
@@ -65,24 +33,4 @@
 		</div>
 	</div>
 
-		<!-- <div
-			id="game-menu-container"
-			class="flex justify-end items-start gap-3 flex-wrap">
-
-			<a
-				class="text-base text-glow cursor-pointer hover-glow-orange border rounded-md p-3 text-center bg-gray-950 "
-				href="/game"
-				data-link
-			>
-				Pong
-			</a>
-			<a
-				class="text-base text-glow cursor-pointer hover-glow-orange border rounded-md p-3 text-center bg-gray-950 "
-				href="/game/tournament"
-				data-link
-			>
-				Pong Tournament
-			</a>
-
-		</div> -->
 </nav>
