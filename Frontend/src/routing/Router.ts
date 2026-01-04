@@ -182,7 +182,7 @@ class Router
 		const navbar = document.getElementById('nav');
 		if (!navbar)
 		{
-			console.warn('Navbar element not found');
+			console.log('Navbar element not found');
 			return;
 		}
 
@@ -195,7 +195,8 @@ class Router
 				navbar.innerHTML = getNavBarHtml();
 				this.navbarInitialized = true;
 
-				// adding navbar loading event
+				// signals to navbar that it can attach the buttons
+				// that have been loaded into the DOM / are in the displayed html
 				const navEvent = new CustomEvent('navbarLoaded');
 				document.dispatchEvent(navEvent);
 			}

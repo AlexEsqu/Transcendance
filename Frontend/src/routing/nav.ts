@@ -8,20 +8,26 @@ export { getNavBarHtml, initNavBarListeners }
 function getNavBarHtml()
 {
 	const name = userState.getUser()?.getName() ?? "Guest";
-	return navHTML.replace('USERNAME', name);
+	const avatar = userState.getUser()?.getAvatarPath() ?? "/assets/placeholder/avatarPlaceholder.png";
+
+	return navHTML
+		.replace('USERNAME', name)
+		.replace('/assets/placeholder/avatarPlaceholder.png', avatar);
 }
 
 let hasAttachedNavListeners = false;
 
 function initNavBarListeners()
 {
-	if (hasAttachedNavListeners)
-		return;
-
-	document.addEventListener('navbarLoaded', () => {
-		attachNavListeners();
+	if (!hasAttachedNavListeners)
+	{
+		document.addEventListener('navbarLoaded', () =>
+			{
+				attachNavListeners();
+			}
+		);
 		hasAttachedNavListeners = true;
-	});
+	}
 
 	UserState.getInstance().subscribe(() => updateNavFromUserData());
 }
@@ -50,8 +56,13 @@ function attachNavListeners()
 function updateNavFromUserData(): void
 {
 	const user = userState.getUser();
+	const navElem = document.getElementById('nav');
 	if (!user)
+	{
+		if (navElem)
+			navElem.style.display ='hidden';
 		return;
+	}
 
 	const userNameElement = document.getElementById('user-name-nav');
 	if (userNameElement)

@@ -43,8 +43,6 @@ function initDashboardPageListeners(): void
 	document.addEventListener('pageLoaded', (event: Event) => {
 		const { detail: path } = event as CustomEvent<string>;
 
-		initNavBarListeners();
-
 		// reinitializing any possibly existing listener
 		cleanupDashboardListeners();
 

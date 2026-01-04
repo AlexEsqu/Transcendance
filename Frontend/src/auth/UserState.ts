@@ -189,6 +189,7 @@ class UserState
 			throw new Error(data.message || data.error || 'Login Failed');
 
 		const user = new RegisteredUser(login, data.id, data.accessToken);
+
 		this.setUser(user);
 	}
 

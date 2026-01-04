@@ -22,8 +22,6 @@ function getGameOptionHtml(): string
 
 function initGamePageListeners(): void
 {
-	initNavBarListeners();
-
 	document.addEventListener('pageLoaded', (event: Event) => {
 		const { detail: path } = event as CustomEvent<string>;
 
