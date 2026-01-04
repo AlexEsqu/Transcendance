@@ -1,6 +1,8 @@
 import { UserState } from "../auth/UserState";
 import { User, RegisteredUser } from "../users/User";
 
+import { getNavBarHtml } from './nav';
+
 export { Router }
 export type { Route, getPageHtmlFunction }
 
@@ -30,6 +32,9 @@ class Router
 	// container within which to display the html content
 	private rootElement: HTMLElement;
 
+	// track if navbar is currently initialized
+	private navbarInitialized: boolean = false;
+
 	//--------------------------- CONSTRUCTORS ------------------------------//
 
 	constructor (userState: UserState, rootSelector: string)
@@ -52,6 +57,8 @@ class Router
 				this.navigateTo('/connection');
 			if (user && window.location.pathname.includes('/connection'))
 				this.navigateTo('/settings');
+			if (this.navbarInitialized)
+				this.renderNavbar(user);
 		});
 	}
 
@@ -116,6 +123,8 @@ class Router
 
 		this.rootElement.innerHTML = route.getPage();
 
+		this.renderNavbar(user);
+
 		const event = new CustomEvent('pageLoaded', { detail: route.path });
 		document.dispatchEvent(event);
 	}
@@ -166,5 +175,36 @@ class Router
 		const user = this.userState.getUser();
 		window.history.replaceState(null, '', (user ? '/settings' : '/connection'));
 		this.render();
+	}
+
+	private renderNavbar(user: User | null): void
+	{
+		const navbar = document.getElementById('nav');
+		if (!navbar)
+		{
+			console.warn('Navbar element not found');
+			return;
+		}
+
+		if (user)
+		{
+			navbar.classList.remove('hidden');
+
+			if (!this.navbarInitialized)
+			{
+				navbar.innerHTML = getNavBarHtml();
+				this.navbarInitialized = true;
+
+				// adding navbar loading event
+				const navEvent = new CustomEvent('navbarLoaded');
+				document.dispatchEvent(navEvent);
+			}
+		}
+		else
+		{
+			navbar.classList.add('hidden');
+			navbar.innerHTML = '';
+			this.navbarInitialized = false;
+		}
 	}
 }

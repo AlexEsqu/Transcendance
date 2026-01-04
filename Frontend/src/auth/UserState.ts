@@ -516,10 +516,7 @@ class UserState
 	public async addToFriendList(friendId: number)
 	{
 		if (!(this.user instanceof RegisteredUser))
-		{
-			console.log("No registered user to refresh");
-			return;
-		}
+			throw new Error("User is not registered and cannot add friends!");
 
 		if (this.user.id === null || this.user.id === undefined)
 			throw new Error("User id is missing");

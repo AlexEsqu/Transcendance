@@ -11,27 +11,17 @@ function getNavBarHtml()
 	return navHTML.replace('USERNAME', name);
 }
 
+let hasAttachedNavListeners = false;
+
 function initNavBarListeners()
 {
-	const refreshAndUpdate = async () =>
-	{
-		try
-		{
-			await UserState.getInstance().refreshUser();
-		}
-		catch (err)
-		{
-			console.log(err);
-		}
-		attachNavListeners();
-		updateNavFromUserData();
-	};
+	if (hasAttachedNavListeners)
+		return;
 
-	document.addEventListener('pageLoaded', () =>
-		{
-			refreshAndUpdate();
-		}
-	);
+	document.addEventListener('navbarLoaded', () => {
+		attachNavListeners();
+		hasAttachedNavListeners = true;
+	});
 
 	UserState.getInstance().subscribe(() => updateNavFromUserData());
 }
@@ -42,9 +32,12 @@ function attachNavListeners()
 	if (logoutButton)
 	{
 		logoutButton.addEventListener('click', async () => {
-			try {
+			try
+			{
 				await userState.logout();
-			} catch (error) {
+			}
+			catch (error)
+			{
 				const msg = error instanceof Error ? error.message : "Unknown error";
 				console.log(`error message is ${msg}`);
 				window.sessionStorage.setItem("errorMessage", msg);
@@ -67,9 +60,4 @@ function updateNavFromUserData(): void
 	const avatarImage = document.getElementById('user-avatar-nav') as HTMLImageElement;
 	if (avatarImage)
 		avatarImage.src = user.getAvatarPath();
-
-	// // only display the delete account button if the user is registered (has an account to delete)
-	// const deleteButton = document.getElementById('delete-user-btn');
-	// if (deleteButton)
-	// 	deleteButton.style.display = user instanceof RegisteredUser ? 'block' : 'none';
 }

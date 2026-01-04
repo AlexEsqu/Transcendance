@@ -2,9 +2,10 @@ import "./style.css"
 import { Router } from './routing/Router';
 import { UserState } from './auth/UserState';
 import { getConnectionLandingHtml, getConnectionForm, getEmailCheck, initConnectionPageListeners} from './auth/connection';
-import { getDashboardPage, getSettingForm, initSettingPageListeners } from "./users/dashboard";
+import { getDashboardPage, getSettingForm, initDashboardPageListeners } from "./users/dashboard";
 import { getGameHtml, getGameOptionHtml, initGamePageListeners } from "./game/display"
 import { getErrorPage } from "./error/error";
+import { initNavBarListeners } from "./routing/nav";
 
 export { userState, router };
 
@@ -29,8 +30,9 @@ router.addRoute('/game', getGameHtml, true);
 router.addRoute('/error', getErrorPage);
 
 initConnectionPageListeners();
-initSettingPageListeners();
+initDashboardPageListeners();
 initGamePageListeners();
+initNavBarListeners();
 
 router.render();
 

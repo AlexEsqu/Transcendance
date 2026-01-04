@@ -12,14 +12,12 @@ export { getGameHtml, getGameOptionHtml, initGamePageListeners };
 
 function getGameHtml(): string
 {
-	const username = userState.getUser()?.getName() ?? "Guest";
-	return (getNavBarHtml() + gameHtml).replace('USERNAME', username);
+	return gameHtml;
 }
 
 function getGameOptionHtml(): string
 {
-	const username = userState.getUser()?.getName() ?? "Guest";
-	return (getNavBarHtml() + optionsHtml).replace('USERNAME', username);
+	return optionsHtml;
 }
 
 function initGamePageListeners(): void
