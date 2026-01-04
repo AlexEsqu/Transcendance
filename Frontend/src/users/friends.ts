@@ -72,9 +72,7 @@ async function showUsers(): Promise<void>
 				continue;
 
 			const isFriend = userFriendList ? userFriendList.some(friend => friend.id === user.id) : false;
-
-			if (!isFriend)
-				userFragment.appendChild(createUserElement(user, isRegistered));
+			userFragment.appendChild(createUserElement(user, isRegistered, isFriend));
 		}
 
 		// empty out the list if existing data inside
@@ -115,7 +113,7 @@ function createFriendElement(friend: BaseUser): HTMLLIElement
 	return li;
 }
 
-function createUserElement(user: BaseUser, isRegistered: boolean): HTMLLIElement
+function createUserElement(user: BaseUser, isRegistered: boolean, isFriend: boolean): HTMLLIElement
 {
 	const template = userTemplate as HTMLTemplateElement;
 	const clone = template.content.cloneNode(true) as DocumentFragment;
@@ -133,8 +131,17 @@ function createUserElement(user: BaseUser, isRegistered: boolean): HTMLLIElement
 	// adding 'add as friend' if the user is registered only
 	if (isRegistered)
 	{
-		const addBtn = clone.querySelector('.add-friend-btn') as HTMLButtonElement;
-		addBtn.dataset.userId = String(user.id);
+		if (!isFriend)
+		{
+			const addBtn = clone.querySelector('.add-friend-btn') as HTMLButtonElement;
+			addBtn.dataset.userId = String(user.id);
+		}
+		else
+		{
+			const addBtn = clone.querySelector('.add-friend-btn') as HTMLButtonElement;
+			addBtn.textContent = 'Friend ❤️'
+			addBtn.disabled = true;
+		}
 	}
 	else
 	{
