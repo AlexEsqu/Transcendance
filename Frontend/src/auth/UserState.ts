@@ -190,7 +190,16 @@ class UserState
 
 		const user = new RegisteredUser(login, data.id, data.accessToken);
 
+		// sets temporary user to launch the refresh
+		this.user = user;
+
 		this.setUser(user);
+
+		// await the refresh
+		await this.refreshUser();
+
+		// notify: refresh succeeded !! woohooo
+		this.notifySubscribers();
 	}
 
 	public async register(username: string, password: string, email: string): Promise<void>
@@ -382,7 +391,8 @@ class UserState
 			if (!response.ok)
 				throw new Error(`Avatar update failed: ${response.status}, ${data.message}`);
 
-			this.refreshUser();
+			await this.refreshUser();
+			this.notifySubscribers();
 		}
 
 		else
@@ -421,29 +431,6 @@ class UserState
 	async changeEmail(newEmail: string): Promise<void>
 	{
 		// AWAITING API ROUTE
-		// if (this.user instanceof RegisteredUser)
-		// {
-		// 	const response = await this.fetchWithTokenRefresh(`${apiDomainName}/users/me/password`, {
-		// 		method: 'PUT',
-		// 		headers: {
-		// 			'Content-Type': 'application/json',
-		// 			'Authorization': `Bearer ${this.user.accessToken}`,
-		// 		},
-		// 		body: JSON.stringify({
-		// 			oldPassword, newPassword
-		// 		})
-		// 	});
-
-		// 	const data = await response.json();
-		// 	if (!response.ok)
-		// 		throw new Error(data.message || 'Password change failed');
-
-		// 	// no need to set user since password is entirely handled by backend
-		// }
-		// else
-		// {
-		// 	throw new Error(`Password update failed: Not a registered User`);
-		// }
 	}
 
 	public async refreshUser(): Promise<void>
@@ -478,8 +465,9 @@ class UserState
 		this.user.avatar = data.avatar ?? this.user.avatar;
 
 		await this.refreshFriendList();
+		this.user.isRefreshed = true;
 
-		this.setUser(this.user);
+		this.saveToLocalStorage();
 	}
 
 	public async refreshFriendList()
@@ -541,9 +529,9 @@ class UserState
 		if (!response.ok)
 			throw new Error(data.message || data.error || `Failed to fetch user friends (${response.status})`);
 
-		this.refreshUser();
+		await this.refreshUser();
+		this.notifySubscribers();
 	}
-
 
 	public async removeFromFriendList(friendId: number)
 	{
@@ -578,6 +566,7 @@ class UserState
 			throw new Error(data.message || data.error || `Failed to fetch user friends (${response.status})`);
 		}
 
-		this.refreshUser();
+		await this.refreshUser();
+		this.notifySubscribers();
 	}
 }

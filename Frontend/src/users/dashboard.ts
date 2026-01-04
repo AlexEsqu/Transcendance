@@ -1,7 +1,7 @@
 import { userState, router } from "../app"
-
-import { getNavBarHtml, initNavBarListeners } from "../routing/nav";
 import { showFriend, showUsers } from "./friends";
+import { RegisteredUser } from "./User";
+import type { Subscriber } from "../auth/UserState";
 
 import dashboardHtml from "../pages/dashboard.html?raw";
 
@@ -10,9 +10,6 @@ import renameFormHtml from "../pages/forms/renameForm.html?raw"
 import avatarFormHtml from "../pages/forms/avatarForm.html?raw"
 import passwordFormHtml from "../pages/forms/passwordForm.html?raw"
 import emailFormHtml from "../pages/forms/emailForm.html?raw"
-
-import { RegisteredUser } from "./User";
-import type { Subscriber } from "../auth/UserState";
 
 export { getDashboardPage, getSettingForm, initDashboardPageListeners }
 

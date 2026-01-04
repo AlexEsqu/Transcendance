@@ -50,12 +50,14 @@ abstract class User implements BaseUser {
 class RegisteredUser extends User
 {
 	accessToken: string | null;
+	isRefreshed: boolean;
 
 	constructor(username: string, id: number, accessToken: string)
 	{
 		super(username);
 		this.id = id;
 		this.accessToken = accessToken;
+		this.isRefreshed = false;
 	}
 }
 
