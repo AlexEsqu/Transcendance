@@ -30,6 +30,8 @@ export class Pong {
 	constructor(canvasId: string, options: IOptions, onNewRound?: () => void)
 	{
 		this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
+		this.canvas.width = window.innerWidth;
+		this.canvas.height = window.innerHeight;
 		this.engine = new Engine(this.canvas, true);
 		this.gui = null;
 		this.scene = null;
@@ -60,10 +62,8 @@ export class Pong {
 		let players: Array<IPlayer> = [];
 		for (let i = 0; i < nbOfPlayer; i++)
 		{
-			if (inputs[i] && inputs[i + 1])
-				players.push({ id: 0, name: inputs[i], score: 0, color: inputs[i + 1]} );
-			// if (inputs[i])
-			// 	players.push({ id: 0, name: inputs[i], score: 0, color: "#"} );
+			if (inputs[i])
+				players.push({ id: 0, name: inputs[i], score: 0, color: "#"} );
 		}
 		return players;
 	}

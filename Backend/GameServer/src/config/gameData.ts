@@ -1,6 +1,6 @@
 import { WebSocket as WSWebSocket } from 'ws';
 
-export { GameType, GameLocation, State, Level, IBall, IPaddle, IPlayer }
+export { GameType, GameLocation, State, Level, IBall, IPaddle, IPlayer, IRound }
 
 /************************************************************************************************************
  * 		Declare CONSTANT variables								 											*
@@ -31,15 +31,16 @@ enum Level {
  ***********************************************************************************************************/
 
 interface IBall {
-	x: number;
-	z: number;
 	speed: number;
-	direction: number;
+	posX: number;
+	posZ: number;
+	dirX: number;
+	dirZ: number;
 };
 
 interface IPaddle {
-	z: number;
-	side: number;
+	posZ: number;
+	side: string;
 	robot: boolean;
 };
 
@@ -65,5 +66,4 @@ interface IRound {
 	results: Array<IResult> | null;
 	nbOfRounds: number;
 	playerIndex: number;
-	nodeColor: string[];
 }

@@ -25,17 +25,17 @@ export async function registerWaitingRoomRoutes(gameServer: FastifyInstance, gam
 			let player = { playerId: -1, roomId: -1 };
 
 			//	Handle: first connection of a client
-			console.log("GAME-SERVER: new connection from a client");
+			console.log("GAME-SERVER: new connection from a client on route '/waitingRoom'");
 
 			//	Handler: receiving message from a client
 			socket.on('message', (message: Buffer) => {
-				console.log("GAME-SERVER: received a message from the client");
+				console.log("GAME-SERVER: received a message from the client on route '/waitingRoom");
 				player = handleMessage(socket, message, validateWaitingMessage, gameControl);
 			});
 	
 			//	Handle: ending client connection properly for the server
 			socket.on('close', () => {
-				console.log("GAME-SERVER: client closed connection");
+				console.log("GAME-SERVER: client closed connection on route '/waitingRoom");
 				handleDisconnection(player, gameControl);
 			});
 	

@@ -133,6 +133,7 @@ function loadGame(engine: Engine, canvas: HTMLCanvasElement, options: IOptions):
 	const glowLayer: GlowLayer = new GlowLayer("glow", id, { mainTextureRatio: 0.6 });
 	glowLayer.intensity = 0.7;
 	glowLayer.blurKernelSize = 64;
+	console.log(options.mapColor);
 
 	const map: Mesh | null = createMap(id, Pong.MAP_HEIGHT, Pong.MAP_WIDTH, options.mapColor);
 
@@ -147,8 +148,9 @@ function loadGame(engine: Engine, canvas: HTMLCanvasElement, options: IOptions):
 	}
 
 	//	Creates 2 paddles, one for each players
-	const leftPadd = new Paddle(id, "left", Pong.MAP_WIDTH, options.level, options.paddColor);
-	const rightPadd = new Paddle(id, "right", Pong.MAP_WIDTH, options.level, options.paddColor);
+	console.log(options.paddColors[0]);
+	const leftPadd = new Paddle(id, "left", Pong.MAP_WIDTH, options.level, options.paddColors[0]);
+	const rightPadd = new Paddle(id, "right", Pong.MAP_WIDTH, options.level, options.paddColors[1] ?? "#a2c2e8");
 	if (!leftPadd || !rightPadd) {
 		console.error("GAME-ERROR: failed to create 'Paddle', can't load game");
 		return null;

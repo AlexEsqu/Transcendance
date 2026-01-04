@@ -1,9 +1,9 @@
 import { Pong } from "../game/Pong"
-import { IOptions, Level } from "../game/Data"
+import { IOptions } from "../game/Data"
+import { clearOptions, loadOptions } from "./options"
+
 import gameHtml from '../pages/game.html?raw'
 import optionsHtml from '../pages/options.html?raw'
-
-import { clearOptions, loadOptions } from "./options"
 import { userState } from "../app"
 
 class GameApp {
@@ -11,7 +11,7 @@ class GameApp {
 	startBtnDisplay: HTMLElement | null;
 	startBtn: HTMLElement | null;
 
-	constructor(canvas : HTMLElement, options: IOptions) {
+	constructor(options: IOptions) {
 		this.startBtnDisplay = document.getElementById("game-start");
 		this.startBtn = document.getElementById('btn-startplay');
 		this.setupStartButton();
@@ -55,14 +55,5 @@ export function launchPongGame(options: IOptions): void
 	}
 
 	//	Launch Pong game when user click on start button
-	const gameWindow = document.getElementById("game-canvas") as HTMLCanvasElement;
-	gameWindow.width = window.innerWidth;
-	gameWindow.height = window.innerHeight;
-	if (!gameWindow.getContext) {
-		console.error("canvas context not found");
-		return ;
-	}
-	console.log("OPTIONS");
-	console.log(options);
-	const app = new GameApp(gameWindow, options);
+	const app = new GameApp(options);
 }

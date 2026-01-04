@@ -1,7 +1,7 @@
 import { userState, router } from "../app";
 import { getNavBarHtml, initNavBarListeners } from "../routing/nav";
 import { launchPongGame } from "./GameApp"
-import { loadOptions, saveOptions } from "./options";
+import { clearOptions, loadOptions, saveOptions } from "./options";
 import { IOptions } from "./Data";
 
 import gameHtml from '../pages/game.html?raw'
@@ -186,9 +186,6 @@ function onGameOptionLoaded(): void
 		const gameType = formData.get('game-type') as string | null;
 		const level = formData.get('level') as string | null;
 		const matchLoc = formData.get('match-location') as string | null;
-		// const ballColor = formData.get('ball-level-input') as string | null;
-		// const backColor = formData.get('back-color-input') as string | null;
-		// const paddColor = formData.get('padd-color-input') as string | null;
 
 		// extracting data but putting default just in case some is missing
 		const options: IOptions = {
@@ -196,12 +193,10 @@ function onGameOptionLoaded(): void
 			level: level ? parseInt(level) : 0,
 			nbOfPlayers: gameType ? parseInt(gameType) : 1,
 			paddColors: getPaddColors() || '#a2c2e8',
-			players: getPlayerNames()
-			// ballColor: ballColor || '#a2c2e8',
-			// mapColor: backColor || '#01011a',
-			// paddColor: paddColor || '#a2c2e8',
+			players: getPlayerNames(),
+			ballColor: '#a2c2e8',
+			mapColor: "#01011a"
 		}
-		console.log(options);
 		saveOptions(options);
 		router.navigateTo('/game');
 	})
@@ -212,7 +207,8 @@ function onGameLoaded(): void
 	const options = loadOptions()
 	if (options)
 	{
-		launchPongGame(options)
+		launchPongGame(options);
+		clearOptions();
 	}
 	else
 		router.navigateTo('/game/error')

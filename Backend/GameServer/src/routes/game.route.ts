@@ -1,7 +1,9 @@
-// import { handleMessage, handleDesconnection } from '../handlers/game.handlers.js'
-
 import { FastifyInstance } from "fastify";
+import Ajv, { ValidateFunction } from 'ajv';
+import { WebSocket as WSWebSocket } from 'ws';
 import { GameControl } from "../services/GameControl";
+import { gameSchema } from '../config/schemas';
+import { handleMessage, handleDisconnection } from '../handlers/game.handlers.js'
 
 /************************************************************************************************************
  * 		Declare routes/endpoints								 											*
@@ -11,25 +13,28 @@ import { GameControl } from "../services/GameControl";
 
 export async function registerGameRoutes(gameServer: FastifyInstance, gameControl: GameControl)
 {
+	const ajv = new Ajv() as Ajv;
+	const validateGameMessage = ajv.compile(gameSchema) as ValidateFunction;
+
 	await gameServer.register(async function (fastify) {
 		fastify.get('/game', { websocket: true }, (socket, request) => {
 			if (!socket) throw new Error("Websocket is missing");
 
-			let playerId: number | null = null;
+			let player = { playerId: -1, roomId: -1 };
 
 			//	Handle: first connection of a client
-			console.log("GAME-SERVER: new connection from a client ", socket);
+			console.log("GAME-SERVER: new connection from a client on route '/game'");
 
 			//	Handler: receiving message from a client
 			socket.on('message', (message: Buffer) => {
-				console.log("GAME-SERVER: received a message from the client ", socket);
-				// playerId = handleMessage(socket, message, validateWaitingMessage, gameControl);
+				console.log("GAME-SERVER: received a message from the client on route '/game'");
+				player = handleMessage(socket, message, validateGameMessage, gameControl);
 			});
 	
 			//	Handle: ending client connection properly for the server
 			socket.on('close', () => {
-				console.log("GAME-SERVER: closed connection from client ", socket);
-				// handleDisconnection(playerId, gameControl);
+				console.log("GAME-SERVER: closed connection from client on route '/game'");
+				handleDisconnection(player, gameControl);
 			});
 	
 			//	Handle: errors!!

@@ -19,8 +19,8 @@ interface IOptions {
 	nbOfPlayers: number; // 1, 2 or 4
 	paddColors: string[];
 	players: string[];
-	// ballColor: string;
-	// mapColor: string;
+	ballColor: string;
+	mapColor: string;
 };
 
 interface IScene {
