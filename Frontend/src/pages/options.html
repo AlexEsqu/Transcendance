@@ -9,18 +9,36 @@
 			id="game-option-form"
 			class="flex flex-col flex-center gap-5 m-5 text-center">
 
-			<!-- Choose game type : classic (1vsAI or 1vs1) or tournament -->
+			<!-- Choose match-location : remote or local -->
 			<div 
 				class="flex flex-col flex-center gap-1 m-1 text-center">
 
 				<label 
-					for="type"
+					for="match-location"
+					class="p-3">
+					Match location
+				</label>
+				<select 
+					id="match-location" 
+					name="match-location"
+					class="gentle-select">
+					<option class='' value="local">Local</option>
+					<option class='' value="remote">Remote</option>
+				</select>
+			</div>
+
+			<!-- Choose game-type : classic (1vsAI or 1vs1) or tournament -->
+			<div 
+				class="flex flex-col flex-center gap-1 m-1 text-center">
+
+				<label 
+					for="game-type"
 					class="p-3">
 					Match type
 				</label>
 				<select 
-					id="type" 
-					name="type"
+					id="game-type" 
+					name="game-type"
 					class="gentle-select">
 					<option class='' value="1">One player and a robot</option>
 					<option class='' value="2">Two players</option>
@@ -48,7 +66,6 @@
 
 			<!-- Choose paddle colors for each player -->
 			<div
-				id="paddle-colors-container"
 				class="flex flex-col flex-center gap-1 m-1 text-center">
 
 				<label
