@@ -1,28 +1,6 @@
-import { createAccessToken, createRefreshToken, hashRefreshToken } from "../../services/authServices.js";
+import { generateTokens } from "../../services/authServices.js";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
-
-export async function generateTokens(server, user, reply) {
-	const accessToken = createAccessToken(server, user.id, user.username);
-	const refreshToken = createRefreshToken(server, user.id, user.username);
-
-	const refreshTokenHash = await hashRefreshToken(refreshToken);
-	const addRefreshToken = server.db.prepare(`UPDATE users SET refresh_token_hash = ? WHERE id = ?`);
-	addRefreshToken.run(refreshTokenHash, user.id);
-	// set cookie
-	reply.setCookie("refreshToken", refreshToken, {
-	  httpOnly: true,
-  		secure: true,      // REQUIRED (HTTPS)
-  		sameSite: "lax",
-		path: "/",
-		maxAge: 60 * 60 * 24 * 7, // 7 days
-	});
-
-	return {
-		accessToken: accessToken,
-		id: user.id,
-	};
-}
 
 export default function login(server) {
 	const opts = {
@@ -106,20 +84,7 @@ export default function login(server) {
 				return reply.status(401).send({ error: "Unauthorized", message: "Invalid credentials" });
 			}
 			if (user.is_2fa_enabled) {
-				const code = crypto.randomInt(100000, 999999).toString();
-				const codeHash = crypto.createHmac("sha256", process.env.OTP_SECRET).update(code).digest("hex");
-				const expires = Date.now() + 1000 * 60 * 5; // 5 minutes
-				const twoFaToken = crypto.randomUUID();
-
-				server.db.prepare(`UPDATE users SET code_hash_2fa = ?, code_expires_2fa = ?, token_2fa = ? WHERE id = ?`).run(codeHash, expires, twoFaToken, user.id);
-				await server.mailer.sendMail({
-					from: `"Pong" <${process.env.GMAIL_USER}>`,
-					to: user.email,
-					subject: "Your 6-digit verification code",
-					html: `
-      				<p>Your 6-digit verification code is: ${code}</p>
-    				`,
-				});
+				sendVerificationCodeEmail(server, user);
 				return reply.status(200).send({
 					twoFactorRequired: true,
 					token: twoFaToken,
@@ -131,5 +96,22 @@ export default function login(server) {
 			console.log(err);
 			return reply.status(500).send({ error: "Internal server error" });
 		}
+	});
+}
+
+export async function sendVerificationCodeEmail(server, user) {
+	const code = crypto.randomInt(100000, 999999).toString();
+	const codeHash = crypto.createHmac("sha256", process.env.OTP_SECRET).update(code).digest("hex");
+	const expires = Date.now() + 1000 * 60 * 5; // 5 minutes
+	const twoFaToken = crypto.randomUUID();
+
+	server.db.prepare(`UPDATE users SET code_hash_2fa = ?, code_expires_2fa = ?, token_2fa = ? WHERE id = ?`).run(codeHash, expires, twoFaToken, user.id);
+	await server.mailer.sendMail({
+		from: `"Pong" <${process.env.GMAIL_USER}>`,
+		to: user.email,
+		subject: "Your 6-digit verification code",
+		html: `
+      				<p>Your 6-digit verification code is: ${code}</p>
+    				`,
 	});
 }
