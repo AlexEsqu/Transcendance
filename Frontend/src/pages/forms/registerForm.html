@@ -1,67 +1,78 @@
 <form
 	id="register-form"
 	name="register-form"
-	class="flex flex-col flex-center justify-between gap-5 m-6 pt-0 px-5 pb-5">
+	class="glow-form glow-anim">
 
-	<div id="inputs" class="flex flex-col flex-center gap-5 p-4 text-center" >
-		<label
-			for="input-login"
-			class="pt-3">
-			Username:
-		</label>
+	<label
+		for="input-login"
+		class="">
+		Username:
 		<input
 			id="input-login"
 			name="input-login"
 			type="login"
 			required
-			class="input-field glow-select p-3 placeholder:text-center"
+			class=""
 			placeholder="XXXbgdu75XXX" />
+	</label>
 
-		<label
-			for="input-email"
-			class="pt-3">
-			Email:
-		</label>
-		<input
-			id="input-email"
-			name="input-email"
-			type="email"
-			required
-			class="input-field glow-select p-3 placeholder:text-center"
-			placeholder="login@42paris.fr" />
+	<label
+		for="input-email"
+		class="">
+		Email:
+	<input
+		id="input-email"
+		name="input-email"
+		type="email"
+		required
+		class=""
+		placeholder="login@42paris.fr" />
+	</label>
 
-		<label
-			for="input-password"
-			class="pt-3">
-			Password:
-		</label>
+	<label
+		for="input-password"
+		class="">
+		Password:
 		<input
 			id="input-password"
 			name="input-password"
 			type="password"
 			required
-			class="input-field glow-select p-3 placeholder:text-center"
+			class=""
 			placeholder="********" />
+	</label>
 
-		<label
-			for="input-password-check"
-			class="pt-3">
-			Password check:
-		</label>
+	<label
+		for="input-password-check"
+		class="">
+		Password check:
 		<input
 			id="input-password-check"
 			name="input-password-check"
 			type="password"
 			required
-			class="input-field glow-select p-3 placeholder:text-center"
+			class=""
 			placeholder="********" />
-	</div>
+	</label>
+
+	<label
+		for="input-two-factor-auth"
+		class="">
+		<input
+			id="input-two-factor-auth"
+			name="input-two-factor-auth"
+			type="checkbox"
+			required
+			class=""
+			placeholder="********" />
+		Add Two Factor Authentication
+	</label>
 
 	<button
 		id="btn-submit-register"
 		name="btn-submit-register"
 		type="submit"
-		class="p-4 mt-12 glow-select border border-slate-500">
+		class="">
 		Register as User
 	</button>
 

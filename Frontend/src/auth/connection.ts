@@ -2,7 +2,6 @@ import { userState, router } from "../app";
 
 import connectionHtml from "../pages/connection.html?raw";
 
-import formHtml from "../pages/form.html?raw";
 import guestFormHtml from "../pages/forms/guestForm.html?raw"
 import loginFormHtml from "../pages/forms/loginForm.html?raw"
 import registerFormHtml from "../pages/forms/registerForm.html?raw"
@@ -25,7 +24,7 @@ function getConnectionLandingHtml(): string
 
 function getConnectionForm(): string {
 
-	return formHtml;
+	return "";
 }
 
 function getEmailCheck(): string
@@ -72,7 +71,9 @@ function initConnectionPageListeners(): void
 
 function onAliasLoaded(): void
 {
-	injectForm(guestFormHtml);
+	const mainContainer = document.getElementById('main')
+	if (mainContainer)
+		mainContainer.insertAdjacentHTML('beforeend', guestFormHtml);
 
 	const guestForm = document.getElementById('guest-form') as HTMLFormElement | null;
 	guestForm?.addEventListener('submit', (e) =>
@@ -88,7 +89,9 @@ function onAliasLoaded(): void
 
 function onRegisterLoaded(): void
 {
-	injectForm(registerFormHtml);
+	const mainContainer = document.getElementById('main')
+	if (mainContainer)
+		mainContainer.insertAdjacentHTML('beforeend', registerFormHtml);
 
 	const registerForm = document.getElementById('register-form') as HTMLFormElement | null;
 	registerForm?.addEventListener('submit', async (e) =>
@@ -126,7 +129,10 @@ function onRegisterLoaded(): void
 
 function onLoginLoaded(): void
 {
-	injectForm(loginFormHtml);
+	const mainContainer = document.getElementById('main')
+	if (mainContainer)
+		mainContainer.insertAdjacentHTML('beforeend', loginFormHtml);
+
 
 	const loginForm = document.getElementById('login-form') as HTMLFormElement | null;
 	loginForm?.addEventListener('submit', async (e) =>
@@ -153,13 +159,4 @@ function onLoginLoaded(): void
 			}
 		}
 	);
-}
-
-
-// UTILITIES
-
-function injectForm(html: string): void
-{
-	const container = document.getElementById('form-container');
-	if (container) container.insertAdjacentHTML('beforeend', html);
 }

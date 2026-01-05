@@ -1,8 +1,9 @@
-<div class="flex flex-col justify-between flex-1 box-border">
+<div id="dashboard-container"
+	class="flex flex-col justify-between flex-1">
 
-	<div class="border-box flex flex-1 h-[80%] gap-2 justify-between mx-6">
+	<div  class="flex flex-1 gap-2 justify-between mx-6">
 
-		<div class="flex flex-col h-full w-[34%] gap-2">
+		<aside id='friend-aside' class="flex flex-1 flex-col w-[34%] gap-2">
 			<section id="friend-section"
 				class="hidden need-registered-user flex-col w-[100%] flex-0 p-4 input-field">
 
@@ -62,24 +63,22 @@
 							Search
 						</button>
 					</div>
-
 				</form>
 
 			</section>
 
-		</div>
+		</aside>
 
-		<section class="flex flex-col flex-1 h-[100%] p-4 input-field">
+		<section id="statistic-section" class="flex flex-col flex-1  p-4 input-field">
 			<h2 class="text-xl">Game Statistics</h2>
 		</section>
 
-
 	</div>
 
-	<section class="border-box flex flex-col justify-center items-center h-[20%] mx-6">
-		<fieldset class="p-0 m-0 text-center w-full">
-			<legend class="border-box flex gap-4 mb-3 justify-center w-full text-xl">Options</legend>
-			<div class="border-box flex flex-wrap gap-4 mt-0 justify-center w-full ">
+	<section id="options-container" class="min-h-0 my-3 mx-6">
+		<fieldset class="flex gap-4 mb-3 justify-center w-full text-lg">
+			<legend class="flex gap-4 mb-3 justify-center w-full text-lg">Options</legend>
+			<div class="flex flex-wrap gap-4 mt-0 justify-center w-full ">
 				<a href="/settings/avatar" data-link class="glow-select need-registered-user hidden items-center justify-center align-center flex-wrap border p-4 text-center flex-1 border-slate-600 text-sm" id="btn-avatar">
 					Change Avatar
 				</a>

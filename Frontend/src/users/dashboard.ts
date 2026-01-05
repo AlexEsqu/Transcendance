@@ -5,13 +5,12 @@ import type { Subscriber } from "../auth/UserState";
 
 import dashboardHtml from "../pages/dashboard.html?raw";
 
-import formHtml from "../pages/form.html?raw";
 import renameFormHtml from "../pages/forms/renameForm.html?raw"
 import avatarFormHtml from "../pages/forms/avatarForm.html?raw"
 import passwordFormHtml from "../pages/forms/passwordForm.html?raw"
 import emailFormHtml from "../pages/forms/emailForm.html?raw"
 
-export { getDashboardPage, getSettingForm, initDashboardPageListeners }
+export { getDashboardPage, initDashboardPageListeners }
 
 
 // variable to hold current listener functions
@@ -25,11 +24,6 @@ let currentUsersListener: Subscriber | null = null;
 function getDashboardPage(): string
 {
 	return dashboardHtml;
-}
-
-function getSettingForm(): string
-{
-	return formHtml;
 }
 
 
@@ -208,7 +202,7 @@ function onDashboardLoaded()
 
 export function injectForm(html: string): void
 {
-	const container = document.getElementById('form-container');
+	const container = document.getElementById('main');
 	if (container)
 		container.insertAdjacentHTML('beforeend', html);
 }

@@ -2,7 +2,7 @@ import "./style.css"
 import { Router } from './routing/Router';
 import { UserState } from './auth/UserState';
 import { getConnectionLandingHtml, getConnectionForm, getEmailCheck, initConnectionPageListeners} from './auth/connection';
-import { getDashboardPage, getSettingForm, initDashboardPageListeners } from "./users/dashboard";
+import { getDashboardPage, initDashboardPageListeners } from "./users/dashboard";
 import { getGameHtml, getGameOptionHtml, initGamePageListeners } from "./game/display"
 import { getErrorPage } from "./error/error";
 import { initNavBarListeners } from "./routing/nav";
@@ -19,10 +19,10 @@ router.addRoute('/connection/emailcheck', getEmailCheck);
 router.addRoute('/connection/alias', getConnectionForm);
 
 router.addRoute('/settings', getDashboardPage, true);
-router.addRoute('/settings/rename', getSettingForm, true);
-router.addRoute('/settings/avatar', getSettingForm, true, true);
-router.addRoute('/settings/email', getSettingForm, true, true);
-router.addRoute('/settings/password', getSettingForm, true, true);
+router.addRoute('/settings/rename', getConnectionForm, true);
+router.addRoute('/settings/avatar', getConnectionForm, true, true);
+router.addRoute('/settings/email', getConnectionForm, true, true);
+router.addRoute('/settings/password', getConnectionForm, true, true);
 
 router.addRoute('/game/options', getGameOptionHtml, true);
 router.addRoute('/game', getGameHtml, true);
