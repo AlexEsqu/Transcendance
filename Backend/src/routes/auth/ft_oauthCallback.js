@@ -1,60 +1,11 @@
 import crypto from "crypto";
 import { generateTokens } from "../../services/authServices.js";
 
-export function ft_OAuth2(server) {
-	const opts = {
-		schema: {
-			tags: ["OAuth"],
-			description: "Redirects the user to the 42 authorize page",
-			responses: {
-				302: {
-					description: "Redirects to the 42 authorization page",
-					headers: {
-						location: { type: "string" },
-					},
-				},
-				500: {
-					description: "Internal Server Error",
-					$ref: "errorResponse#",
-				},
-				default: {
-					description: "Unexpected error",
-					$ref: "errorResponse#",
-				},
-			},
-		},
-	};
-	server.get("/oauth/42", opts, (req, reply) => {
-		try {
-			const state = crypto.randomUUID();
-			const redirectUrl = encodeURI(`${process.env.API_DOMAIN_NAME}/users/auth/oauth/42/callback`);
-			reply.setCookie("state", state, {
-				httpOnly: true,
-				secure: true,
-				sameSite: "Lax",
-				path: "api/users/auth/oauth/42/callback",
-				maxAge: 60 * 5, // 1 minute
-			});
-			const oAuthURL = new URL(process.env.FT_OAUTH_URL);
-			oAuthURL.searchParams.append("client_id", process.env.FT_CLIENT_ID);
-			oAuthURL.searchParams.append("redirect_uri", redirectUrl);
-			oAuthURL.searchParams.append("state", state);
-			oAuthURL.searchParams.append("scope", "public");
-			oAuthURL.searchParams.append("response_type", "code");
-			console.log(oAuthURL.href);
-			return reply.status(302).redirect(oAuthURL.href);
-		} catch (err) {
-			console.log(err);
-			return reply.status(500).send({ error: "Internal server error", message: err.message });
-		}
-	});
-}
-
 export function ft_OAuth2_callback(server) {
 	const opts = {
 		schema: {
 			tags: ["OAuth"],
-			description: "Verifies the user's 42 authorization code and redirects the user to the frontend",
+			description: "Handles the OAuth2 callback from 42. Verifies the authorization code and state, retrieves the user information from 42, and either logs in an existing user or signs up a new user. Returns access tokens if login/signup is successful, or a two-factor authentication token if 2FA is required.",
 			querystring: {
 				type: "object",
 				required: ["code", "state"],
@@ -139,7 +90,7 @@ export function ft_OAuth2_callback(server) {
 	});
 }
 
-async function downloadAvatar(url) {
+export async function downloadAvatar(url) {
 	const res = fetch(url);
 	if (!res.ok) return null;
 	//   const contentType = res.headers.get("content-type");
@@ -150,7 +101,7 @@ async function downloadAvatar(url) {
 	return uploadPath;
 }
 
-async function isUserInDB(server, user) {
+export async function isUserInDB(server, user) {
 	try {
 		const userInDB = await server.db.prepare("SELECT * FROM users WHERE email = ?").get(user.email);
 		return userInDB;
@@ -184,7 +135,7 @@ function prepareParamsFor42TokenExchange(req, reply) {
 	return params;
 }
 
-async function get42Token(params) {
+export async function get42Token(params) {
 	try {
 		const response = await fetch("https://api.intra.42.fr/oauth/token", {
 			method: "POST",

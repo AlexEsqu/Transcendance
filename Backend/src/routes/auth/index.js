@@ -5,7 +5,8 @@ import sendMailVerification from "./sendMailVerification.js";
 import signup from "./signup.js";
 import verifyEmail from "./verifyEmail.js";
 import login_2fa from "./2faLogin.js";
-import { ft_OAuth2, ft_OAuth2_callback } from "./ft_oAuth2.js";
+import { ft_OAuth2_callback } from "./ft_oauthCallback.js";
+import ft_OAuth2 from "./ft_oauth.js";
 
 export default async function authRoutes(server) {
 	server.register(signup, { prefix: "api/users" });
