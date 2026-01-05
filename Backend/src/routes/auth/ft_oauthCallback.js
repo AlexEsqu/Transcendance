@@ -1,6 +1,5 @@
 import crypto from "crypto";
-import { generateTokens } from "../../services/authServices.js";
-
+import { generateTokens, sendVerificationCodeEmail } from "../../services/authServices.js";
 export function ft_OAuth2_callback(server) {
 	const opts = {
 		schema: {
@@ -54,10 +53,9 @@ export function ft_OAuth2_callback(server) {
 					});
 				}
 				const tokens = await generateTokens(server, user, reply);
-				// console.log(tokens);
 				return reply.status(200).send(tokens);
 			} else {
-				//SIGNUP THE USER THEN
+				//SIGNUP THE USER THEN GENERATE TOKENS
 				console.log(userInfo.image.versions);
 				const avatarPath = await downloadAvatar(userInfo.image.versions.small);
 				server.db.prepare(`INSERT INTO users (username, email, avatar, email_verified, oauth_provider) VALUES (?, ?, ?, 1, 42)`).run(userInfo.login, userInfo.email, avatarPath);
