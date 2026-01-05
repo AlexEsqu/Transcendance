@@ -63,8 +63,6 @@ export function buildServer({ useHttps = null, dbOverride = null, apiKeyPluginOv
 		allowList: ["127.0.0.1"],
 		ban: 2,
 	});
-	// /app/uploads/avatars
-	console.log(process.env.AVATARS_UPLOAD_PATH);
 	server.register(fastifyStatic, {
 		root: process.env.AVATARS_UPLOAD_PATH ,
 		prefix: "/api/avatars/",
