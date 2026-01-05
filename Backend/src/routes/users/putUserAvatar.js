@@ -60,8 +60,10 @@ export default function putUserAvatar(server) {
 			fs.writeFileSync(uploadPath, buffer);
 
 			server.db.prepare(`UPDATE users SET avatar = ? WHERE id = ?`).run(uploadPath, id);
+			console.log("old avatar: " ,old_avatar)
+			console.log("new avatar: ", uploadPath)
 
-			if (old_avatar) {
+			if (old_avatar !== uploadPath) {
 				fs.unlink(old_avatar, () => {
 					console.log(old_avatar + " was deleted");
 				});
