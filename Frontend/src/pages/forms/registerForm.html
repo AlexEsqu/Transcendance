@@ -3,10 +3,14 @@
 	name="register-form"
 	class="glow-form glow-anim">
 
-	<label
-		for="input-login"
-		class="">
-		Username:
+	<h1>Email Sign Up</h1>
+
+	<section>
+		<label
+			for="input-login"
+			class="">
+			Username:
+		</label>
 		<input
 			id="input-login"
 			name="input-login"
@@ -14,25 +18,29 @@
 			required
 			class=""
 			placeholder="XXXbgdu75XXX" />
-	</label>
+	</section>
 
-	<label
-		for="input-email"
-		class="">
-		Email:
-	<input
-		id="input-email"
-		name="input-email"
-		type="email"
-		required
-		class=""
-		placeholder="login@42paris.fr" />
-	</label>
+	<section>
+		<label
+			for="input-email"
+			class="">
+			Email:
+		</label>
+		<input
+			id="input-email"
+			name="input-email"
+			type="email"
+			required
+			class=""
+			placeholder="login@42paris.fr" />
+	</section>
 
-	<label
-		for="input-password"
-		class="">
-		Password:
+	<section>
+		<label
+			for="input-password"
+			class="">
+			Password:
+		</label>
 		<input
 			id="input-password"
 			name="input-password"
@@ -40,12 +48,14 @@
 			required
 			class=""
 			placeholder="********" />
-	</label>
+	</section>
 
-	<label
-		for="input-password-check"
-		class="">
-		Password check:
+	<section>
+		<label
+			for="input-password-check"
+			class="">
+			Password verification:
+		</label>
 		<input
 			id="input-password-check"
 			name="input-password-check"
@@ -53,11 +63,14 @@
 			required
 			class=""
 			placeholder="********" />
-	</label>
+	</section>
 
-	<label
-		for="input-two-factor-auth"
-		class="">
+	<section class="checkbox-form">
+		<label
+			for="input-two-factor-auth"
+			class="">
+			Enable Two Factor Authentication:
+		</label>
 		<input
 			id="input-two-factor-auth"
 			name="input-two-factor-auth"
@@ -65,8 +78,7 @@
 			required
 			class=""
 			placeholder="********" />
-		Add Two Factor Authentication
-	</label>
+	</section>
 
 	<button
 		id="btn-submit-register"
