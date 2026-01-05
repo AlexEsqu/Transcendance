@@ -54,7 +54,7 @@ export default function putUserAvatar(server) {
 			const data = req.body.avatar;
 			
 			//get the full upload path
-			const uploadPath = `${process.env.AVATARS_UPLOAD_PATH}/${data.filename}`;
+			const uploadPath = `${process.env.AVATARS_UPLOAD_PATH}/user_${id}_${data.filename}`;
 
 			const buffer = await data.toBuffer();
 			fs.writeFileSync(uploadPath, buffer);
