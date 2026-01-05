@@ -56,3 +56,21 @@ export async function generateTokens(server, user, reply) {
 		id: user.id,
 	};
 }
+
+export async function sendVerificationCodeEmail(server, user) {
+	const code = crypto.randomInt(100000, 999999).toString();
+	const codeHash = crypto.createHmac("sha256", process.env.OTP_SECRET).update(code).digest("hex");
+	const expires = Date.now() + 1000 * 60 * 5; // 5 minutes
+	const twoFaToken = crypto.randomUUID();
+
+	server.db.prepare(`UPDATE users SET code_hash_2fa = ?, code_expires_2fa = ?, token_2fa = ? WHERE id = ?`).run(codeHash, expires, twoFaToken, user.id);
+	await server.mailer.sendMail({
+		from: `"Pong" <${process.env.GMAIL_USER}>`,
+		to: user.email,
+		subject: "Your 6-digit verification code",
+		html: `
+      				<p>Your 6-digit verification code is: ${code}</p>
+    				`,
+	});
+}
+
