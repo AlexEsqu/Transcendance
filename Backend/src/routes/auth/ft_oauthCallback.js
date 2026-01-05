@@ -5,52 +5,33 @@ export function ft_OAuth2_callback(server) {
 	const opts = {
 		schema: {
 			tags: ["OAuth"],
-			description: "Handles the OAuth2 callback from 42. Verifies the authorization code and state, retrieves the user information from 42, and either logs in an existing user or signs up a new user. Returns access tokens if login/signup is successful, or a two-factor authentication token if 2FA is required.",
+			description:
+				"Handles the OAuth2 callback from 42. Verifies the authorization code and state, retrieves the user information from 42, and either logs in an existing user or signs up a new user. Returns access tokens if login/signup is successful, or a two-factor authentication token if 2FA is required.",
 			querystring: {
 				type: "object",
 				required: ["code", "state"],
 				properties: {
 					code: {
 						type: "string",
-						description: "The code you received as a response of `GET /users/auth/oauth/42`",
+						description: "The code you received as a response of `GET api/users/auth/oauth/42`",
 						example: "a3f9c8e2b4d74e0c9f...",
 					},
 					state: {
 						type: "string",
-						description: "Unguessable string provided in the in by backend for verification `GET /users/auth/oauth/42`",
+						description: "Unguessable string provided in the in by backend for verification `GET api/users/auth/oauth/42`",
 						example: "a3f9c8e2b4d74e0c9f...",
 					},
 				},
 			},
-			responses: {
+			response: {
 				200: {
-					oneOf: [
-						{
-							description: "Login successful",
-							type: "object",
-							required: ["accessToken", "id"],
-							properties: {
-								accessToken: { type: "string" },
-								id: { type: "integer" },
-							},
-						},
-						{
-							description: "Two-factor authentication required",
-							type: "object",
-							required: ["twoFactorRequired", "token"],
-							properties: {
-								twoFactorRequired: { type: "boolean", example: true },
-								token: { type: "string", description: "2FA continuation token" },
-							},
-						},
-					],
+					description: "Successful login or 2FA required",
+					oneOf: [{ $ref: "loginTokenObject#" }, { $ref: "twoFactorRequiredObject#" }],
 				},
 				500: {
-					description: "Internal Server Error",
 					$ref: "errorResponse#",
 				},
 				default: {
-					description: "Unexpected error",
 					$ref: "errorResponse#",
 				},
 			},
@@ -78,7 +59,7 @@ export function ft_OAuth2_callback(server) {
 			} else {
 				//SIGNUP THE USER THEN
 				console.log(userInfo.image.versions);
-				const avatarPath = await downloadAvatar(userInfo.image.versions.small) ;
+				const avatarPath = await downloadAvatar(userInfo.image.versions.small);
 				server.db.prepare(`INSERT INTO users (username, email, avatar, email_verified, oauth_provider) VALUES (?, ?, ?, 1, 42)`).run(userInfo.login, userInfo.email, avatarPath);
 				const tokens = await generateTokensgenerateTokens(server, user, reply);
 				return reply.status(200).send(tokens);

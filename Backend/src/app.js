@@ -19,7 +19,7 @@ import matchesRoutes from "./routes/matches/index.js";
 import userRoutes from "./routes/users/index.js";
 import authRoutes from "./routes/auth/index.js";
 import nodemailer from "nodemailer";
-import { authCredentialsBody, errorResponse, SignupBody, SuccessMessageResponse, matchObject, userIdObject, publicUserObject } from "./schemas/schemas.js";
+import { authCredentialsBody, errorResponse, SignupBody, SuccessMessageResponse, matchObject, userIdObject, publicUserObject, loginTokenObject, twoFactorRequiredObject  } from "./schemas/schemas.js";
 
 export function buildServer({ useHttps = null, dbOverride = null, apiKeyPluginOverride = null, sessionPluginOverride = null, jwtFake = null, mailerOverride = null } = {}) {
 	const server = Fastify({
@@ -78,6 +78,8 @@ export function buildServer({ useHttps = null, dbOverride = null, apiKeyPluginOv
 	server.addSchema(matchObject);
 	server.addSchema(userIdObject);
 	server.addSchema(publicUserObject);
+	server.addSchema(loginTokenObject);
+	server.addSchema(twoFactorRequiredObject);
 	// server.listen({ port: 8080 });
 	return server;
 }
