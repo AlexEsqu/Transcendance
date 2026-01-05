@@ -1,7 +1,4 @@
-import { RouteShorthandOptions } from "fastify"
-import Ajv, { ValidateFunction } from 'ajv';
-
-export { waitingSchema, gameSchema }
+export { waitingSchema, gameSchema, IGameMessage }
 
 /************************************************************************************************************
  * 		Declare schema for route's options																	*
@@ -28,4 +25,15 @@ const gameSchema = {
 		move: {type: 'string'}
 	},
 	additionalProperties: false
+};
+
+/************************************************************************************************************
+ * 		Declare schema for route's options																	*
+ ***********************************************************************************************************/
+
+interface IGameMessage {
+	id: number;
+	roomId: number;
+	ready: boolean;
+	move?: string;
 };

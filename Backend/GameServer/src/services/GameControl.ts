@@ -2,6 +2,7 @@ import { GameLocation, GameType, IPlayer } from '../config/gameData';
 import { WebSocket as WSWebSocket } from 'ws';
 import { notifyPlayersInRoom } from '../utils/broadcast'
 import { Room } from './Room';
+import { IGameMessage } from '../config/schemas';
 
 export class GameControl
 {
@@ -26,10 +27,25 @@ export class GameControl
 			socket: socket,
 			gameType: gameType,
 			gameLocation: gameLocation,
-			isReady: false,
-			score: 0,
+			isReady: false
 		};
 		return player;
+	}
+
+	getPlayer(roomId: number, playerId: number): IPlayer | undefined
+	{
+		if (this.gamingRooms.has(roomId)) {
+			const room = this.gamingRooms.get(roomId);
+			if (room?.players.has(playerId))
+				return room.players.get(playerId);
+		}
+		return undefined;
+	}
+
+	getGamingRoom(roomId: number): Room | undefined
+	{
+		if (this.gamingRooms.has(roomId))
+			return this.gamingRooms.get(roomId);
 	}
 
 	addPlayerInWaitingRoom(player: IPlayer): number | undefined

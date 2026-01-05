@@ -4,6 +4,7 @@ import { WebSocket as WSWebSocket } from 'ws';
 import { GameControl } from "../services/GameControl";
 import { gameSchema } from '../config/schemas';
 import { handleMessage, handleDisconnection } from '../handlers/game.handlers.js'
+import { IPlayer } from "../config/gameData";
 
 /************************************************************************************************************
  * 		Declare routes/endpoints								 											*
@@ -20,7 +21,7 @@ export async function registerGameRoutes(gameServer: FastifyInstance, gameContro
 		fastify.get('/game', { websocket: true }, (socket, request) => {
 			if (!socket) throw new Error("Websocket is missing");
 
-			let player = { playerId: -1, roomId: -1 };
+			let player : IPlayer | undefined;
 
 			//	Handle: first connection of a client
 			console.log("GAME-SERVER: new connection from a client on route '/game'");

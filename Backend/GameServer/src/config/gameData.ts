@@ -1,6 +1,6 @@
 import { WebSocket as WSWebSocket } from 'ws';
 
-export { GameType, GameLocation, State, Level, IBall, IPaddle, IPlayer, IRound }
+export { GameType, GameLocation, State, Level, IBall, IPaddle, IPlayer, IRound, IResult, IGameState }
 
 /************************************************************************************************************
  * 		Declare CONSTANT variables								 											*
@@ -11,7 +11,7 @@ export { GameType, GameLocation, State, Level, IBall, IPaddle, IPlayer, IRound }
  ***********************************************************************************************************/
 
 enum GameType {
-	solo = 1, duo, tournament 
+	solo = 1, duo = 2, tournament = 4 
 };
 
 enum GameLocation {
@@ -30,6 +30,16 @@ enum Level {
  * 		Declare interfaces																					*
  ***********************************************************************************************************/
 
+interface IGameState {
+	roomId: number;
+	state: number;
+	timestamp: number;
+	round: number;
+	leftPaddPos: number;
+	rightPaddPos: number;
+	ball: { x: number, z: number };
+};
+
 interface IBall {
 	speed: number;
 	posX: number;
@@ -42,6 +52,8 @@ interface IPaddle {
 	posZ: number;
 	side: string;
 	robot: boolean;
+	score: number;
+	player: IPlayer | undefined;
 };
 
 interface IPlayer {
@@ -50,20 +62,19 @@ interface IPlayer {
 	gameType: GameType;
 	gameLocation: GameLocation;
 	isReady: boolean;
-	score: number;
 	roomId?: number;
 	color?: string;
 };
 
 interface IResult {
-	winner: IPlayer | null;
+	winner: IPlayer | undefined;
 	maxScore: number;
-	loser: IPlayer | null;
+	loser: IPlayer | undefined;
 	minScore: number;
 };
 
 interface IRound {
 	results: Array<IResult> | null;
+	waitingPlayers: Array<IPlayer>;
 	nbOfRounds: number;
-	playerIndex: number;
 }

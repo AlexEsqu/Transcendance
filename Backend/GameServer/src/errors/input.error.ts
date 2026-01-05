@@ -19,5 +19,10 @@ function getJSONError(details: string, error: number ): IErrorMessage
 		error: error ?? 500,
 		details: details
 	};
+	// const errorMessage: IErrorMessage = {
+	// 	statusCode: error ?? 500,
+	// 	error: error,
+	// 	details: details
+	// };
 	return errorMessage;
 }

@@ -9,7 +9,6 @@ export { monitoringRounds, saveResults, newRound, drawMatchHistoryTree, drawScor
 
 /**
  * 	- Returns 'true' if one of the players has reached the maximum score, otherwise false
- * 	- Returns 'true' if one of the players has reached the maximum score, otherwise false
  */
 function monitoringRounds(scene: IScene, nbOfRounds: number): boolean
 {
@@ -75,11 +74,9 @@ function newRound(scene: IScene, rounds: IRound): IRound
 	let nbOfPlayers = scene.options.nbOfPlayers;
 	if (nbOfPlayers == 4 && rounds.nbOfRounds >= 0 && rounds.nbOfRounds < 2)
 		nbOfPlayers = 2;
-	// else if (nbOfPlayers == 8 && rounds.nbOfRounds >= 0 && rounds.nbOfRounds < 4) nbOfPlayers = 2;
 
 	if (nbOfPlayers == 4 && rounds.results && rounds.nbOfRounds == Pong.MAX_ROUNDS - 1)
 	{
-		// console.log("4 players last round");
 		if (rounds.results[0])
 			leftPadd.player = rounds.results[0].winner;
 		if (rounds.results[1])
@@ -94,17 +91,6 @@ function newRound(scene: IScene, rounds: IRound): IRound
 		rightPadd.player = scene.players[rounds.playerIndex];
 		rounds.playerIndex++;
 	}
-	/** Condition if 8 players for a tournament */
-	// if (nbOfPlayers == 8 && rounds.nbOfRounds == Pong.MAX_ROUNDS / 2) {
-	// 	leftPadd.player = rounds.results[0].winner;
-	// 	rightPadd.player = rounds.results[1].winner;
-	// } else if (rounds.nbOfRounds == (Pong.MAX_ROUNDS / 2) + 1) {
-	// 	leftPadd.player = rounds.results[2].winner;
-	// 	rightPadd.player = rounds.results[3].winner;
-	// } else if (rounds.nbOfRounds == Pong.MAX_ROUNDS - 1) {
-	// 	leftPadd.player = rounds.results[4].winner;
-	// 	rightPadd.player = rounds.results[5].winner;
-	// }
 
 	//	Reset data
 	if (scene.ball)
@@ -117,16 +103,6 @@ function newRound(scene: IScene, rounds: IRound): IRound
 		leftPadd.player.score = 0;
 	if (rightPadd.player)
 		rightPadd.player.score = 0;
-
-	// let leftIndex = 0;
-	// let rightIndex = 1;
-	// if (rounds.nbOfRounds >= 1) {
-	// 	leftIndex = rounds.nbOfRounds + 1;
-	// 	rightIndex = rounds.nbOfRounds + 2;
-	// }
-
-	// if (rounds.nodeColor[leftIndex]) rounds.nodeColor[leftIndex] = leftPadd.player.color;
-	// if (rounds.nodeColor[rightIndex]) rounds.nodeColor[rightIndex] = rightPadd.player.color;
 
 	scene.leftPadd = leftPadd;
 	scene.rightPadd = rightPadd;

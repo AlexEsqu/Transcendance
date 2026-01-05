@@ -1,23 +1,23 @@
 import { GameType, IPlayer } from '../config/gameData.js';
 import { GameLoop } from './GameLoop';
+import { GameControl } from './GameControl';
 
 export class Room
 {
 	id: number;
 	type: GameType;
-	GameLoop: GameLoop | null;
+	gameLoop: GameLoop | null;
 	players: Map<number, IPlayer> = new Map<number, IPlayer>();
 
 	constructor(roomId: number, players: Map<number, IPlayer> | IPlayer, gameType: GameType)
 	{
 		this.id = roomId;
 		this.type = gameType;
-		this.GameLoop = null;
+		this.gameLoop = null;
 
 		if (players instanceof Map) {
-			for (const [key, value] of players) {
+			for (const [key, value] of players)
 				this.addPlayerInRoom(value.id, value);
-			}
 		}
 		else
 			this.addPlayerInRoom(players.id, players);
@@ -34,5 +34,26 @@ export class Room
 			return true;
 		}
 		return false;
+	}
+
+	isEveryoneReady(): boolean
+	{
+		for (const [key, value] of this.players) {
+			if (value.isReady === false)
+				return false;
+		}
+		return true;
+	}
+
+	startGame(gameControl: GameControl): void
+	{
+		this.gameLoop = new GameLoop(this.id, this.type, this.players);
+		this.gameLoop.runGameLoop(gameControl);
+	}
+
+	handlePlayerInput(playerId: number, input: string): void
+	{
+		if (this.gameLoop)
+			this.gameLoop.processPlayerInput(playerId, input);
 	}
 }
