@@ -44,12 +44,6 @@ function initGamePageListeners(): void
 				return;
 			}
 
-			// case '/game/tournament':
-			// {
-			// 	onTournamentGameLoaded();
-			// 	return;
-			// }
-
 			case '/game/error':
 			{
 				// TO DO

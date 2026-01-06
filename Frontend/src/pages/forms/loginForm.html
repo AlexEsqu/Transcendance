@@ -14,9 +14,12 @@
 			name="input-login"
 			type="login"
 			required
-			maxlength="20"
 			class=""
 			placeholder="André De La Jacopière" />
+		<span
+			aria-live="polite"
+			class="error-hint text-center text-red-500 text-xs mt-1 hidden">
+		</span>
 	</section>
 
 	<section>
@@ -30,8 +33,13 @@
 			name="input-password"
 			type="password"
 			required
+			minlength="8"
 			class=""
 			placeholder="********" />
+		<span
+			aria-live="polite"
+			class="error-hint text-center text-red-500 text-xs mt-1 hidden">
+		</span>
 	</section>
 
 	<button

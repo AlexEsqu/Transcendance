@@ -2,7 +2,6 @@ import { userState } from "../app";
 import { RegisteredUser, type BaseUser } from './User'
 import { apiKey, apiDomainName } from '../auth/UserState';
 import { friendTemplate, userTemplate } from "../components/loader";
-import { createText } from "../game/Graphics";
 
 export { showFriend, showUsers }
 

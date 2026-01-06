@@ -1,6 +1,7 @@
 <form
 	id="register-form"
 	name="register-form"
+	novalidate
 	class="glow-form glow-anim">
 
 	<h1>Email Sign Up</h1>
@@ -16,8 +17,14 @@
 			name="input-login"
 			type="login"
 			required
+			minlength="3"
+			maxlength="20"
 			class=""
 			placeholder="XXXbgdu75XXX" />
+		<span
+			aria-live="polite"
+			class="error-hint text-center text-red-500 text-xs mt-1 hidden">
+		</span>
 	</section>
 
 	<section>
@@ -33,6 +40,10 @@
 			required
 			class=""
 			placeholder="login@42paris.fr" />
+		<span
+			aria-live="polite"
+			class="error-hint text-center text-red-500 text-xs mt-1 hidden">
+		</span>
 	</section>
 
 	<section>
@@ -46,8 +57,13 @@
 			name="input-password"
 			type="password"
 			required
+			minlength="8"
 			class=""
 			placeholder="********" />
+		<span
+			aria-live="polite"
+			class="error-hint text-center text-red-500 text-xs mt-1 hidden">
+		</span>
 	</section>
 
 	<section>
@@ -61,8 +77,12 @@
 			name="input-password-check"
 			type="password"
 			required
-			class=""
+			class="confirmation-input"
 			placeholder="********" />
+		<span
+			aria-live="polite"
+			class="error-hint text-center text-red-500 text-xs mt-1 hidden">
+		</span>
 	</section>
 
 	<button
