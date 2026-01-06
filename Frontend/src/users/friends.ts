@@ -2,6 +2,7 @@ import { userState } from "../app";
 import { RegisteredUser, type BaseUser } from './User'
 import { apiKey, apiDomainName } from '../auth/UserState';
 import { friendTemplate, userTemplate } from "../components/loader";
+import { createText } from "../game/Graphics";
 
 export { showFriend, showUsers }
 
@@ -20,17 +21,17 @@ async function showFriend(): Promise<void>
 	{
 		const mainUser = userState.getUser();
 		const userFriendList = mainUser?.getFriends() ?? [];
-		const allUsers = await getAllUsers();
 
-		for (const user of allUsers)
+		if (userFriendList.length > 0)
 		{
-			if (user.id === mainUser?.id)
-				continue;
-
-			const isFriend = userFriendList ? userFriendList.some(friend => friend.id === user.id) : false;
-
-			if (isFriend)
-				friendFragment.appendChild(createFriendElement(user));
+			for (const friend of userFriendList)
+			{
+				friendFragment.appendChild(createFriendElement(friend));
+			}
+		}
+		else
+		{
+			friendFragment.appendChild(document.createTextNode('No friends yet...'))
 		}
 
 		// empty out the list if existing data inside
@@ -66,13 +67,20 @@ async function showUsers(): Promise<void>
 		const userFriendList = mainUser?.getFriends() ?? [];
 		const allUsers = await getAllUsers();
 
-		for (const user of allUsers)
+		if (allUsers.length > 0)
 		{
-			if (user.id === mainUser?.id)
-				continue;
+			for (const user of allUsers)
+			{
+				if (user.id === mainUser?.id)
+					continue;
 
-			const isFriend = userFriendList ? userFriendList.some(friend => friend.id === user.id) : false;
-			userFragment.appendChild(createUserElement(user, isRegistered, isFriend));
+				const isFriend = userFriendList ? userFriendList.some(friend => friend.id === user.id) : false;
+				userFragment.appendChild(createUserElement(user, isRegistered, isFriend));
+			}
+		}
+		else
+		{
+			userFragment.appendChild(document.createTextNode('No registered users yet...'))
 		}
 
 		// empty out the list if existing data inside
