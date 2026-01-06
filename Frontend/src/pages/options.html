@@ -1,35 +1,35 @@
 <div id="game-option-main" class="flex flex-col items-center justify-center">
-	<div class="glow-anim flex flex-col items-center justify-center p-6">
-		<form id="game-option-form" class="flex flex-col flex-center gap-5 m-5 text-center">
+	<div class="glow-anim">
+		<form id="game-option-form" class="glow-form">
 			<!-- Choose game mode/type : 1vsAI, 1vs1 or tournaments -->
-			 <div class="flex flex-col flex-center gap-1 m-1 text-center">
-				<label for="mode" class="p-3">Match type</label>
+			 <section>
+				<label for="mode" class="">Match type</label>
 				<select id="mode" class="gentle-select">
 					<option class='' value="1">One player and a robot</option>
 					<option class='' value="2">Two players</option>
 					<option class='' value="4">Tournament with 4 friends</option>
 					<!-- <option value="8">Tournament with 8 friends</option> -->
 				</select>
-			</div>
+			</section>
 			<!-- Choose participants -->
-			<div class="flex flex-col flex-center gap-1 m-1 text-center">
-				<label for="mode" class="p-3">Who fights ?</label>
+			<section>
+				<label for="mode" class="">Who fights ?</label>
 				<div id="players-container" class="w-full flex flex-col gap-2">
 					<!-- inputs are handled dynamically -->
 				</div>
-			</div>
+			</section>
 			<!-- Choose game level : the higher the level, the more challenging it is -->
-			<div class="flex flex-col flex-center gap-1 m-1 text-center">
-				<label for="level" class="p-3">How intense ?</label>
+			<section>
+				<label for="level" class="">How intense ?</label>
 				<select id="level" class="gentle-select">
 					<option value="0">easy</option>
 					<option value="1">medium</option>
 					<option value="2">hard</option>
 				</select>
-			</div>
+			</section>
 			<!-- Choose rendering customization -->
-			<div>
-				<p class="p-3">Customize the rendering</p>
+			<section>
+				<p class="">Customize the rendering</p>
 				<div class="flex items-center justify-center gap-2 mt-2">
 					<label for="ball-color-input" class="p-1">Ball</label>
 					<input type="color" class="w-12 h-6 border bg-transparent cursor-pointer p-0" id="ball-color-input" value="#a2c2e8" title="Choose your color">
@@ -38,9 +38,9 @@
 					<!-- <label for="hs-color-input" class="p-1">Paddle</label>
 					<input type="color" class="p-1 h-5 w-14 block bg-white border border-gray-200 cursor-pointer disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700" id="padd-color-input" value="#a2c2e8" title="Choose your color"> -->
 				</div>
-			</div>
+			</section>
 			<!-- When every settings are good, submit the form -->
-			<button class="p-4 mt-6 glow-select border border-slate-500" type="submit" id="btn-submit">Submit Options</button>
+			<button class="" type="submit" id="btn-submit">Submit Options</button>
 		</form>
 	</div>
 </div>
