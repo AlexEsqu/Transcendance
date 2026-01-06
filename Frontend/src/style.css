@@ -21,10 +21,15 @@
  .glow-form {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
 	align-content: center;
-    margin: clamp(0.5rem, 5vh, 4rem);
     padding: clamp(0.75rem, 2vw, 2rem);
+	gap: 1rem;
+	width: fit-content;
+    min-width: min-content;
+    max-width: min(90vw, 500px);
+	margin: auto;
+	font-size: clamp(0.75em, 2vh, 1.25em);
   }
 
   .glow-form a {
@@ -38,7 +43,6 @@
   }
 
   .glow-form section {
-    font-size: clamp(0.75em, 2vh, 1.25em);;
 	display: flex;
 	flex-direction: column;
   }
@@ -61,6 +65,7 @@
   .glow-form button[type="submit"] {
     padding: 0.5rem 0.75rem;
     border: 1px solid rgb(100, 116, 139);
+	font-size: inherit;
     font-size: 1em;
   }
 
