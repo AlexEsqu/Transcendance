@@ -18,11 +18,11 @@ router.addRoute('/connection/register', getConnectionForm);
 router.addRoute('/connection/emailcheck', getEmailCheck);
 router.addRoute('/connection/alias', getConnectionForm);
 
-router.addRoute('/settings', getDashboardPage, true);
-router.addRoute('/settings/rename', getConnectionForm, true);
-router.addRoute('/settings/avatar', getConnectionForm, true, true);
-router.addRoute('/settings/email', getConnectionForm, true, true);
-router.addRoute('/settings/password', getConnectionForm, true, true);
+router.addRoute('/dashboard', getDashboardPage, true);
+router.addRoute('/dashboard/rename', getConnectionForm, true);
+router.addRoute('/dashboard/avatar', getConnectionForm, true, true);
+router.addRoute('/dashboard/email', getConnectionForm, true, true);
+router.addRoute('/dashboard/password', getConnectionForm, true, true);
 
 router.addRoute('/game/options', getGameOptionHtml, true);
 router.addRoute('/game', getGameHtml, true);

@@ -35,25 +35,25 @@ function initDashboardPageListeners(): void
 
 		switch (path)
 		{
-			case '/settings/rename':
+			case '/dashboard/rename':
 			{
 				onRenameLoaded();
 				return;
 			}
 
-			case '/settings/avatar':
+			case '/dashboard/avatar':
 			{
 				onAvatarLoaded();
 				return;
 			}
 
-			case '/settings/password':
+			case '/dashboard/password':
 			{
 				onPasswordLoaded();
 				return;
 			}
 
-			case '/settings/email':
+			case '/dashboard/email':
 			{
 				onEmailLoaded(); // TO DO : add api route
 				return;

@@ -56,7 +56,7 @@ class Router
 			if (!user && window.location.pathname !== '/connection')
 				this.navigateTo('/connection');
 			if (user && window.location.pathname.includes('/connection'))
-				this.navigateTo('/settings');
+				this.navigateTo('/dashboard');
 			if (this.navbarInitialized)
 				this.renderNavbar(user);
 		});
@@ -162,7 +162,7 @@ class Router
 			if (hasHistory)
 				targetPath = initialPath;
 			else
-				targetPath = '/settings';
+				targetPath = '/dashboard';
 		}
 
 		console.log(`going to ${targetPath}`);
@@ -173,7 +173,7 @@ class Router
 	private redirectToDefaultPage()
 	{
 		const user = this.userState.getUser();
-		window.history.replaceState(null, '', (user ? '/settings' : '/connection'));
+		window.history.replaceState(null, '', (user ? '/dashboard' : '/connection'));
 		this.render();
 	}
 
