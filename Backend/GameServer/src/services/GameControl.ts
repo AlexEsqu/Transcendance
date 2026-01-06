@@ -2,7 +2,7 @@ import { GameLocation, GameType, IPlayer } from '../config/gameData';
 import { WebSocket as WSWebSocket } from 'ws';
 import { notifyPlayersInRoom } from '../utils/broadcast'
 import { Room } from './Room';
-import { IGameMessage } from '../config/schemas';
+import { IGameMessage, IRoomMessage } from '../config/schemas';
 
 export class GameControl
 {
@@ -117,7 +117,12 @@ export class GameControl
 		this.gamingRooms.set(roomId, room);
 		this.waitingRoom.delete(roomId);
 		console.log("GAME-CONTROL: new gaming room created ", roomId);
-		notifyPlayersInRoom(this.gamingRooms.get(roomId), "New gaming room created and you're in");
+
+		const welcomeMessage: IRoomMessage = {
+			roomId: roomId,
+			message: `You've been added to a new gaming room [id:${roomId}]`
+		};
+		notifyPlayersInRoom(this.gamingRooms.get(roomId), welcomeMessage);
 		return true;
 	}
 

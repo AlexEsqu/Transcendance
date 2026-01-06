@@ -26,6 +26,8 @@ export class Pong {
 	isLaunched: boolean;
 	onNewRound?: () => void;
 	scene: IScene | null;
+	waitSocket: WebSocket | null = null;
+	socket: WebSocket | null = null;
 
 	constructor(canvasId: string, options: IOptions, onNewRound?: () => void)
 	{
@@ -55,6 +57,18 @@ export class Pong {
 		this.scene.players = players;
 		this.scene.state = State.opening;
 		this.time = Date.now();
+		this.waitSocket = new WebSocket("ws://localhost:4001/waitingRoom");
+		this.waitSocket.onopen = (e) => {
+			console.log("CLIENT CONNECTED to game server");
+			const JSONForm = {
+				id: Date.now(),
+				game: 'solo',
+				location: 'remote'
+			};
+			const data = JSON.stringify(JSONForm);
+			if (this.waitSocket)
+				this.waitSocket.send(data);
+		}
 	}
 
 	initPlayers(inputs: string[], nbOfPlayer: number): Array<IPlayer>
@@ -82,10 +96,40 @@ export class Pong {
 		const keys: Record<string, boolean> = {};
 		let isNewRound: boolean = true;
 		let rounds: IRound = { results: null, nbOfRounds: 0, playerIndex: 0, nodeColor: [] };
+		let roomId: number | undefined = undefined;
+
+		interface testJSON {
+			roomId: number;
+			message: string;
+		};
 
 		//	Manage user input and update data before render
 		this.handleInput(keys, rounds);
 		this.scene.id.registerBeforeRender(() => {
+			if (this.waitSocket) this.waitSocket.onmessage = (e) => {
+				const gameState: testJSON = JSON.parse(e.data);
+				console.log("Received Game server state : ", gameState);
+				if (roomId === undefined && gameState.roomId !== undefined) {
+					roomId = gameState.roomId;
+					this.socket = new WebSocket("ws://localhost:4001/game");
+					console.log(`roomID ${roomId}`);
+					console.log(`state.roomID ${gameState.roomId}`);
+				}
+			}
+			if (this.socket) this.socket.onopen = (e) => {
+				const gameState = {
+					id: Date.now(),
+					roomId: roomId,
+					ready: true,
+				};
+				console.log(gameState);
+				if (roomId !== undefined)
+					this.socket?.send(JSON.stringify(gameState));
+			}
+			if (this.socket) this.socket.onmessage = (e) => {
+				const gameState = JSON.parse(e.data);
+				console.log("Received Game server state : ", gameState);
+			}
 			if (this.scene && this.scene.state === State.opening) this.opening();
 			if (this.scene && this.scene.state === State.end) this.endGame(rounds);
 			if (this.scene && this.scene.state === State.play && this.isLaunched) {

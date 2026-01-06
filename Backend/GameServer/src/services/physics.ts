@@ -1,29 +1,95 @@
-import { IBall } from "../config/gameData";
+import { GAME, IBall, IPaddle } from "../config/gameData";
 
-class GameSize
+
+export function isBallHittingPaddle(ball: IBall, paddle: IPaddle): boolean
 {
-	static PADD_WIDTH = 1.25;
-	static PADD_HEIGHT = 0.25;
-	static PADD_DEPTH = 0.25;
+	const paddTopEdge: number = paddle.pos.z + (GAME.MAP_WIDTH / 2);
+	const paddDownEdge: number = paddle.pos.z - (GAME.MAP_WIDTH / 2);
+	const ballLeftEdge: number = ball.posistion.x - GAME.BALL_RADIUS;
+	const ballRightEdge: number = ball.posistion.x + GAME.BALL_RADIUS;
+	const ballTopEdge: number = ball.posistion.z + GAME.BALL_RADIUS;
+	const ballDownEdge: number = ball.posistion.z - GAME.BALL_RADIUS;
 
-	static MAP_WIDTH = 10;
-	static MAP_HEIGHT = 6;
+	//	Check if the ball hits the paddle front (X-axis)
+	if (paddle.side === 'right' && ballRightEdge <= paddle.pos.x - (GAME.PADD_DEPTH / 2))
+		return false;
+	else if (ballLeftEdge >= paddle.pos.x + (GAME.PADD_DEPTH / 2))
+		return false;
+
+	//	Check if the ball fits in the paddle's coordinates range (Z-axis)
+	if (ballTopEdge <= paddTopEdge + (GAME.BALL_RADIUS * 2) && ballDownEdge >= paddDownEdge - (GAME.BALL_RADIUS * 2))
+		return true;
+
+	return false;
 }
+
+export function isBallHittingWall(ball: IBall): boolean
+{
+	const ballDownEdge: number = ball.posistion.z - GAME.BALL_RADIUS;
+	const ballTopEdge: number = ball.posistion.z + GAME.BALL_RADIUS;
+	const mapLimit: number = GAME.MAP_HEIGHT / 2;
+
+	if (ballDownEdge <= -(mapLimit) || ballTopEdge >= mapLimit)
+		return true;
+	return false;
+}
+
+export function isBallOutOfBounds(ball: IBall): boolean
+{
+	const ballLeftEdge: number = ball.posistion.x - GAME.BALL_RADIUS;
+	const ballRightEdge: number = ball.posistion.x + GAME.BALL_RADIUS;
+	const mapLimit: number = GAME.MAP_WIDTH / 2;
+
+	if (ballLeftEdge < -(mapLimit) || ballRightEdge > mapLimit)
+		return true;
+	return false;
+}
+
+export function adjustBallHorizontalPos(ball: IBall): number
+{
+	if (ball.posistion.x >= 0)
+	{
+		const ballLeftEdge: number = ball.posistion.x - GAME.BALL_RADIUS;
+		return (ballLeftEdge - GAME.BALL_RADIUS - 0.001);
+	}
+	const ballRightEdge: number = ball.posistion.x + GAME.BALL_RADIUS;
+	return (ballRightEdge + GAME.BALL_RADIUS - 0.0001);
+}
+
+export function adjustBallVerticalPos(ball: IBall)
+{
+	const mapLimit: number = GAME.MAP_HEIGHT / 2;
+	if (ball.posistion.z >= 0)
+		return (mapLimit - GAME.BALL_RADIUS - 0.001);
+	return (-(mapLimit) + GAME.BALL_RADIUS - 0.0001);
+}
+
+
+export function normalizeVector(v: { x: number, z: number }): { x: number, z: number }
+{
+	const length = Math.sqrt(v.x * v.x + v.z * v.z);
+
+	if (length === 0)
+		return v;
+
+	return { x: v.x / length, z: v.z / length };
+}
+
 
 export function isNewPaddPosHittingMapLimit(paddCenterpos: number, velocityStep: number, input: string): boolean
 {
-	const mapLimit: number = GameSize.MAP_HEIGHT / 2;
+	const mapLimit: number = GAME.MAP_HEIGHT / 2;
 	let newPaddPos: number;
 
 	switch (input)
 	{
 		case 'up':
-			newPaddPos = paddCenterpos + (GameSize.PADD_WIDTH / 2) + velocityStep;
+			newPaddPos = paddCenterpos + (GAME.PADD_WIDTH / 2) + velocityStep;
 			if (newPaddPos <= mapLimit)
 				return false;
 			return true;
 		case 'down':
-			newPaddPos = paddCenterpos - (GameSize.PADD_WIDTH / 2) - velocityStep;
+			newPaddPos = paddCenterpos - (GAME.PADD_WIDTH / 2) - velocityStep;
 			if (newPaddPos >= -mapLimit)
 				return false;
 			return true;
@@ -35,8 +101,8 @@ export function isNewPaddPosHittingMapLimit(paddCenterpos: number, velocityStep:
 export function scaleVelocity(ball: IBall, deltaTime: number): { x: number, z: number }
 {
 	const velocity = {
-		x: ball.dirX * (ball.speed * deltaTime),
-		z: ball.dirZ * (ball.speed * deltaTime)
+		x: ball.direction.x * (ball.speed * deltaTime),
+		z: ball.direction.z * (ball.speed * deltaTime)
 	}
 	return velocity;
 }

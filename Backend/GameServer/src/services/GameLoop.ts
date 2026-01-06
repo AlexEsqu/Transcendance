@@ -1,22 +1,12 @@
-import { IBall, IPaddle, IPlayer, State, Level, GameType, IRound, IResult, IGameState } from '../config/gameData'
+import { GAME, IBall, IPaddle, IPlayer, State, Level, GameType, IRound, IResult, IGameState } from '../config/gameData'
 import { initBall, initPadd, initPlayers } from '../utils/init'
-import { isNewPaddPosHittingMapLimit, scaleVelocity } from './physics';
+import { isBallHittingWall, isBallHittingPaddle, isBallOutOfBounds, adjustBallHorizontalPos, adjustBallVerticalPos, isNewPaddPosHittingMapLimit, scaleVelocity, normalizeVector } from './physics';
 import { notifyPlayersInRoom } from '../utils/broadcast';
 import { GameControl } from './GameControl';
 import { Room } from './Room';
 
 export class GameLoop
 {
-	static MAX_SCORE = 2;
-	static MAX_ROUNDS = 1;
-
-	static BALL_START_SPEED = 6;
-	static BALL_MAX_SPEED = 10;
-	static BALL_RADIUS = 0.15;
-
-	static PADD_RESPONSIVENESS = -25.0;
-	static PADD_SPEED = 25.0;
-
 	roomId: number;
 	matchType: GameType;
 	ball: IBall;
@@ -31,7 +21,7 @@ export class GameLoop
 	constructor(roomId: number, matchType: GameType, players: Map<number, IPlayer>)
 	{
 		if (matchType === GameType.tournament)
-			GameLoop.MAX_ROUNDS = matchType - 1;
+			GAME.MAX_ROUNDS = matchType - 1;
 		this.roomId = roomId;
 		this.matchType = matchType;
 		this.ball = initBall();
@@ -53,12 +43,13 @@ export class GameLoop
 		let isNewRound: boolean = false;
 		let gameStateInfo: IGameState;
 
+		console.log("GAME-SERVER: game loop started");
 		const interval = setInterval(() => {
 			//	update data & check collisions
 			if (this.state === State.play && this.isGameRunning) {
 				this.updateGameData();
 				//	monitor score/rounds
-				isNewRound = this.monitorScore();
+				isNewRound = this.isPlayerHitsMaxScore();
 			}
 			if (isNewRound)
 				this.requestNewRound();
@@ -75,15 +66,61 @@ export class GameLoop
 		//	Move the ball position according to its direction and velocity
 		const deltaTime: number = (Date.now() - this.timestamp) / 1000;
 		const velocity = scaleVelocity(this.ball, deltaTime);
-		this.ball.posX += velocity.x;
-		this.ball.posZ += velocity.z;
+		this.ball.posistion.x += velocity.x;
+		this.ball.posistion.z += velocity.z;
 
 		//	Check if the ball hits the edge of map/paddles or is out of bounds -> update its direction accordingly
-		//	Depending on what/where the ball hits an object or a limit, its direction is reversed and gain speed
-		const isBallOutOfBounds: boolean = bouncingBallProcess();
+		//	Depending on what/where the ball hits an object or a limit, its direction is reversed and gains speed
+		const isBallOutOfBounds: boolean = this.bouncingBallProcess();
 		if (isBallOutOfBounds)
 			this.state = State.launch;
-		
+	}
+
+	bouncingBallProcess(): boolean
+	{
+		if (isBallHittingPaddle(this.ball, this.leftPadd) || isBallHittingPaddle(this.ball, this.rightPadd))
+		{
+			//	Invert X direction
+			this.ball.posistion.x = adjustBallHorizontalPos(this.ball);
+			this.ball.direction.x = -(this.ball.direction.x);
+			
+			const ballLeftEdge = this.ball.posistion.x - GAME.BALL_RADIUS;
+			//	Avoid repeating trajectories, increase angle (Z-axis) if the ball hits top/down edge of the paddle
+			if (ballLeftEdge <= 0)
+				this.ball.direction.z = (this.ball.posistion.z - this.leftPadd.pos.z) / GAME.PADD_WIDTH;
+			else
+				this.ball.direction.z = (this.ball.posistion.z - this.rightPadd.pos.z) / GAME.PADD_WIDTH;
+			//	Increase again the angle (less predictable) --- is necessary ??
+			this.ball.direction.z *= 1.01;
+			//	Add random noise to trajectories (avoid perfect loop, less predictable, better gameplay)
+			const random = (Math.random() - 0.4) * 0.03;
+			this.ball.direction.z += random;
+
+			//	Normalize direction's vector (stabilizes physics, sightly rendering)
+			this.ball.direction = normalizeVector(this.ball.direction);
+
+			//	Increase gradually the speed
+			this.ball.speed = Math.min(GAME.BALL_MAX_SPEED, this.ball.speed * 1.05);
+
+			return false;
+		}
+
+		if (isBallHittingWall(this.ball))
+		{
+			this.ball.direction.z = -(this.ball.direction.z);
+			this.ball.posistion.z = adjustBallVerticalPos(this.ball);
+		}
+
+		if (isBallOutOfBounds(this.ball))
+		{
+			if (this.ball.posistion.x > 0)
+				this.leftPadd.score += 1;
+			else
+				this.rightPadd.score += 1;
+			this.resetBall();
+			return true;
+		}
+		return false;
 	}
 
 	processPlayerInput(playerId: number, input: string): void
@@ -101,14 +138,27 @@ export class GameLoop
 
 		const deltaTime: number = (Date.now() - this.timestamp) / 1000;
 		//	Frame-rate independent smoothing
-        const alpha: number = 1 - Math.exp(GameLoop.PADD_RESPONSIVENESS * deltaTime);
+        const alpha: number = 1 - Math.exp(GAME.PADD_RESPONSIVENESS * deltaTime);
 		//	Calculate the velocity of the paddle's movement
-		const velocityStep: number = GameLoop.PADD_SPEED * deltaTime * alpha;
+		const velocityStep: number = GAME.PADD_SPEED * deltaTime * alpha;
 
-		if (input === 'up' && !isNewPaddPosHittingMapLimit(paddle.posZ, velocityStep, input))
-			paddle.posZ += velocityStep;
-		else if (input === 'down' && !isNewPaddPosHittingMapLimit(paddle.posZ, velocityStep, input))
-			paddle.posZ -= velocityStep;
+		if (input === 'up' && !isNewPaddPosHittingMapLimit(paddle.pos.z, velocityStep, input))
+			paddle.pos.z += velocityStep;
+		else if (input === 'down' && !isNewPaddPosHittingMapLimit(paddle.pos.z, velocityStep, input))
+			paddle.pos.z -= velocityStep;
+	}
+
+	isPlayerHitsMaxScore(): boolean
+	{
+		if (this.leftPadd.player === undefined || this.rightPadd.player === undefined)
+			return false;
+
+		if (this.leftPadd.score === GAME.MAX_SCORE || this.rightPadd.score === GAME.MAX_SCORE) {
+			if (this.rounds.nbOfRounds >= GAME.MAX_ROUNDS)
+				this.state = State.end;
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -125,25 +175,27 @@ export class GameLoop
 
 		console.log("GAME-STATE: new round");
 		//	Who should play now ?
-		let nbOfPlayers = this.matchType as number;
-		if (nbOfPlayers === 4 && this.rounds && this.rounds.nbOfRounds >= 0 && this.rounds.nbOfRounds < 2)
-			nbOfPlayers = 2;
+		let match = this.matchType;
+		if (match === GameType.tournament && this.rounds.nbOfRounds >= 0 && this.rounds.nbOfRounds < 2)
+			match = GameType.duo;
 		//	If the match type is a tournament and it's the final round, the last two players must be the two winners of the previous rounds
-		if (nbOfPlayers == 4 && this.rounds && this.rounds.results && this.rounds.nbOfRounds == GameLoop.MAX_ROUNDS - 1)
+		if (match === GameType.tournament && this.rounds.nbOfRounds === GAME.MAX_ROUNDS - 1)
 		{
-			if (this.rounds.results[0])
-				this.leftPadd.player = this.rounds.results[0].winner;
-			if (this.rounds.results[1])
-				this.rightPadd.player = this.rounds.results[1].winner;
+			if (!this.rounds.results || !this.rounds.results[0] || !this.rounds.results[1]) {
+				console.error("Error while trying to assign players to new round, previous match's results not found");
+				return ;
+			}
+			this.leftPadd.player = this.rounds.results[0].winner;
+			this.rightPadd.player = this.rounds.results[1].winner;
 		}
-		else if (this.rounds.waitingPlayers) 
+		else if (this.rounds.waitingPlayers)
 		{
 			this.leftPadd.player = this.rounds.waitingPlayers.pop();
 			this.rightPadd.player = this.rounds.waitingPlayers.pop();
 		}
 		this.rounds.nbOfRounds += 1;
 
-		//	Reset data
+		//	Reset game's data
 		this.ball = initBall();
 		// this.resetBall();
 		this.resetPaddles();
@@ -154,8 +206,8 @@ export class GameLoop
 	*/
 	saveResults(): void
 	{
-		const winner: IPaddle = this.leftPadd.score === GameLoop.MAX_SCORE ? this.leftPadd : this.rightPadd;
-		const loser: IPaddle = this.leftPadd.score === GameLoop.MAX_SCORE ? this.rightPadd : this.leftPadd;
+		const winner: IPaddle = this.leftPadd.score === GAME.MAX_SCORE ? this.leftPadd : this.rightPadd;
+		const loser: IPaddle = this.leftPadd.score === GAME.MAX_SCORE ? this.rightPadd : this.leftPadd;
 
 		const results: IResult = {
 			winner: winner.player,
@@ -172,13 +224,13 @@ export class GameLoop
 
 	resetBall(): void
 	{
-		this.ball.speed = GameLoop.BALL_START_SPEED;
-		this.ball.posX = 0.0;
+		this.ball.speed = GAME.BALL_START_SPEED;
+		this.ball.posistion.x = 0.0;
 	}
 
 	resetPaddles(): void
 	{
-		this.leftPadd.posZ = 0.0;
+		this.leftPadd.pos.z = 0.0;
 		this.leftPadd.score = 0;
 	}
 
@@ -189,9 +241,9 @@ export class GameLoop
 			state: this.state as number,
 			timestamp: this.timestamp,
 			round: this.rounds.nbOfRounds,
-			leftPaddPos: this.leftPadd.posZ,
-			rightPaddPos: this.rightPadd.posZ,
-			ball: { x: this.ball.posX, z: this.ball.posZ }
+			leftPaddPos: this.leftPadd.pos.z,
+			rightPaddPos: this.rightPadd.pos.z,
+			ball: { x: this.ball.posistion.x, z: this.ball.posistion.z }
 		};
 		return gameStateInfo;
 	}

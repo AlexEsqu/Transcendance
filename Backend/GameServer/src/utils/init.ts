@@ -1,24 +1,22 @@
-import { IBall, IPaddle, GameType, IPlayer } from '../config/gameData'
-import { GameLoop } from '../services/GameLoop';
+import { GAME, IBall, IPaddle, GameType, IPlayer } from '../config/gameData'
 
 export { initBall, initPadd, initPlayers }
 
 function initBall(): IBall
 {
 	const ball: IBall = {
-		speed: GameLoop.BALL_START_SPEED,
-		posX: 0.0,
-		posZ: 0.0,
-		dirX: 0.5,
-		dirZ: 0.0
+		speed: GAME.BALL_START_SPEED,
+		posistion: { x: 0.0, z: 0.0 },
+		direction: { x: 0.5, z: 0.0 }
 	}
 	return ball;
 }
 
 function initPadd(gameType: GameType, side: string): IPaddle
 {
+	const posX: number = side === 'right' ? (GAME.MAP_WIDTH / 2) : -(GAME.MAP_WIDTH / 2);
 	const paddle: IPaddle = {
-		posZ: 0.0,
+		pos: { x: posX, z: 0.0 },
 		side: side,
 		robot: gameType === GameType.solo ? true : false,
 		score: 0,

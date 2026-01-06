@@ -1,10 +1,28 @@
 import { WebSocket as WSWebSocket } from 'ws';
 
-export { GameType, GameLocation, State, Level, IBall, IPaddle, IPlayer, IRound, IResult, IGameState }
+export { GAME, GameType, GameLocation, State, Level, IBall, IPaddle, IPlayer, IRound, IResult, IGameState }
 
 /************************************************************************************************************
  * 		Declare CONSTANT variables								 											*
  ***********************************************************************************************************/
+
+const GAME = {
+	MAX_SCORE: 2,
+	MAX_ROUNDS: 1,
+
+	BALL_START_SPEED: 6,
+	BALL_MAX_SPEED: 10,
+	BALL_RADIUS: 0.15,
+
+	PADD_RESPONSIVENESS: -25.0,
+	PADD_SPEED: 25.0,
+	PADD_WIDTH: 1.25,
+	PADD_HEIGHT: 0.25,
+	PADD_DEPTH: 0.25,
+
+	MAP_WIDTH: 10,
+	MAP_HEIGHT: 6
+}
 
 /************************************************************************************************************
  * 		Declare enums																						*
@@ -42,14 +60,12 @@ interface IGameState {
 
 interface IBall {
 	speed: number;
-	posX: number;
-	posZ: number;
-	dirX: number;
-	dirZ: number;
+	posistion: { x: number, z: number };
+	direction: { x: number, z: number };
 };
 
 interface IPaddle {
-	posZ: number;
+	pos: { x: number, z: number };
 	side: string;
 	robot: boolean;
 	score: number;

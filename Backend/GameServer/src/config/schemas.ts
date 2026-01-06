@@ -1,4 +1,4 @@
-export { waitingSchema, gameSchema, IGameMessage }
+export { waitingSchema, gameSchema, IGameMessage, IRoomMessage }
 
 /************************************************************************************************************
  * 		Declare schema for route's options																	*
@@ -36,4 +36,9 @@ interface IGameMessage {
 	roomId: number;
 	ready: boolean;
 	move?: string;
+};
+
+interface IRoomMessage {
+	roomId: number;
+	message: string;
 };
