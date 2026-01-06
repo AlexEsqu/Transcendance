@@ -1,5 +1,8 @@
 import crypto from "crypto";
 import { generateTokens, sendVerificationCodeEmail } from "../../services/authServices.js";
+
+const redirectUrl = encodeURI(`${process.env.FRONTEND_DOMAIN_NAME}/connection/login`);
+
 export function ft_OAuth2_callback(server) {
 	const opts = {
 		schema: {
@@ -24,8 +27,19 @@ export function ft_OAuth2_callback(server) {
 			},
 			response: {
 				200: {
-					description: "Successful login or 2FA required",
-					oneOf: [{ $ref: "loginTokenObject#" }, { $ref: "twoFactorRequiredObject#" }],
+					description: "Two-factor authentication required",
+					type: "object",
+					required: ["twoFactorRequired", "token"],
+					properties: {
+						twoFactorRequired: { type: "boolean" },
+						token: { type: "string" },
+					},
+				},
+				302: {
+					description: "Sucess: Redirects to the frontend",
+					headers: {
+						location: { type: "string" },
+					},
 				},
 				500: {
 					$ref: "errorResponse#",
@@ -41,39 +55,46 @@ export function ft_OAuth2_callback(server) {
 			const params = prepareParamsFor42TokenExchange(req, reply);
 			if (!params) return;
 			const { access_token } = await get42Token(params);
-			const userInfo = await get42User(access_token);
-			// console.log(userInfo);
-			const user = await isUserInDB(server, userInfo);
+			const fortyTwoUserData = await get42User(access_token);
+			const user = await isUserInDB(server, fortyTwoUserData);
 			if (user) {
+				console.log("42 USER IN DB, LOGGING IN THE USER");
 				if (user.is_2fa_enabled) {
-					sendVerificationCodeEmail(server, user);
+					console.log("42 USER HAS 2FA ENABLED, SENDING VERIFICATION CODE");
+					const twoFaToken = await sendVerificationCodeEmail(server, user);
 					return reply.status(200).send({
 						twoFactorRequired: true,
 						token: twoFaToken,
 					});
 				}
-				const tokens = await generateTokens(server, user, reply);
-				return reply.status(200).send(tokens);
+				console.log("42 USER HAS 2FA DISABLED, GENERATING TOKENS");
+				await generateTokens(server, user, reply);
+				return reply.status(302).redirect(redirectUrl);
 			} else {
+				console.log("42 USER NOT IN DB, SIGNING UP THE USER");
 				//SIGNUP THE USER THEN GENERATE TOKENS
-				console.log(userInfo.image.versions);
-				const avatarPath = await downloadAvatar(userInfo.image.versions.small);
-				server.db.prepare(`INSERT INTO users (username, email, avatar, email_verified, oauth_provider) VALUES (?, ?, ?, 1, 42)`).run(userInfo.login, userInfo.email, avatarPath);
-				const tokens = await generateTokensgenerateTokens(server, user, reply);
-				return reply.status(200).send(tokens);
+				const avatarPath = await downloadAvatar(fortyTwoUserData.image.versions.small, user.id);
+				const result = server.db
+					.prepare(`INSERT INTO users (username, email, avatar, email_verified, oauth_provider) VALUES (?, ?, ?, 1, 42)`)
+					.run(fortyTwoUserData.login, fortyTwoUserData.email, avatarPath);
+				const newUser = server.db.prepare(`SELECT * FROM users WHERE id = ?`).get(result.lastInsertRowid);
+				console.log("42 USER HAS BEEN CREATED, GENERATING TOKENS");
+				await generateTokens(server, newUser, reply);
+				return reply.status(302).redirect(redirectUrl);
 			}
 		} catch (err) {
 			console.log(err);
-			return reply.status(500).send({ error: "Internal server error" });
+			reply.clearCookie("state");
+			return reply.redirect(`${redirectUrl}?error=oauth_failed`);
 		}
 	});
 }
 
-export async function downloadAvatar(url) {
-	const res = fetch(url);
+export async function downloadAvatar(url, userId) {
+	const res = await fetch(url);
 	if (!res.ok) return null;
 	//   const contentType = res.headers.get("content-type");
-	const uploadPath = `${process.env.AVATARS_UPLOAD_PATH}/user_${id}.jpg`;
+	const uploadPath = `${process.env.AVATARS_UPLOAD_PATH}/user_${userId}.jpg`;
 
 	const buffer = Buffer.from(await res.arrayBuffer());
 	fs.writeFileSync(uploadPath, buffer);
@@ -96,8 +117,7 @@ function prepareParamsFor42TokenExchange(req, reply) {
 	const code = req.query.code;
 	const redirectUri = encodeURI(`${process.env.API_DOMAIN_NAME}/users/auth/oauth/42/callback`);
 	if (cookieState != ft_state) {
-		reply.status(401).send({ error: "Unauthorized", message: "Invalid state" });
-		return null;
+		return reply.redirect(`${redirectUrl}?error=invalid_state`);
 	}
 	const params = new URLSearchParams();
 	params.append("grant_type", "authorization_code");

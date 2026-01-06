@@ -70,6 +70,7 @@ export default function login(server) {
 			//looks for the user in the db if it exists
 
 			const user = await server.db.prepare(`SELECT * FROM users WHERE email = ? OR username = ? `).get(login, login);
+			console.log(user);
 			if (!user) {
 				return reply.status(401).send({ error: "Unauthorized", message: "Invalid credentials" });
 			}
@@ -84,7 +85,7 @@ export default function login(server) {
 				return reply.status(401).send({ error: "Unauthorized", message: "Invalid credentials" });
 			}
 			if (user.is_2fa_enabled) {
-				sendVerificationCodeEmail(server, user);
+				const twoFaToken = await sendVerificationCodeEmail(server, user);
 				return reply.status(200).send({
 					twoFactorRequired: true,
 					token: twoFaToken,
