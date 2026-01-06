@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import { generateTokens, sendVerificationCodeEmail } from "../../services/authServices.js";
 
-const redirectUrl = encodeURI(`${process.env.FRONTEND_DOMAIN_NAME}/connection/login`);
+const redirectUrl = encodeURI(`${process.env.FRONTEND_DOMAIN_NAME}/settings`);
 
 export function ft_OAuth2_callback(server) {
 	const opts = {
@@ -73,11 +73,12 @@ export function ft_OAuth2_callback(server) {
 			} else {
 				console.log("42 USER NOT IN DB, SIGNING UP THE USER");
 				//SIGNUP THE USER THEN GENERATE TOKENS
-				const avatarPath = await downloadAvatar(fortyTwoUserData.image.versions.small, user.id);
 				const result = server.db
-					.prepare(`INSERT INTO users (username, email, avatar, email_verified, oauth_provider) VALUES (?, ?, ?, 1, 42)`)
-					.run(fortyTwoUserData.login, fortyTwoUserData.email, avatarPath);
+					.prepare(`INSERT INTO users (username, email, email_verified, oauth_provider) VALUES (?, ?, 1, 42)`)
+					.run(fortyTwoUserData.login, fortyTwoUserData.email);
 				const newUser = server.db.prepare(`SELECT * FROM users WHERE id = ?`).get(result.lastInsertRowid);
+				const avatarPath = await downloadAvatar(fortyTwoUserData.image.versions.small, newUser.id);
+				server.db.prepare(`UPDATE users SET avatar = ? WHERE id = ?`).run(avatarPath, newUser.id);
 				console.log("42 USER HAS BEEN CREATED, GENERATING TOKENS");
 				await generateTokens(server, newUser, reply);
 				return reply.status(302).redirect(redirectUrl);
