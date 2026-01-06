@@ -2,6 +2,7 @@ import { userState, router } from "../app"
 import { showFriend, showUsers } from "./friends";
 import { RegisteredUser } from "./User";
 import type { Subscriber } from "../auth/UserState";
+import { displayMatchHistory } from "./stats";
 
 import dashboardHtml from "../pages/dashboard.html?raw";
 
@@ -11,7 +12,6 @@ import passwordFormHtml from "../pages/forms/passwordForm.html?raw"
 import emailFormHtml from "../pages/forms/emailForm.html?raw"
 
 export { getDashboardPage, initDashboardPageListeners }
-
 
 // variable to hold current listener functions
 
@@ -190,7 +190,7 @@ function onEmailLoaded(): void
 	);
 }
 
-function onDashboardLoaded()
+async function onDashboardLoaded()
 {
 	const user = userState.getUser();
 	const isRegistered = user instanceof RegisteredUser;
@@ -202,9 +202,12 @@ function onDashboardLoaded()
 	{
 		showRegisteredUserOptions(user);
 		userState.subscribe(currentFriendsListener);
+		displayMatchHistory();
 	}
 
 	userState.subscribe(currentUsersListener);
+
+
 }
 
 

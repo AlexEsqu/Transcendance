@@ -1,9 +1,9 @@
 <div id="dashboard-container"
 	class="flex flex-1 flex-col justify-between ">
 
-	<div  class="flex flex-1 gap-2 justify-between mx-6">
+	<div  class="flex flex-1 gap-2 justify-between mx-6 min-h-60">
 
-		<aside id='friend-aside' class="flex flex-2 flex-col gap-2 min-h-0">
+		<aside id='friend-aside' class="flex flex-2 flex-col gap-2 min-h-0 min-w-65">
 			<section id="friend-section"
 				class="hidden need-registered-user flex-col w-[100%] flex-0 p-4 input-field">
 
@@ -70,7 +70,38 @@
 		</aside>
 
 		<section id="statistic-section" class="flex flex-1 flex-col p-4 input-field">
-			<h2 class="text-xl">Game Statistics</h2>
+
+			<h2 id="statistic-title"
+				class="text-xl">
+				Game Statistics
+			</h2>
+
+			<div id="dashboard-graph-container"
+				class="w-full flex flex-1 justify-center align-middle border border-slate-600 mt-2 mb-2">
+				<div id="match-history-error"
+					class="flex flex-1 justify-center align-middle">
+					Loading history...
+				</div>
+				<canvas id="dashboard-graph-canvas"
+					class="hidden">
+				</canvas>
+			</div>
+
+			<div class="flex justify-between gap-4 text-center">
+				<div class="flex flex-wrap justify-center align-baseline gap-2 border border-slate-600 p-2 w-[33%]">
+					<span class="font-bold text-green-300" id="wins-count">0</span>
+					<span class="">Wins</span>
+				</div>
+				<div class="flex flex-wrap justify-center align-baseline gap-2 border border-slate-600 p-2 w-[33%]">
+					<span class="font-bold text-red-300" id="losses-count">0</span>
+					<span class="">Losses</span>
+				</div>
+				<div class="flex flex-wrap justify-center align-baseline gap-2 border border-slate-600 p-2 w-[33%]">
+					<span class="font-bold" id="winrate-count">0%</span>
+					<span class="">Win Rate</span>
+				</div>
+			</div>
+
 		</section>
 
 	</div>
