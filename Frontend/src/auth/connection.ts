@@ -1,12 +1,10 @@
-import { FrameGraphComputeShaderTask } from "@babylonjs/core";
 import { userState, router } from "../app";
+import { apiDomainName, apiKey } from "./UserState";
 
 import connectionHtml from "../pages/connection.html?raw";
-
 import guestFormHtml from "../pages/forms/guestForm.html?raw"
 import loginFormHtml from "../pages/forms/loginForm.html?raw"
 import registerFormHtml from "../pages/forms/registerForm.html?raw"
-
 import checkEmailHtml from "../pages/info/checkEmail.html?raw"
 
 export {
@@ -63,11 +61,39 @@ function initConnectionPageListeners(): void
 
 			default:
 			{
+				onConnectionLoaded();
 				return;
 			}
 
 		}
 	});
+}
+
+function onConnectionLoaded(): void
+{
+	const oauthBtn = document.getElementById('btn-oauth') as HTMLButtonElement;
+	oauthBtn.addEventListener('click', async (e) =>
+		{
+			e.preventDefault();
+			const response = await fetch(`${apiDomainName}/users/auth/oauth/42`,
+					{
+						method: 'GET',
+						headers:
+						{
+							'accept': 'application/json',
+							'X-App-Secret': `${apiKey}`
+						},
+					});
+					const data = await response.json();
+
+					if (!response.ok || !data.accessToken)
+					{
+						console.log(data.message || data.error || 'Faied to refresh token');
+						return false;
+					}
+					console.log(data);
+		}
+	);
 }
 
 function onAliasLoaded(): void
@@ -136,7 +162,6 @@ function onLoginLoaded(): void
 	const mainContainer = document.getElementById('main')
 	if (mainContainer)
 		mainContainer.insertAdjacentHTML('beforeend', loginFormHtml);
-
 
 	const loginForm = document.getElementById('login-form') as HTMLFormElement | null;
 	loginForm?.addEventListener('submit', async (e) =>
