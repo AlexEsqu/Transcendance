@@ -596,7 +596,8 @@ class UserState
 		if (!response.ok)
 			throw new Error(data.message || data.error || '2FA disable failed');
 
-		await this.refreshUser();
+		this.user.hasTwoFactorAuth = true;
+		// await this.refreshUser(); // once I get a get API on the 2FA
 		this.notifySubscribers();
 	}
 
@@ -621,7 +622,8 @@ class UserState
 		if (!response.ok)
 			throw new Error(data.message || data.error || '2FA disable failed');
 
-		await this.refreshUser();
+		this.user.hasTwoFactorAuth = false;
+		// await this.refreshUser(); // once I get a get API on the 2FA
 		this.notifySubscribers();
 	}
 }
