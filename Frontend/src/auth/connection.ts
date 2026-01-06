@@ -1,3 +1,4 @@
+import { FrameGraphComputeShaderTask } from "@babylonjs/core";
 import { userState, router } from "../app";
 
 import connectionHtml from "../pages/connection.html?raw";
@@ -103,6 +104,9 @@ function onRegisterLoaded(): void
 			const password = formData.get('input-password') as string | null;
 			const check = formData.get('input-password-check') as string | null;
 
+			// apparently proper way to extract boolean from html checkbox ._.
+			const twoFA = formData.get('input-two-factor-auth') === 'on';
+
 			if (!login || !password || !email)
 				return;
 
@@ -114,7 +118,7 @@ function onRegisterLoaded(): void
 
 			try
 			{
-				await userState.register(login, password, email);
+				await userState.register(login, password, email, twoFA);
 				router.navigateTo("/connection/emailcheck");
 			}
 			catch (error)
