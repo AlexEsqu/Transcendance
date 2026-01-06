@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { generateTokens } from "./login.js";
+import { generateTokens } from "../../services/authServices.js";
 
 export default function login_2fa(server) {
 	const opts = {

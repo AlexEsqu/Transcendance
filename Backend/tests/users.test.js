@@ -1,5 +1,5 @@
 import { buildServer } from "../src/app.js";
-import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { describe, it, expect, beforeAll, afterAll, mock, vi } from "vitest";
 import mockDb from "./mocks/inMemoryDb.js";
 import mockApiKey from "./mocks/mockValidateApiKey.js";
 import { users } from "./mocks/mockObjects.js";
@@ -13,7 +13,7 @@ beforeAll(async () => {
 	server = buildServer({
 		dbOverride: mockDb,
 		apiKeyPluginOverride: mockApiKey,
-		mailerOverride: mockMailer
+		mailerOverride: mockMailer,
 	});
 	await server.ready();
 });
@@ -116,7 +116,7 @@ describe("POST /users/auth/send-mail-verification", () => {
 			url: "/api/users/auth/send-mail-verification",
 			body: {
 				email: users[0].email,
-			}
+			},
 		});
 		expect(response.statusCode).toBe(400);
 		expect(response.json()).toHaveProperty("error", "Bad Request");
@@ -128,14 +128,12 @@ describe("POST /users/auth/send-mail-verification", () => {
 			url: "/api/users/auth/send-mail-verification",
 			body: {
 				email: users[1].email,
-			}
+			},
 		});
 		expect(response.statusCode).toBe(200);
 		expect(response.json()).toHaveProperty("success", true);
 	});
-
 });
-	
 
 describe("PUT /users/me/password", () => {
 	it("returns 401 for not logged in", async () => {
@@ -327,3 +325,51 @@ describe("DELETE /users/me", () => {
 		expect(response.statusCode).toBe(204);
 	});
 });
+
+
+// // Mock only the helpers
+// vi.mock("../src/routes/auth/ft_oAuth2.js", async (importOriginal) => {
+//   const actual = await importOriginal();
+//   return {
+//     ...actual,
+//     get42Token: vi.fn().mockResolvedValue({ access_token: "fake-token" }),
+//     get42User: vi.fn().mockResolvedValue({
+//       login: "jdoe",
+//       email: "jdoe@42.fr",
+//       image: { versions: { small: "https://avatar.url/jdoe.png" } },
+//     }),
+//     downloadAvatar: vi.fn().mockResolvedValue("/avatars/jdoe.png"),
+//   };
+// });
+
+
+// describe("POST /api/users/auth/oauth/42", () => {
+// 	it("return 302 for successful redirect to 42 api", async () => {
+		
+// 		const res = await server.inject({
+// 			method: "GET",
+// 			url: "/api/users/auth/oauth/42",
+// 		});
+// 		expect(res.location)
+// 		expect(res.statusCode).toBe(302);
+// 	});
+// });
+
+// describe("GET /api/users/auth/oauth/42/callback", () => {
+//   it("logs in existing user and sets refresh cookie", async () => {
+//     // seed DB
+//     server.db.prepare(`
+//       INSERT INTO users (id, username, email, email_verified, oauth_provider)
+//       VALUES (1, 'jdoe', 'jdoe@42.fr', 1, 42)
+//     `).run();
+
+//     const res = await server.inject({
+//       method: "GET",
+//       url: "/api/users/auth/oauth/42/callback?code=abc&state=ok",
+//       cookies: { state: "ok" },
+//     });
+
+//     expect(res.statusCode).toBe(302); // or 302 depending on redirect
+//     expect(res.json()).toHaveProperty("accessToken");
+//   });
+// });

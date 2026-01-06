@@ -73,3 +73,33 @@ export const publicUserObject = {
 		is_active: { type: "boolean" },
 	},
 };
+
+export const loginTokenObject = {
+  $id: "loginTokenObject",
+  type: "object",
+  required: ["accessToken", "id"],
+  properties: {
+    accessToken: { type: "string" },
+    id: { type: "integer" },
+  },
+  example: {
+    accessToken: "a3f9c8e2b4d74e0c9f...",
+    id: 1,
+  },
+  description: "Login successful",
+};
+
+export const twoFactorRequiredObject = {
+  $id: "twoFactorRequiredObject",
+  type: "object",
+  required: ["twoFactorRequired", "token"],
+  properties: {
+    twoFactorRequired: { type: "boolean", example: true },
+    token: { type: "string" },
+  },
+  example: {
+    twoFactorRequired: true,
+    token: "a3f9c8e2b4d74e0c9f...",
+  },
+  description: "Two-factor authentication required",
+};

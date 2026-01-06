@@ -58,7 +58,7 @@ export default function verifyEmail(server) {
 				});
 			}
 			server.db.prepare(`UPDATE users SET email_verify_token = NULL, email_verify_expires = NULL, email_verified = ? WHERE id = ?`).run(1, user.id);
-			return reply.redirect(`${process.env.FRONTEND_DOMAIN_NAME}/?verified=true`);
+			return reply.redirect(`${process.env.FRONTEND_DOMAIN_NAME}/connection/login?verified=true`);
 		} catch (error) {
 			console.error(error);
 			reply.status(500).send({
