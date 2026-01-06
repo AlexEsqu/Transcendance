@@ -3,9 +3,10 @@ import bcrypt from "bcrypt";
 
 export function createAccessToken(server, id, username) {
   // Use the injected server instance instead of server
+  const accessTokenLifetime = process.env.ACCESS_TOKEN_LIFETIME_IN_MINUTES
   const token = server.jwt.sign(
     { id, username },
-    { expiresIn: "10m" } // TODO: adjust
+    { expiresIn: `${accessTokenLifetime}m` } // TODO: adjust
   );
 
   // Update last_activity in DB
@@ -72,5 +73,6 @@ export async function sendVerificationCodeEmail(server, user) {
       				<p>Your 6-digit verification code is: ${code}</p>
     				`,
 	});
+	return twoFaToken;
 }
 

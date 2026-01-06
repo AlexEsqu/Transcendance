@@ -16,5 +16,5 @@ export function computeActive(last_active_at) {
 	}
 	const last = new Date(last_active_at);
 	const diff = (Date.now() - last.getTime()) / 60000; // in minutes
-	return diff < 5;
+	return diff < process.env.ACCESS_TOKEN_LIFETIME_IN_MINUTES;
 }
