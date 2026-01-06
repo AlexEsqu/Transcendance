@@ -202,7 +202,7 @@ class UserState
 		this.notifySubscribers();
 	}
 
-	public async register(username: string, password: string, email: string, twoFA: boolean): Promise<void>
+	public async register(username: string, password: string, email: string): Promise<void>
 	{
 		const response = await fetch(`${apiDomainName}/users/signup`,
 			{

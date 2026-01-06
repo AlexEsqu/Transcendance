@@ -70,25 +70,6 @@
     font-size: 1em;
   }
 
-	/* CHECKBOX */
-
-  .glow-form input[type="checkbox"] {
-    padding: 0;
-    height: 1.5em;
-	width: 1.5em;
-  }
-
-  .glow-form section.checkbox-form {
-	flex-direction: row;
-	justify-content: start;
-	align-items: center;
-	gap: 1rem;
-  }
-
-  .glow-form section.checkbox-form label {
-	margin: 0;
-  }
-
 
 
 
