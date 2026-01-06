@@ -104,6 +104,7 @@ class UserState
 					username: this.user.username,
 					id: this.user.id,
 					accessToken: this.user.accessToken,
+					hasTwoFactorAuth: this.user.hasTwoFactorAuth,
 					avatar: this.user.avatar,
 					friends: this.user.friends
 				}
@@ -145,6 +146,7 @@ class UserState
 					: "Unknown error when loading user from local storage";
 				console.log(msg);
 				this.setUser(null);
+				router.navigateTo('/connection')
 			}
 		}
 		else if (guestData)
@@ -268,6 +270,7 @@ class UserState
 		}
 
 		this.setUser(null);
+
 	}
 
 	//------------------------ TOKEN REFRESHER -------------------------------//
@@ -565,6 +568,58 @@ class UserState
 			console.log(data);
 			throw new Error(data.message || data.error || `Failed to fetch user friends (${response.status})`);
 		}
+
+		await this.refreshUser();
+		this.notifySubscribers();
+	}
+
+	// 2FA
+
+	public async enableTwoFactorAuth()
+	{
+		if (!(this.user instanceof RegisteredUser))
+			throw new Error("Not authenticated");
+
+		const response = await this.fetchWithTokenRefresh(`${apiDomainName}/users/me/2fa`,
+			{
+				method: 'PUT',
+				headers: {
+					'accept': 'application/json',
+					'Authorization': `Bearer ${this.user.accessToken}`,
+					'X-App-Secret': `${apiKey}`
+				},
+				body: JSON.stringify({ "enabled": true })
+			}
+		);
+
+		const data = await response.json();
+		if (!response.ok)
+			throw new Error(data.message || data.error || '2FA disable failed');
+
+		await this.refreshUser();
+		this.notifySubscribers();
+	}
+
+	public async disableTwoFactorAuth()
+	{
+		if (!(this.user instanceof RegisteredUser))
+			throw new Error("Not authenticated");
+
+		const response = await this.fetchWithTokenRefresh(`${apiDomainName}/users/me/2fa`,
+			{
+				method: 'PUT',
+				headers: {
+					'accept': 'application/json',
+					'Authorization': `Bearer ${this.user.accessToken}`,
+					'X-App-Secret': `${apiKey}`
+				},
+				body: JSON.stringify({ "enabled": false })
+			}
+		);
+
+		const data = await response.json();
+		if (!response.ok)
+			throw new Error(data.message || data.error || '2FA disable failed');
 
 		await this.refreshUser();
 		this.notifySubscribers();

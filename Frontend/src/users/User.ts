@@ -51,6 +51,7 @@ class RegisteredUser extends User
 {
 	accessToken: string | null;
 	isRefreshed: boolean;
+	hasTwoFactorAuth: boolean;
 
 	constructor(username: string, id: number, accessToken: string)
 	{
@@ -58,6 +59,7 @@ class RegisteredUser extends User
 		this.id = id;
 		this.accessToken = accessToken;
 		this.isRefreshed = false;
+		this.hasTwoFactorAuth = false;
 	}
 }
 

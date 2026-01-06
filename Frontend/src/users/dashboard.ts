@@ -75,7 +75,10 @@ function initDashboardPageListeners(): void
 
 function onRenameLoaded(): void
 {
-	injectForm(renameFormHtml);
+	const mainContainer = document.getElementById('main')
+	if (mainContainer)
+		mainContainer.insertAdjacentHTML('beforeend', renameFormHtml);
+
 	const renameForm = document.getElementById('rename-form') as HTMLFormElement | null;
 
 	renameForm?.addEventListener('submit', async (e) =>
@@ -96,7 +99,9 @@ function onRenameLoaded(): void
 
 function onAvatarLoaded(): void
 {
-	injectForm(avatarFormHtml);
+	const mainContainer = document.getElementById('main')
+	if (mainContainer)
+		mainContainer.insertAdjacentHTML('beforeend', avatarFormHtml);
 
 	const avatarForm = document.getElementById('avatar-form') as HTMLFormElement | null;
 	avatarForm?.addEventListener('submit', async (e) =>
@@ -121,7 +126,9 @@ function onAvatarLoaded(): void
 
 function onPasswordLoaded(): void
 {
-	injectForm(passwordFormHtml);
+	const mainContainer = document.getElementById('main')
+	if (mainContainer)
+		mainContainer.insertAdjacentHTML('beforeend', passwordFormHtml);
 
 	const passwordForm = document.getElementById('password-form') as HTMLFormElement | null;
 	passwordForm?.addEventListener('submit', async (e) =>
@@ -154,7 +161,10 @@ function onPasswordLoaded(): void
 
 function onEmailLoaded(): void
 {
-	injectForm(emailFormHtml);
+	const mainContainer = document.getElementById('main')
+	if (mainContainer)
+		mainContainer.insertAdjacentHTML('beforeend', emailFormHtml);
+
 	const emailForm = document.getElementById('user-email-form') as HTMLFormElement | null;
 
 	emailForm?.addEventListener('submit', async (e) =>
@@ -190,7 +200,7 @@ function onDashboardLoaded()
 
 	if (isRegistered)
 	{
-		showRegisteredUserOptions();
+		showRegisteredUserOptions(user);
 		userState.subscribe(currentFriendsListener);
 	}
 
@@ -200,20 +210,35 @@ function onDashboardLoaded()
 
 // UTILITIES
 
-export function injectForm(html: string): void
-{
-	const container = document.getElementById('main');
-	if (container)
-		container.insertAdjacentHTML('beforeend', html);
-}
-
-function showRegisteredUserOptions()
+function showRegisteredUserOptions(user : RegisteredUser)
 {
 	document.querySelectorAll('.need-registered-user').forEach(el =>
 		{
 			(el as HTMLElement).style.display = 'flex';
 		}
 	);
+
+	const twoFactorAuthBtn = document.getElementById('enable-tfa-btn');
+	if (twoFactorAuthBtn)
+	{
+		if (user.hasTwoFactorAuth) {
+			twoFactorAuthBtn.textContent = 'Disable Two Factor Authentication';
+			twoFactorAuthBtn.addEventListener('click', () => {
+				userState.disableTwoFactorAuth();
+			});
+		} else {
+			twoFactorAuthBtn.textContent = 'Enable Two Factor Authentication';
+			twoFactorAuthBtn.addEventListener('click', () => {
+				userState.enableTwoFactorAuth();
+			});
+		}
+	}
+
+	const deleteAccBtn = document.getElementById('delete-account-btn');
+	deleteAccBtn?.addEventListener('click', () => {
+		userState.deleteAccount();
+		router.navigateTo('')
+	})
 }
 
 function cleanupDashboardListeners()
