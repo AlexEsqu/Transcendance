@@ -603,9 +603,12 @@ class UserState
 				headers: {
 					'accept': 'application/json',
 					'Authorization': `Bearer ${this.user.accessToken}`,
-					'X-App-Secret': `${apiKey}`
+					'X-App-Secret': `${apiKey}`,
+					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({ "enabled": true })
+				body: JSON.stringify({ 
+					enabled: true 
+				})
 			}
 		);
 
@@ -630,9 +633,12 @@ class UserState
 				headers: {
 					'accept': 'application/json',
 					'Authorization': `Bearer ${this.user.accessToken}`,
-					'X-App-Secret': `${apiKey}`
+					'X-App-Secret': `${apiKey}`,
+					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({ "enabled": false })
+				body: JSON.stringify({ 
+					enabled: false 
+				})
 			}
 		);
 
