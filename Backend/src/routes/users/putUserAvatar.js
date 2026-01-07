@@ -55,13 +55,13 @@ export default function putUserAvatar(server) {
 			
 			//get the full upload path
 			const uploadPath = `${process.env.AVATARS_UPLOAD_PATH}/user_${id}_${data.filename}`;
-
+			console.log(uploadPath);
 			const buffer = await data.toBuffer();
 			fs.writeFileSync(uploadPath, buffer);
 
 			server.db.prepare(`UPDATE users SET avatar = ? WHERE id = ?`).run(uploadPath, id);
 
-			if (old_avatar !== uploadPath) {
+			if (old_avatar && old_avatar !== uploadPath) {
 				fs.unlink(old_avatar, () => {
 					console.log(old_avatar + " was deleted");
 				});
