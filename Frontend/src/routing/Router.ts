@@ -56,7 +56,7 @@ class Router
 			if (!user && window.location.pathname !== '/connection')
 				this.navigateTo('/connection');
 			if (user && window.location.pathname.includes('/connection'))
-				this.navigateTo('/settings');
+				this.navigateTo('/dashboard');
 			if (this.navbarInitialized)
 				this.renderNavbar(user);
 		});
@@ -92,18 +92,22 @@ class Router
 
 		let route = this.routes.find(route => route.path === currentPath);
 
-		console.log(route && `route is ${route.path}`)
-
-
 		// if no route found, defaulting to the connection page
-		if (!route)
+		if (!route || !route.path)
+		{
+			this.redirectToDefaultPage();
+			return;
+		}
+
+		// if route requires no user, defaulting to the dashboard page
+		if (!route.needUser && user)
 		{
 			this.redirectToDefaultPage();
 			return;
 		}
 
 		// if route requires a user, defaulting to the connection page
-		if (route && route.needUser && !user)
+		if (route.needUser && !user)
 		{
 			this.redirectToDefaultPage();
 			return;
@@ -114,6 +118,16 @@ class Router
 		{
 			this.redirectToDefaultPage();
 			return;
+		}
+
+		// if the user is currently on a game page, warn them that leaving will end game
+		if (user && currentPath.includes('/game'))
+		{
+			const confirmed = window.confirm(
+				'Leaving the game page will end the game.\n Are you sure you want to continue?'
+			);
+			if (!confirmed)
+				return;
 		}
 
 		if (!route)
@@ -162,7 +176,7 @@ class Router
 			if (hasHistory)
 				targetPath = initialPath;
 			else
-				targetPath = '/settings';
+				targetPath = '/dashboard';
 		}
 
 		console.log(`going to ${targetPath}`);
@@ -173,7 +187,7 @@ class Router
 	private redirectToDefaultPage()
 	{
 		const user = this.userState.getUser();
-		window.history.replaceState(null, '', (user ? '/settings' : '/connection'));
+		window.history.replaceState(null, '', (user ? '/dashboard' : '/connection'));
 		this.render();
 	}
 

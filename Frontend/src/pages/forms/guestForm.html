@@ -1,7 +1,8 @@
 <form
 	id="guest-form"
 	name="guest-form"
-	class="glow-form glow-anim">
+	class="glow-form glow-anim"
+	novalidate>
 
 	<section>
 		<label
@@ -15,7 +16,12 @@
 			type="text"
 			class=""
 			required
+			maxlength="20"
 			placeholder="Wisely, Lilith, V..." />
+		<span
+			aria-live="polite"
+			class="error-hint text-center text-red-500 text-xs mt-1 hidden">
+		</span>
 	</section>
 
 	<button

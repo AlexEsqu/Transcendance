@@ -59,9 +59,14 @@ function initConnectionPageListeners(): void
 				return;
 			}
 
-			default:
+			case '/connection':
 			{
 				onConnectionLoaded();
+				return;
+			}
+
+			default:
+			{
 				return;
 			}
 
@@ -71,7 +76,7 @@ function initConnectionPageListeners(): void
 
 function onConnectionLoaded(): void
 {
-	const oauthBtn = document.getElementById('btn-oauth') as HTMLButtonElement;
+	const oauthBtn = document.getElementById('oauth-btn') as HTMLButtonElement;
 	oauthBtn.addEventListener('click', async (e) =>
 		{
 			e.preventDefault();

@@ -2,18 +2,25 @@
 	id="rename-form"
 	name="rename-form"
 	autocomplete="off"
+	novalidate
 	class="glow-form glow-anim">
 
 	<section>
-		<label for="input-new-name">New Username:</label>
+		<label for="input-new-name">
+			New Username:
+		</label>
 		<input
 			id="input-rename-user"
 			name="input-new-name"
 			type="text"
 			required
-			class=""
+			minlength="3"
+			maxlength="20"
+			pattern="[a-zA-Z0-9_]+"
 			autocomplete="off"
-			placeholder="Alice" />
+			placeholder="Alice"
+			data-error-msg="Cannot contain special characters"/>
+		<span aria-live="polite" class="error-hint text-center text-red-500 text-xs mt-1 hidden"></span>
 	</section>
 
 	<button

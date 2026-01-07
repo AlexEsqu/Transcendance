@@ -23,7 +23,7 @@
     flex-direction: column;
     justify-content: flex-start;
 	align-content: center;
-    padding: clamp(0.75rem, 2vw, 2rem);
+    padding: clamp(1rem, 5vw, 5rem);
 	gap: 1rem;
 	width: fit-content;
     min-width: min-content;

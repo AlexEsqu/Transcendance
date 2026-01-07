@@ -1,7 +1,9 @@
 <form
 	id="user-email-form"
 	name="user-email-form"
-	class="glow-form ">
+	novalidate
+	autocomplete="off"
+	class="glow-form glow-anim">
 
 	<section>
 		<label for="input-email">
@@ -12,9 +14,13 @@
 			name="input-email"
 			type="email"
 			required
-			class=""
 			placeholder="NEW EMAIL"
+			data-error-msg="Must be a valid email address"
 		/>
+		<span
+			aria-live="polite"
+			class="error-hint text-center text-red-500 text-xs mt-1 hidden">
+		</span>
 	</section>
 
 	<section>
@@ -25,16 +31,21 @@
 			id="input-email-check"
 			name="input-email-check"
 			type="email"
+			class="confirmation-input"
 			required
-			class=""
-			placeholder="NEW EMAIL CHECK"/>
+			placeholder="NEW EMAIL CHECK"
+			data-error-msg="Must be identical to the email address"
+			data-confirmation-target="input-email"/>
+		<span
+			aria-live="polite"
+			class="error-hint text-center text-red-500 text-xs mt-1 hidden">
+		</span>
 	</section>
 
 	<button
 		id="btn-submit-email"
 		name="btn-submit-email"
-		type="submit"
-		class="">
+		type="submit">
 		Change Email
 	</button>
 
