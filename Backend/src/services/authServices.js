@@ -1,40 +1,36 @@
 import bcrypt from "bcrypt";
-
+import crypto from "crypto";
 
 export function createAccessToken(server, id, username) {
-  // Use the injected server instance instead of server
-  const accessTokenLifetime = process.env.ACCESS_TOKEN_LIFETIME_IN_MINUTES
-  const token = server.jwt.sign(
-    { id, username },
-    { expiresIn: `${accessTokenLifetime}m` } // TODO: adjust
-  );
+	// Use the injected server instance instead of server
+	const accessTokenLifetime = process.env.ACCESS_TOKEN_LIFETIME_IN_MINUTES;
+	const token = server.jwt.sign({ id, username }, { expiresIn: `${accessTokenLifetime}m` }, { type: "user" });
 
-  // Update last_activity in DB
-  const date = new Date();
-  const sqliteDate = date.toISOString();
-  server.db.prepare(`UPDATE users SET last_activity = ? WHERE id = ?`).run(sqliteDate, id);
+	// Update last_activity in DB
+	const date = new Date();
+	const sqliteDate = date.toISOString();
+	server.db.prepare(`UPDATE users SET last_activity = ? WHERE id = ?`).run(sqliteDate, id);
 
-  return token;
+	return token;
 }
 
 /**
  * Creates a refresh token using the provided server instance
  */
 export function createRefreshToken(server, id, username) {
-  return server.jwt.sign(
-    { id, username },
-    { expiresIn: "7d" } // TODO: adjust
-  );
+	return server.jwt.sign(
+		{ id, username },
+		{ expiresIn: "7d" } // TODO: adjust
+	);
 }
 
 /**
  * Hashes a refresh token
  */
 export async function hashRefreshToken(token) {
-  const salt = await bcrypt.genSalt(10);
-  return bcrypt.hash(token, salt);
+	const salt = await bcrypt.genSalt(10);
+	return bcrypt.hash(token, salt);
 }
-
 
 export async function generateTokens(server, user, reply) {
 	const accessToken = createAccessToken(server, user.id, user.username);
@@ -75,4 +71,3 @@ export async function sendVerificationCodeEmail(server, user) {
 	});
 	return twoFaToken;
 }
-

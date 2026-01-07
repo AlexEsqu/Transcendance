@@ -68,15 +68,7 @@ export default function login_2fa(server) {
 			return reply.status(401).send({ error: "Unauthorized", message: "Invalid code" });
 		}
 		server.db
-			.prepare(
-				`
-						UPDATE users 
-							SET code_hash_2fa = null, 
-							code_expires_2fa = null, 
-							token_2fa = null 
-						WHERE id = ?
-						`
-			)
+			.prepare(`UPDATE users SET code_hash_2fa = null,code_expires_2fa = null,token_2fa = null WHERE id = ?`)
 			.run(user.id);
 		return generateTokens(server, user, reply);
 	});

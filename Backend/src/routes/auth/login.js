@@ -1,6 +1,5 @@
-import { generateTokens } from "../../services/authServices.js";
+import { generateTokens, sendVerificationCodeEmail } from "../../services/authServices.js";
 import bcrypt from "bcrypt";
-import crypto from "crypto";
 
 export default function login(server) {
 	const opts = {
