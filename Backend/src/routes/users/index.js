@@ -7,7 +7,9 @@ import getFriends from "./friends/getFriends.js";
 import addFriend from "./friends/postFriend.js";
 import deleteFriend from "./friends/deleteFriend.js";
 import putUsername from "./putUsername.js";
-import toggle_2fa from "./2fa.js";
+import toggle_2fa from "./toggle2fa.js";
+import get_2fa_status from "./get2fa.js";
+import postGuest from "./guests/postGuest.js";
 
 export default async function userRoutes(server) {
 	server.register(getUsers, { prefix: "api" });
@@ -21,4 +23,6 @@ export default async function userRoutes(server) {
 	server.register(deleteUser, { prefix: "api/users" });
 	server.register(getFriends, { prefix: "api/users" });
 	server.register(toggle_2fa, { prefix: "api/users" });
+	server.register(get_2fa_status, { prefix: "api/users" });
+	server.register(postGuest, {prefix : "api"})
 }

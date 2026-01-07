@@ -17,5 +17,6 @@ ENV SQLITE_PATH=/app/data/database.db
 ENV AVATARS_UPLOAD_PATH=/app/uploads/avatars
 
 ENV FT_OAUTH_URL=https://api.intra.42.fr/oauth/authorize
+ENV ACCESS_TOKEN_LIFETIME_IN_MINUTES=10
 RUN chmod +x scripts/entrypoint.sh
 ENTRYPOINT ["./scripts/entrypoint.sh"]
