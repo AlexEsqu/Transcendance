@@ -13,7 +13,7 @@ export default function login(server) {
    If 2FA is enabled for the user, the endpoint does not issue tokens immediately. \
    Instead, a one-time 6-digit verification code is sent to the user's email and \
    a temporary 2FA continuation token is generated, which must be used to complete \
-   authentication via the 2FA verification endpoint. \
+   authentication via the 2FA verification endpoint through the api route `POST /api/users/auth/login/2fa`. \
    `This endpoint requires the client to have a verified email address.`",
 			tags: ["auth"],
 			body: { $ref: "authCredentialsBody" },
@@ -32,10 +32,10 @@ export default function login(server) {
 						{
 							description: "Two-factor authentication required",
 							type: "object",
-							required: ["twoFactorRequired", "token"],
+							required: ["twoFactorRequired", "twoFactorToken"],
 							properties: {
 								twoFactorRequired: { type: "boolean", example: true },
-								token: { type: "string", description: "2FA continuation token" },
+								twoFactorToken: { type: "string", description: "2FA continuation token" },
 							},
 						},
 					],
@@ -87,7 +87,7 @@ export default function login(server) {
 				const twoFaToken = await sendVerificationCodeEmail(server, user);
 				return reply.status(200).send({
 					twoFactorRequired: true,
-					token: twoFaToken,
+					twoFactorToken: twoFaToken,
 				});
 			}
 			const tokens = await generateTokens(server, user, reply);
