@@ -1,4 +1,4 @@
-import { GameLocation, GameType, IPlayer } from '../config/gameData';
+import { GameLocation, MatchType, IPlayer } from '../config/gameData';
 import { WebSocket as WSWebSocket } from 'ws';
 import { notifyPlayersInRoom } from '../utils/broadcast'
 import { Room } from './Room';
@@ -17,15 +17,15 @@ export class GameControl
 
 	generatePlayerId(socket: WSWebSocket, data: any)
 	{
-		const gameType: GameType = data.game === 'tournament' ? GameType.tournament: 
-								data.game === 'duo' ? GameType.duo: GameType.solo;
+		const matchType: MatchType = data.game === 'tournament' ? MatchType.tournament: 
+								data.game === 'duo' ? MatchType.duo: MatchType.solo;
 
 		const gameLocation: GameLocation = data.location === 'local' ? GameLocation.local: GameLocation.remote;
 
 		const player: IPlayer = {
 			id: data.id,
 			socket: socket,
-			gameType: gameType,
+			matchType: matchType,
 			gameLocation: gameLocation,
 			isReady: false
 		};
@@ -52,8 +52,8 @@ export class GameControl
 	{
 		console.log("GAME-CONTROL : add a new player in a waiting room");
 		
-		//	Add to an existing room that match with the gameType and gameLocation ?
-		let roomId: number | undefined = this.findWaitingRoomMatch(player.gameType, player.gameLocation);
+		//	Add to an existing room that match with the matchType and gameLocation ?
+		let roomId: number | undefined = this.findWaitingRoomMatch(player.matchType, player.gameLocation);
 		if (roomId !== undefined)
 			this.waitingRoom.get(roomId)?.addPlayerInRoom(player.id, player);
 		else //	Or create a new waiting room and add the player in
@@ -70,12 +70,12 @@ export class GameControl
 		return roomId;
 	}
 
-	findWaitingRoomMatch(gameType: GameType, gameLocation: GameLocation): number | undefined
+	findWaitingRoomMatch(matchType: MatchType, gameLocation: GameLocation): number | undefined
 	{
 		if (this.waitingRoom.size <= 0) return undefined;
 
 		for (const [key, value] of this.waitingRoom) {
-			if (value.type === gameType && value.players.size + 1 <= value.type)
+			if (value.type === matchType && value.players.size + 1 <= value.type)
 				return key;
 		}
 
@@ -88,7 +88,7 @@ export class GameControl
 		const roomId = Date.now();
 		if (!roomId) return undefined;
 
-		const room = new Room(roomId, player, player.gameType);
+		const room = new Room(roomId, player, player.matchType);
 		if (!room) return undefined;
 
 		this.waitingRoom.set(roomId, room);

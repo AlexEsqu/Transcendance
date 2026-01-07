@@ -1,4 +1,4 @@
-import { Pong } from "../game/Pong"
+import { Pong } from "./Pong"
 import { IOptions } from "../game/Data"
 import { clearOptions, loadOptions } from "./options"
 
@@ -16,8 +16,12 @@ class GameApp {
 		this.startBtn = document.getElementById('btn-startplay');
 		this.setupStartButton();
 		
-		this.pong = new Pong("game-canvas", options, () => this.showStartButton());
-		this.pong.runGame();
+		try {
+			this.pong = new Pong("game-canvas", options, () => this.showStartButton());
+			this.pong.goToWaitingRoom();
+		} catch (error) {
+			console.error(error); // TO DO: better error handling
+		}
 	}
 
 	play() {

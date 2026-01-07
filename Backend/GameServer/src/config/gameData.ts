@@ -1,6 +1,7 @@
 import { WebSocket as WSWebSocket } from 'ws';
 
-export { GAME, GameType, GameLocation, State, Level, IBall, IPaddle, IPlayer, IRound, IResult, IGameState }
+export { GAME, MatchType, GameLocation, State, Level, GAMING_ROOM_URL, WAITING_ROOM_URL }
+export type { IBall, IPaddle, IPlayer, IRound, IResult, IGameState }
 
 /************************************************************************************************************
  * 		Declare CONSTANT variables								 											*
@@ -24,11 +25,14 @@ const GAME = {
 	MAP_HEIGHT: 6
 }
 
+const GAMING_ROOM_URL: string = "/room/gaming";
+const WAITING_ROOM_URL: string = "/room/waiting";
+
 /************************************************************************************************************
  * 		Declare enums																						*
  ***********************************************************************************************************/
 
-enum GameType {
+enum MatchType {
 	solo = 1, duo = 2, tournament = 4 
 };
 
@@ -75,7 +79,7 @@ interface IPaddle {
 interface IPlayer {
 	id: number;
 	socket: WSWebSocket;
-	gameType: GameType;
+	matchType: MatchType;
 	gameLocation: GameLocation;
 	isReady: boolean;
 	roomId?: number;

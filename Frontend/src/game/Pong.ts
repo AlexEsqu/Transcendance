@@ -1,149 +1,134 @@
-import { Engine, Color3 } from '@babylonjs/core';
+import { Engine } from '@babylonjs/core';
 import { AdvancedDynamicTexture } from "@babylonjs/gui";
-import { sendMatchesPostRequest } from "./sendMatches";
-import { State, IPlayer, IRound, IOptions, IScene } from "./Data"
-import { Paddle } from './Paddle';
-import { createText, createAnimation, loadGame, createMaterial } from './Graphics';
+import { State, IPlayer, IOptions, IScene, IResult, IPaddle, JSONWaitingRoom, JSONRoomMessage, JSONGameState, JSONGameUpdate } from "./Data";
+import { createText, createAnimation, loadGame } from './Graphics';
 import { monitoringRounds, saveResults, newRound, drawMatchHistoryTree, drawScore, drawName } from './manageRounds';
-import { Ball } from './Ball';
-
-export interface IPaddle {
-	paddle: Paddle,
-	player: IPlayer | null,
-};
+import { getCanvasConfig, getPlayers, fillWaitingRoomRequest } from './utils';
 
 export class Pong {
-	static MAP_WIDTH = 10;
-	static MAP_HEIGHT = 6;
-	static MAX_SCORE = 2;
-	static MAX_ROUNDS = 1;
+
+	static WAITING_ROOM_URL = "ws://localhost:4001/room/waiting";
+	static GAMING_ROOM_URL = "ws://localhost:4001/room/gaming";
 
 	canvas: HTMLCanvasElement;
-	engine: Engine;
-	gui: AdvancedDynamicTexture | null;
-	robot: boolean;
-	time?: number;
+	engine: Engine | null = null;
+	scene: IScene | null = null;
+	gui: AdvancedDynamicTexture | null = null;
 	isLaunched: boolean;
+	waitingSocket: WebSocket | null = null;
+	gamingSocket: WebSocket | null = null;
+	roomId: number | undefined = undefined;
+	playerId: number; 
+	timestamp: number = 0;
 	onNewRound?: () => void;
-	scene: IScene | null;
-	waitSocket: WebSocket | null = null;
-	socket: WebSocket | null = null;
 
 	constructor(canvasId: string, options: IOptions, onNewRound?: () => void)
 	{
-		this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
-		this.canvas.width = window.innerWidth;
-		this.canvas.height = window.innerHeight;
+		this.canvas = getCanvasConfig(canvasId);
 		this.engine = new Engine(this.canvas, true);
-		this.gui = null;
-		this.scene = null;
-		this.robot = false;
-		if (options.nbOfPlayers >= 4) Pong.MAX_ROUNDS = options.nbOfPlayers - 1;
+		if (!this.engine)
+			throw new Error("'engine' creation failed");
+		this.scene = loadGame(this.engine, this.canvas, options);
+		if (!this.scene)
+			throw new Error("'scene' creation failed");
+		this.scene.players = getPlayers(options.players, options.nbOfPlayers);
+		this.scene.state = State.waiting;
 		this.onNewRound = onNewRound;
 		this.isLaunched = false;
-		this.scene = loadGame(this.engine, this.canvas, options);
-		if (!this.scene) return ;
-		let players: Array<IPlayer> = this.initPlayers(options.players, options.nbOfPlayers);
-		console.log(players);
-		if (players.length != options.nbOfPlayers) {
-			console.error("players init failed, players are missing");
-			return ;
-		}
-		if (options.nbOfPlayers === 1) { // special case: opponent is a robot
-			this.robot = true;
-			players.push({ id: 0, name: "Robot", score: 0, color: "#8dbcff" });
-			players.reverse();
-		}
-		this.scene.players = players;
-		this.scene.state = State.opening;
-		this.time = Date.now();
-		this.waitSocket = new WebSocket("ws://localhost:4001/waitingRoom");
-		this.waitSocket.onopen = (e) => {
-			console.log("CLIENT CONNECTED to game server");
-			const JSONForm = {
-				id: Date.now(),
-				game: 'solo',
-				location: 'remote'
-			};
-			const data = JSON.stringify(JSONForm);
-			if (this.waitSocket)
-				this.waitSocket.send(data);
-		}
+		this.waitingSocket = new WebSocket(Pong.WAITING_ROOM_URL);
+		if (!this.waitingSocket)
+			throw new Error("'waitingSocket' creation failed");
+		this.timestamp = Date.now();
+		this.playerId = 42; // TO DO - get users ID from UI
 	}
 
-	initPlayers(inputs: string[], nbOfPlayer: number): Array<IPlayer>
+	goToWaitingRoom(): void
 	{
-		let players: Array<IPlayer> = [];
-		for (let i = 0; i < nbOfPlayer; i++)
-		{
-			if (inputs[i])
-				players.push({ id: 0, name: inputs[i], score: 0, color: "#"} );
+		if (!this.waitingSocket)
+			throw new Error("'waitingSocket' not found");
+
+		const request: JSONWaitingRoom = fillWaitingRoomRequest(this.scene?.options.matchLocation,
+															this.scene?.options.nbOfPlayers, undefined);
+
+		//	On socket creation send a message to the server to be added in a waiting room
+		this.waitingSocket.onopen = (e) => {
+			if (!this.waitingSocket)
+				throw new Error("'waitingSocket' not found");
+			console.log("GAME-FRONT: connection with game-server");
+			const data = JSON.stringify(request);
+			this.waitingSocket.send(data);
 		}
-		return players;
+
+		//	Wait for the server to manage waiting rooms and assign current user to a gaming room
+		this.waitingSocket.onmessage = (e) => {
+			const serverMsg: JSONRoomMessage = JSON.parse(e.data);
+			console.log(`GAME-FRONT: received message from server (${serverMsg})`);
+			
+			// console.log(`roomID ${this.roomId}`);
+			// console.log(`state.roomID ${serverMsg.roomId}`);
+			if (this.roomId === undefined && serverMsg.roomId !== undefined) {
+				this.roomId = serverMsg.roomId;
+				this.gamingSocket = new WebSocket(Pong.GAMING_ROOM_URL);
+				this.goToGamingRoom();
+			}
+		}
+
+		this.waitingSocket.onerror = (error) => {
+			// console.error(error);
+			throw new Error(error.toString());
+		}
 	}
 
+	goToGamingRoom(): void
+	{
+		if (!this.gamingSocket)
+			throw new Error("'gamingSocket' not found");
+			
+		this.gamingSocket.onopen = (e) => {
+			if (this.roomId === undefined)
+				throw new Error("'roomId' is undefined, can't enter to gaming room");
+			if (!this.gamingSocket)
+				throw new Error("'gamingSocket' not found");
 
-	/**
-	 * 	- Main loop that displays/renders the game scene and listens for events and inputs to update each frame
-	 */
+			console.log(`GAME-FRONT: joining the gaming room(${this.roomId})`);
+			const joinMsg = {
+				id: this.playerId ?? Date.now(),
+				roomId: this.roomId,
+				ready: false,
+			};
+			this.gamingSocket.send(JSON.stringify(joinMsg));
+			this.runGame();
+		}
+
+		this.gamingSocket.onerror = (error) => {
+			// console.error(error);
+			throw new Error(error.toString());
+		}
+
+		
+	}
+
 	runGame(): void
 	{
-		if (!this.engine || !this.scene || !this.scene.id || (this.scene.players && this.scene.players.length <= 1)) {
+		if (!this.engine || !this.scene || !this.scene.id) {
 			console.error("error occured while loading 'Pong' game");
 			return ;
 		}
 
 		const keys: Record<string, boolean> = {};
 		let isNewRound: boolean = true;
-		let rounds: IRound = { results: null, nbOfRounds: 0, playerIndex: 0, nodeColor: [] };
-		let roomId: number | undefined = undefined;
-
-		interface testJSON {
-			roomId: number;
-			message: string;
-		};
 
 		//	Manage user input and update data before render
-		this.handleInput(keys, rounds);
+		this.handleInput(keys);
 		this.scene.id.registerBeforeRender(() => {
-			if (this.waitSocket) this.waitSocket.onmessage = (e) => {
-				const gameState: testJSON = JSON.parse(e.data);
-				console.log("Received Game server state : ", gameState);
-				if (roomId === undefined && gameState.roomId !== undefined) {
-					roomId = gameState.roomId;
-					this.socket = new WebSocket("ws://localhost:4001/game");
-					console.log(`roomID ${roomId}`);
-					console.log(`state.roomID ${gameState.roomId}`);
-				}
-			}
-			if (this.socket) this.socket.onopen = (e) => {
-				const gameState = {
-					id: Date.now(),
-					roomId: roomId,
-					ready: true,
-				};
-				console.log(gameState);
-				if (roomId !== undefined)
-					this.socket?.send(JSON.stringify(gameState));
-			}
-			if (this.socket) this.socket.onmessage = (e) => {
-				const gameState = JSON.parse(e.data);
-				console.log("Received Game server state : ", gameState);
-			}
 			if (this.scene && this.scene.state === State.opening) this.opening();
 			if (this.scene && this.scene.state === State.end) this.endGame(rounds);
-			if (this.scene && this.scene.state === State.play && this.isLaunched) {
-				let launch = this.updateGame(keys);
-				isNewRound = monitoringRounds(this.scene, rounds.nbOfRounds);
-				//	If 'updateGame' has detected that the ball is out of bounds, must relaunch the ball from the middle of the map
-				if (launch && !isNewRound)
-					this.launch(3);
-			}
-			//	If 'monitoringRounds' has detected that a player has reached the max score
-			if (isNewRound) { rounds = this.requestNewRound(rounds); console.log(rounds); }
+			if (this.scene && this.scene.state === State.play && this.isLaunched)
+			this.timestamp = Date.now();
+
 			isNewRound = false;
-			this.time = Date.now();
 		});
+
 		//	Rendering loop
 		this.engine.runRenderLoop(() => {
 			if (this.scene &&( !this.scene.id || this.scene.state === State.stop)) this.engine.stopRenderLoop();
@@ -151,93 +136,75 @@ export class Pong {
 		});
 	}
 
-	/**
-	 * 	- Save the results of the previous match, if needed and/or assign new players their paddles, also reset data if needed
-	 */
-	requestNewRound(rounds: IRound): IRound
+	updateGame(keys: Record<string, boolean>): boolean
 	{
-		if (!this.scene) {
-			console.error("'scene' object is null");
-			return rounds;
+		if (!this.scene) return false;
+
+		let isBallOutOfBounds: boolean = false;
+		let player: number | undefined = this.playerId ?? 42;
+		let action: string = 'none';
+
+		//	If a user presses a key, ask the server to update paddle's position
+		if (keys["ArrowDown"]) {
+			player = this.scene.rightPadd?.player?.id;
+			action = 'down';
+		} else if (keys["ArrowUp"]) {
+			player = this.scene.rightPadd?.player?.id;
+			action = 'up';
 		}
 
-		this.scene.state = State.pause;
-		this.isLaunched = false;
+		if (action !== 'none')
+			this.sendUpdateToGameServer(player ?? this.playerId, action, true);
 
-		let currentNbOfRounds: number = 0;
-		if (rounds) currentNbOfRounds = rounds.nbOfRounds;
-
-		//	Save the results of the previous match, if there was one
-		if (this.scene.leftPadd && this.scene.rightPadd)
-			rounds = saveResults(this.scene.leftPadd, this.scene.rightPadd, rounds);
-		//	Assign new players to their paddles for the next match and reset data (paddle & ball)
-		rounds = newRound(this.scene, rounds)
-		rounds.nbOfRounds += 1;
-
-		// Display names and score of the new players
-		if (currentNbOfRounds < rounds.nbOfRounds && this.scene.leftPadd && this.scene.rightPadd)
-		{
-			// drawMatchHistoryTree(this.canvasUI, playersColors, roundsColors, this.scene.options.nbOfPlayers);
-			if (this.scene.leftPadd.player?.name && this.scene.rightPadd.player?.name)
-				drawName(this.scene.leftPadd.player.name, this.scene.rightPadd.player.name, rounds.nbOfRounds);
-			if (this.scene.leftPadd.player?.score && this.scene.rightPadd.player?.score)
-				drawScore(this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
+		if (this.scene.options.matchLocation === 'local') {
+			if (keys["s"]) {
+				player = this.scene.leftPadd?.player?.id;
+				action = 'down';
+			} else if (keys["w"]) {
+				player = this.scene.leftPadd?.player?.id;
+				action = 'up';
+			}
 		}
 
-		//	Display start button to launch the game for a new round
-		if (this.onNewRound && rounds.nbOfRounds <= Pong.MAX_ROUNDS)
-			this.onNewRound();
-		else monitoringRounds(this.scene, rounds.nbOfRounds);
+		
 
-		return rounds;
-	}
+		const newState = this.getGameUpdate();
 
-	/**
-	 * 	- Listen to new user inputs and update every paddle's data accordingly
-	 * 	- Returns '1' if it has been detected that the ball is out of bounds, otherwise 0
-	 */
-	updateGame(keys: Record<string, boolean>): number
-	{
-		if (!this.scene) return 0;
-
-		let isBallOutOfBounds: number = 0;
-		let paddle: Paddle | null = null;
-		let side: string = "down";
-
-		if (!this.scene.ball || !this.time || !this.scene.leftPadd || !this.scene.rightPadd)
-		{
-			console.error("objects are missing to run and update the game, can't continue");
-			return 0;
-		}
-		//	Update ball's position according to its direction and velocity
-		this.scene.ball.move(this.time);
-		//	Check for collisions and invert ball's direction if so
-		if (this.scene.ball.update(this.scene.leftPadd, this.scene.rightPadd) == true)
-			isBallOutOfBounds = 1;
-
-		//	If a user presses a key, update the position of its padd
-		if ((keys["ArrowDown"] || keys["ArrowUp"]))
-		{
-			paddle = this.scene.rightPadd.paddle;
-			if (keys["ArrowUp"])
-				side = "up";
-		}
-		if (!this.robot && (keys["s"] || keys["w"]))
-		{
-			paddle = this.scene.leftPadd.paddle;
-			if (keys["w"])
-				side = "up";
-		}
-
-		if (this.robot)
-			this.scene.leftPadd.paddle.autoMove(this.scene.ball, (Pong.MAP_HEIGHT / 2), this.time);
-		if (paddle)
-			paddle.move(side, Pong.MAP_HEIGHT / 2, this.time);
-
-		if (this.scene.leftPadd.player && this.scene.rightPadd.player)
-			drawScore(this.scene.leftPadd.player.score,  this.scene.rightPadd.player.score);
 
 		return isBallOutOfBounds;
+	}
+
+	sendUpdateToGameServer(player: number, action: string, ready: boolean): void
+	{
+		if (!this.roomId || !this.gamingSocket) {
+			console.error("GAME-FRONT: Error, can't send update to game server because elements are missing");
+			return ;
+		}
+
+		const gameUpdateMsg: JSONGameUpdate = {
+			id: player,
+			roomId: this.roomId,
+			ready: ready,
+			move: action
+		};
+
+		this.gamingSocket.send(JSON.stringify(gameUpdateMsg));
+	}
+
+	getGameUpdate(): void
+	{
+		if (!this.gamingSocket)
+			throw new Error("'gamingSocket' not found");
+
+		this.gamingSocket.onmessage = (e) => {
+			if (this.roomId === undefined)
+				throw new Error("'roomId' is undefined, can't enter to gaming room");
+			if (!this.gamingSocket)
+				throw new Error("'gamingSocket' not found");
+
+			const gameState: JSONGameState = JSON.parse(e.data);
+			console.log(`GAME-FRONT: game state from room(${this.roomId}) =`, gameState);
+		}
 	}
 
 	/**
@@ -278,7 +245,7 @@ export class Pong {
 	 * 	- Camera tilt animation when the game launches
 	 */
 	opening(): void {
-		console.log("GAME-STATE: opening");
+		console.log("GAME-FRONT: opening");
 		const keys = [
 			{ frame: 0, value: 0 },
 			{ frame: 60, value: (Math.PI / 4) }
@@ -293,20 +260,18 @@ export class Pong {
 		}
 	}
 
-	endGame(rounds: IRound): void
+	endGame(result: IResult): void
 	{
-		if (!rounds || rounds.nbOfRounds < 0) {
+		if (!result) {
 			console.error("results of matches are lost");
 			return ;
 		}
-		console.log("GAME-STATE: end");
-
-		const index = rounds.nbOfRounds - 2;
+		console.log("GAME-FRONT: end");
 
 		const winnerSpot = document.getElementById('match-results');
-		if (winnerSpot && rounds.results && rounds.results[index]?.winner?.name)
+		if (winnerSpot && result.winner?.name)
 		{
-			winnerSpot.textContent = `${rounds.results[index].winner.name} wins!`;
+			winnerSpot.textContent = `${result.winner?.name} wins!`;
 			winnerSpot.classList.remove('invisible');
 		}
 	}
@@ -315,16 +280,18 @@ export class Pong {
 	 * 	- Listens to window inputs for each frame.
 	 * 	- Saves keys status (on/off) to update scene objects accordingly.
 	 */
-	handleInput(keys: Record<string, boolean>, rounds: IRound): void {
+	handleInput(keys: Record<string, boolean>): void
+	{
 		//	Resize the game with the window
 		window.addEventListener('resize', () => {
+		if (this.engine)
 			this.engine.resize();
-			if (this.scene && this.scene.leftPadd && this.scene.leftPadd.player && this.scene.rightPadd && this.scene.rightPadd.player) {
-				drawName(this.scene.leftPadd.player.name, this.scene.rightPadd.player.name, this.scene.options.nbOfPlayers);
-				drawScore(this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
-				// drawMatchHistoryTree(this.canvasUI, rounds, this.scene.options.nbOfPlayers);
-			}
-		});
+		if (this.scene && this.scene.leftPadd && this.scene.leftPadd.player && this.scene.rightPadd && this.scene.rightPadd.player)
+		{
+			drawName(this.scene.leftPadd.player.name, this.scene.rightPadd.player.name, this.scene.options.nbOfPlayers);
+			drawScore(this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
+		}
+
 		//	Shift+Ctrl+Alt+I == Hide/show the Inspector
 		window.addEventListener("keydown", (ev) => {
             if (ev.shiftKey && ev.ctrlKey && ev.altKey && (ev.key === "I" || ev.key === "i")) {
@@ -335,6 +302,7 @@ export class Pong {
                 }
             }
         });
+
 		//	Detect when a user presses or releases a key to play the game
 		window.addEventListener("keydown", (evt) => {
 			if (evt.key === "ArrowDown" || evt.key === "ArrowUp")
@@ -343,6 +311,7 @@ export class Pong {
 		});
 		window.addEventListener("keyup", (evt) => {
 			keys[evt.key] = false;
+		});
 		});
 	}
 }

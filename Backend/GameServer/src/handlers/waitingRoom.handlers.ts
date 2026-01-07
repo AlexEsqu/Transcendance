@@ -16,7 +16,7 @@ export { handleMessage, handleDisconnection}
 function handleMessage(socket: WSWebSocket, message: Buffer, 
 	validateSchema: ValidateFunction, gameControl: GameControl): { playerId: number, roomId: number}
 {
-	console.log("GAME-SERVER: handle received message from '/waitingRoom' route");
+	console.log("GAME-SERVER: handle received message from '/room/waiting' route");
 	try {
 		//	Must parse and validate received message
 		const data = JSON.parse(message.toString());

@@ -9,7 +9,7 @@ const waitingSchema = {
 	required: ['id', 'game', 'location'],
 	properties: {
 		id: {type: 'number'},
-		game: {type: 'string'},
+		match: {type: 'string'},
 		location: {type: 'string'}
 	},
 	additionalProperties: false

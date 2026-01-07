@@ -1,23 +1,17 @@
-import { IResult } from "./Data";
+import { IResult, JSONMatchesResults } from "./Data";
 
 export { sendMatchesPostRequest };
 
-interface IJSON {
-	winner_id: number;
-	loser_id: number;
-	winner_score: number;
-	loser_score: number;
-	date: string;
-}
 
-function fillMatchesJSON(results: IResult, time?: number): IJSON | null
+
+function fillMatchesJSON(results: IResult, time?: number): JSONMatchesResults | null
 {
 	if (!results || !results.winner || !results.loser) return null;
 
 	const date = new Date(time ?? Date.now());
 
 	// get Id from Name
-	let matches: IJSON = {
+	let matches: JSONMatchesResults = {
 		winner_id: results.winner.id,
 		loser_id: results.loser.id,
 		winner_score: results.maxScore,
@@ -42,7 +36,7 @@ function sendMatchesPostRequest(results: IResult, time?: number): void
 	};
 
 	const matchesURL: string = "https://localhost:8443/matches";
-	const matchesJSON: IJSON | null = fillMatchesJSON(results, time);
+	const matchesJSON: JSONMatchesResults | null = fillMatchesJSON(results, time);
 	if (!matchesJSON) return ;
 
 	const request = new Request(
@@ -55,19 +49,19 @@ function sendMatchesPostRequest(results: IResult, time?: number): void
 	);
 
 	fetch(request)
-		.then(async (res) => {
-			const text = await res.text();
+		.then(async (response) => {
+			const text = await response.text();
 			try {
 				const json = JSON.parse(text);
 				console.log('server response (json):', json);
 			} catch {
 				console.log('server response (text):', text);
 			}
-			if (!res.ok) {
-				console.error('HTTP error', res.status, res.statusText);
+			if (!response.ok) {
+				console.error('HTTP error', response.status, response.statusText);
 			}
 		})
-		.catch((err) => {
-			console.error('network/fetch error', err);
+		.catch((error) => {
+			console.error('network/fetch error', error);
 		});
 }

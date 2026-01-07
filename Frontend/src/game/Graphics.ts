@@ -2,7 +2,7 @@ import { Engine, Scene, Mesh, MeshBuilder, Vector3, Color3, GlowLayer, Color4, S
 import { AdvancedDynamicTexture, TextBlock } from "@babylonjs/gui";
 import { Ball } from './Ball';
 import { Paddle } from './Paddle';
-import { Pong } from './Pong';
+import { Pong } from './Pong_old';
 import { IOptions, IScene } from './Data';
 
 export { createBall, createPaddle, createCamera, createText, createMap, createAnimation, loadGame, createMaterial }

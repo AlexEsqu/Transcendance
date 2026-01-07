@@ -189,7 +189,7 @@ function onGameOptionLoaded(): void
 
 		// extracting data but putting default just in case some is missing
 		const options: IOptions = {
-			matchType: matchLoc ? matchLoc : 'local',
+			matchLocation: matchLoc ? matchLoc : 'local',
 			level: level ? parseInt(level) : 0,
 			nbOfPlayers: gameType ? parseInt(gameType) : 1,
 			paddColors: getPaddColors() || '#a2c2e8',

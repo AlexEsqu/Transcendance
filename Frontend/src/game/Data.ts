@@ -1,12 +1,10 @@
-import { Scene, ArcRotateCamera } from '@babylonjs/core';
-import { Ball } from './Ball';
-import { IPaddle } from './Pong';
+import { Scene, ArcRotateCamera, Mesh } from '@babylonjs/core';
 
 export { State, Level }
-export type {IPlayer, IRound, IOptions, IScene, IResult }
+export type { IPlayer, IPaddle, IOptions, IScene, IResult, JSONMatchesResults, JSONWaitingRoom, JSONRoomMessage, JSONGameState, JSONGameUpdate }
 
 enum State {
-	opening, launch, play, pause, end, stop
+	waiting, opening, launch, play, pause, end, stop
 };
 
 enum Level {
@@ -14,7 +12,7 @@ enum Level {
 };
 
 interface IOptions {
-	matchType: string;	//	'local' or 'remote'
+	matchLocation: string;	// 'local' or 'remote'
 	level: number;
 	nbOfPlayers: number; // 1, 2 or 4
 	paddColors: string[];
@@ -23,11 +21,16 @@ interface IOptions {
 	mapColor: string;
 };
 
+interface IPaddle {
+	mesh: Mesh | null;
+	player: IPlayer | null,
+};
+
 interface IScene {
 	id: Scene | null;
 	state: State;
 	camera: ArcRotateCamera | null;
-	ball: Ball | null;
+	ball: Mesh | null;
 	leftPadd: IPaddle | null;
 	rightPadd: IPaddle | null;
 	options: IOptions;
@@ -48,9 +51,38 @@ interface IResult {
 	minScore: number;
 };
 
-interface IRound {
-	results: Array<IResult> | null;
-	nbOfRounds: number;
-	playerIndex: number;
-	nodeColor: string[];
+interface JSONMatchesResults {
+	winner_id: number;
+	loser_id: number;
+	winner_score: number;
+	loser_score: number;
+	date: string;
 }
+
+interface JSONWaitingRoom {
+	id: number;
+	match: string;
+	location: string;
+};
+
+interface JSONRoomMessage {
+	roomId: number;
+	message: string;
+};
+
+interface JSONGameState {
+	roomId: number;
+	state: number;
+	timestamp: number;
+	round: number;
+	leftPaddPos: number;
+	rightPaddPos: number;
+	ball: { x: number, z: number };
+};
+
+interface JSONGameUpdate {
+	id?: number;
+	roomId: number;
+	ready: boolean;
+	move?: string;
+};

@@ -1,5 +1,5 @@
 import { IRound, State, IScene, IResult } from "./Data";
-import { IPaddle, Pong } from "./Pong";
+import { IPaddle, Pong } from "./Pong_old";
 
 export { monitoringRounds, saveResults, newRound, drawMatchHistoryTree, drawScore, drawName }
 

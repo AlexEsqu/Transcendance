@@ -4,7 +4,7 @@ import { WebSocket as WSWebSocket } from 'ws';
 import { GameControl } from "../services/GameControl";
 import { gameSchema } from '../config/schemas';
 import { handleMessage, handleDisconnection } from '../handlers/game.handlers.js'
-import { IPlayer } from "../config/gameData";
+import { IPlayer, GAMING_ROOM_URL } from "../config/gameData";
 
 /************************************************************************************************************
  * 		Declare routes/endpoints								 											*
@@ -18,7 +18,7 @@ export async function registerGameRoutes(gameServer: FastifyInstance, gameContro
 	const validateGameMessage = ajv.compile(gameSchema) as ValidateFunction;
 
 	await gameServer.register(async function (fastify) {
-		fastify.get('/game', { websocket: true }, (socket, request) => {
+		fastify.get(GAMING_ROOM_URL, { websocket: true }, (socket, request) => {
 			if (!socket) throw new Error("Websocket is missing");
 
 			let player : IPlayer | undefined;

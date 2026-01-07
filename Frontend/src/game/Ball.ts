@@ -1,6 +1,6 @@
 import { Scene, Vector3, Mesh } from '@babylonjs/core';
 import { Paddle } from "./Paddle";
-import { Pong, IPaddle } from "./Pong";
+import { Pong, IPaddle } from "./Pong_old";
 import { createBall } from './Graphics';
 import { Level } from './Data';
 

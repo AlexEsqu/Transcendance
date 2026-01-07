@@ -17,13 +17,13 @@ export { handleMessage, handleDisconnection}
 function handleMessage(socket: WSWebSocket, message: Buffer, 
 	validateSchema: ValidateFunction, gameControl: GameControl): IPlayer | undefined
 {
-	console.log("GAME-SERVER: handle received message from '/game' route");
+	console.log("GAME-SERVER: handle received message from '/room/game'' route");
 	try {
 		//	Must parse and validate received message
 		const data = JSON.parse(message.toString()) as IGameMessage;
 		if (!validateSchema(data) || data === undefined || !data) {
 			socket.send(JSON.stringify(getJSONError("Bad request", 400)));
-			throw new Error("message received doesn't match with 'validateSchema' on '/game'") ;
+			throw new Error("message received doesn't match with 'validateSchema' on '/room/game''") ;
 		}
 
 		const player: IPlayer | undefined = gameControl.getPlayer(data.roomId, data.id);
