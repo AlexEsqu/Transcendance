@@ -3,7 +3,7 @@ import { WebSocket as WSWebSocket } from 'ws';
 import { getJSONError } from '../errors/input.error';
 import { GameControl } from '../services/GameControl';
 import { Room } from '../services/Room';
-import { IPlayer } from '../config/gameData';
+import { IPlayer } from '../config/pongData';
 import { IGameMessage } from '../config/schemas';
 
 /***********************************************************************************************************/

@@ -1,4 +1,4 @@
-import { IOptions } from "./Data";
+import { IOptions } from "./pongData";
 
 export {saveOptions, loadOptions, clearOptions }
 

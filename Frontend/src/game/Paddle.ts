@@ -1,7 +1,6 @@
 import { Vector3, Mesh, Scene } from '@babylonjs/core';
-import { createPaddle } from './Graphics';
 import { Ball } from "./Ball";
-import { Level } from './Data';
+import { Level } from './pongData';
 
 export class Paddle {
 	static WIDTH = 1.25;

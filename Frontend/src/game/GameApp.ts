@@ -1,5 +1,5 @@
 import { Pong } from "./Pong"
-import { IOptions } from "../game/Data"
+import { IOptions } from "./pongData"
 import { clearOptions, loadOptions } from "./options"
 
 import gameHtml from '../pages/game.html?raw'

@@ -1,4 +1,4 @@
-export { waitingSchema, gameSchema, IGameMessage, IRoomMessage }
+export { waitingSchema, gameSchema, JSONGameState, JSONInputsUpdate, JSONRoomAccess }
 
 /************************************************************************************************************
  * 		Declare schema for route's options																	*
@@ -28,17 +28,29 @@ const gameSchema = {
 };
 
 /************************************************************************************************************
- * 		Declare schema for route's options																	*
+ * 		Declare submit JSON forms to communicate with clients												*
  ***********************************************************************************************************/
 
-interface IGameMessage {
+interface JSONGameState {
+	roomId: number;
+	state: number;
+	timestamp: number;
+	round: number;
+	leftPaddPos: number;
+	rightPaddPos: number;
+	leftPaddScore: number;
+	rightPaddScore: number;
+	ball: { x: number, z: number };
+};
+
+interface JSONInputsUpdate {
 	id: number;
 	roomId: number;
 	ready: boolean;
 	move?: string;
 };
 
-interface IRoomMessage {
+interface JSONRoomAccess {
 	roomId: number;
 	message: string;
 };

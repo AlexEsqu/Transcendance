@@ -1,4 +1,4 @@
-import { IResult, JSONMatchesResults } from "./Data";
+import { IResult, JSONMatchesResults } from "./pongData";
 
 export { sendMatchesPostRequest };
 

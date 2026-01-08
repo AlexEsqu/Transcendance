@@ -4,7 +4,7 @@ import { WebSocket as WSWebSocket } from 'ws';
 import { GameControl } from "../services/GameControl";
 import { gameSchema } from '../config/schemas';
 import { handleMessage, handleDisconnection } from '../handlers/game.handlers.js'
-import { IPlayer, GAMING_ROOM_URL } from "../config/gameData";
+import { IPlayer, GAMING_ROOM_URL } from "../config/pongData";
 
 /************************************************************************************************************
  * 		Declare routes/endpoints								 											*

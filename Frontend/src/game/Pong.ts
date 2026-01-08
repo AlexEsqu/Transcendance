@@ -1,9 +1,9 @@
-import { Engine } from '@babylonjs/core';
-import { AdvancedDynamicTexture } from "@babylonjs/gui";
-import { State, IPlayer, IOptions, IScene, IResult, IPaddle, JSONWaitingRoom, JSONRoomMessage, JSONGameState, JSONGameUpdate } from "./Data";
-import { createText, createAnimation, loadGame } from './Graphics';
-import { monitoringRounds, saveResults, newRound, drawMatchHistoryTree, drawScore, drawName } from './manageRounds';
+import { JSONMatchesResults, JSONInputsUpdate, JSONGameState, JSONRoomAccess, JSONAwaitingAccess } from './submit.json';
+import { State, IPlayer, IOptions, IScene, IResult } from "./pongData";
+import { createText, createAnimation, loadGame, drawScore, drawName } from './Graphics';
 import { getCanvasConfig, getPlayers, fillWaitingRoomRequest } from './utils';
+import { AdvancedDynamicTexture } from "@babylonjs/gui";
+import { Engine } from '@babylonjs/core';
 
 export class Pong {
 
@@ -14,7 +14,7 @@ export class Pong {
 	engine: Engine | null = null;
 	scene: IScene | null = null;
 	gui: AdvancedDynamicTexture | null = null;
-	isLaunched: boolean;
+	isRunning: boolean;
 	waitingSocket: WebSocket | null = null;
 	gamingSocket: WebSocket | null = null;
 	roomId: number | undefined = undefined;
@@ -34,7 +34,7 @@ export class Pong {
 		this.scene.players = getPlayers(options.players, options.nbOfPlayers);
 		this.scene.state = State.waiting;
 		this.onNewRound = onNewRound;
-		this.isLaunched = false;
+		this.isRunning = false;
 		this.waitingSocket = new WebSocket(Pong.WAITING_ROOM_URL);
 		if (!this.waitingSocket)
 			throw new Error("'waitingSocket' creation failed");
@@ -47,7 +47,7 @@ export class Pong {
 		if (!this.waitingSocket)
 			throw new Error("'waitingSocket' not found");
 
-		const request: JSONWaitingRoom = fillWaitingRoomRequest(this.scene?.options.matchLocation,
+		const request: JSONAwaitingAccess = fillWaitingRoomRequest(this.scene?.options.matchLocation,
 															this.scene?.options.nbOfPlayers, undefined);
 
 		//	On socket creation send a message to the server to be added in a waiting room
@@ -61,7 +61,7 @@ export class Pong {
 
 		//	Wait for the server to manage waiting rooms and assign current user to a gaming room
 		this.waitingSocket.onmessage = (e) => {
-			const serverMsg: JSONRoomMessage = JSON.parse(e.data);
+			const serverMsg: JSONRoomAccess = JSON.parse(e.data);
 			console.log(`GAME-FRONT: received message from server (${serverMsg})`);
 			
 			// console.log(`roomID ${this.roomId}`);
@@ -104,8 +104,6 @@ export class Pong {
 			// console.error(error);
 			throw new Error(error.toString());
 		}
-
-		
 	}
 
 	runGame(): void
@@ -116,23 +114,36 @@ export class Pong {
 		}
 
 		const keys: Record<string, boolean> = {};
+		let result: IResult = { winner: null, maxScore: 0, loser: null, minScore: 0};
 		let isNewRound: boolean = true;
 
 		//	Manage user input and update data before render
 		this.handleInput(keys);
 		this.scene.id.registerBeforeRender(() => {
-			if (this.scene && this.scene.state === State.opening) this.opening();
-			if (this.scene && this.scene.state === State.end) this.endGame(rounds);
-			if (this.scene && this.scene.state === State.play && this.isLaunched)
-			this.timestamp = Date.now();
-
+			if (!this.scene)
+				return ;
+			if (this.scene.state === State.opening)
+				this.opening();
+			if (isNewRound && this.scene.state === State.launch)
+				this.launch(3);
+			if (this.scene.state === State.end)
+				this.endGame(result);
+			if (this.scene.state === State.play)
+				isNewRound = this.updateGame(keys);
 			isNewRound = false;
+			this.timestamp = Date.now();
 		});
 
 		//	Rendering loop
 		this.engine.runRenderLoop(() => {
-			if (this.scene &&( !this.scene.id || this.scene.state === State.stop)) this.engine.stopRenderLoop();
-			if (this.scene && this.scene.id) this.scene.id.render();
+			if (!this.engine)
+				return ;
+			if (!this.scene || !this.scene.id || this.scene.state === State.stop) {
+				this.engine.stopRenderLoop();
+				return ;
+			}
+
+			this.scene.id.render();
 		});
 	}
 
@@ -166,12 +177,34 @@ export class Pong {
 			}
 		}
 
-		
+		const newGameState: JSONGameState | null = this.getGameStateUpdated();
+		if (!newGameState)
+			return isBallOutOfBounds;
 
-		const newState = this.getGameUpdate();
-
+		this.processNewGameState(newGameState);
 
 		return isBallOutOfBounds;
+	}
+
+	processNewGameState(gameState: JSONGameState): void
+	{
+		if (!this.scene)
+			return ;
+
+		this.scene.state = gameState.state as State;
+		this.timestamp = gameState.timestamp;
+		if (this.scene.leftPadd && this.scene.leftPadd.mesh && this.scene.leftPadd.player) {
+			this.scene.leftPadd.mesh.position.z = gameState.leftPaddPos;
+			this.scene.leftPadd.player.score = gameState.leftPaddScore;
+		}
+		if (this.scene.rightPadd && this.scene.rightPadd.mesh && this.scene.rightPadd.player) {
+			this.scene.rightPadd.mesh.position.z = gameState.rightPaddPos;
+			this.scene.rightPadd.player.score = gameState.rightPaddScore;
+		}
+		if (this.scene.ball) {
+			this.scene.ball.position.x = gameState.ball.x;
+			this.scene.ball.position.z = gameState.ball.z;
+		}
 	}
 
 	sendUpdateToGameServer(player: number, action: string, ready: boolean): void
@@ -181,7 +214,7 @@ export class Pong {
 			return ;
 		}
 
-		const gameUpdateMsg: JSONGameUpdate = {
+		const gameUpdateMsg: JSONInputsUpdate = {
 			id: player,
 			roomId: this.roomId,
 			ready: ready,
@@ -191,7 +224,7 @@ export class Pong {
 		this.gamingSocket.send(JSON.stringify(gameUpdateMsg));
 	}
 
-	getGameUpdate(): void
+	getGameStateUpdated(): JSONGameState | null
 	{
 		if (!this.gamingSocket)
 			throw new Error("'gamingSocket' not found");
@@ -204,7 +237,9 @@ export class Pong {
 
 			const gameState: JSONGameState = JSON.parse(e.data);
 			console.log(`GAME-FRONT: game state from room(${this.roomId}) =`, gameState);
+			return gameState;
 		}
+		return null;
 	}
 
 	/**
@@ -216,8 +251,7 @@ export class Pong {
 
 		if (countdown <= 0 && this.scene && this.scene.ball) {
 			this.scene.state = State.play;
-			this.isLaunched = true;
-			this.scene.ball.launch();
+			this.isRunning = true;
 			return ;
 		}
 		if (this.scene) this.scene.state = State.launch;

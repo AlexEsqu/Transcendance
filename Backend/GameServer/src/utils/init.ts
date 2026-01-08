@@ -1,4 +1,4 @@
-import { GAME, IBall, IPaddle, GameType, IPlayer } from '../config/gameData'
+import { GAME, IBall, IPaddle, IPlayer, MatchType } from '../config/pongData'
 
 export { initBall, initPadd, initPlayers }
 
@@ -12,13 +12,18 @@ function initBall(): IBall
 	return ball;
 }
 
-function initPadd(gameType: GameType, side: string): IPaddle
+function initPadd(matchType: MatchType, side: string): IPaddle
 {
+	let isRobot: boolean = false;
+	if (matchType === MatchType.solo && side === 'left')
+		isRobot = true;
+	
 	const posX: number = side === 'right' ? (GAME.MAP_WIDTH / 2) : -(GAME.MAP_WIDTH / 2);
+
 	const paddle: IPaddle = {
 		pos: { x: posX, z: 0.0 },
 		side: side,
-		robot: gameType === GameType.solo ? true : false,
+		robot: matchType === MatchType.solo ? true : false,
 		score: 0,
 		player: undefined
 	}

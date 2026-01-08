@@ -1,14 +1,16 @@
-import { GAME, IBall, IPaddle, IPlayer, State, Level, GameType, IRound, IResult, IGameState } from '../config/gameData'
+import { isBallHittingWall, isBallHittingPaddle, isBallOutOfBounds, isNewPaddPosHittingMapLimit, 
+	adjustBallHorizontalPos, adjustBallVerticalPos, scaleVelocity, normalizeVector, processRobotOpponent } from './physics';
+import { GAME, IBall, IPaddle, IPlayer, State, Level, MatchType, IRound, IResult } from '../config/pongData'
 import { initBall, initPadd, initPlayers } from '../utils/init'
-import { isBallHittingWall, isBallHittingPaddle, isBallOutOfBounds, adjustBallHorizontalPos, adjustBallVerticalPos, isNewPaddPosHittingMapLimit, scaleVelocity, normalizeVector } from './physics';
 import { notifyPlayersInRoom } from '../utils/broadcast';
+import { JSONGameState } from '../config/schemas';
 import { GameControl } from './GameControl';
 import { Room } from './Room';
 
 export class GameLoop
 {
 	roomId: number;
-	matchType: GameType;
+	matchType: MatchType;
 	ball: IBall;
 	leftPadd: IPaddle;
 	rightPadd: IPaddle;
@@ -18,9 +20,9 @@ export class GameLoop
 	isGameRunning: boolean;
 	timestamp: number;
 
-	constructor(roomId: number, matchType: GameType, players: Map<number, IPlayer>)
+	constructor(roomId: number, matchType: MatchType, players: Map<number, IPlayer>)
 	{
-		if (matchType === GameType.tournament)
+		if (matchType === MatchType.tournament)
 			GAME.MAX_ROUNDS = matchType - 1;
 		this.roomId = roomId;
 		this.matchType = matchType;
@@ -41,7 +43,7 @@ export class GameLoop
 		if (room === undefined) return ; // HANDLE ERROR LATER
 
 		let isNewRound: boolean = false;
-		let gameStateInfo: IGameState;
+		let gameStateInfo: JSONGameState;
 
 		console.log("GAME-SERVER: game loop started");
 		const interval = setInterval(() => {
@@ -74,6 +76,9 @@ export class GameLoop
 		const isBallOutOfBounds: boolean = this.bouncingBallProcess();
 		if (isBallOutOfBounds)
 			this.state = State.launch;
+
+		if (this.leftPadd.robot)
+			this.processPlayerInput(0, processRobotOpponent(this.leftPadd, this.ball));
 	}
 
 	bouncingBallProcess(): boolean
@@ -176,10 +181,10 @@ export class GameLoop
 		console.log("GAME-STATE: new round");
 		//	Who should play now ?
 		let match = this.matchType;
-		if (match === GameType.tournament && this.rounds.nbOfRounds >= 0 && this.rounds.nbOfRounds < 2)
-			match = GameType.duo;
+		if (match === MatchType.tournament && this.rounds.nbOfRounds >= 0 && this.rounds.nbOfRounds < 2)
+			match = MatchType.duo;
 		//	If the match type is a tournament and it's the final round, the last two players must be the two winners of the previous rounds
-		if (match === GameType.tournament && this.rounds.nbOfRounds === GAME.MAX_ROUNDS - 1)
+		if (match === MatchType.tournament && this.rounds.nbOfRounds === GAME.MAX_ROUNDS - 1)
 		{
 			if (!this.rounds.results || !this.rounds.results[0] || !this.rounds.results[1]) {
 				console.error("Error while trying to assign players to new round, previous match's results not found");
@@ -196,8 +201,8 @@ export class GameLoop
 		this.rounds.nbOfRounds += 1;
 
 		//	Reset game's data
-		this.ball = initBall();
-		// this.resetBall();
+		// this.ball = initBall();
+		this.resetBall();
 		this.resetPaddles();
 	}
 
@@ -226,6 +231,10 @@ export class GameLoop
 	{
 		this.ball.speed = GAME.BALL_START_SPEED;
 		this.ball.posistion.x = 0.0;
+		if (Math.floor(Math.random() * 2) === 1)
+			this.ball.direction.x = 1;
+		else
+			this.ball.direction.x = -1;
 	}
 
 	resetPaddles(): void
@@ -234,15 +243,17 @@ export class GameLoop
 		this.leftPadd.score = 0;
 	}
 
-	composeGameState(): IGameState
+	composeGameState(): JSONGameState
 	{
-		const gameStateInfo: IGameState = {
+		const gameStateInfo: JSONGameState = {
 			roomId: this.roomId,
 			state: this.state as number,
 			timestamp: this.timestamp,
 			round: this.rounds.nbOfRounds,
 			leftPaddPos: this.leftPadd.pos.z,
 			rightPaddPos: this.rightPadd.pos.z,
+			leftPaddScore: this.leftPadd.score,
+			rightPaddScore: this.rightPadd.score,
 			ball: { x: this.ball.posistion.x, z: this.ball.posistion.z }
 		};
 		return gameStateInfo;

@@ -1,4 +1,4 @@
-import { GameLocation, MatchType, IPlayer } from '../config/gameData';
+import { GameLocation, MatchType, IPlayer } from '../config/pongData';
 import { WebSocket as WSWebSocket } from 'ws';
 import { notifyPlayersInRoom } from '../utils/broadcast'
 import { Room } from './Room';

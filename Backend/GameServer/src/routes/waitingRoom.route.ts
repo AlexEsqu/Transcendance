@@ -4,7 +4,7 @@ import { WebSocket as WSWebSocket } from 'ws';
 
 import { handleMessage, handleDisconnection } from '../handlers/waitingRoom.handlers';
 import { GameControl } from '../services/GameControl';
-import { IPlayer, WAITING_ROOM_URL } from '../config/gameData';
+import { IPlayer, WAITING_ROOM_URL } from '../config/pongData';
 import { waitingSchema } from '../config/schemas';
 
 /************************************************************************************************************

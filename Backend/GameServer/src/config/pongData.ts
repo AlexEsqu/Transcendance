@@ -1,7 +1,9 @@
 import { WebSocket as WSWebSocket } from 'ws';
 
+/************************************************************************************************************/
+
 export { GAME, MatchType, GameLocation, State, Level, GAMING_ROOM_URL, WAITING_ROOM_URL }
-export type { IBall, IPaddle, IPlayer, IRound, IResult, IGameState }
+export type { IBall, IPaddle, IPlayer, IRound, IResult }
 
 /************************************************************************************************************
  * 		Declare CONSTANT variables								 											*
@@ -15,6 +17,7 @@ const GAME = {
 	BALL_MAX_SPEED: 10,
 	BALL_RADIUS: 0.15,
 
+	BOT_PROBABILITY: 4,
 	PADD_RESPONSIVENESS: -25.0,
 	PADD_SPEED: 25.0,
 	PADD_WIDTH: 1.25,
@@ -51,16 +54,6 @@ enum Level {
 /************************************************************************************************************
  * 		Declare interfaces																					*
  ***********************************************************************************************************/
-
-interface IGameState {
-	roomId: number;
-	state: number;
-	timestamp: number;
-	round: number;
-	leftPaddPos: number;
-	rightPaddPos: number;
-	ball: { x: number, z: number };
-};
 
 interface IBall {
 	speed: number;

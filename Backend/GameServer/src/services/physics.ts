@@ -1,4 +1,4 @@
-import { GAME, IBall, IPaddle } from "../config/gameData";
+import { GAME, IBall, IPaddle } from "../config/pongData";
 
 
 export function isBallHittingPaddle(ball: IBall, paddle: IPaddle): boolean
@@ -105,4 +105,26 @@ export function scaleVelocity(ball: IBall, deltaTime: number): { x: number, z: n
 		z: ball.direction.z * (ball.speed * deltaTime)
 	}
 	return velocity;
+}
+
+export function processRobotOpponent(paddle: IPaddle, ball: IBall): string
+{
+	//	Avoid the robot to always move perfectly : 1/BOT_PROBABILITY chance to miss the target
+	if (Math.floor(Math.random() * GAME.BOT_PROBABILITY) == 1) return 'none';
+	
+	//	Reduces noise & vibration (avoid robot constantly moving even when unmecessary)
+	if (ball.posistion.x >= 0) return 'none';
+	else if (ball.posistion.z === paddle.pos.z) return 'none';
+
+	const halfPaddLength: number = GAME.PADD_WIDTH / 2;
+
+	//	No move needed if the ball is already in the paddle's field
+	if (ball.posistion.z <= paddle.pos.z + halfPaddLength && ball.posistion.z >= paddle.pos.z - halfPaddLength)
+		return 'none';
+
+	//	Process automatic move
+	if (ball.posistion.z > paddle.pos.z)
+		return 'up';
+	else
+		return 'down';
 }

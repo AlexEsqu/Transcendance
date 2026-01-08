@@ -1,4 +1,4 @@
-import { IRound, State, IScene, IResult } from "./Data";
+import { IRound, State, IScene, IResult } from "./pongData";
 import { IPaddle, Pong } from "./Pong_old";
 
 export { monitoringRounds, saveResults, newRound, drawMatchHistoryTree, drawScore, drawName }

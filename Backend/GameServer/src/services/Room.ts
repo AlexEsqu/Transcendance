@@ -1,4 +1,4 @@
-import { GameType, IPlayer } from '../config/gameData.js';
+import { GameType, IPlayer } from '../config/pongData.js';
 import { GameLoop } from './GameLoop';
 import { GameControl } from './GameControl';
 

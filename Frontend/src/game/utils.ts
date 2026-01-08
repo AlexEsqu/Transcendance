@@ -1,4 +1,4 @@
-import { IPlayer, JSONWaitingRoom } from "./Data";
+import { IPlayer, JSONWaitingRoom } from "./pongData";
 
 export function getCanvasConfig(canvasId: string): HTMLCanvasElement
 {
