@@ -1,7 +1,7 @@
 import navHTML from "../pages/nav.html?raw"
-import { User, RegisteredUser } from "../users/User"
+import { User, RegisteredUser } from "../user/User"
 import { userState, router } from "../app"
-import { UserState } from "../auth/UserState";
+import { UserState } from "../user/UserState";
 
 export { getNavBarHtml, initNavBarListeners }
 

@@ -1,9 +1,9 @@
 import { userState, router } from "../app"
-import { showFriend, showUsers } from "./friends";
-import { RegisteredUser } from "./User";
-import type { Subscriber } from "../auth/UserState";
-import { displayMatchHistory } from "./stats";
-import { onAvatarLoaded, onEmailLoaded, onPasswordLoaded, onRenameLoaded } from "./settings";
+import { showFriend, showUsers } from "./socialSection";
+import { RegisteredUser } from "../user/User";
+import type { Subscriber } from "../user/UserState";
+import { displayMatchHistory } from "./graphsSection";
+import { onAvatarLoaded, onEmailLoaded, onPasswordLoaded, onRenameLoaded } from "./settingsSection";
 
 import dashboardHtml from "../pages/dashboard.html?raw";
 

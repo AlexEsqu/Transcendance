@@ -1,5 +1,5 @@
 import { userState, router } from "../app";
-import { apiDomainName, apiKey } from "./UserState";
+import { apiDomainName, apiKey } from "../user/UserState";
 
 import connectionHtml from "../pages/connection.html?raw";
 import guestFormHtml from "../pages/forms/guestForm.html?raw"

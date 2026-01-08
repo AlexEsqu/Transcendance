@@ -1,5 +1,5 @@
 import { userState, router } from "../app";
-import { getNavBarHtml, initNavBarListeners } from "../routing/nav";
+import { getNavBarHtml, initNavBarListeners } from "../navigation/nav";
 import { launchPongGame } from "./GameApp"
 import { loadOptions, saveOptions } from "./options";
 import { IOptions } from "./Data";

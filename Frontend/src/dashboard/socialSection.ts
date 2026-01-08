@@ -1,7 +1,7 @@
 import { userState } from "../app";
-import { RegisteredUser, type BaseUser } from './User'
-import { apiKey, apiDomainName } from '../auth/UserState';
-import { friendTemplate, userTemplate } from "../components/loader";
+import { RegisteredUser, type BaseUser } from '../user/User'
+import { apiKey, apiDomainName } from '../user/UserState';
+import { friendTemplate, userTemplate } from "../utils/templateLoader";
 
 export { showFriend, showUsers }
 

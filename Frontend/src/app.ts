@@ -1,11 +1,11 @@
 import "./style.css"
-import { Router } from './routing/Router';
-import { UserState } from './auth/UserState';
-import { getConnectionLandingHtml, getConnectionForm, getEmailCheck, initConnectionPageListeners} from './auth/connection';
-import { getDashboardPage, initDashboardPageListeners } from "./users/dashboard";
+import { Router } from './navigation/Router';
+import { UserState } from './user/UserState';
+import { getConnectionLandingHtml, getConnectionForm, getEmailCheck, initConnectionPageListeners} from './auth/connectionPage';
+import { getDashboardPage, initDashboardPageListeners } from "./dashboard/dashboardPage";
 import { getGameHtml, getGameOptionHtml, initGamePageListeners } from "./game/display"
 import { getErrorPage } from "./error/error";
-import { initNavBarListeners } from "./routing/nav";
+import { initNavBarListeners } from "./navigation/nav";
 
 export { userState, router };
 

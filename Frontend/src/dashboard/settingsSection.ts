@@ -1,12 +1,11 @@
 import { userState, router } from "../app"
-import { checkInputValidityOnUnfocus, isValidInputs } from "./validation"
+import { checkInputValidityOnUnfocus, isValidInputs } from "../utils/inputValidation"
 import renameFormHtml from "../pages/forms/renameForm.html?raw"
 import avatarFormHtml from "../pages/forms/avatarForm.html?raw"
 import passwordFormHtml from "../pages/forms/passwordForm.html?raw"
 import emailFormHtml from "../pages/forms/emailForm.html?raw"
 
 export { onAvatarLoaded, onRenameLoaded, onEmailLoaded, onPasswordLoaded }
-
 
 function onRenameLoaded(): void
 {

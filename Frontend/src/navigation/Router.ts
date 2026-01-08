@@ -1,5 +1,5 @@
-import { UserState } from "../auth/UserState";
-import { User, RegisteredUser } from "../users/User";
+import { UserState } from "../user/UserState";
+import { User, RegisteredUser } from "../user/User";
 
 import { getNavBarHtml } from './nav';
 

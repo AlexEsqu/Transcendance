@@ -1,6 +1,6 @@
-import { RegisteredUser, GuestUser, User, BaseUser } from "../users/User";
+import { RegisteredUser, GuestUser, User, BaseUser } from "./User";
 import { router } from "../app";
-import type { MatchHistory } from "../users/stats";
+import type { MatchHistory } from "../dashboard/graphsSection";
 
 const apiKey : string = import.meta.env.VITE_APP_SECRET_KEY ?? "";
 const jwtKey : string = import.meta.env.VITE_JWT_SECRET ?? "";
@@ -591,65 +591,7 @@ class UserState
 
 	// 2FA
 
-	public async enableTwoFactorAuth()
-	{
-		if (!(this.user instanceof RegisteredUser))
-			throw new Error("Not authenticated");
 
-		const response = await this.fetchWithTokenRefresh(
-			`${apiDomainName}/users/me/2fa`,
-			{
-				method: 'PUT',
-				headers: {
-					'accept': 'application/json',
-					'Authorization': `Bearer ${this.user.accessToken}`,
-					'X-App-Secret': `${apiKey}`,
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({ 
-					enabled: true 
-				})
-			}
-		);
-
-		const data = await response.json();
-		if (!response.ok)
-			throw new Error(data.message || data.error || '2FA disable failed');
-
-		this.user.hasTwoFactorAuth = true;
-		// await this.refreshUser(); // once I get a get API on the 2FA
-		this.notifySubscribers();
-	}
-
-	public async disableTwoFactorAuth()
-	{
-		if (!(this.user instanceof RegisteredUser))
-			throw new Error("Not authenticated");
-
-		const response = await this.fetchWithTokenRefresh(
-			`${apiDomainName}/users/me/2fa`,
-			{
-				method: 'PUT',
-				headers: {
-					'accept': 'application/json',
-					'Authorization': `Bearer ${this.user.accessToken}`,
-					'X-App-Secret': `${apiKey}`,
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({ 
-					enabled: false 
-				})
-			}
-		);
-
-		const data = await response.json();
-		if (!response.ok)
-			throw new Error(data.message || data.error || '2FA disable failed');
-
-		this.user.hasTwoFactorAuth = false;
-		// await this.refreshUser(); // once I get a get API on the 2FA
-		this.notifySubscribers();
-	}
 
 	// MATCH HISTORY
 
