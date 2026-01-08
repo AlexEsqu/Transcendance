@@ -2,12 +2,10 @@ import { Pong } from "./Pong"
 import { IOptions } from "./pongData"
 import { clearOptions, loadOptions } from "./options"
 
-import gameHtml from '../pages/game.html?raw'
-import optionsHtml from '../pages/options.html?raw'
-import { userState } from "../app"
+/************************************************************************************************************/
 
 class GameApp {
-	pong: Pong;
+	pong: Pong | null = null;
 	startBtnDisplay: HTMLElement | null;
 	startBtn: HTMLElement | null;
 
@@ -15,7 +13,6 @@ class GameApp {
 		this.startBtnDisplay = document.getElementById("game-start");
 		this.startBtn = document.getElementById('btn-startplay');
 		this.setupStartButton();
-		
 		try {
 			this.pong = new Pong("game-canvas", options, () => this.showStartButton());
 			this.pong.goToWaitingRoom();
@@ -24,13 +21,16 @@ class GameApp {
 		}
 	}
 
-	play() {
+	play(): void
+	{
 		requestAnimationFrame(() => {
+			if (!this.pong) return ;
 			this.pong.launch(3);
 		});
 	}
 
-	setupStartButton() {
+	setupStartButton(): void
+	{
 		if (!this.startBtn || !this.startBtnDisplay) {
 			console.error("'start button' UI not found");
 			return ;
@@ -43,7 +43,8 @@ class GameApp {
 		});
 	}
 
-	showStartButton() {
+	showStartButton(): void
+	{
 		if (this.startBtnDisplay) this.startBtnDisplay.style.display = 'flex';
 	}
 }

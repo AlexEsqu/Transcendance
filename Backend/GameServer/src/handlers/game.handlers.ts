@@ -4,7 +4,7 @@ import { getJSONError } from '../errors/input.error';
 import { GameControl } from '../services/GameControl';
 import { Room } from '../services/Room';
 import { IPlayer } from '../config/pongData';
-import { IGameMessage } from '../config/schemas';
+import { JSONInputsUpdate } from '../config/schemas';
 
 /***********************************************************************************************************/
 
@@ -20,7 +20,7 @@ function handleMessage(socket: WSWebSocket, message: Buffer,
 	console.log("GAME-SERVER: handle received message from '/room/game'' route");
 	try {
 		//	Must parse and validate received message
-		const data = JSON.parse(message.toString()) as IGameMessage;
+		const data: JSONInputsUpdate = JSON.parse(message.toString());
 		if (!validateSchema(data) || data === undefined || !data) {
 			socket.send(JSON.stringify(getJSONError("Bad request", 400)));
 			throw new Error("message received doesn't match with 'validateSchema' on '/room/game''") ;

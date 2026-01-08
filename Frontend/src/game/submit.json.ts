@@ -1,16 +1,8 @@
-export type { JSONMatchesResults, JSONInputsUpdate, JSONGameState, JSONRoomAccess, JSONAwaitingAccess }
+export type { JSONInputsUpdate, JSONGameState, JSONRoomAccess, JSONAwaitingAccess }
 
 /************************************************************************************************************
  * 		Declare submit JSON forms to communicate with server												*
  ***********************************************************************************************************/
-
-interface JSONMatchesResults {
-	winner_id: number;
-	loser_id: number;
-	winner_score: number;
-	loser_score: number;
-	date: string;
-}
 
 interface JSONAwaitingAccess {
 	id: number;

@@ -1,6 +1,5 @@
 import { FastifyInstance } from "fastify";
 import Ajv, { ValidateFunction } from 'ajv';
-import { WebSocket as WSWebSocket } from 'ws';
 import { GameControl } from "../services/GameControl";
 import { gameSchema } from '../config/schemas';
 import { handleMessage, handleDisconnection } from '../handlers/game.handlers.js'

@@ -1,11 +1,10 @@
-import fastify, { FastifyInstance } from 'fastify';
-import Ajv, { ValidateFunction } from 'ajv';
-import { WebSocket as WSWebSocket } from 'ws';
-
 import { handleMessage, handleDisconnection } from '../handlers/waitingRoom.handlers';
 import { GameControl } from '../services/GameControl';
-import { IPlayer, WAITING_ROOM_URL } from '../config/pongData';
+import { WAITING_ROOM_URL } from '../config/pongData';
 import { waitingSchema } from '../config/schemas';
+import { FastifyInstance } from 'fastify';
+import Ajv, { ValidateFunction } from 'ajv';
+import { WebSocket as WSWebSocket } from 'ws';
 
 /************************************************************************************************************
  * 		Declare routes/endpoints								 											*

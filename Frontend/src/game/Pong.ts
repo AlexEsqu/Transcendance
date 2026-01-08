@@ -1,4 +1,4 @@
-import { JSONMatchesResults, JSONInputsUpdate, JSONGameState, JSONRoomAccess, JSONAwaitingAccess } from './submit.json';
+import { JSONInputsUpdate, JSONGameState, JSONRoomAccess, JSONAwaitingAccess } from './submit.json';
 import { State, IPlayer, IOptions, IScene, IResult } from "./pongData";
 import { createText, createAnimation, loadGame, drawScore, drawName } from './Graphics';
 import { getCanvasConfig, getPlayers, fillWaitingRoomRequest } from './utils';

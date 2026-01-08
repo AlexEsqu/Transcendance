@@ -1,6 +1,13 @@
-import { IPlayer, JSONWaitingRoom } from "./pongData";
+import { IPlayer, IResult } from './pongData';
+import { JSONAwaitingAccess } from './submit.json';
 
-export function getCanvasConfig(canvasId: string): HTMLCanvasElement
+/************************************************************************************************************/
+
+export { getCanvasConfig, getPlayers, fillWaitingRoomRequest }
+
+/************************************************************************************************************/
+
+function getCanvasConfig(canvasId: string): HTMLCanvasElement
 {
 	const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
 	canvas.width = window.innerWidth;
@@ -8,7 +15,7 @@ export function getCanvasConfig(canvasId: string): HTMLCanvasElement
 	return canvas;
 }
 
-export function getPlayers(inputs: string[], nbOfPlayers: number): Array<IPlayer> | null
+function getPlayers(inputs: string[], nbOfPlayers: number): Array<IPlayer> | null
 {
 	let players: Array<IPlayer> = [];
 	for (let i = 0; i < nbOfPlayers; i++)
@@ -30,9 +37,9 @@ export function getPlayers(inputs: string[], nbOfPlayers: number): Array<IPlayer
 	return players;
 }
 
-export function fillWaitingRoomRequest(matchLocation: string | undefined, 
+function fillWaitingRoomRequest(matchLocation: string | undefined, 
 									nbOfPlayers: number | undefined, 
-									id: number | undefined): JSONWaitingRoom
+									id: number | undefined): JSONAwaitingAccess
 {
 	let match: string;
 	switch(nbOfPlayers)
@@ -52,7 +59,7 @@ export function fillWaitingRoomRequest(matchLocation: string | undefined,
 	}
 
 	let location: string = matchLocation ?? 'local';
-	const request: JSONWaitingRoom = {
+	const request: JSONAwaitingAccess = {
 		id: id ?? Date.now(),
 		match: match,
 		location: location

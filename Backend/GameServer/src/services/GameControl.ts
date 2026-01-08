@@ -2,7 +2,7 @@ import { GameLocation, MatchType, IPlayer } from '../config/pongData';
 import { WebSocket as WSWebSocket } from 'ws';
 import { notifyPlayersInRoom } from '../utils/broadcast'
 import { Room } from './Room';
-import { IGameMessage, IRoomMessage } from '../config/schemas';
+import { JSONRoomAccess } from '../config/schemas';
 
 export class GameControl
 {
@@ -118,7 +118,7 @@ export class GameControl
 		this.waitingRoom.delete(roomId);
 		console.log("GAME-CONTROL: new gaming room created ", roomId);
 
-		const welcomeMessage: IRoomMessage = {
+		const welcomeMessage: JSONRoomAccess = {
 			roomId: roomId,
 			message: `You've been added to a new gaming room [id:${roomId}]`
 		};

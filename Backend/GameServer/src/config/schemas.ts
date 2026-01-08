@@ -1,4 +1,4 @@
-export { waitingSchema, gameSchema, JSONGameState, JSONInputsUpdate, JSONRoomAccess }
+export { waitingSchema, gameSchema, JSONGameState, JSONInputsUpdate, JSONRoomAccess, JSONMatchesResults }
 
 /************************************************************************************************************
  * 		Declare schema for route's options																	*
@@ -28,7 +28,7 @@ const gameSchema = {
 };
 
 /************************************************************************************************************
- * 		Declare submit JSON forms to communicate with clients												*
+ * 		Declare submit JSON forms to communicate with clients or server									*
  ***********************************************************************************************************/
 
 interface JSONGameState {
@@ -53,4 +53,12 @@ interface JSONInputsUpdate {
 interface JSONRoomAccess {
 	roomId: number;
 	message: string;
+};
+
+interface JSONMatchesResults {
+	winner_id: number;
+	loser_id: number;
+	winner_score: number;
+	loser_score: number;
+	date: string;
 };

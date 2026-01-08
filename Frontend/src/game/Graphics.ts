@@ -1,8 +1,7 @@
 import { Engine, Scene, Mesh, MeshBuilder, Vector3, Color3, GlowLayer, Color4, StandardMaterial,
 	 ArcRotateCamera, GroundMesh, Animation, IAnimationKey } from '@babylonjs/core';
 import { AdvancedDynamicTexture, TextBlock } from "@babylonjs/gui";
-import { GAME_SIZE, IOptions, IPaddle, IScene } from './pongData';
-import { Pong } from './Pong';
+import { GAME_SIZE, IOptions, IScene } from './pongData';
 
 /************************************************************************************************************/
 

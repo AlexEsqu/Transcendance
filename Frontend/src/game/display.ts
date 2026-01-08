@@ -7,7 +7,11 @@ import { IOptions } from "./pongData";
 import gameHtml from '../pages/game.html?raw'
 import optionsHtml from '../pages/options.html?raw'
 
+/************************************************************************************************************/
+
 export { getGameHtml, getGameOptionHtml, initGamePageListeners };
+
+/************************************************************************************************************/
 
 function getGameHtml(): string
 {

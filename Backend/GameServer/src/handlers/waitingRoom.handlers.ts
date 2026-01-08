@@ -3,7 +3,6 @@ import { WebSocket as WSWebSocket } from 'ws';
 
 import { GameControl } from '../services/GameControl.js'
 import { getJSONError } from '../errors/input.error';
-// import { sendToClient } from '../utils/broadcast.js'
 
 /***********************************************************************************************************/
 
@@ -36,7 +35,6 @@ function handleMessage(socket: WSWebSocket, message: Buffer,
 		return ({ playerId: -1, roomId: -1});
 	}
 }
-
 
 function handleDisconnection(player: { playerId: number, roomId: number }, gameControl: GameControl)
 {

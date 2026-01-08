@@ -1,8 +1,11 @@
-import { IResult, JSONMatchesResults } from "./pongData";
+import { JSONMatchesResults } from '../config/schemas';
+import { IResult } from '../config/pongData';
 
-export { sendMatchesPostRequest };
+/************************************************************************************************************/
 
+export { sendMatchesToDataBase }
 
+/************************************************************************************************************/
 
 function fillMatchesJSON(results: IResult, time?: number): JSONMatchesResults | null
 {
@@ -21,10 +24,10 @@ function fillMatchesJSON(results: IResult, time?: number): JSONMatchesResults | 
 	return matches;
 }
 
-function sendMatchesPostRequest(results: IResult, time?: number): void
+function sendMatchesToDataBase(results: IResult | null, time?: number): void
 {
 	if (!results) {
-		console.error("Results are undefined when sending matches POST request");
+		console.error("Results are not found when sending matches POST request to backend");
 		return ;
 	}
 

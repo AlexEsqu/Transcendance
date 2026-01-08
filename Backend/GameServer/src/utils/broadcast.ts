@@ -1,9 +1,13 @@
-import { IGameMessage, IRoomMessage } from "../config/schemas";
+import { JSONGameState, JSONRoomAccess } from "../config/schemas";
 import { Room } from "../services/Room";
+
+/************************************************************************************************************/
 
 export { notifyPlayersInRoom }
 
-function notifyPlayersInRoom(room: Room | undefined, message: string | IGameMessage | IRoomMessage): void
+/************************************************************************************************************/
+
+function notifyPlayersInRoom(room: Room | undefined, message: string | JSONGameState | JSONRoomAccess): void
 {
 	if (room === undefined || room.players.size <= 0) return ;
 	

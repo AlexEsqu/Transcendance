@@ -1,11 +1,16 @@
 import { isBallHittingWall, isBallHittingPaddle, isBallOutOfBounds, isNewPaddPosHittingMapLimit, 
-	adjustBallHorizontalPos, adjustBallVerticalPos, scaleVelocity, normalizeVector, processRobotOpponent } from './physics';
+	adjustBallHorizontalPos, adjustBallVerticalPos, scaleVelocity, normalizeVector, processRobotOpponent 
+} from './physics';
+
 import { GAME, IBall, IPaddle, IPlayer, State, Level, MatchType, IRound, IResult } from '../config/pongData'
 import { initBall, initPadd, initPlayers } from '../utils/init'
 import { notifyPlayersInRoom } from '../utils/broadcast';
 import { JSONGameState } from '../config/schemas';
 import { GameControl } from './GameControl';
 import { Room } from './Room';
+import { sendMatchesToDataBase } from '../utils/sendMatchResult';
+
+/************************************************************************************************************/
 
 export class GameLoop
 {
@@ -61,6 +66,9 @@ export class GameLoop
 			gameStateInfo = this.composeGameState();
 			notifyPlayersInRoom(room, JSON.stringify(gameStateInfo));
 		}, 1000 / 60); // 60fps
+
+		if (this.state === State.end && this.rounds.results)
+			sendMatchesToDataBase(this.rounds.results[this.rounds.results.length - 1], Date.now());
 	}
 
 	updateGameData(): void
