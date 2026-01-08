@@ -325,6 +325,99 @@ describe("DELETE /users/me", () => {
 		expect(response.statusCode).toBe(204);
 	});
 });
+describe("PUT /api/users/me/2fa", () => {
+	it("returns 401 for not logged in", async () => {
+		const response = await server.inject({
+			method: "PUT",
+			url: "/api/users/me/2fa",
+		});
+		expect(response.statusCode).toBe(401);
+		expect(response.json()).toHaveProperty("error", "Unauthorized");
+	});
+
+	it("returns 200 for successful 2fa change", async () => {
+		const response = await server.inject({
+			method: "PUT",
+			url: "/api/users/me/2fa",
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+				"X-App-Secret": "bgb",
+			},
+			payload: {
+				enabled: true,
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toMatchObject({
+			success: true,
+			message: "2FA status updated successfully to true",
+		});
+	});
+
+	it("returns 200 for successful 2fa change", async () => {
+		const response = await server.inject({
+			method: "PUT",
+			url: "/api/users/me/2fa",
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+				"X-App-Secret": "bgb",
+			},
+			payload: {
+				enabled: false,
+			},
+		});
+		expect(response.statusCode).toBe(200);
+		expect(response.json()).toMatchObject({
+			success: true,
+			message: "2FA status updated successfully to false",
+		});
+	});
+});
+describe("GET /api/users/me/2fa", () => {
+  it("returns 401 when not authenticated", async () => {
+    const res = await server.inject({
+      method: "GET",
+      url: "/api/users/me/2fa",
+    });
+
+    expect(res.statusCode).toBe(401);
+    expect(res.json()).toHaveProperty("error", "Unauthorized");
+  });
+
+  it("toggles 2FA successfully", async () => {
+    const headers = {
+      Authorization: `Bearer ${accessToken}`,
+      "X-App-Secret": "bgb",
+    };
+
+    const res1 = await server.inject({
+      method: "GET",
+      url: "/api/users/me/2fa",
+      headers,
+    });
+
+    expect(res1.json()).toEqual({ is_2fa_enabled: false });
+
+    const res2 = await server.inject({
+      method: "PUT",
+      url: "/api/users/me/2fa",
+      headers,
+      payload: { enabled: true },
+    });
+
+    expect(res2.json()).toMatchObject({
+      success: true,
+    });
+
+    const res3 = await server.inject({
+      method: "GET",
+      url: "/api/users/me/2fa",
+      headers,
+    });
+
+    expect(res3.json()).toEqual({ is_2fa_enabled: true });
+  });
+});
 
 
 // // Mock only the helpers
@@ -342,10 +435,9 @@ describe("DELETE /users/me", () => {
 //   };
 // });
 
-
 // describe("POST /api/users/auth/oauth/42", () => {
 // 	it("return 302 for successful redirect to 42 api", async () => {
-		
+
 // 		const res = await server.inject({
 // 			method: "GET",
 // 			url: "/api/users/auth/oauth/42",
