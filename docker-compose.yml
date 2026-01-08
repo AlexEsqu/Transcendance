@@ -54,11 +54,11 @@ services:
     ports:
       - "8200:8200"
     environment:
-      VAULT_TOKEN: root
-      VAULT_ADDR: http://0.0.0.0:8200
+      VAULT_TOKEN: "root-token"
+      VAULT_ADDR: "http://0.0.0.0:8200"
     cap_add:
       - IPC_LOCK
-    command: server -dev #TODO: dev only
+    command: "server -dev -dev-root-token-id=root-token" #TODO: dev only
     networks:
       - app-network
 volumes:
