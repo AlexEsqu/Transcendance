@@ -1,9 +1,9 @@
 import { userState, router } from "../app"
 import { checkInputValidityOnUnfocus, isValidInputs } from "../utils/inputValidation"
-import renameFormHtml from "../pages/forms/renameForm.html?raw"
-import avatarFormHtml from "../pages/forms/avatarForm.html?raw"
-import passwordFormHtml from "../pages/forms/passwordForm.html?raw"
-import emailFormHtml from "../pages/forms/emailForm.html?raw"
+import renameFormHtml from "../html/forms/renameForm.html?raw"
+import avatarFormHtml from "../html/forms/avatarForm.html?raw"
+import passwordFormHtml from "../html/forms/passwordForm.html?raw"
+import emailFormHtml from "../html/forms/emailForm.html?raw"
 
 export { onAvatarLoaded, onRenameLoaded, onEmailLoaded, onPasswordLoaded }
 
@@ -30,7 +30,7 @@ function onRenameLoaded(): void
 				{
 					try
 					{
-						await userState.rename(newName);
+						await userState.customize.rename(newName);
 						router.render();
 					}
 					catch (err)
@@ -57,7 +57,7 @@ function onAvatarLoaded(): void
 			if (formData) {
 				try
 				{
-					await userState.updateAvatar(formData);
+					await userState.customize.updateAvatar(formData);
 					alert('Avatar updated!');
 				}
 				catch (err)
@@ -99,7 +99,7 @@ function onPasswordLoaded(): void
 				if (oldPassword && newPassword) {
 					try
 					{
-						await userState.changePassword(oldPassword, newPassword);
+						await userState.customize.changePassword(oldPassword, newPassword);
 						alert('password updated!');
 					}
 					catch (err)
@@ -141,7 +141,7 @@ function onEmailLoaded(): void
 
 				if (newEmail)
 				{
-					userState.changeEmail(newEmail);
+					userState.customize.changeEmail(newEmail);
 					alert('email unsupported so far!');
 					router.render();
 				}

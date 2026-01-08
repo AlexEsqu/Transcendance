@@ -1,7 +1,7 @@
 import { UserState } from "../user/UserState";
 import { User, RegisteredUser } from "../user/User";
 
-import { getNavBarHtml } from './nav';
+import { getNavBarHtml } from './navSection';
 
 export { Router }
 export type { Route, getPageHtmlFunction }

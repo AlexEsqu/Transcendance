@@ -1,12 +1,19 @@
 import { RegisteredUser, GuestUser, User, BaseUser } from "./User";
 import { router } from "../app";
-import type { MatchHistory } from "../dashboard/graphsSection";
+import { apiDomainName, apiKey } from "./UserState";
+import type { UserState } from "./UserState";
+import type { MatchHistory } from "../dashboard/graphSection";
 
-export class CustomizeUserService
+export class CustomizeService
 {
-	constructor(private userState: UserState) {}
+	userState: UserState;
 
-	public async rename(newName: string): Promise<void>
+	constructor(userState: UserState)
+	{
+		this.userState = userState;
+	}
+
+	async rename(newName: string): Promise<void>
 	{
 		const user = this.userState.getUser();
 
@@ -44,7 +51,7 @@ export class CustomizeUserService
 		this.userState.setUser(user);
 	}
 
-	public async updateAvatar(formData: FormData): Promise<void>
+	async updateAvatar(formData: FormData): Promise<void>
 	{
 		const user = this.userState.getUser();
 
@@ -77,7 +84,7 @@ export class CustomizeUserService
 		}
 	}
 
-	public async changePassword(oldPassword: string, newPassword: string): Promise<void>
+	async changePassword(oldPassword: string, newPassword: string): Promise<void>
 	{
 		const user = this.userState.getUser();
 
@@ -107,8 +114,36 @@ export class CustomizeUserService
 		}
 	}
 
-	public async changeEmail(newEmail: string): Promise<void>
+	async changeEmail(newEmail: string): Promise<void>
 	{
 		// AWAITING API ROUTE
+	}
+
+	async fetchMatchHistory(): Promise<MatchHistory[]>
+	{
+		const user = this.userState.getUser();
+
+		if (!(user instanceof RegisteredUser))
+			throw new Error("Not authenticated");
+
+		const response = await this.userState.fetchWithTokenRefresh(
+			`${apiDomainName}/users/${user.id}/matches`,
+			{
+				method: 'GET',
+				headers:
+				{
+					'accept': 'application/json',
+					'Authorization': `Bearer ${user.accessToken}`,
+					'X-App-Secret': `${apiKey}`
+				}
+			}
+		);
+
+		const data = await response.json();
+
+		if (!response.ok)
+			throw new Error(data.message || data.error || 'Failed to fetch match history');
+
+		return data;
 	}
 }

@@ -1,5 +1,5 @@
-import friendTemplateHtml from "../pages/templates/friend.html?raw";
-import userTemplateHtml   from "../pages/templates/user.html?raw";
+import friendTemplateHtml from "../html/templates/friend.html?raw";
+import userTemplateHtml   from "../html/templates/user.html?raw";
 
 export { friendTemplate, userTemplate };
 

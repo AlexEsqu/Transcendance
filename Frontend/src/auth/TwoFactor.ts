@@ -4,12 +4,14 @@ import { apiDomainName, apiKey } from '../user/UserState';
 
 export class TwoFactorService
 {
-	constructor(private userState: UserState)
-	{
+	userState: UserState;
 
+	constructor(userState: UserState)
+	{
+		this.userState = userState;
 	}
 
-	public async toggle2fa(val: boolean): Promise<void>
+	async toggle2fa(val: boolean): Promise<void>
 	{
 		const user = this.userState.getUser();
 

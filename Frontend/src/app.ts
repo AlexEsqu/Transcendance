@@ -5,7 +5,7 @@ import { getConnectionLandingHtml, getConnectionForm, getEmailCheck, initConnect
 import { getDashboardPage, initDashboardPageListeners } from "./dashboard/dashboardPage";
 import { getGameHtml, getGameOptionHtml, initGamePageListeners } from "./game/display"
 import { getErrorPage } from "./error/error";
-import { initNavBarListeners } from "./navigation/nav";
+import { initNavBarListeners } from "./navigation/navSection";
 
 export { userState, router };
 

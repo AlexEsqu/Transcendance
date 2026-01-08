@@ -2,10 +2,10 @@ import { userState, router } from "../app"
 import { showFriend, showUsers } from "./socialSection";
 import { RegisteredUser } from "../user/User";
 import type { Subscriber } from "../user/UserState";
-import { displayMatchHistory } from "./graphsSection";
-import { onAvatarLoaded, onEmailLoaded, onPasswordLoaded, onRenameLoaded } from "./settingsSection";
+import { displayMatchHistory } from "./graphSection";
+import { onAvatarLoaded, onEmailLoaded, onPasswordLoaded, onRenameLoaded } from "./settingSection";
 
-import dashboardHtml from "../pages/dashboard.html?raw";
+import dashboardHtml from "../html/dashboard.html?raw";
 
 export { getDashboardPage, initDashboardPageListeners }
 
@@ -14,14 +14,12 @@ export { getDashboardPage, initDashboardPageListeners }
 let currentFriendsListener: Subscriber | null = null;
 let currentUsersListener: Subscriber | null = null;
 
-
 // Getting base html for the pages
 
 function getDashboardPage(): string
 {
 	return dashboardHtml;
 }
-
 
 // find the correct on load function to activate buttons and options
 
@@ -69,8 +67,6 @@ function initDashboardPageListeners(): void
 	});
 }
 
-// LOAD DASHBOARD DATA
-
 async function onDashboardLoaded()
 {
 	const user = userState.getUser();
@@ -87,8 +83,6 @@ async function onDashboardLoaded()
 	}
 
 	userState.subscribe(currentUsersListener);
-
-
 }
 
 function showRegisteredUserOptions(user : RegisteredUser)
@@ -102,22 +96,25 @@ function showRegisteredUserOptions(user : RegisteredUser)
 	const twoFactorAuthBtn = document.getElementById('enable-tfa-btn');
 	if (twoFactorAuthBtn)
 	{
-		if (user.hasTwoFactorAuth) {
+		if (user.hasTwoFactorAuth)
+		{
 			twoFactorAuthBtn.textContent = 'Disable Two Factor Authentication';
 			twoFactorAuthBtn.addEventListener('click', () => {
-				userState.disableTwoFactorAuth();
+				userState.twoFactor.toggle2fa(false);
 			});
-		} else {
+		}
+		else
+		{
 			twoFactorAuthBtn.textContent = 'Enable Two Factor Authentication';
 			twoFactorAuthBtn.addEventListener('click', () => {
-				userState.enableTwoFactorAuth();
+				userState.twoFactor.toggle2fa(true);
 			});
 		}
 	}
 
 	const deleteAccBtn = document.getElementById('delete-account-btn');
 	deleteAccBtn?.addEventListener('click', () => {
-		userState.deleteAccount();
+		userState.emailAuth.deleteAccount();
 		router.navigateTo('')
 	})
 }

@@ -175,7 +175,7 @@ function attachAddRemoveFriendButtonListener(): void
 
 			try
 			{
-				await userState.addToFriendList(Number(userId));
+				await userState.social.addToFriendList(Number(userId));
 				target.textContent = 'Added!';
 				target.disabled = true;
 			}
@@ -198,7 +198,7 @@ function attachAddRemoveFriendButtonListener(): void
 
 			try
 			{
-				await userState.removeFromFriendList(Number(friendId));
+				await userState.social.removeFromFriendList(Number(friendId));
 				target.textContent = 'Removed!';
 				target.disabled = true;
 			}
