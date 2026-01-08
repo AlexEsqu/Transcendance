@@ -80,23 +80,31 @@ function onConnectionLoaded(): void
 	oauthBtn.addEventListener('click', async (e) =>
 		{
 			e.preventDefault();
-			const response = await fetch(`${apiDomainName}/users/auth/oauth/42`,
-					{
-						method: 'GET',
-						headers:
-						{
-							'accept': 'application/json',
-							'X-App-Secret': `${apiKey}`
-						},
-					});
-					const data = await response.json();
+			/* Not an api call but a button that redirects to my route that will itself redirect to 42's api, 
+			  I process the info and store a refresh token in the users cookies, you can now follow the same
+			  process as the usual login ;) */
+			
 
-					if (!response.ok || !data.accessToken)
-					{
-						console.log(data.message || data.error || 'Faied to refresh token');
-						return false;
-					}
-					console.log(data);
+			window.location.replace(`${apiDomainName}/users/auth/oauth/42`)
+			//now that its successful, the user now has a refresh token, you can now login the user
+
+			// const response = await fetch(`${apiDomainName}/users/auth/oauth/42`,
+			// 		{
+			// 			method: 'GET',
+			// 			headers:
+			// 			{
+			// 				'accept': 'application/json',
+			// 				'X-App-Secret': `${apiKey}`
+			// 			},
+			// 		});
+			// 		const data = await response.json();
+
+			// 		if (!response.ok || !data.accessToken)
+			// 		{
+			// 			console.log(data.message || data.error || 'Faied to refresh token');
+			// 			return false;
+			// 		}
+			// 		console.log(data);
 		}
 	);
 }
