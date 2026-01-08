@@ -4,7 +4,8 @@ import { clearOptions, loadOptions } from "./options"
 
 /************************************************************************************************************/
 
-class GameApp {
+class GameApp
+{
 	pong: Pong | null = null;
 	startBtnDisplay: HTMLElement | null;
 	startBtn: HTMLElement | null;

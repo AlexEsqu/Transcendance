@@ -44,7 +44,7 @@ function handleMessage(socket: WSWebSocket, message: Buffer,
 
 		//	If player is ready & wants to move, update its paddle pos
 		if (player.isReady && data.move)
-			gamingRoom.handlePlayerInput(player.id, data.move);
+			gamingRoom.handlePlayerInput(player.id, data.state, data.move);
 
 		return (player);
 

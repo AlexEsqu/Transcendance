@@ -1,11 +1,14 @@
 import { JSONInputsUpdate, JSONGameState, JSONRoomAccess, JSONAwaitingAccess } from './submit.json';
 import { State, IPlayer, IOptions, IScene, IResult } from "./pongData";
 import { createText, createAnimation, loadGame, drawScore, drawName } from './Graphics';
-import { getCanvasConfig, getPlayers, fillWaitingRoomRequest } from './utils';
+import { getCanvasConfig, getPlayers, fillWaitingRoomRequest, getPlayersId } from './utils';
 import { AdvancedDynamicTexture } from "@babylonjs/gui";
 import { Engine } from '@babylonjs/core';
 
-export class Pong {
+/************************************************************************************************************/
+
+export class Pong
+{
 
 	static WAITING_ROOM_URL = "ws://localhost:4001/room/waiting";
 	static GAMING_ROOM_URL = "ws://localhost:4001/room/gaming";
@@ -18,7 +21,6 @@ export class Pong {
 	waitingSocket: WebSocket | null = null;
 	gamingSocket: WebSocket | null = null;
 	roomId: number | undefined = undefined;
-	playerId: number; 
 	timestamp: number = 0;
 	onNewRound?: () => void;
 
@@ -39,7 +41,6 @@ export class Pong {
 		if (!this.waitingSocket)
 			throw new Error("'waitingSocket' creation failed");
 		this.timestamp = Date.now();
-		this.playerId = 42; // TO DO - get users ID from UI
 	}
 
 	goToWaitingRoom(): void
@@ -55,14 +56,13 @@ export class Pong {
 			if (!this.waitingSocket)
 				throw new Error("'waitingSocket' not found");
 			console.log("GAME-FRONT: connection with game-server");
-			const data = JSON.stringify(request);
-			this.waitingSocket.send(data);
+			this.waitingSocket.send(JSON.stringify(request));
 		}
 
 		//	Wait for the server to manage waiting rooms and assign current user to a gaming room
 		this.waitingSocket.onmessage = (e) => {
 			const serverMsg: JSONRoomAccess = JSON.parse(e.data);
-			console.log(`GAME-FRONT: received message from server (${serverMsg})`);
+			console.log(`GAME-FRONT: received message from server =`, serverMsg);
 			
 			// console.log(`roomID ${this.roomId}`);
 			// console.log(`state.roomID ${serverMsg.roomId}`);
@@ -122,6 +122,7 @@ export class Pong {
 		this.scene.id.registerBeforeRender(() => {
 			if (!this.scene)
 				return ;
+			console.log(`GAME-FRONT-STATE: ${this.scene.state}`);
 			if (this.scene.state === State.opening)
 				this.opening();
 			if (isNewRound && this.scene.state === State.launch)
@@ -209,7 +210,7 @@ export class Pong {
 
 	sendUpdateToGameServer(player: number, action: string, ready: boolean): void
 	{
-		if (!this.roomId || !this.gamingSocket) {
+		if (!this.roomId || !this.gamingSocket || !this.scene) {
 			console.error("GAME-FRONT: Error, can't send update to game server because elements are missing");
 			return ;
 		}
@@ -218,6 +219,7 @@ export class Pong {
 			id: player,
 			roomId: this.roomId,
 			ready: ready,
+			state: this.scene.state,
 			move: action
 		};
 

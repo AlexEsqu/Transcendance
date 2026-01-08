@@ -6,7 +6,7 @@ export { waitingSchema, gameSchema, JSONGameState, JSONInputsUpdate, JSONRoomAcc
 
 const waitingSchema = {
 	type: 'object',
-	required: ['id', 'game', 'location'],
+	required: ['id', 'match', 'location'],
 	properties: {
 		id: {type: 'number'},
 		match: {type: 'string'},
@@ -22,6 +22,7 @@ const gameSchema = {
 		id: {type: 'number'},
 		roomId: {type: 'number'},
 		ready: {type: 'boolean'},
+		state: {type: 'number'},
 		move: {type: 'string'}
 	},
 	additionalProperties: false
@@ -47,6 +48,7 @@ interface JSONInputsUpdate {
 	id: number;
 	roomId: number;
 	ready: boolean;
+	state: number;
 	move?: string;
 };
 

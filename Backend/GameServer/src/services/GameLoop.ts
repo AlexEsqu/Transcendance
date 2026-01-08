@@ -56,7 +56,7 @@ export class GameLoop
 			if (this.state === State.play && this.isGameRunning) {
 				this.updateGameData();
 				//	monitor score/rounds
-				isNewRound = this.isPlayerHitsMaxScore();
+				isNewRound = this.isPlayerHittingMaxScore();
 			}
 			if (isNewRound)
 				this.requestNewRound();
@@ -65,6 +65,7 @@ export class GameLoop
 			//	broadcast to players = send game state/data to all players
 			gameStateInfo = this.composeGameState();
 			notifyPlayersInRoom(room, JSON.stringify(gameStateInfo));
+			console.log(`GAME-SERVER: state ${this.state}`);
 		}, 1000 / 60); // 60fps
 
 		if (this.state === State.end && this.rounds.results)
@@ -86,7 +87,7 @@ export class GameLoop
 			this.state = State.launch;
 
 		if (this.leftPadd.robot)
-			this.processPlayerInput(0, processRobotOpponent(this.leftPadd, this.ball));
+			this.processPlayerInput(0, this.state, processRobotOpponent(this.leftPadd, this.ball));
 	}
 
 	bouncingBallProcess(): boolean
@@ -136,9 +137,11 @@ export class GameLoop
 		return false;
 	}
 
-	processPlayerInput(playerId: number, input: string): void
+	processPlayerInput(playerId: number, state: number, input: string): void
 	{
 		let paddle: IPaddle;
+
+		this.state = state as State;
 	
 		if (this.leftPadd.player?.id === playerId)
 			paddle = this.leftPadd;
@@ -161,7 +164,7 @@ export class GameLoop
 			paddle.pos.z -= velocityStep;
 	}
 
-	isPlayerHitsMaxScore(): boolean
+	isPlayerHittingMaxScore(): boolean
 	{
 		if (this.leftPadd.player === undefined || this.rightPadd.player === undefined)
 			return false;

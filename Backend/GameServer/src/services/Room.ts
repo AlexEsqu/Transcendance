@@ -53,9 +53,9 @@ export class Room
 		this.gameLoop.runGameLoop(gameControl);
 	}
 
-	handlePlayerInput(playerId: number, input: string): void
+	handlePlayerInput(playerId: number, state: number, input: string): void
 	{
 		if (this.gameLoop)
-			this.gameLoop.processPlayerInput(playerId, input);
+			this.gameLoop.processPlayerInput(playerId, state, input);
 	}
 }

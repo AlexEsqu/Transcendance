@@ -31,5 +31,6 @@ interface JSONInputsUpdate {
 	id?: number;
 	roomId: number;
 	ready: boolean;
+	state: number;
 	move?: string;
 };

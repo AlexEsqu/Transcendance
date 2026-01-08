@@ -27,7 +27,7 @@ const launchGameServer = async () => {
 
 		//	Listen on portP
 		await gameServer.listen({ port: parseInt(port), host: host }, (address) => {
-			console.log("GAME-SERVER: \$`{address}`\ listening");
+			// console.log(`GAME-SERVER: ${address} listening`);
 		});
 	} catch (err) {
 		console.error(err);

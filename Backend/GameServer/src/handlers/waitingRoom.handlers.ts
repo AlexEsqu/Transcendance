@@ -19,7 +19,7 @@ function handleMessage(socket: WSWebSocket, message: Buffer,
 	try {
 		//	Must parse and validate received message
 		const data = JSON.parse(message.toString());
-		if (!validateSchema(data) || data === undefined) {
+		if (!validateSchema(data)) {
 			socket.send(JSON.stringify(getJSONError("Bad request", 400)));
 			return ({ playerId: -1, roomId: -1});
 		}
