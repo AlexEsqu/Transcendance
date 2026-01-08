@@ -1,27 +1,35 @@
 import navHTML from "../pages/nav.html?raw"
 import { User, RegisteredUser } from "../users/User"
 import { userState, router } from "../app"
+import { UserState } from "../auth/UserState";
 
 export { getNavBarHtml, initNavBarListeners }
 
 function getNavBarHtml()
 {
 	const name = userState.getUser()?.getName() ?? "Guest";
-	return navHTML.replace('USERNAME', name);
+	const avatar = userState.getUser()?.getAvatarPath() ?? "/assets/placeholder/avatarPlaceholder.png";
+
+	return navHTML
+		.replace('USERNAME', name)
+		.replace('/assets/placeholder/avatarPlaceholder.png', avatar);
 }
+
+let hasAttachedNavListeners = false;
 
 function initNavBarListeners()
 {
-	document.addEventListener('pageLoaded', (event: Event) => {
-		const customEvent = event as CustomEvent<string>;
-		const path = customEvent.detail;
+	if (!hasAttachedNavListeners)
+	{
+		document.addEventListener('navbarLoaded', () =>
+			{
+				attachNavListeners();
+			}
+		);
+		hasAttachedNavListeners = true;
+	}
 
-		if (path.startsWith('/settings') || path.startsWith('/game'))
-		{
-			attachNavListeners();
-			updateNavFromUserData(userState.getUser());
-		}
-	});
+	UserState.getInstance().subscribe(() => updateNavFromUserData());
 }
 
 function attachNavListeners()
@@ -30,9 +38,12 @@ function attachNavListeners()
 	if (logoutButton)
 	{
 		logoutButton.addEventListener('click', async () => {
-			try {
+			try
+			{
 				await userState.logout();
-			} catch (error) {
+			}
+			catch (error)
+			{
 				const msg = error instanceof Error ? error.message : "Unknown error";
 				console.log(`error message is ${msg}`);
 				window.sessionStorage.setItem("errorMessage", msg);
@@ -42,10 +53,16 @@ function attachNavListeners()
 	}
 }
 
-function updateNavFromUserData(user: User | null): void
+function updateNavFromUserData(): void
 {
+	const user = userState.getUser();
+	const navElem = document.getElementById('nav');
 	if (!user)
+	{
+		if (navElem)
+			navElem.style.display ='hidden';
 		return;
+	}
 
 	const userNameElement = document.getElementById('user-name-nav');
 	if (userNameElement)
@@ -54,9 +71,4 @@ function updateNavFromUserData(user: User | null): void
 	const avatarImage = document.getElementById('user-avatar-nav') as HTMLImageElement;
 	if (avatarImage)
 		avatarImage.src = user.getAvatarPath();
-
-	// // only display the delete account button if the user is registered (has an account to delete)
-	// const deleteButton = document.getElementById('delete-user-btn');
-	// if (deleteButton)
-	// 	deleteButton.style.display = user instanceof RegisteredUser ? 'block' : 'none';
 }

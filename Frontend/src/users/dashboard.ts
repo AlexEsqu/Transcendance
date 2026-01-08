@@ -1,70 +1,67 @@
 import { userState, router } from "../app"
-
-import { getNavBarHtml, initNavBarListeners } from "../routing/nav";
+import { showFriend, showUsers } from "./friends";
+import { RegisteredUser } from "./User";
+import type { Subscriber } from "../auth/UserState";
+import { displayMatchHistory } from "./stats";
+import { onAvatarLoaded, onEmailLoaded, onPasswordLoaded, onRenameLoaded } from "./settings";
 
 import dashboardHtml from "../pages/dashboard.html?raw";
-import formHtml from "../pages/form.html?raw";
-import renameFormHtml from "../pages/forms/renameForm.html?raw"
-import avatarFormHtml from "../pages/forms/avatarForm.html?raw"
-import passwordFormHtml from "../pages/forms/passwordForm.html?raw"
-import { RegisterClass } from "@babylonjs/core";
-import { GuestUser, RegisteredUser } from "./User";
-// import emailFormHtml from "../pages/forms/emailForm.html?raw"
 
-export { getDashboardPage, getSettingForm, initSettingPageListeners }
+export { getDashboardPage, initDashboardPageListeners }
 
-// Getting base html
+// variable to hold current listener functions
+
+let currentFriendsListener: Subscriber | null = null;
+let currentUsersListener: Subscriber | null = null;
+
+
+// Getting base html for the pages
 
 function getDashboardPage(): string
 {
-	const name = userState.getUser()?.getName() ?? "Guest";
-	return (getNavBarHtml() + dashboardHtml).replace('USERNAME', name);
+	return dashboardHtml;
 }
 
-function getSettingForm(): string
+
+// find the correct on load function to activate buttons and options
+
+function initDashboardPageListeners(): void
 {
-	const name = userState.getUser()?.getName() ?? "Guest";
-	return (getNavBarHtml() + formHtml).replace('USERNAME', name);
-}
-
-// on load function to activate buttons and options
-
-function initSettingPageListeners(): void
-{
-	initNavBarListeners();
-	console.log(import.meta.env);
-
 	document.addEventListener('pageLoaded', (event: Event) => {
 		const { detail: path } = event as CustomEvent<string>;
 
+		// reinitializing any possibly existing listener
+		cleanupDashboardListeners();
+
 		switch (path)
 		{
-			case '/settings/rename':
+			case '/dashboard/rename':
 			{
 				onRenameLoaded();
 				return;
 			}
 
-			case '/settings/avatar':
+			case '/dashboard/avatar':
 			{
 				onAvatarLoaded();
 				return;
 			}
 
-			case '/settings/password':
+			case '/dashboard/password':
 			{
 				onPasswordLoaded();
 				return;
 			}
 
-			// case '/settings/email':
-			// {
-			// 	onLoginLoaded();
-			// 	return;
-			// }
+			case '/dashboard/email':
+			{
+				onEmailLoaded(); // TO DO : add api route
+				return;
+			}
 
 			default:
 			{
+				onDashboardLoaded()
 				return;
 			}
 
@@ -72,106 +69,69 @@ function initSettingPageListeners(): void
 	});
 }
 
-function onRenameLoaded(): void
+// LOAD DASHBOARD DATA
+
+async function onDashboardLoaded()
 {
 	const user = userState.getUser();
+	const isRegistered = user instanceof RegisteredUser;
 
-	injectForm(renameFormHtml);
-	const renameForm = document.getElementById('rename-form') as HTMLFormElement | null;
+	currentFriendsListener = () => showFriend();
+	currentUsersListener = () => showUsers();
 
-	renameForm?.addEventListener('submit', async (e) =>
-		{
-			e.preventDefault();
-			const formData = new FormData(renameForm);
-			const newName = formData.get('input-new-name') as string | null;
-
-			if (newName)
-			{
-				userState.rename(newName);
-				router.render();
-			}
-
-		}
-	);
-}
-
-function onAvatarLoaded(): void
-{
-	const user = userState.getUser();
-	if (!(user instanceof RegisteredUser))
+	if (isRegistered)
 	{
-		router.navigateTo('/settings');
-		return;
+		showRegisteredUserOptions(user);
+		userState.subscribe(currentFriendsListener);
+		displayMatchHistory();
 	}
 
-	injectForm(avatarFormHtml);
+	userState.subscribe(currentUsersListener);
 
-	const avatarForm = document.getElementById('avatar-form') as HTMLFormElement | null;
-	avatarForm?.addEventListener('submit', async (e) =>
-		{
-			e.preventDefault();
-			const formData = new FormData(avatarForm);
-			if (formData) {
-				try
-				{
-					await userState.updateAvatar(formData);
-					alert('Avatar updated!');
-				}
-				catch (err)
-				{
-					alert('Failed to update avatar.');
-					console.error(err);
-				}
-			}
-		}
-	);
+
 }
 
-function onPasswordLoaded(): void
+function showRegisteredUserOptions(user : RegisteredUser)
 {
-	const user = userState.getUser();
-	if (!(user instanceof RegisteredUser))
+	document.querySelectorAll('.need-registered-user').forEach(el =>
+		{
+			(el as HTMLElement).style.display = 'flex';
+		}
+	);
+
+	const twoFactorAuthBtn = document.getElementById('enable-tfa-btn');
+	if (twoFactorAuthBtn)
 	{
-		router.navigateTo('/settings');
-		return;
+		if (user.hasTwoFactorAuth) {
+			twoFactorAuthBtn.textContent = 'Disable Two Factor Authentication';
+			twoFactorAuthBtn.addEventListener('click', () => {
+				userState.disableTwoFactorAuth();
+			});
+		} else {
+			twoFactorAuthBtn.textContent = 'Enable Two Factor Authentication';
+			twoFactorAuthBtn.addEventListener('click', () => {
+				userState.enableTwoFactorAuth();
+			});
+		}
 	}
 
-	injectForm(passwordFormHtml);
-
-	const passwordForm = document.getElementById('password-form') as HTMLFormElement | null;
-	passwordForm?.addEventListener('submit', async (e) =>
-		{
-			e.preventDefault();
-			const formData = new FormData(passwordForm);
-			const newPassword = formData.get('input-password') as string | null;
-			const newPasswordCheck = formData.get('input-password-check') as string | null;
-			const oldPassword = formData.get('input-old-password') as string | null;
-			if (newPassword === newPasswordCheck)
-			{
-				alert("The new passwords doesn't match...")
-				return;
-			}
-			if (oldPassword && newPassword) {
-				try
-				{
-					await userState.changePassword(oldPassword, newPassword);
-					alert('password updated!');
-				}
-				catch (err)
-				{
-					alert('Failed to update password.');
-					console.error(err);
-				}
-			}
-		}
-	);
+	const deleteAccBtn = document.getElementById('delete-account-btn');
+	deleteAccBtn?.addEventListener('click', () => {
+		userState.deleteAccount();
+		router.navigateTo('')
+	})
 }
 
-
-// UTILITIES
-
-export function injectForm(html: string): void
+function cleanupDashboardListeners()
 {
-	const container = document.getElementById('form-container');
-	if (container) container.insertAdjacentHTML('beforeend', html);
+	if (currentFriendsListener)
+	{
+		userState.unsubscribe(currentFriendsListener);
+		currentFriendsListener = null;
+	}
+	if (currentUsersListener)
+	{
+		userState.unsubscribe(currentUsersListener);
+		currentUsersListener = null;
+	}
 }

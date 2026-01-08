@@ -3,11 +3,11 @@
 	class="flex flex-col items-center justify-center">
 
 	<div 
-		class="glow-anim flex flex-col items-center justify-center p-6">
+		class="glow-anim">
 
 		<form 
 			id="game-option-form"
-			class="flex flex-col flex-center gap-5 m-5 text-center">
+			class="glow-form">
 
 			<!-- Choose match-location : remote or local -->
 			<div 
@@ -28,8 +28,7 @@
 			</div>
 
 			<!-- Choose game-type : classic (1vsAI or 1vs1) or tournament -->
-			<div 
-				class="flex flex-col flex-center gap-1 m-1 text-center">
+			<section>
 
 				<label 
 					for="game-type"
@@ -45,11 +44,10 @@
 					<option class='' value="4">Tournament with 4 players</option>
 					<!-- <option value="8">Tournament with 8 friends</option> -->
 				</select>
-			</div>
+			</section>
 	
 			<!-- Choose participants -->
-			<div 
-				class="flex flex-col flex-center gap-1 m-1 text-center">
+			<section>
 
 				<label 
 					for="players-container" 
@@ -62,11 +60,10 @@
 					title="Choose participants">
 					<!-- inputs are handled dynamically -->
 				</div>
-			</div>
+			</section>
 
 			<!-- Choose paddle colors for each player -->
-			<div
-				class="flex flex-col flex-center gap-1 m-1 text-center">
+			<section>
 
 				<label
 					for="paddle-colors-container"
@@ -78,11 +75,10 @@
 					class="w-full flex flex-col gap-2">
 					<!-- inputs are handled dynamically -->
 				</div>
-			</div>
+			</section>
 
 			<!-- Choose game level : the higher the level, the more challenging it is -->
-			<div 
-				class="flex flex-col flex-center gap-1 m-1 text-center">
+			<section>
 
 				<label 
 					for="level" 
@@ -99,7 +95,7 @@
 					<option value="1">medium</option>
 					<option value="2">hard</option>
 				</select>
-			</div>
+			</section>
 
 			<!-- Choose rendering customization -->
 			<!-- <div>
@@ -109,7 +105,7 @@
 					<input type="color" class="w-12 h-6 border bg-transparent cursor-pointer p-0" id="ball-color-input" name="ball-level-input" value="#a2c2e8" title="Choose your color">
 					<label for="back-color-input" class="p-1">Map</label>
 					<input type="color" class="w-12 h-6 border bg-transparent cursor-pointer p-0" id="back-color-input" name="back-color-input" value="#01011a" title="Choose your color">
-					<!-- <label for="hs-color-input" class="p-1">Paddle</label>
+					 <label for="hs-color-input" class="p-1">Paddle</label>
 					<input type="color" class="p-1 h-5 w-14 block bg-white border border-gray-200 cursor-pointer disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700" id="padd-color-input" name="padd-color-input" value="#a2c2e8" title="Choose your color"> -->
 				<!-- </div>
 			</div> -->

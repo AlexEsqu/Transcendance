@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="box-border  h-screen flex flex-col m-0 p-0">
+<html class="flex flex-1 h-full">
 	<head>
 		<meta charset="UTF-8">
 		<title>Transcendence</title>
@@ -8,9 +8,9 @@
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&family=PT+Mono&family=Share+Tech+Mono&family=Silkscreen:wght@400;700&family=VT323&display=swap" rel="stylesheet">
 	</head>
-	<!-- optional background: bg-[linear-gradient(90deg,rgba(12,13,17,1)_0%,_rgba(23,26,36,1)_100%)] -->
-	<body class="bg-[#0C0D11] font-[Orbitron] text-slate-300 h-screen box-border flex flex-col m-0 p-0">
-		<div id="main" class="h-screen flex flex-col m-0 p-0 box-border"></div>
-	<script type="module" src="/src/app.ts"></script>
+	<body class="bg-[#0C0D11] font-[Orbitron] text-slate-300 flex flex-col flex-1">
+		<nav id="nav" class="hidden"></nav>
+		<main id="main" class="flex flex-1 justify-center"></main>
+		<script type="module" src="/src/app.ts"></script>
 	</body>
 </html>

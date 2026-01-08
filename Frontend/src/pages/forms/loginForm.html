@@ -1,39 +1,52 @@
 <form
 	id="login-form"
 	name="login-form"
-	class="flex flex-col flex-center justify-between gap-5 m-6 pt-0 px-5 pb-5">
+	class="glow-form glow-anim">
 
-	<label
-		for="input-login"
-		class="text-center pt-3">
-		Username or Email
-	</label>
-	<input
-		id="input-login"
-		name="input-login"
-		type="login"
-		required
-		class="input-field glow-select p-3 placeholder:text-center"
-		placeholder="André De La Jacopière" />
+	<section>
+		<label
+			for="input-login"
+			class="">
+			Username or Email
+		</label>
+		<input
+			id="input-login"
+			name="input-login"
+			type="login"
+			required
+			class=""
+			placeholder="André De La Jacopière" />
+		<span
+			aria-live="polite"
+			class="error-hint text-center text-red-500 text-xs mt-1 hidden">
+		</span>
+	</section>
 
-	<label
-		for="input-password"
-		class="text-center pt-3">
-		Password:
-	</label>
-	<input
-		id="input-password"
-		name="input-password"
-		type="password"
-		required
-		class="input-field glow-select p-3 placeholder:text-center"
-		placeholder="********" />
+	<section>
+		<label
+			for="input-password"
+			class="">
+			Password:
+		</label>
+		<input
+			id="input-password"
+			name="input-password"
+			type="password"
+			required
+			minlength="8"
+			class=""
+			placeholder="********" />
+		<span
+			aria-live="polite"
+			class="error-hint text-center text-red-500 text-xs mt-1 hidden">
+		</span>
+	</section>
 
 	<button
 		id="btn-submit-login"
 		name="btn-submit-login"
 		type="submit"
-		class="p-4 mt-12 glow-select border border-slate-500">
+		class="">
 		Login as User
 	</button>
 

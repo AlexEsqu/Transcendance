@@ -1,5 +1,6 @@
-import { RegisteredUser, GuestUser, User } from "../users/User";
-import { router } from "../app"
+import { RegisteredUser, GuestUser, User, BaseUser } from "../users/User";
+import { router } from "../app";
+import type { MatchHistory } from "../users/stats";
 
 const apiKey : string = import.meta.env.VITE_APP_SECRET_KEY ?? "";
 const jwtKey : string = import.meta.env.VITE_JWT_SECRET ?? "";
@@ -9,7 +10,7 @@ console.log(jwtKey);
 console.log(apiDomainName);
 
 export type { Subscriber }
-export { UserState }
+export { UserState, apiKey, apiDomainName }
 
 type Subscriber = (user: User | null) => void;
 
@@ -101,10 +102,12 @@ class UserState
 		{
 			localStorage.setItem(localStorageKeyForRegisteredUser, JSON.stringify(
 				{
-					name: this.user.name,
+					username: this.user.username,
 					id: this.user.id,
 					accessToken: this.user.accessToken,
-					avatarPath: this.user.avatarPath
+					hasTwoFactorAuth: this.user.hasTwoFactorAuth,
+					avatar: this.user.avatar,
+					friends: this.user.friends
 				}
 			));
 		}
@@ -112,8 +115,8 @@ class UserState
 		{
 			localStorage.setItem(localStorageKeyForGuestUser, JSON.stringify(
 				{
-					name: this.user.name,
-					avatarPath: this.user.avatarPath
+					username: this.user.username,
+					avatar: this.user.avatar
 				}
 			));
 		}
@@ -123,22 +126,37 @@ class UserState
 	{
 		const registeredData = localStorage.getItem(localStorageKeyForRegisteredUser);
 		const guestData = localStorage.getItem(localStorageKeyForGuestUser);
+		localStorage.removeItem(localStorageKeyForGuestUser);
+		localStorage.removeItem(localStorageKeyForRegisteredUser);
 
 		if (registeredData)
 		{
-			const data = JSON.parse(registeredData);
-			this.user = new RegisteredUser(data.name, data.id, data.accessToken);
-			this.user.avatarPath = data.avatarPath;
+			try
+			{
+				const data = JSON.parse(registeredData);
+				this.user = new RegisteredUser(data.username, data.id, data.accessToken);
+				this.user.avatar = data.avatar;
+				this.user.friends = data.friends ?? [];
+				this.notifySubscribers();
+				this.refreshUser();
+			}
+			catch (error)
+			{
+				const msg = error instanceof Error
+					? error.message
+					: "Unknown error when loading user from local storage";
+				console.log(msg);
+				this.setUser(null);
+				router.navigateTo('/connection')
+			}
 		}
 		else if (guestData)
 		{
 			const data = JSON.parse(guestData);
-			this.user = new GuestUser(data.name);
-			this.user.avatarPath = data.avatarPath;
+			const user = new GuestUser(data.username);
+			user.avatar = data.avatar;
+			this.setUser(user);
 		}
-
-		this.notifySubscribers();
-
 		console.log(this.user);
 	}
 
@@ -154,7 +172,8 @@ class UserState
 
 	public async loginAsRegistered(login: string, password: string): Promise<void>
 	{
-		const response = await fetch(`${apiDomainName}/users/auth/login`,
+		const response = await fetch(
+			`${apiDomainName}/users/auth/login`,
 			{
 				method: 'POST',
 				headers: {
@@ -174,12 +193,23 @@ class UserState
 			throw new Error(data.message || data.error || 'Login Failed');
 
 		const user = new RegisteredUser(login, data.id, data.accessToken);
+
+		// sets temporary user to launch the refresh
+		this.user = user;
+
 		this.setUser(user);
+
+		// await the refresh
+		await this.refreshUser();
+
+		// notify: refresh succeeded !! woohooo
+		this.notifySubscribers();
 	}
 
 	public async register(username: string, password: string, email: string): Promise<void>
 	{
-		const response = await fetch(`${apiDomainName}/users/signup`,
+		const response = await fetch(
+			`${apiDomainName}/users/signup`,
 			{
 				method: 'POST',
 				headers: {
@@ -203,7 +233,8 @@ class UserState
 	{
 		if (this.user instanceof RegisteredUser)
 		{
-			const response = await this.fetchWithTokenRefresh(`${apiDomainName}/users/auth/logout`,
+			const response = await this.fetchWithTokenRefresh(
+				`${apiDomainName}/users/auth/logout`,
 				{
 					method: 'POST',
 					headers: {
@@ -226,7 +257,8 @@ class UserState
 	{
 		if (this.user instanceof RegisteredUser)
 		{
-			const response = await this.fetchWithTokenRefresh(`${apiDomainName}/users/me`,
+			const response = await this.fetchWithTokenRefresh(
+				`${apiDomainName}/users/me`,
 				{
 					method: 'DELETE',
 					headers: {
@@ -243,6 +275,7 @@ class UserState
 		}
 
 		this.setUser(null);
+
 	}
 
 	//------------------------ TOKEN REFRESHER -------------------------------//
@@ -252,16 +285,18 @@ class UserState
 		if (!(this.user instanceof RegisteredUser))
 			return false;
 
-		const response = await fetch(`${apiDomainName}/users/auth/refresh`,
-		{
-			method: 'POST',
-			headers:
+		const response = await fetch(
+			`${apiDomainName}/users/auth/refresh`,
 			{
-				'accept': 'application/json',
-				'Authorization': `Bearer ${this.user.accessToken}`,
-				'X-App-Secret': `${apiKey}`
-			},
-		});
+				method: 'POST',
+				headers:
+				{
+					'accept': 'application/json',
+					'Authorization': `Bearer ${this.user.accessToken}`,
+					'X-App-Secret': `${apiKey}`
+				},
+			}
+		);
 		const data = await response.json();
 
 		if (!response.ok || !data.accessToken)
@@ -317,31 +352,33 @@ class UserState
 	{
 		if (this.user instanceof RegisteredUser)
 		{
-			const response = await this.fetchWithTokenRefresh(`${apiDomainName}/users/me/username`,
-			{
-				method: 'PUT',
-				headers:
+			const response = await this.fetchWithTokenRefresh(
+				`${apiDomainName}/users/me/username`,
 				{
-					'accept': 'application/json',
-					'Content-Type': 'application/json',
-					'Authorization': `Bearer ${this.user.accessToken}`,
-					'X-App-Secret': `${apiKey}`
-				},
-				body: JSON.stringify({
-					new_username: newName
-				})
-			});
+					method: 'PUT',
+					headers:
+					{
+						'accept': 'application/json',
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${this.user.accessToken}`,
+						'X-App-Secret': `${apiKey}`
+					},
+					body: JSON.stringify({
+						new_username: newName
+					})
+				}
+			);
 
 			const data = await response.json();
 			if (!response.ok)
 				throw new Error(data.message || 'Renaming failed');
 
-			this.user.name = newName;
+			this.user.username = newName;
 			router.render();
 		}
 
 		else if (this.user instanceof GuestUser)
-			this.user.name= newName;
+			this.user.username= newName;
 
 		this.setUser(this.user);
 	}
@@ -350,23 +387,26 @@ class UserState
 	{
 		if (this.user instanceof RegisteredUser)
 		{
-			const response = await this.fetchWithTokenRefresh(`${apiDomainName}/users/me/avatar`,
-			{
-				method: 'PUT',
-				headers:
+			const response = await this.fetchWithTokenRefresh(
+				`${apiDomainName}/users/me/avatar`,
 				{
-					'accept': 'application/json',
-					'Authorization': `Bearer ${this.user.accessToken}`,
-					'X-App-Secret': `${apiKey}`
-				},
-				body: formData,
-			});
+					method: 'PUT',
+					headers:
+					{
+						'accept': 'application/json',
+						'Authorization': `Bearer ${this.user.accessToken}`,
+						'X-App-Secret': `${apiKey}`
+					},
+					body: formData,
+				}
+			);
 
 			const data = await response.json();
 			if (!response.ok)
 				throw new Error(`Avatar update failed: ${response.status}, ${data.message}`);
 
-			this.refreshUser();
+			await this.refreshUser();
+			this.notifySubscribers();
 		}
 
 		else
@@ -379,7 +419,8 @@ class UserState
 	{
 		if (this.user instanceof RegisteredUser)
 		{
-			const response = await fetch(`${apiDomainName}/users/me/password`, {
+			const response = await this.fetchWithTokenRefresh(
+				`${apiDomainName}/users/me/password`, {
 				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json',
@@ -402,6 +443,11 @@ class UserState
 		}
 	}
 
+	async changeEmail(newEmail: string): Promise<void>
+	{
+		// AWAITING API ROUTE
+	}
+
 	public async refreshUser(): Promise<void>
 	{
 		if (!(this.user instanceof RegisteredUser))
@@ -413,7 +459,8 @@ class UserState
 		if (this.user.id === null || this.user.id === undefined)
 			throw new Error("User id is missing");
 
-		const response = await fetch(`${apiDomainName}/users/${this.user.id}`,
+		const response = await this.fetchWithTokenRefresh(
+			`${apiDomainName}/users/${this.user.id}`,
 			{
 				method: 'GET',
 				headers:
@@ -430,9 +477,205 @@ class UserState
 		if (!response.ok)
 			throw new Error(data.message || data.error || `Failed to fetch user (${response.status})`);
 
-		this.user.name = data.username ?? data.name ?? this.user.name;
-		this.user.avatarPath = data.avatar ?? this.user.avatarPath;
-		this.setUser(this.user);
+		this.user.username = data.username ?? data.username ?? this.user.username;
+		this.user.avatar = data.avatar ?? this.user.avatar;
+
+		await this.refreshFriendList();
+		this.user.isRefreshed = true;
+
+		this.saveToLocalStorage();
 	}
 
+	public async refreshFriendList()
+	{
+		if (!(this.user instanceof RegisteredUser))
+		{
+			console.log("No registered user to refresh");
+			return;
+		}
+
+		if (this.user.id === null || this.user.id === undefined)
+			throw new Error("User id is missing");
+
+		const response = await this.fetchWithTokenRefresh(
+			`${apiDomainName}/users/me/friends`,
+			{
+				method: 'GET',
+				headers:
+				{
+					'accept': 'application/json',
+					'X-App-Secret': `${apiKey}`,
+					'Authorization': `Bearer ${this.user.accessToken}`
+				}
+			}
+		);
+
+		const data = await response.json();
+		console.log(`received friends as:`);
+		console.log(data);
+		if (!response.ok)
+			throw new Error(data.message || data.error || `Failed to fetch user friends (${response.status})`);
+
+		this.user.setFriends(data);
+	}
+
+	public async addToFriendList(friendId: number)
+	{
+		if (!(this.user instanceof RegisteredUser))
+			throw new Error("User is not registered and cannot add friends!");
+
+		if (this.user.id === null || this.user.id === undefined)
+			throw new Error("User id is missing");
+
+		const response = await this.fetchWithTokenRefresh(
+			`${apiDomainName}/users/me/friends`,
+			{
+				method: 'POST',
+				headers:
+				{
+					'accept': 'application/json',
+					'Content-Type': 'application/json',
+					'X-App-Secret': `${apiKey}`,
+					'Authorization': `Bearer ${this.user.accessToken}`
+				},
+				body: JSON.stringify({ id: friendId }),
+			}
+		);
+
+		const data = await response.json();
+		console.log(data);
+		if (!response.ok)
+			throw new Error(data.message || data.error || `Failed to fetch user friends (${response.status})`);
+
+		await this.refreshUser();
+		this.notifySubscribers();
+	}
+
+	public async removeFromFriendList(friendId: number)
+	{
+		if (!(this.user instanceof RegisteredUser))
+		{
+			console.log("No registered user to refresh");
+			return;
+		}
+
+		if (this.user.id === null || this.user.id === undefined)
+			throw new Error("User id is missing");
+
+		const response = await this.fetchWithTokenRefresh(
+			`${apiDomainName}/users/me/friends`,
+			{
+				method: 'DELETE',
+				headers:
+				{
+					'accept': 'application/json',
+					'Content-Type': 'application/json',
+					'X-App-Secret': `${apiKey}`,
+					'Authorization': `Bearer ${this.user.accessToken}`
+				},
+				body: JSON.stringify({ id: friendId }),
+			}
+		);
+
+
+		if (!response.ok)
+		{
+			const data = await response.json();
+			console.log(data);
+			throw new Error(data.message || data.error || `Failed to fetch user friends (${response.status})`);
+		}
+
+		await this.refreshUser();
+		this.notifySubscribers();
+	}
+
+	// 2FA
+
+	public async enableTwoFactorAuth()
+	{
+		if (!(this.user instanceof RegisteredUser))
+			throw new Error("Not authenticated");
+
+		const response = await this.fetchWithTokenRefresh(
+			`${apiDomainName}/users/me/2fa`,
+			{
+				method: 'PUT',
+				headers: {
+					'accept': 'application/json',
+					'Authorization': `Bearer ${this.user.accessToken}`,
+					'X-App-Secret': `${apiKey}`,
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ 
+					enabled: true 
+				})
+			}
+		);
+
+		const data = await response.json();
+		if (!response.ok)
+			throw new Error(data.message || data.error || '2FA disable failed');
+
+		this.user.hasTwoFactorAuth = true;
+		// await this.refreshUser(); // once I get a get API on the 2FA
+		this.notifySubscribers();
+	}
+
+	public async disableTwoFactorAuth()
+	{
+		if (!(this.user instanceof RegisteredUser))
+			throw new Error("Not authenticated");
+
+		const response = await this.fetchWithTokenRefresh(
+			`${apiDomainName}/users/me/2fa`,
+			{
+				method: 'PUT',
+				headers: {
+					'accept': 'application/json',
+					'Authorization': `Bearer ${this.user.accessToken}`,
+					'X-App-Secret': `${apiKey}`,
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ 
+					enabled: false 
+				})
+			}
+		);
+
+		const data = await response.json();
+		if (!response.ok)
+			throw new Error(data.message || data.error || '2FA disable failed');
+
+		this.user.hasTwoFactorAuth = false;
+		// await this.refreshUser(); // once I get a get API on the 2FA
+		this.notifySubscribers();
+	}
+
+	// MATCH HISTORY
+
+	public async fetchMatchHistory(): Promise<MatchHistory[]>
+	{
+		if (!(this.user instanceof RegisteredUser))
+			throw new Error("Not authenticated");
+
+		const response = await this.fetchWithTokenRefresh(
+			`${apiDomainName}/users/${this.user.id}/matches`,
+			{
+				method: 'GET',
+				headers:
+				{
+					'accept': 'application/json',
+					'Authorization': `Bearer ${this.user.accessToken}`,
+					'X-App-Secret': `${apiKey}`
+				}
+			}
+		);
+
+		const data = await response.json();
+
+		if (!response.ok)
+			throw new Error(data.message || data.error || 'Failed to fetch match history');
+
+		return data;
+	}
 }

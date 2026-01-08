@@ -1,5 +1,4 @@
 import { userState, router } from "../app";
-import { getNavBarHtml, initNavBarListeners } from "../routing/nav";
 import { launchPongGame } from "./GameApp"
 import { clearOptions, loadOptions, saveOptions } from "./options";
 import { IOptions } from "./pongData";
@@ -15,20 +14,16 @@ export { getGameHtml, getGameOptionHtml, initGamePageListeners };
 
 function getGameHtml(): string
 {
-	const name = userState.getUser()?.getName() ?? "Guest";
-	return (getNavBarHtml() + gameHtml).replace('USERNAME', name);
+	return gameHtml;
 }
 
 function getGameOptionHtml(): string
 {
-	const name = userState.getUser()?.getName() ?? "Guest";
-	return (getNavBarHtml() + optionsHtml).replace('USERNAME', name);
+	return optionsHtml;
 }
 
 function initGamePageListeners(): void
 {
-	initNavBarListeners();
-
 	document.addEventListener('pageLoaded', (event: Event) => {
 		const { detail: path } = event as CustomEvent<string>;
 
@@ -50,12 +45,6 @@ function initGamePageListeners(): void
 					router.navigateTo('/game/options')
 				return;
 			}
-
-			// case '/game/tournament':
-			// {
-			// 	onTournamentGameLoaded();
-			// 	return;
-			// }
 
 			case '/game/error':
 			{
@@ -85,8 +74,8 @@ function generatePlayersInputs(nbOfPlayers: number): void
 		const input = document.createElement('input');
 		input.type = 'text';
 		input.id = `player${i}`;
-		input.name = `player${i}`;
-		input.placeholder = nbOfPlayers === 1 ? 'Your name' : `Player ${i}`;
+		// input.username = `player${i}`;
+		input.placeholder = nbOfPlayers === 1 ? 'Your username' : `Player ${i}`;
 		input.className = 'input-field p-2 placeholder:text-center';
 		playersContainer.appendChild(input);
 	}
@@ -114,7 +103,7 @@ function generatePaddleColorsInputs(nbOfPlayers: number): void
 		input.type = 'color';
 		input.id = `paddle-color-${i}`;
 		input.name = `paddle-color-${i}`;
-		input.className = "w-12 h-6 border bg-transparent cursor-pointer p-0";
+		input.className = "w-12 h-10 border bg-transparent cursor-pointer";
 		input.value = '#a2c2e8';
 		input.title = 'Choose paddle color';
 

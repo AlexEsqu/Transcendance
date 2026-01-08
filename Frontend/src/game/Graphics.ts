@@ -102,10 +102,10 @@ function createMap(scene: Scene, height: number, width: number, colorHex: string
 	return map;
 }
 
-function createAnimation(name: string, target: string, keys: IAnimationKey[]): Animation
+function createAnimation(username: string, target: string, keys: IAnimationKey[]): Animation
 {
 	const animation = new Animation(
-		name,
+		username,
 		target,
 		50, // frames per second
 		Animation.ANIMATIONTYPE_FLOAT,

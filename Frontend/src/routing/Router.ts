@@ -1,6 +1,8 @@
 import { UserState } from "../auth/UserState";
 import { User, RegisteredUser } from "../users/User";
 
+import { getNavBarHtml } from './nav';
+
 export { Router }
 export type { Route, getPageHtmlFunction }
 
@@ -30,6 +32,9 @@ class Router
 	// container within which to display the html content
 	private rootElement: HTMLElement;
 
+	// track if navbar is currently initialized
+	private navbarInitialized: boolean = false;
+
 	//--------------------------- CONSTRUCTORS ------------------------------//
 
 	constructor (userState: UserState, rootSelector: string)
@@ -51,7 +56,9 @@ class Router
 			if (!user && window.location.pathname !== '/connection')
 				this.navigateTo('/connection');
 			if (user && window.location.pathname.includes('/connection'))
-				this.navigateTo('/settings');
+				this.navigateTo('/dashboard');
+			if (this.navbarInitialized)
+				this.renderNavbar(user);
 		});
 	}
 
@@ -85,18 +92,22 @@ class Router
 
 		let route = this.routes.find(route => route.path === currentPath);
 
-		console.log(route && `route is ${route.path}`)
-
-
 		// if no route found, defaulting to the connection page
-		if (!route)
+		if (!route || !route.path)
+		{
+			this.redirectToDefaultPage();
+			return;
+		}
+
+		// if route requires no user, defaulting to the dashboard page
+		if (!route.needUser && user)
 		{
 			this.redirectToDefaultPage();
 			return;
 		}
 
 		// if route requires a user, defaulting to the connection page
-		if (route && route.needUser && !user)
+		if (route.needUser && !user)
 		{
 			this.redirectToDefaultPage();
 			return;
@@ -109,12 +120,24 @@ class Router
 			return;
 		}
 
+		// if the user is currently on a game page, warn them that leaving will end game
+		if (user && currentPath.includes('/game'))
+		{
+			const confirmed = window.confirm(
+				'Leaving the game page will end the game.\n Are you sure you want to continue?'
+			);
+			if (!confirmed)
+				return;
+		}
+
 		if (!route)
 			return;
 
 		console.log(route && `corrected route is ${route.path}`)
 
 		this.rootElement.innerHTML = route.getPage();
+
+		this.renderNavbar(user);
 
 		const event = new CustomEvent('pageLoaded', { detail: route.path });
 		document.dispatchEvent(event);
@@ -153,7 +176,7 @@ class Router
 			if (hasHistory)
 				targetPath = initialPath;
 			else
-				targetPath = '/settings';
+				targetPath = '/dashboard';
 		}
 
 		console.log(`going to ${targetPath}`);
@@ -164,7 +187,39 @@ class Router
 	private redirectToDefaultPage()
 	{
 		const user = this.userState.getUser();
-		window.history.replaceState(null, '', (user ? '/settings' : '/connection'));
+		window.history.replaceState(null, '', (user ? '/dashboard' : '/connection'));
 		this.render();
+	}
+
+	private renderNavbar(user: User | null): void
+	{
+		const navbar = document.getElementById('nav');
+		if (!navbar)
+		{
+			console.log('Navbar element not found');
+			return;
+		}
+
+		if (user)
+		{
+			navbar.classList.remove('hidden');
+
+			if (!this.navbarInitialized)
+			{
+				navbar.innerHTML = getNavBarHtml();
+				this.navbarInitialized = true;
+
+				// signals to navbar that it can attach the buttons
+				// that have been loaded into the DOM / are in the displayed html
+				const navEvent = new CustomEvent('navbarLoaded');
+				document.dispatchEvent(navEvent);
+			}
+		}
+		else
+		{
+			navbar.classList.add('hidden');
+			navbar.innerHTML = '';
+			this.navbarInitialized = false;
+		}
 	}
 }

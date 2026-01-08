@@ -1,12 +1,15 @@
 <form
 	id="register-form"
 	name="register-form"
-	class="flex flex-col flex-center justify-between gap-5 m-6 pt-0 px-5 pb-5">
+	novalidate
+	class="glow-form glow-anim">
 
-	<div id="inputs" class="flex flex-col flex-center gap-5 p-4 text-center" >
+	<h1>Email Sign Up</h1>
+
+	<section>
 		<label
 			for="input-login"
-			class="pt-3">
+			class="">
 			Username:
 		</label>
 		<input
@@ -14,12 +17,20 @@
 			name="input-login"
 			type="login"
 			required
-			class="input-field glow-select p-3 placeholder:text-center"
+			minlength="3"
+			maxlength="20"
+			class=""
 			placeholder="XXXbgdu75XXX" />
+		<span
+			aria-live="polite"
+			class="error-hint text-center text-red-500 text-xs mt-1 hidden">
+		</span>
+	</section>
 
+	<section>
 		<label
 			for="input-email"
-			class="pt-3">
+			class="">
 			Email:
 		</label>
 		<input
@@ -27,12 +38,18 @@
 			name="input-email"
 			type="email"
 			required
-			class="input-field glow-select p-3 placeholder:text-center"
+			class=""
 			placeholder="login@42paris.fr" />
+		<span
+			aria-live="polite"
+			class="error-hint text-center text-red-500 text-xs mt-1 hidden">
+		</span>
+	</section>
 
+	<section>
 		<label
 			for="input-password"
-			class="pt-3">
+			class="">
 			Password:
 		</label>
 		<input
@@ -40,28 +57,39 @@
 			name="input-password"
 			type="password"
 			required
-			class="input-field glow-select p-3 placeholder:text-center"
+			minlength="8"
+			class=""
 			placeholder="********" />
+		<span
+			aria-live="polite"
+			class="error-hint text-center text-red-500 text-xs mt-1 hidden">
+		</span>
+	</section>
 
+	<section>
 		<label
 			for="input-password-check"
-			class="pt-3">
-			Password check:
+			class="">
+			Password verification:
 		</label>
 		<input
 			id="input-password-check"
 			name="input-password-check"
 			type="password"
 			required
-			class="input-field glow-select p-3 placeholder:text-center"
+			class="confirmation-input"
 			placeholder="********" />
-	</div>
+		<span
+			aria-live="polite"
+			class="error-hint text-center text-red-500 text-xs mt-1 hidden">
+		</span>
+	</section>
 
 	<button
 		id="btn-submit-register"
 		name="btn-submit-register"
 		type="submit"
-		class="p-4 mt-12 glow-select border border-slate-500">
+		class="">
 		Register as User
 	</button>
 

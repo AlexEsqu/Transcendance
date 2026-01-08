@@ -1,12 +1,10 @@
 import { userState, router } from "../app";
+import { apiDomainName, apiKey } from "./UserState";
 
 import connectionHtml from "../pages/connection.html?raw";
-
-import formHtml from "../pages/form.html?raw";
 import guestFormHtml from "../pages/forms/guestForm.html?raw"
 import loginFormHtml from "../pages/forms/loginForm.html?raw"
 import registerFormHtml from "../pages/forms/registerForm.html?raw"
-
 import checkEmailHtml from "../pages/info/checkEmail.html?raw"
 
 export {
@@ -25,7 +23,7 @@ function getConnectionLandingHtml(): string
 
 function getConnectionForm(): string {
 
-	return formHtml;
+	return "";
 }
 
 function getEmailCheck(): string
@@ -61,6 +59,12 @@ function initConnectionPageListeners(): void
 				return;
 			}
 
+			case '/connection':
+			{
+				onConnectionLoaded();
+				return;
+			}
+
 			default:
 			{
 				return;
@@ -70,9 +74,46 @@ function initConnectionPageListeners(): void
 	});
 }
 
+function onConnectionLoaded(): void
+{
+	const oauthBtn = document.getElementById('oauth-btn') as HTMLButtonElement;
+	oauthBtn.addEventListener('click', async (e) =>
+		{
+			e.preventDefault();
+			/* Not an api call but a button that redirects to my route that will itself redirect to 42's api, 
+			  I process the info and store a refresh token in the users cookies, you can now follow the same
+			  process as the usual login ;) */
+			
+
+			window.location.replace(`${apiDomainName}/users/auth/oauth/42`)
+			//now that its successful, the user now has a refresh token, you can now login the user
+
+			// const response = await fetch(`${apiDomainName}/users/auth/oauth/42`,
+			// 		{
+			// 			method: 'GET',
+			// 			headers:
+			// 			{
+			// 				'accept': 'application/json',
+			// 				'X-App-Secret': `${apiKey}`
+			// 			},
+			// 		});
+			// 		const data = await response.json();
+
+			// 		if (!response.ok || !data.accessToken)
+			// 		{
+			// 			console.log(data.message || data.error || 'Faied to refresh token');
+			// 			return false;
+			// 		}
+			// 		console.log(data);
+		}
+	);
+}
+
 function onAliasLoaded(): void
 {
-	injectForm(guestFormHtml);
+	const mainContainer = document.getElementById('main')
+	if (mainContainer)
+		mainContainer.insertAdjacentHTML('beforeend', guestFormHtml);
 
 	const guestForm = document.getElementById('guest-form') as HTMLFormElement | null;
 	guestForm?.addEventListener('submit', (e) =>
@@ -88,7 +129,9 @@ function onAliasLoaded(): void
 
 function onRegisterLoaded(): void
 {
-	injectForm(registerFormHtml);
+	const mainContainer = document.getElementById('main')
+	if (mainContainer)
+		mainContainer.insertAdjacentHTML('beforeend', registerFormHtml);
 
 	const registerForm = document.getElementById('register-form') as HTMLFormElement | null;
 	registerForm?.addEventListener('submit', async (e) =>
@@ -126,7 +169,9 @@ function onRegisterLoaded(): void
 
 function onLoginLoaded(): void
 {
-	injectForm(loginFormHtml);
+	const mainContainer = document.getElementById('main')
+	if (mainContainer)
+		mainContainer.insertAdjacentHTML('beforeend', loginFormHtml);
 
 	const loginForm = document.getElementById('login-form') as HTMLFormElement | null;
 	loginForm?.addEventListener('submit', async (e) =>
@@ -153,13 +198,4 @@ function onLoginLoaded(): void
 			}
 		}
 	);
-}
-
-
-// UTILITIES
-
-function injectForm(html: string): void
-{
-	const container = document.getElementById('form-container');
-	if (container) container.insertAdjacentHTML('beforeend', html);
 }

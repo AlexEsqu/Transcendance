@@ -1,7 +1,7 @@
 import { JSONInputsUpdate, JSONGameState, JSONRoomAccess, JSONAwaitingAccess } from './submit.json';
 import { State, IPlayer, IOptions, IScene, IResult } from "./pongData";
 import { createText, createAnimation, loadGame, drawScore, drawName } from './Graphics';
-import { getCanvasConfig, getPlayers, fillWaitingRoomRequest, getPlayersId } from './utils';
+import { getCanvasConfig, getPlayers, fillWaitingRoomRequest } from './utils';
 import { AdvancedDynamicTexture } from "@babylonjs/gui";
 import { Engine } from '@babylonjs/core';
 
