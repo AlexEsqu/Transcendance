@@ -1,12 +1,12 @@
 
 services:
   api:
-    build: ./Backend
+    build: ./Backend/api
     container_name: api
     command: npm run start
     volumes:
-      - ./Backend/src:/app/src
-      - ./Backend/scripts:/app/scripts
+      - ./Backend/api/src:/app/src
+      - ./Backend/api/scripts:/app/scripts
       - sqlite:/app/data
       - user_avatars:/app/uploads/avatars
     environment:
@@ -48,6 +48,19 @@ services:
     networks:
       - app-network
 
+  vault:
+    image: hashicorp/vault:1.13.3
+    container_name: vault
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: root
+      VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
+    cap_add:
+      - IPC_LOCK
+    command: server -dev #TODO: dev only
+    networks:
+      - app-network
 volumes:
   sqlite:
   user_avatars:
