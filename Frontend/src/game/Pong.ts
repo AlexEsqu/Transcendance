@@ -21,6 +21,7 @@ export class Pong
 	waitingSocket: WebSocket | null = null;
 	gamingSocket: WebSocket | null = null;
 	roomId: number | undefined = undefined;
+	playerId: number = 0;
 	timestamp: number = 0;
 	onNewRound?: () => void;
 
@@ -40,16 +41,18 @@ export class Pong
 		this.waitingSocket = new WebSocket(Pong.WAITING_ROOM_URL);
 		if (!this.waitingSocket)
 			throw new Error("'waitingSocket' creation failed");
+		if (this.scene.players)
+			this.playerId = this.scene.players[0].id === 0 ? this.scene.players[1].id : this.scene.players[0].id;
 		this.timestamp = Date.now();
 	}
 
 	goToWaitingRoom(): void
 	{
-		if (!this.waitingSocket)
-			throw new Error("'waitingSocket' not found");
+		if (!this.waitingSocket || !this.scene)
+			throw new Error("can't go to waiting room, elements are missing to continue");
 
 		const request: JSONAwaitingAccess = fillWaitingRoomRequest(this.scene?.options.matchLocation,
-															this.scene?.options.nbOfPlayers, undefined);
+															this.scene?.options.nbOfPlayers, this.playerId);
 
 		//	On socket creation send a message to the server to be added in a waiting room
 		this.waitingSocket.onopen = (e) => {
@@ -92,7 +95,7 @@ export class Pong
 
 			console.log(`GAME-FRONT: joining the gaming room(${this.roomId})`);
 			const joinMsg = {
-				id: this.playerId ?? Date.now(),
+				id: this.playerId,
 				roomId: this.roomId,
 				ready: false,
 			};

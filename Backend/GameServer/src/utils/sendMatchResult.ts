@@ -32,7 +32,7 @@ function sendMatchesToDataBase(results: IResult | null, time?: number): void
 	}
 
 	if (!process.env.APP_SECRET_KEY) return ;
-	const args = {
+	const headers = {
 		'Content-Type': 'application/json',
 		'accept': '*/*',
 		'X-App-Secret': process.env.APP_SECRET_KEY
@@ -47,18 +47,18 @@ function sendMatchesToDataBase(results: IResult | null, time?: number): void
 		{
 			method: 'POST',
 			body: JSON.stringify(matchesJSON),
-			headers: new Headers(args)
+			headers: new Headers(headers)
 		}
 	);
 
 	fetch(request)
 		.then(async (response) => {
-			const text = await response.text();
+			const body = await response.text();
 			try {
-				const json = JSON.parse(text);
+				const json = JSON.parse(body);
 				console.log('server response (json):', json);
 			} catch {
-				console.log('server response (text):', text);
+				console.log('server response (text):', body);
 			}
 			if (!response.ok) {
 				console.error('HTTP error', response.status, response.statusText);

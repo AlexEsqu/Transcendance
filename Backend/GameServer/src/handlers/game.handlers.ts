@@ -26,6 +26,7 @@ function handleMessage(socket: WSWebSocket, message: Buffer,
 			throw new Error("message received doesn't match with 'validateSchema' on '/room/game''") ;
 		}
 
+		console.log(`DATA ================ ${data.id}`);
 		const player: IPlayer | undefined = gameControl.getPlayer(data.roomId, data.id);
 		const gamingRoom: Room | undefined = gameControl.getGamingRoom(data.roomId);
 

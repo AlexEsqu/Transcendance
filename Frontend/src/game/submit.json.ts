@@ -1,4 +1,4 @@
-export type { JSONInputsUpdate, JSONGameState, JSONRoomAccess, JSONAwaitingAccess }
+export type { JSONInputsUpdate, JSONGameState, JSONRoomAccess, JSONAwaitingAccess, JSONListUsers }
 
 /************************************************************************************************************
  * 		Declare submit JSON forms to communicate with server												*
@@ -34,3 +34,10 @@ interface JSONInputsUpdate {
 	state: number;
 	move?: string;
 };
+
+type JSONListUsers = Array<{
+	id: number;
+	username: string;
+	avatar?: string;
+	is_active: boolean;
+}>;
