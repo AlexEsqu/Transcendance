@@ -13,33 +13,60 @@ export default function login(server) {
    If 2FA is enabled for the user, the endpoint does not issue tokens immediately. \
    Instead, a one-time 6-digit verification code is sent to the user's email and \
    a temporary 2FA continuation token is generated, which must be used to complete \
-   authentication via the 2FA verification endpoint. \
+   authentication via the 2FA verification endpoint through the api route `POST /api/users/auth/login/2fa`. \
    `This endpoint requires the client to have a verified email address.`",
 			tags: ["auth"],
 			body: { $ref: "authCredentialsBody" },
 			response: {
 				200: {
-					oneOf: [
-						{
-							description: "Login successful",
-							type: "object",
-							required: ["accessToken", "id"],
-							properties: {
-								accessToken: { type: "string" },
-								id: { type: "integer" },
+	description: "Login successful or 2FA required",
+	content: {
+		"application/json": {
+			schema: {
+				oneOf: [
+					{
+						description: "Login successful",
+						type: "object",
+						required: ["accessToken", "id"],
+						properties: {
+							accessToken: { type: "string" },
+							id: { type: "integer" },
+						},
+					},
+					{
+						description: "Two-factor authentication required",
+						type: "object",
+						required: ["twoFactorRequired", "twoFactorToken"],
+						properties: {
+							twoFactorRequired: { type: "boolean", example: true },
+							twoFactorToken: {
+								type: "string",
+								description: "2FA continuation token",
 							},
 						},
-						{
-							description: "Two-factor authentication required",
-							type: "object",
-							required: ["twoFactorRequired", "token"],
-							properties: {
-								twoFactorRequired: { type: "boolean", example: true },
-								token: { type: "string", description: "2FA continuation token" },
-							},
-						},
-					],
+					},
+				],
+			},
+			examples: {
+				no2faExample: {
+					summary: "Successful response when no 2FA is required",
+					value: {
+						accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+						id: 12,
+					},
 				},
+				twoFaExample: {
+					summary: "Successful response when 2FA is required",
+					value: {
+						twoFactorRequired: true,
+						twoFactorToken: "2fa_continuation_token",
+					},
+				},
+			},
+		},
+	},
+},
+
 				302: {
 					description: "Redirect: Email not verified",
 					$ref: "SuccessMessageResponse#",
@@ -87,7 +114,7 @@ export default function login(server) {
 				const twoFaToken = await sendVerificationCodeEmail(server, user);
 				return reply.status(200).send({
 					twoFactorRequired: true,
-					token: twoFaToken,
+					twoFactorToken: twoFaToken,
 				});
 			}
 			const tokens = await generateTokens(server, user, reply);
