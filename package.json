@@ -1,0 +1,28 @@
+{
+  "name": "ft_transcendence",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlexEsqu/Transcendance.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AlexEsqu/Transcendance/issues"
+  },
+  "homepage": "https://github.com/AlexEsqu/Transcendance#readme",
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-security": "^3.0.1",
+    "globals": "^16.5.0",
+    "typescript-eslint": "^8.49.0"
+  }
+}
