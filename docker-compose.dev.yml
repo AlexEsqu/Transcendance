@@ -19,6 +19,8 @@ services:
       - FRONTEND_DOMAIN_NAME=${FRONTEND_DOMAIN_NAME}
       - FT_CLIENT_ID=${FT_CLIENT_ID}
       - FT_CLIENT_SECRET=${FT_CLIENT_SECRET}
+    depends_on:
+      - vault
     networks:
       - app-network
 
@@ -31,6 +33,8 @@ services:
       - VITE_JWT_SECRET=${JWT_SECRET}
       - VITE_APP_SECRET_KEY=${APP_SECRET_KEY}
       - VITE_API_DOMAIN_NAME=${API_DOMAIN_NAME}
+    depends_on:
+      - vault
     networks:
       - app-network
 
@@ -45,6 +49,7 @@ services:
     depends_on:
       - api
       - typescript
+      - vault
     networks:
       - app-network
 
@@ -53,14 +58,30 @@ services:
     container_name: vault
     ports:
       - "8200:8200"
-    environment:
-      VAULT_TOKEN: "root-token"
-      VAULT_ADDR: "http://0.0.0.0:8200"
     cap_add:
       - IPC_LOCK
-    command: "server -dev -dev-root-token-id=root-token" #TODO: dev only
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: root-token
+      VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
+    command: vault server -dev
     networks:
       - app-network
+
+  vault-init:
+    image: hashicorp/vault:1.13.3
+    container_name: vault-init
+    depends_on:
+      - vault
+    environment:
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: root-token
+    volumes:
+      - ./Backend/vault/scripts:/vault/scripts:ro
+    entrypoint: [ "sh", "/vault/scripts/script.sh" ]
+    restart: "no"
+    networks:
+      - app-network
+
 volumes:
   sqlite:
   user_avatars:
