@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import { generateTokens, sendVerificationCodeEmail } from "../../services/authServices.js";
 import fs from "fs"
-const redirectUrl = encodeURI(`${process.env.FRONTEND_DOMAIN_NAME}/settings`);
+const redirectUrl = encodeURI(`${process.env.FRONTEND_DOMAIN_NAME}/dashboard`);
 
 export function ft_OAuth2_callback(server) {
 	const opts = {

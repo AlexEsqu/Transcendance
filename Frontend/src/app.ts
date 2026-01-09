@@ -1,7 +1,7 @@
 import "./style.css"
 import { Router } from './navigation/Router';
 import { UserState } from './user/UserState';
-import { getConnectionLandingHtml, getConnectionForm, getEmailCheck, initConnectionPageListeners} from './auth/connectionPage';
+import { getConnectionLandingHtml, getConnectionForm, getEmailCheck, get2FACheck, initConnectionPageListeners} from './auth/connectionPage';
 import { getDashboardPage, initDashboardPageListeners } from "./dashboard/dashboardPage";
 import { getGameHtml, getGameOptionHtml, initGamePageListeners } from "./game/display"
 import { getErrorPage } from "./error/error";
@@ -16,6 +16,7 @@ router.addRoute('/connection', getConnectionLandingHtml);
 router.addRoute('/connection/login', getConnectionForm);
 router.addRoute('/connection/register', getConnectionForm);
 router.addRoute('/connection/emailcheck', getEmailCheck);
+router.addRoute('/connection/tfacheck', get2FACheck);
 router.addRoute('/connection/alias', getConnectionForm);
 
 router.addRoute('/dashboard', getDashboardPage, true);

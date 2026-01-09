@@ -1,5 +1,6 @@
 import type { UserState } from "../user/UserState";
 import { RegisteredUser } from "../user/User";
+import { router } from "../app";
 
 export class OAuthService
 {
@@ -21,28 +22,42 @@ export class OAuthService
 
 	async login()
 	{
-		// const response = await fetch(
-		// 	`${this.apiDomainName}/users/auth/oauth/42/callback`,
-		// 	{
-		// 		method: 'GET',
-		// 		headers: {
-		// 			'accept': 'application/json',
-		// 			// 'Content-Type': 'application/json',
-		// 			'X-App-Secret': this.apiKey
-		// 		},
-		// 	}
-		// );
+		const urlParams = new URLSearchParams(window.location.search);
+		const error = urlParams.get('error');
 
-		// const data = await response.json();
-		// if (!response.ok) {
-		// 	throw new Error(data.message || data.error || 'OAuth login failed');
-		// }
+		if (error)
+			throw new Error("error in the oauth callback");
 
-		// const user = new RegisteredUser(data.username, data.id, data.accessToken);
-		// this.userState.setUser(user);
+		console.log(urlParams);
 
-		// window.location.replace('/');
-		window.location.replace(`${this.apiDomainName}/users/auth/oauth/42`);
+		try {
+			const response = await fetch(
+				`${this.apiDomainName}/users/auth/refresh`,
+				{
+					method: 'GET',
+					credentials: 'include',
+					headers:
+					{
+						'accept': 'application/json',
+						'X-App-Secret': `${this.apiKey}`
+					}
+				}
+			);
+
+			const data = await response.json();
+
+			if (!response.ok)
+				throw new Error(data.error ?? 'Failed to authenticate with OAuth');
+
+			// two fa verif if needed
+
+			// refreshing user
+
+		}
+		catch (error) {
+			console.error('OAuth callback error:', error);
+			throw error;
+		}
 	}
-
 }
+

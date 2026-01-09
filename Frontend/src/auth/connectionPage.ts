@@ -6,11 +6,12 @@ import guestFormHtml from "../html/forms/guestForm.html?raw"
 import loginFormHtml from "../html/forms/loginForm.html?raw"
 import registerFormHtml from "../html/forms/registerForm.html?raw"
 import checkEmailHtml from "../html/info/checkEmail.html?raw"
+import check2faHtml from "../html/info/twoFactorCheck.html"
 
 export {
 	getConnectionLandingHtml,
 	getConnectionForm,
-	getEmailCheck,
+	getEmailCheck, get2FACheck,
 	initConnectionPageListeners }
 
 
@@ -29,6 +30,11 @@ function getConnectionForm(): string {
 function getEmailCheck(): string
 {
 	return checkEmailHtml;
+}
+
+function get2FACheck(): string
+{
+	return check2faHtml;
 }
 
 // FUNCTION TO ACTIVATE THE EVENT LISTENERS AND POSSIBLE BUTTON INTERACTIONS
@@ -59,12 +65,6 @@ function initConnectionPageListeners(): void
 				return;
 			}
 
-			case '/connection':
-			{
-				onConnectionLoaded();
-				return;
-			}
-
 			default:
 			{
 				return;
@@ -72,30 +72,6 @@ function initConnectionPageListeners(): void
 
 		}
 	});
-}
-
-function onConnectionLoaded(): void
-{
-	const oauthBtn = document.getElementById('oauth-btn') as HTMLButtonElement;
-	oauthBtn.addEventListener('click', async (e) =>
-		{
-			e.preventDefault();
-			/* Not an api call but a button that redirects to my route that will itself redirect to 42's api,
-			  I process the info and store a refresh token in the users cookies, you can now follow the same
-			  process as the usual login ;) */
-
-			userState.oAuth.register();
-
-		}
-	);
-
-	const oauthLogInBtn = document.getElementById('oauth-login-btn') as HTMLButtonElement;
-	oauthLogInBtn.addEventListener('click', async (e) =>
-		{
-			e.preventDefault();
-			userState.oAuth.login();
-		}
-	);
 }
 
 function onAliasLoaded(): void
@@ -134,7 +110,7 @@ function onRegisterLoaded(): void
 		return;
 
 	checkInputValidityOnUnfocus(registerForm);
-	registerForm?.addEventListener('submit', async (e) =>
+	registerForm.addEventListener('submit', async (e) =>
 		{
 			e.preventDefault();
 			const formData = new FormData(registerForm);
@@ -166,6 +142,23 @@ function onRegisterLoaded(): void
 					window.sessionStorage.setItem("errorMessage", msg);
 					router.navigateTo("/error");
 				}
+			}
+		}
+	);
+
+	const oauthRegisterBtn = document.getElementById('oauth-btn') as HTMLButtonElement;
+	oauthRegisterBtn.addEventListener('click', async (e) =>
+		{
+			e.preventDefault();
+			try
+			{
+				await userState.oAuth.register();
+			}
+			catch (error)
+			{
+				const msg = error instanceof Error ? error.message : "OAuth failed";
+				window.sessionStorage.setItem("errorMessage", msg);
+				router.navigateTo("/error");
 			}
 		}
 	);
@@ -206,6 +199,23 @@ function onLoginLoaded(): void
 						router.navigateTo("/error");
 					}
 				}
+			}
+		}
+	);
+
+	const oauthLogInBtn = document.getElementById('oauth-login-btn') as HTMLButtonElement;
+	oauthLogInBtn.addEventListener('click', async (e) =>
+		{
+			e.preventDefault();
+			try
+			{
+				await userState.oAuth.login();
+			}
+			catch (error)
+			{
+				const msg = error instanceof Error ? error.message : "OAuth failed";
+				window.sessionStorage.setItem("errorMessage", msg);
+				router.navigateTo("/error");
 			}
 		}
 	);

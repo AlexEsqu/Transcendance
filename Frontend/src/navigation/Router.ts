@@ -2,6 +2,7 @@ import { UserState } from "../user/UserState";
 import { User, RegisteredUser } from "../user/User";
 
 import { getNavBarHtml } from './navSection';
+import { apiDomainName } from "../user/UserState";
 
 export { Router }
 export type { Route, getPageHtmlFunction }
@@ -53,7 +54,10 @@ class Router
 
 		// automatically kicks out user if log out, or display dashboard if log in
 		this.userState.subscribe((user) => {
-			if (!user && window.location.pathname !== '/connection')
+			if (!user &&
+				(window.location.pathname !== '/connection'
+					&& window.location.pathname !== `${apiDomainName}/users/auth/oauth/42`)
+				)
 				this.navigateTo('/connection');
 			if (user && window.location.pathname.includes('/connection'))
 				this.navigateTo('/dashboard');
@@ -120,15 +124,15 @@ class Router
 			return;
 		}
 
-		// if the user is currently on a game page, warn them that leaving will end game
-		if (user && currentPath.includes('/game'))
-		{
-			const confirmed = window.confirm(
-				'Leaving the game page will end the game.\n Are you sure you want to continue?'
-			);
-			if (!confirmed)
-				return;
-		}
+		// // if the user is currently on a game page, warn them that leaving will end game
+		// if (user && currentPath.includes('/game'))
+		// {
+		// 	const confirmed = window.confirm(
+		// 		'Leaving the game page will end the game.\n Are you sure you want to continue?'
+		// 	);
+		// 	if (!confirmed)
+		// 		return;
+		// }
 
 		if (!route)
 			return;
