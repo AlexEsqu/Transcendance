@@ -7,7 +7,6 @@ import fastifyCookie from "@fastify/cookie";
 import cors from "@fastify/cors";
 import fastifyRateLimit from "@fastify/rate-limit";
 import fastifyStatic from "@fastify/static";
-import path from "node:path";
 
 import db from "./database.js";
 import clientAuthPlugin from "./plugins/validateApiKey.js";
@@ -18,7 +17,7 @@ import mailerPlugin from "./plugins/mailer.js";
 import matchesRoutes from "./routes/matches/index.js";
 import userRoutes from "./routes/users/index.js";
 import authRoutes from "./routes/auth/index.js";
-import nodemailer from "nodemailer";
+
 import { authCredentialsBody, errorResponse, SignupBody, SuccessMessageResponse, matchObject, userIdObject, publicUserObject, loginTokenObject, twoFactorRequiredObject  } from "./schemas/schemas.js";
 
 export function buildServer({ useHttps = null, dbOverride = null, apiKeyPluginOverride = null, sessionPluginOverride = null, jwtFake = null, mailerOverride = null } = {}) {
@@ -69,7 +68,6 @@ export function buildServer({ useHttps = null, dbOverride = null, apiKeyPluginOv
 	});
 
 	server.register(mailerOverride ?? mailerPlugin);
-
 	// Schemas
 	server.addSchema(authCredentialsBody);
 	server.addSchema(errorResponse);
@@ -81,5 +79,6 @@ export function buildServer({ useHttps = null, dbOverride = null, apiKeyPluginOv
 	server.addSchema(loginTokenObject);
 	server.addSchema(twoFactorRequiredObject);
 	// server.listen({ port: 8080 });
+
 	return server;
 }
