@@ -85,25 +85,15 @@ function onConnectionLoaded(): void
 			  process as the usual login ;) */
 
 			userState.oAuth.register();
-			//now that its successful, the user now has a refresh token, you can now login the user
 
-			// const response = await fetch(`${apiDomainName}/users/auth/oauth/42`,
-			// 		{
-			// 			method: 'GET',
-			// 			headers:
-			// 			{
-			// 				'accept': 'application/json',
-			// 				'X-App-Secret': `${apiKey}`
-			// 			},
-			// 		});
-			// 		const data = await response.json();
+		}
+	);
 
-			// 		if (!response.ok || !data.accessToken)
-			// 		{
-			// 			console.log(data.message || data.error || 'Faied to refresh token');
-			// 			return false;
-			// 		}
-			// 		console.log(data);
+	const oauthLogInBtn = document.getElementById('oauth-login-btn') as HTMLButtonElement;
+	oauthLogInBtn.addEventListener('click', async (e) =>
+		{
+			e.preventDefault();
+			userState.oAuth.login();
 		}
 	);
 }
