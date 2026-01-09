@@ -23,29 +23,58 @@
     flex-direction: column;
     justify-content: flex-start;
 	align-content: center;
-    padding: clamp(1rem, 5vw, 5rem);
-	gap: 1rem;
+	padding-left: clamp(0.125rem, 5vw, 3.5rem);
+	padding-right: clamp(0.125rem, 5vw, 3.5rem);
+	padding-top: clamp(0.125rem, 5vh, 3.5rem);
+	padding-bottom: clamp(0.125rem, 5vh, 3.5rem);
+	gap: 0.25rem;
 	width: fit-content;
     min-width: min-content;
     max-width: min(90vw, 500px);
 	margin: auto;
-	font-size: clamp(0.75em, 2vh, 1.25em);
+	font-size: clamp(0.75em, 2vh, 1.5em);
   }
 
   .glow-form a {
 	align-self: center;
 	padding: 3vh;
+	font-size: clamp(1rem, 2vh, 1.5em);
+	gap: 1rem;
+	min-width: min-content;
+    max-width: min(90vw, 500px);
+  }
+
+  .glow-form article {
+	display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+	align-content: center;
+	gap: 0.5rem;
+	margin: auto;
+	width: 100%;
   }
 
   .glow-form h1 {
 	font-size: x-large;
 	text-align: center;
+	margin-bottom: 1rem;
+	margin-left: 0;
+	margin-right: 0;
+	margin-top: 0;
+	padding: 0;
+  }
+
+  .glow-form h2 {
+	font-size: larger;
+	text-align: center;
 	margin: 0;
+	padding: 0;
   }
 
   .glow-form section {
 	display: flex;
 	flex-direction: column;
+	width: 100%;
   }
 
   .glow-form section label {
@@ -63,10 +92,11 @@
     text-align: center;
   }
 
-  .glow-form button[type="submit"] {
+  .glow-form button {
     padding: 0.5rem 0.75rem;
     border: 1px solid rgb(100, 116, 139);
 	font-size: inherit;
+	width: 100%;
     font-size: 1em;
   }
 
