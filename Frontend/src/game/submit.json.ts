@@ -1,11 +1,12 @@
-export type { JSONInputsUpdate, JSONGameState, JSONRoomAccess, JSONAwaitingAccess, JSONListUsers }
+export type { JSONInputsUpdate, JSONGameState, JSONRoomAccess, JSONRoomDemand }
 
 /************************************************************************************************************
  * 		Declare submit JSON forms to communicate with server												*
  ***********************************************************************************************************/
 
-interface JSONAwaitingAccess {
+interface JSONRoomDemand {
 	id: number;
+	username: string;
 	match: string;
 	location: string;
 };
@@ -28,16 +29,9 @@ interface JSONGameState {
 };
 
 interface JSONInputsUpdate {
-	id?: number;
+	id: number;
 	roomId: number;
 	ready: boolean;
 	state: number;
 	move?: string;
 };
-
-type JSONListUsers = Array<{
-	id: number;
-	username: string;
-	avatar?: string;
-	is_active: boolean;
-}>;

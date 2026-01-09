@@ -1,4 +1,6 @@
-export { waitingSchema, gameSchema, JSONGameState, JSONInputsUpdate, JSONRoomAccess, JSONMatchesResults }
+export { waitingSchema, gameSchema, 
+	JSONGameState, JSONInputsUpdate, JSONRoomAccess, JSONMatchesResults, JSONRoomDemand
+}
 
 /************************************************************************************************************
  * 		Declare schema for route's options																	*
@@ -9,6 +11,7 @@ const waitingSchema = {
 	required: ['id', 'match', 'location'],
 	properties: {
 		id: {type: 'number'},
+		username: {type: 'string'},
 		match: {type: 'string'},
 		location: {type: 'string'}
 	},
@@ -17,9 +20,9 @@ const waitingSchema = {
 
 const gameSchema = {
 	type: 'object',
-	required: ['id', 'roomId', 'ready'],
+	required: ['username', 'roomId', 'ready'],
 	properties: {
-		id: {type: 'number'},
+		username: {type: 'string'},
 		roomId: {type: 'number'},
 		ready: {type: 'boolean'},
 		state: {type: 'number'},
@@ -45,7 +48,7 @@ interface JSONGameState {
 };
 
 interface JSONInputsUpdate {
-	id: number;
+	username: string;
 	roomId: number;
 	ready: boolean;
 	state: number;
@@ -55,6 +58,13 @@ interface JSONInputsUpdate {
 interface JSONRoomAccess {
 	roomId: number;
 	message: string;
+};
+
+interface JSONRoomDemand {
+	id: number;
+	username: string;
+	match: string;
+	location: string;
 };
 
 interface JSONMatchesResults {

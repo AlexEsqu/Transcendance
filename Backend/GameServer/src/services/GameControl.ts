@@ -2,7 +2,7 @@ import { GameLocation, MatchType, IPlayer } from '../config/pongData';
 import { WebSocket as WSWebSocket } from 'ws';
 import { notifyPlayersInRoom } from '../utils/broadcast'
 import { Room } from './Room';
-import { JSONRoomAccess } from '../config/schemas';
+import { JSONRoomAccess, JSONRoomDemand } from '../config/schemas';
 
 export class GameControl
 {
@@ -15,15 +15,16 @@ export class GameControl
 		this.gamingRooms = new Map();
 	}
 
-	generatePlayerId(socket: WSWebSocket, data: any)
+	generatePlayerId(socket: WSWebSocket, data: JSONRoomDemand)
 	{
-		const matchType: MatchType = data.game === 'tournament' ? MatchType.tournament: 
-								data.game === 'duo' ? MatchType.duo: MatchType.solo;
+		const matchType: MatchType = data.match === 'tournament' ? MatchType.tournament: 
+								data.match === 'duo' ? MatchType.duo: MatchType.solo;
 
 		const gameLocation: GameLocation = data.location === 'local' ? GameLocation.local: GameLocation.remote;
 
 		const player: IPlayer = {
 			id: data.id,
+			username: data.username,
 			socket: socket,
 			matchType: matchType,
 			gameLocation: gameLocation,
@@ -32,12 +33,12 @@ export class GameControl
 		return player;
 	}
 
-	getPlayer(roomId: number, playerId: number): IPlayer | undefined
+	getPlayer(roomId: number, player: string): IPlayer | undefined
 	{
 		if (this.gamingRooms.has(roomId)) {
 			const room = this.gamingRooms.get(roomId);
-			if (room?.players.has(playerId))
-				return room.players.get(playerId);
+			if (room?.players.has(player))
+				return room.players.get(player);
 		}
 		return undefined;
 	}
@@ -55,7 +56,7 @@ export class GameControl
 		//	Add to an existing room that match with the matchType and gameLocation ?
 		let roomId: number | undefined = this.findWaitingRoomMatch(player.matchType, player.gameLocation);
 		if (roomId !== undefined)
-			this.waitingRoom.get(roomId)?.addPlayerInRoom(player.id, player);
+			this.waitingRoom.get(roomId)?.addPlayerInRoom(player.username, player);
 		else //	Or create a new waiting room and add the player in
 			roomId = this.createWaitingRoom(player);
 
@@ -66,7 +67,7 @@ export class GameControl
 		//	Waiting room completed ? create a gaming room
 		const fullWaitingRoomId: number | undefined = this.checkFullWaitingRoom();
 		if (fullWaitingRoomId !== undefined)
-			this.createGamingRoom(fullWaitingRoomId);
+			this.createGamingRoom(fullWaitingRoomId, player);
 		return roomId;
 	}
 
@@ -106,7 +107,7 @@ export class GameControl
 		return undefined;
 	}
 
-	createGamingRoom(roomId: number): boolean
+	createGamingRoom(roomId: number, player: IPlayer): boolean
 	{
 		const room = this.waitingRoom.get(roomId);
 		if (room === undefined) {
@@ -120,13 +121,13 @@ export class GameControl
 
 		const welcomeMessage: JSONRoomAccess = {
 			roomId: roomId,
-			message: `You've been added to a new gaming room [id:${roomId}]`
+			message: `Player ${player.username} has been added to gaming room n'${roomId}`
 		};
 		notifyPlayersInRoom(this.gamingRooms.get(roomId), welcomeMessage);
 		return true;
 	}
 
-	deletePlayerFromRoom(playerId: number, roomId: number): void
+	deletePlayerFromRoom(player: string, roomId: number): void
 	{
 		let room: Room | undefined;
 		if (this.waitingRoom.has(roomId)) {
@@ -139,7 +140,7 @@ export class GameControl
 			console.log("GAME-SERVER: a player has left the gaming room");
 			notifyPlayersInRoom(room, "A player has left the gaming room");
 		}
-		if (room && room.players.has(playerId))
-			room.players.delete(playerId);
+		if (room && room.players.has(player))
+			room.players.delete(player);
 	}
 }

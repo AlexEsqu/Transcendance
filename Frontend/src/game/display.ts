@@ -74,9 +74,13 @@ function generatePlayersInputs(nbOfPlayers: number): void
 		const input = document.createElement('input');
 		input.type = 'text';
 		input.id = `player${i}`;
-		// input.username = `player${i}`;
-		input.placeholder = nbOfPlayers === 1 ? 'Your username' : `Player ${i}`;
+		if (nbOfPlayers === 1 || i === 1)
+			input.placeholder = userState.getUser()?.getName() ?? 'Player 1';
+		else
+			input.placeholder = `Player ${i}`;
 		input.className = 'input-field p-2 placeholder:text-center';
+		if (i === 1)
+			input.disabled = true;
 		playersContainer.appendChild(input);
 	}
 }
@@ -97,7 +101,7 @@ function generatePaddleColorsInputs(nbOfPlayers: number): void
 		const label = document.createElement('label');
 		label.htmlFor = `paddle-color-${i}`;
 		label.className = 'p-1';
-		label.textContent = nbOfPlayers === 1 ? 'Your color' : `Player ${i}`;
+		label.textContent = nbOfPlayers === 1 ? (userState.getUser()?.getName() ?? 'Your color') : `Player ${i}`;
 
 		const input = document.createElement('input');
 		input.type = 'color';
@@ -116,17 +120,25 @@ function generatePaddleColorsInputs(nbOfPlayers: number): void
 function initializePlayerInputs(): void
 {
 	const gameTypeSelect = document.getElementById('game-type') as HTMLSelectElement;
-	if (!gameTypeSelect) {
+	const locationSelect = document.getElementById('match-location') as HTMLSelectElement;
+	if (!gameTypeSelect)
 		throw new Error("'game-type' select not found");
-	}
+	else if (!locationSelect)
+		throw new Error("'match-location' select not found");
 
-	const nbOfPlayers: number = parseInt(gameTypeSelect.value);
+	let nbOfPlayers: number = parseInt(gameTypeSelect.value);
+	if (locationSelect.value === 'remote')
+		nbOfPlayers = 1;
 
 	generatePlayersInputs(nbOfPlayers);
 	generatePaddleColorsInputs(nbOfPlayers);
 
 	gameTypeSelect.addEventListener('change', function() {
-		const newNbOfPlayers: number = parseInt(gameTypeSelect.value);
+		const locationSelect = document.getElementById('match-location') as HTMLSelectElement;
+
+		let newNbOfPlayers: number = parseInt(gameTypeSelect.value);
+		if (locationSelect.value === 'remote')
+			newNbOfPlayers = 1;
 		generatePlayersInputs(newNbOfPlayers);
 		generatePaddleColorsInputs(newNbOfPlayers);
 	});

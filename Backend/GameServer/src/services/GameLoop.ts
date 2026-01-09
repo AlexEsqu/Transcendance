@@ -25,7 +25,7 @@ export class GameLoop
 	isGameRunning: boolean;
 	timestamp: number;
 
-	constructor(roomId: number, matchType: MatchType, players: Map<number, IPlayer>)
+	constructor(roomId: number, matchType: MatchType, players: Map<string, IPlayer>)
 	{
 		if (matchType === MatchType.tournament)
 			GAME.MAX_ROUNDS = matchType - 1;
@@ -45,12 +45,12 @@ export class GameLoop
 	runGameLoop(gameControl: GameControl): void
 	{
 		const room: Room | undefined = gameControl.getGamingRoom(this.roomId);
-		if (room === undefined) return ; // HANDLE ERROR LATER
+		if (room === undefined) return ; // TO DO: HANDLE ERROR LATER
 
 		let isNewRound: boolean = false;
 		let gameStateInfo: JSONGameState;
 
-		console.log("GAME-SERVER: game loop started");
+		console.log("GAME-LOOP: game loop started");
 		const interval = setInterval(() => {
 			//	update data & check collisions
 			if (this.state === State.play && this.isGameRunning) {
@@ -87,7 +87,7 @@ export class GameLoop
 			this.state = State.launch;
 
 		if (this.leftPadd.robot)
-			this.processPlayerInput(0, this.state, processRobotOpponent(this.leftPadd, this.ball));
+			this.processPlayerInput('Robot', this.state, processRobotOpponent(this.leftPadd, this.ball));
 	}
 
 	bouncingBallProcess(): boolean
@@ -137,18 +137,18 @@ export class GameLoop
 		return false;
 	}
 
-	processPlayerInput(playerId: number, state: number, input: string): void
+	processPlayerInput(player: string, state: number, input: string): void
 	{
 		let paddle: IPaddle;
 
 		this.state = state as State;
 	
-		if (this.leftPadd.player?.id === playerId)
+		if (this.leftPadd.player?.username === player)
 			paddle = this.leftPadd;
-		else if (this.rightPadd.player?.id === playerId)
+		else if (this.rightPadd.player?.username === player)
 			paddle = this.rightPadd;
 		else {
-			console.error("(GAME-SERVER(processPlayerInput): no match with the given player ID");
+			console.error("(GAME-SERVER(processPlayerInput): no match with the given username");
 			return ;
 		}
 
@@ -189,7 +189,7 @@ export class GameLoop
 		if (this.rounds)
 			this.saveResults();
 
-		console.log("GAME-STATE: new round");
+		console.log("GAME-LOOP: new round");
 		//	Who should play now ?
 		let match = this.matchType;
 		if (match === MatchType.tournament && this.rounds.nbOfRounds >= 0 && this.rounds.nbOfRounds < 2)
@@ -198,7 +198,7 @@ export class GameLoop
 		if (match === MatchType.tournament && this.rounds.nbOfRounds === GAME.MAX_ROUNDS - 1)
 		{
 			if (!this.rounds.results || !this.rounds.results[0] || !this.rounds.results[1]) {
-				console.error("Error while trying to assign players to new round, previous match's results not found");
+				console.error("GAME-LOOP: failed to assign players to new round, previous match's results not found");
 				return ;
 			}
 			this.leftPadd.player = this.rounds.results[0].winner;

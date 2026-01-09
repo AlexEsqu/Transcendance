@@ -1,7 +1,7 @@
-import { JSONInputsUpdate, JSONGameState, JSONRoomAccess, JSONAwaitingAccess } from './submit.json';
+import { JSONInputsUpdate, JSONGameState, JSONRoomAccess, JSONRoomDemand } from './submit.json';
 import { State, IPlayer, IOptions, IScene, IResult } from "./pongData";
 import { createText, createAnimation, loadGame, drawScore, drawName } from './Graphics';
-import { getCanvasConfig, getPlayers, fillWaitingRoomRequest } from './utils';
+import { getCanvasConfig, getPlayers, fillRoomDemand } from './utils';
 import { AdvancedDynamicTexture } from "@babylonjs/gui";
 import { Engine } from '@babylonjs/core';
 
@@ -21,7 +21,7 @@ export class Pong
 	waitingSocket: WebSocket | null = null;
 	gamingSocket: WebSocket | null = null;
 	roomId: number | undefined = undefined;
-	playerId: number = 0;
+	mainPlayer: string | null = null;
 	timestamp: number = 0;
 	onNewRound?: () => void;
 
@@ -31,18 +31,19 @@ export class Pong
 		this.engine = new Engine(this.canvas, true);
 		if (!this.engine)
 			throw new Error("'engine' creation failed");
+		const players = getPlayers(options.players, options.paddColors, options.nbOfPlayers, options.matchLocation);
+		if (!players)
+			throw new Error("players are not found");
 		this.scene = loadGame(this.engine, this.canvas, options);
 		if (!this.scene)
 			throw new Error("'scene' creation failed");
-		this.scene.players = getPlayers(options.players, options.nbOfPlayers);
+		this.scene.players = players;
 		this.scene.state = State.waiting;
 		this.onNewRound = onNewRound;
 		this.isRunning = false;
 		this.waitingSocket = new WebSocket(Pong.WAITING_ROOM_URL);
 		if (!this.waitingSocket)
 			throw new Error("'waitingSocket' creation failed");
-		if (this.scene.players)
-			this.playerId = this.scene.players[0].id === 0 ? this.scene.players[1].id : this.scene.players[0].id;
 		this.timestamp = Date.now();
 	}
 
@@ -51,15 +52,25 @@ export class Pong
 		if (!this.waitingSocket || !this.scene)
 			throw new Error("can't go to waiting room, elements are missing to continue");
 
-		const request: JSONAwaitingAccess = fillWaitingRoomRequest(this.scene?.options.matchLocation,
-															this.scene?.options.nbOfPlayers, this.playerId);
+		const options: IOptions = this.scene.options;
 
 		//	On socket creation send a message to the server to be added in a waiting room
 		this.waitingSocket.onopen = (e) => {
-			if (!this.waitingSocket)
-				throw new Error("'waitingSocket' not found");
+			if (!this.waitingSocket || !this.scene)
+				throw new Error("elements not found, can't go to waiting room");
 			console.log("GAME-FRONT: connection with game-server");
-			this.waitingSocket.send(JSON.stringify(request));
+			const players = this.scene.players;
+			if (options.matchLocation === 'local') {
+				for (const player of players)
+				{
+					const demand: JSONRoomDemand = fillRoomDemand(options.matchLocation, options.nbOfPlayers, player);
+					console.log(demand);
+					this.waitingSocket.send(JSON.stringify(demand));
+				}
+			} else {
+				const demand: JSONRoomDemand = fillRoomDemand(options.matchLocation, options.nbOfPlayers, players[0]);
+				this.waitingSocket.send(JSON.stringify(demand));
+			}
 		}
 
 		//	Wait for the server to manage waiting rooms and assign current user to a gaming room
@@ -86,7 +97,7 @@ export class Pong
 	{
 		if (!this.gamingSocket)
 			throw new Error("'gamingSocket' not found");
-			
+
 		this.gamingSocket.onopen = (e) => {
 			if (this.roomId === undefined)
 				throw new Error("'roomId' is undefined, can't enter to gaming room");
@@ -94,10 +105,13 @@ export class Pong
 				throw new Error("'gamingSocket' not found");
 
 			console.log(`GAME-FRONT: joining the gaming room(${this.roomId})`);
-			const joinMsg = {
-				id: this.playerId,
+			if (this.scene)
+				this.scene.state = State.opening;
+			const joinMsg: JSONInputsUpdate = {
+				id: 42,
 				roomId: this.roomId,
 				ready: false,
+				state: this.scene?.state ?? 1
 			};
 			this.gamingSocket.send(JSON.stringify(joinMsg));
 			this.runGame();
@@ -156,7 +170,7 @@ export class Pong
 		if (!this.scene) return false;
 
 		let isBallOutOfBounds: boolean = false;
-		let player: number | undefined = this.playerId ?? 42;
+		let player: number | undefined = 42;
 		let action: string = 'none';
 
 		//	If a user presses a key, ask the server to update paddle's position
@@ -169,7 +183,7 @@ export class Pong
 		}
 
 		if (action !== 'none')
-			this.sendUpdateToGameServer(player ?? this.playerId, action, true);
+			this.sendUpdateToGameServer(player ?? -1, action, true);
 
 		if (this.scene.options.matchLocation === 'local') {
 			if (keys["s"]) {
@@ -308,9 +322,9 @@ export class Pong
 		console.log("GAME-FRONT: end");
 
 		const winnerSpot = document.getElementById('match-results');
-		if (winnerSpot && result.winner?.name)
+		if (winnerSpot && result.winner?.username)
 		{
-			winnerSpot.textContent = `${result.winner?.name} wins!`;
+			winnerSpot.textContent = `${result.winner?.username} wins!`;
 			winnerSpot.classList.remove('invisible');
 		}
 	}
@@ -327,7 +341,7 @@ export class Pong
 			this.engine.resize();
 		if (this.scene && this.scene.leftPadd && this.scene.leftPadd.player && this.scene.rightPadd && this.scene.rightPadd.player)
 		{
-			drawName(this.scene.leftPadd.player.name, this.scene.rightPadd.player.name, this.scene.options.nbOfPlayers);
+			drawName(this.scene.leftPadd.player.username, this.scene.rightPadd.player.username, this.scene.options.nbOfPlayers);
 			drawScore(this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
 		}
 

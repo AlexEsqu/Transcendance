@@ -44,7 +44,7 @@ enum GameLocation {
 };
 
 enum State {
-	opening, launch, play, pause, end, stop
+	waiting, opening, launch, play, pause, end, stop
 };
 
 enum Level {
@@ -71,6 +71,7 @@ interface IPaddle {
 
 interface IPlayer {
 	id: number;
+	username: string;
 	socket: WSWebSocket;
 	matchType: MatchType;
 	gameLocation: GameLocation;

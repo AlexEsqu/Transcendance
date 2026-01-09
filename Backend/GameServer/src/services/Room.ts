@@ -9,9 +9,9 @@ export class Room
 	id: number;
 	type: MatchType;
 	gameLoop: GameLoop | null;
-	players: Map<number, IPlayer> = new Map<number, IPlayer>();
+	players: Map<string, IPlayer> = new Map<string, IPlayer>();
 
-	constructor(roomId: number, players: Map<number, IPlayer> | IPlayer, matchType: MatchType)
+	constructor(roomId: number, players: Map<string, IPlayer> | IPlayer, matchType: MatchType)
 	{
 		this.id = roomId;
 		this.type = matchType;
@@ -19,19 +19,19 @@ export class Room
 
 		if (players instanceof Map) {
 			for (const [key, value] of players)
-				this.addPlayerInRoom(value.id, value);
+				this.addPlayerInRoom(value.username, value);
 		}
 		else
-			this.addPlayerInRoom(players.id, players);
+			this.addPlayerInRoom(players.username, players);
 
 		console.log("GAME-ROOM: new room created");
 	}
 
-	addPlayerInRoom(playerId: number, player: IPlayer): boolean
+	addPlayerInRoom(username: string, player: IPlayer): boolean
 	{
 		if (this.players.size !== this.type) {
 			player.roomId = this.id;
-			this.players.set(playerId, player);
+			this.players.set(username, player);
 			console.log("GAME-ROOM: new player added to room ", this.id);
 			return true;
 		}
@@ -53,9 +53,9 @@ export class Room
 		this.gameLoop.runGameLoop(gameControl);
 	}
 
-	handlePlayerInput(playerId: number, state: number, input: string): void
+	handlePlayerInput(player: string, state: number, input: string): void
 	{
 		if (this.gameLoop)
-			this.gameLoop.processPlayerInput(playerId, state, input);
+			this.gameLoop.processPlayerInput(player, state, input);
 	}
 }

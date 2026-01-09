@@ -17,21 +17,20 @@ export { handleMessage, handleDisconnection}
 function handleMessage(socket: WSWebSocket, message: Buffer, 
 	validateSchema: ValidateFunction, gameControl: GameControl): IPlayer | undefined
 {
-	console.log("GAME-SERVER: handle received message from '/room/game'' route");
+	console.log("GAME-HANDLER: handle received message from '/room/game' route");
 	try {
 		//	Must parse and validate received message
 		const data: JSONInputsUpdate = JSON.parse(message.toString());
 		if (!validateSchema(data) || data === undefined || !data) {
 			socket.send(JSON.stringify(getJSONError("Bad request", 400)));
-			throw new Error("message received doesn't match with 'validateSchema' on '/room/game''") ;
+			throw new Error("GAME-HANDLER: message received doesn't match with 'validateSchema' on '/room/game' route") ;
 		}
 
-		console.log(`DATA ================ ${data.id}`);
-		const player: IPlayer | undefined = gameControl.getPlayer(data.roomId, data.id);
+		const player: IPlayer | undefined = gameControl.getPlayer(data.roomId, data.username);
 		const gamingRoom: Room | undefined = gameControl.getGamingRoom(data.roomId);
 
 		if (player === undefined || gamingRoom === undefined)
-			throw new Error("player or gaming room not found, can't handle user message");
+			throw new Error("GAME-HANDLER: player or gaming room not found, can't handle user message on 'room/game' route");
 
 		//	Check if player informs that its ready
 		if (data.ready === true)
@@ -45,7 +44,7 @@ function handleMessage(socket: WSWebSocket, message: Buffer,
 
 		//	If player is ready & wants to move, update its paddle pos
 		if (player.isReady && data.move)
-			gamingRoom.handlePlayerInput(player.id, data.state, data.move);
+			gamingRoom.handlePlayerInput(player.username, data.state, data.move);
 
 		return (player);
 
@@ -59,5 +58,5 @@ function handleDisconnection(player: IPlayer | undefined, gameControl: GameContr
 {
 	console.log("GAME-HANDLER: disconnection of client ", player?.id);
 	if (player)
-		gameControl.deletePlayerFromRoom(player.id, player.roomId ?? -1);
+		gameControl.deletePlayerFromRoom(player.username, player.roomId ?? -1);
 }

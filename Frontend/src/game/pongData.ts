@@ -56,12 +56,12 @@ interface IScene {
 	leftPadd: IPaddle | null;
 	rightPadd: IPaddle | null;
 	options: IOptions;
-	players: Array<IPlayer> | null;
+	players: Array<IPlayer>;
 };
 
 interface IPlayer {
 	id: number;
-	name: string;
+	username: string;
 	score: number;
 	color: string;
 };

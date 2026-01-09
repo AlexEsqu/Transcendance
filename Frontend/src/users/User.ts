@@ -31,6 +31,11 @@ abstract class User implements BaseUser {
 		return this.username;
 	}
 
+	getId(): number
+	{
+		return this.id;
+	}
+
 	getAvatarPath(): string
 	{
 		return this.avatar;

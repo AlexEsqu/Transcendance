@@ -23,17 +23,17 @@ export async function registerGameRoutes(gameServer: FastifyInstance, gameContro
 			let player : IPlayer | undefined;
 
 			//	Handle: first connection of a client
-			console.log("GAME-SERVER: new connection from a client on route '/game'");
+			console.log("GAME-SERVER: new connection from a client on route '/room/game'");
 
 			//	Handler: receiving message from a client
 			socket.on('message', (message: Buffer) => {
-				console.log("GAME-SERVER: received a message from the client on route '/game'");
+				console.log("GAME-SERVER: received a message from the client on route '/room/game'");
 				player = handleMessage(socket, message, validateGameMessage, gameControl);
 			});
 	
 			//	Handle: ending client connection properly for the server
 			socket.on('close', () => {
-				console.log("GAME-SERVER: closed connection from client on route '/game'");
+				console.log("GAME-SERVER: closed connection from client on route '/room/game'");
 				handleDisconnection(player, gameControl);
 			});
 	

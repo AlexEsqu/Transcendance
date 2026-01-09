@@ -34,7 +34,7 @@ function initPadd(matchType: MatchType, side: string): IPaddle
 	return paddle;
 }
 
-function initPlayers(players: Map<number, IPlayer>): Array<IPlayer>
+function initPlayers(players: Map<string, IPlayer>): Array<IPlayer>
 {
 	let playerTab: Array<IPlayer> = new Array<IPlayer>;
 
