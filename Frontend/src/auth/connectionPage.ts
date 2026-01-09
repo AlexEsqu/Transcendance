@@ -121,7 +121,7 @@ function onAliasLoaded(): void
 			const formData = new FormData(guestForm);
 			const alias = formData.get('input-alias') as string | null;
 			if (alias)
-				userState.guestAuth.guestin(alias);
+				userState.guest.guestin(alias);
 		}
 	);
 }

@@ -2,7 +2,7 @@ import { RegisteredUser, GuestUser, User, BaseUser } from "./User";
 import { router } from "../app";
 import { EmailAuthService } from "../auth/EmailAuth";
 import { OAuthService } from "../auth/OAuth";
-import { GuestAuth } from "../auth/GuestAuth";
+import { GuestService } from "../auth/Guest";
 import { TwoFactorService } from "../auth/TwoFactor";
 import { CustomizeService } from "./Customize";
 import { SocialService } from "./Social";
@@ -38,7 +38,7 @@ class UserState
 	// sub services (to subdivide the class and look neater)
 	emailAuth: EmailAuthService;
 	oAuth: OAuthService;
-	guestAuth: GuestAuth;
+	guest: GuestService;
 	twoFactor: TwoFactorService;
 	customize: CustomizeService;
 	social: SocialService;
@@ -50,7 +50,7 @@ class UserState
 	{
 		this.emailAuth = new EmailAuthService(apiDomainName, apiKey, this);
 		this.oAuth = new OAuthService(apiDomainName, apiKey, this);
-		this.guestAuth = new GuestAuth(this);
+		this.guest = new GuestService(this);
 		this.twoFactor = new TwoFactorService(this);
 		this.customize = new CustomizeService(this);
 		this.social = new SocialService(this);

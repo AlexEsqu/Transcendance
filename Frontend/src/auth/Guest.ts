@@ -1,7 +1,7 @@
 import { GuestUser } from "../user/User";
 import { UserState } from "../user/UserState";
 
-export class GuestAuth
+export class GuestService
 {
 	constructor(private userState: UserState)
 	{
