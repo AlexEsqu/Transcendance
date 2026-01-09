@@ -40,7 +40,7 @@ function getPlayers(inputs: string[], colors: string[], nbOfPlayers: number, mat
 	// special case: opponent is a robot
 	if (nbOfPlayers === 1) { 
 		players.push({ id: 0, username: "Robot", score: 0, color: "#8dbcff" });
-		players.reverse();
+		// players.reverse();
 	}
 	return players;
 }

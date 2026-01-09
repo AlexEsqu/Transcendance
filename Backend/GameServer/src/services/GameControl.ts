@@ -62,7 +62,7 @@ export class GameControl
 
 		//	Notify everyone in the waiting room
 		if (roomId !== undefined)
-			notifyPlayersInRoom(this.waitingRoom.get(roomId), "new player added in the waiting room");
+			notifyPlayersInRoom(this.waitingRoom.get(roomId), `new player ${player.username} added in the waiting room n'${roomId}`);
 
 		//	Waiting room completed ? create a gaming room
 		const fullWaitingRoomId: number | undefined = this.checkFullWaitingRoom();
@@ -91,6 +91,18 @@ export class GameControl
 
 		const room = new Room(roomId, player, player.matchType);
 		if (!room) return undefined;
+		if (player.matchType === MatchType.solo) {
+			const playerRobot: IPlayer = {
+				id: 0,
+				username: 'Robot',
+				socket: player.socket,
+				matchType: player.matchType,
+				gameLocation: player.gameLocation,
+				isReady: true,
+				roomId: roomId
+			};
+			room.addPlayerInRoom('Robot', playerRobot);
+		}
 
 		this.waitingRoom.set(roomId, room);
 		console.log("GAME-CONTROL: new waiting room created ", roomId);
@@ -100,7 +112,7 @@ export class GameControl
 	checkFullWaitingRoom(): number | undefined
 	{
 		for (const [key, value] of this.waitingRoom) {
-			if (value.players.size === value.type)
+			if (value.players.size === value.type || value.type === 1)
 				return key;
 		}
 		console.log("GAME-CONTROL: no full waiting room detected");
@@ -118,7 +130,7 @@ export class GameControl
 		this.gamingRooms.set(roomId, room);
 		this.waitingRoom.delete(roomId);
 		console.log("GAME-CONTROL: new gaming room created ", roomId);
-
+		console.log("ROOOM ", this.gamingRooms.get(roomId)?.players);
 		const welcomeMessage: JSONRoomAccess = {
 			roomId: roomId,
 			message: `Player ${player.username} has been added to gaming room n'${roomId}`

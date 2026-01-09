@@ -29,7 +29,7 @@ interface JSONGameState {
 };
 
 interface JSONInputsUpdate {
-	id: number;
+	username: string;
 	roomId: number;
 	ready: boolean;
 	state: number;

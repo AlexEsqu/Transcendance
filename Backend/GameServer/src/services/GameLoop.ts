@@ -65,7 +65,8 @@ export class GameLoop
 			//	broadcast to players = send game state/data to all players
 			gameStateInfo = this.composeGameState();
 			notifyPlayersInRoom(room, JSON.stringify(gameStateInfo));
-			console.log(`GAME-SERVER: state ${this.state}`);
+			if (this.state === State.end)
+				return ;
 		}, 1000 / 60); // 60fps
 
 		if (this.state === State.end && this.rounds.results)

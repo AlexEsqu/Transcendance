@@ -21,7 +21,7 @@ export class Pong
 	waitingSocket: WebSocket | null = null;
 	gamingSocket: WebSocket | null = null;
 	roomId: number | undefined = undefined;
-	mainPlayer: string | null = null;
+	mainPlayer: string;
 	timestamp: number = 0;
 	onNewRound?: () => void;
 
@@ -38,6 +38,7 @@ export class Pong
 		if (!this.scene)
 			throw new Error("'scene' creation failed");
 		this.scene.players = players;
+		this.mainPlayer = players[0].username;
 		this.scene.state = State.waiting;
 		this.onNewRound = onNewRound;
 		this.isRunning = false;
@@ -60,23 +61,19 @@ export class Pong
 				throw new Error("elements not found, can't go to waiting room");
 			console.log("GAME-FRONT: connection with game-server");
 			const players = this.scene.players;
-			if (options.matchLocation === 'local') {
-				for (const player of players)
-				{
+			for (const player of players)
+			{
+				if (player.id !== 0) {
 					const demand: JSONRoomDemand = fillRoomDemand(options.matchLocation, options.nbOfPlayers, player);
-					console.log(demand);
 					this.waitingSocket.send(JSON.stringify(demand));
 				}
-			} else {
-				const demand: JSONRoomDemand = fillRoomDemand(options.matchLocation, options.nbOfPlayers, players[0]);
-				this.waitingSocket.send(JSON.stringify(demand));
 			}
 		}
 
 		//	Wait for the server to manage waiting rooms and assign current user to a gaming room
 		this.waitingSocket.onmessage = (e) => {
 			const serverMsg: JSONRoomAccess = JSON.parse(e.data);
-			console.log(`GAME-FRONT: received message from server =`, serverMsg);
+			// console.log(`GAME-FRONT: received message from server =`, serverMsg);
 			
 			// console.log(`roomID ${this.roomId}`);
 			// console.log(`state.roomID ${serverMsg.roomId}`);
@@ -103,17 +100,16 @@ export class Pong
 				throw new Error("'roomId' is undefined, can't enter to gaming room");
 			if (!this.gamingSocket)
 				throw new Error("'gamingSocket' not found");
+			if (!this.scene)
+				throw new Error("'scene' not found");
 
 			console.log(`GAME-FRONT: joining the gaming room(${this.roomId})`);
-			if (this.scene)
-				this.scene.state = State.opening;
-			const joinMsg: JSONInputsUpdate = {
-				id: 42,
-				roomId: this.roomId,
-				ready: false,
-				state: this.scene?.state ?? 1
-			};
-			this.gamingSocket.send(JSON.stringify(joinMsg));
+			this.scene.state = State.opening;
+			const players = this.scene.players;
+			for (const player of players)
+			{
+				this.sendUpdateToGameServer(player.username, 'none', true);
+			}
 			this.runGame();
 		}
 
@@ -170,29 +166,31 @@ export class Pong
 		if (!this.scene) return false;
 
 		let isBallOutOfBounds: boolean = false;
-		let player: number | undefined = 42;
+		let player: string | undefined;
 		let action: string = 'none';
 
 		//	If a user presses a key, ask the server to update paddle's position
 		if (keys["ArrowDown"]) {
-			player = this.scene.rightPadd?.player?.id;
+			player = this.scene.rightPadd?.player?.username;
 			action = 'down';
 		} else if (keys["ArrowUp"]) {
-			player = this.scene.rightPadd?.player?.id;
+			player = this.scene.rightPadd?.player?.username;
 			action = 'up';
 		}
 
 		if (action !== 'none')
-			this.sendUpdateToGameServer(player ?? -1, action, true);
+			this.sendUpdateToGameServer(player ?? 'NaN', action, true);
 
 		if (this.scene.options.matchLocation === 'local') {
 			if (keys["s"]) {
-				player = this.scene.leftPadd?.player?.id;
+				player = this.scene.leftPadd?.player?.username;
 				action = 'down';
 			} else if (keys["w"]) {
-				player = this.scene.leftPadd?.player?.id;
+				player = this.scene.leftPadd?.player?.username;
 				action = 'up';
 			}
+			if (action !== 'none')
+				this.sendUpdateToGameServer(player ?? 'NaN', action, true);
 		}
 
 		const newGameState: JSONGameState | null = this.getGameStateUpdated();
@@ -225,7 +223,7 @@ export class Pong
 		}
 	}
 
-	sendUpdateToGameServer(player: number, action: string, ready: boolean): void
+	sendUpdateToGameServer(player: string, action: string, ready: boolean): void
 	{
 		if (!this.roomId || !this.gamingSocket || !this.scene) {
 			console.error("GAME-FRONT: Error, can't send update to game server because elements are missing");
@@ -233,7 +231,7 @@ export class Pong
 		}
 
 		const gameUpdateMsg: JSONInputsUpdate = {
-			id: player,
+			username: player,
 			roomId: this.roomId,
 			ready: ready,
 			state: this.scene.state,
@@ -255,7 +253,7 @@ export class Pong
 				throw new Error("'gamingSocket' not found");
 
 			const gameState: JSONGameState = JSON.parse(e.data);
-			console.log(`GAME-FRONT: game state from room(${this.roomId}) =`, gameState);
+			// console.log(`GAME-FRONT: game state from room(${this.roomId}) =`, gameState);
 			return gameState;
 		}
 		return null;

@@ -32,7 +32,12 @@ export class Room
 		if (this.players.size !== this.type) {
 			player.roomId = this.id;
 			this.players.set(username, player);
-			console.log("GAME-ROOM: new player added to room ", this.id);
+			console.log(`GAME-ROOM: player ${player.username} added to room n'${this.id}`);
+			return true;
+		}
+		else if (this.type === 1) {
+			this.players.set(username, player);
+			console.log(`GAME-ROOM: player ${player.username} added to room n'${this.id}`);
 			return true;
 		}
 		return false;
