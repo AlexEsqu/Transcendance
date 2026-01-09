@@ -88,7 +88,7 @@ export class EmailAuthService
 				throw new Error(data.message || data.error || 'Logout Failed');
 		}
 
-		this.userState.setUser(null);
+		this.userState.resetUser();
 	}
 
 	async deleteAccount(): Promise<void>
@@ -114,6 +114,6 @@ export class EmailAuthService
 				throw new Error(data.message || data.error || 'Delete account Failed');
 		}
 
-		this.userState.setUser(null);
+		this.userState.resetUser();
 	}
 }

@@ -169,8 +169,7 @@ class UserState
 					? error.message
 					: "Unknown error when loading user from local storage";
 				console.log(msg);
-				this.setUser(null);
-				router.navigateTo('/connection')
+				this.resetUser();
 			}
 		}
 		else if (guestData)
@@ -207,10 +206,9 @@ class UserState
 		if (!response.ok || !data.accessToken)
 		{
 			console.log(data.message || data.error || 'Faied to refresh token');
-			this.setUser(null);
+			this.resetUser();
 			return false;
 		}
-
 
 		this.user.accessToken = data.accessToken;
 		this.saveToLocalStorage();
@@ -323,5 +321,27 @@ class UserState
 			throw new Error(data.message || data.error || `Failed to fetch user friends (${response.status})`);
 
 		this.user.setFriends(data);
+	}
+
+	async logout()
+	{
+		const user = this.getUser();
+
+		if (user instanceof RegisteredUser)
+			await this.emailAuth.logout();
+		else
+			this.guest.guestout();
+	}
+
+	resetUser(): void
+	{
+		this.user = null;
+
+		localStorage.removeItem(localStorageKeyForGuestUser);
+		localStorage.removeItem(localStorageKeyForRegisteredUser);
+
+		this.notifySubscribers();
+
+		router.navigateTo('/connection');
 	}
 }

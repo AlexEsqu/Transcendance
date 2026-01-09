@@ -13,5 +13,10 @@ export class GuestService
 		const guestUser = new GuestUser(username);
 		this.userState.setUser(guestUser);
 	}
+
+	guestout(): void
+	{
+		this.userState.resetUser();
+	}
 }
 
