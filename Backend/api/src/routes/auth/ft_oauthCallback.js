@@ -8,7 +8,8 @@ export function ft_OAuth2_callback(server) {
 		schema: {
 			tags: ["OAuth"],
 			description:
-				"Handles the OAuth2 callback from 42. Verifies the authorization code and state, retrieves the user information from 42, and either logs in an existing user or signs up a new user. Returns access tokens if login/signup is successful, or a two-factor authentication token if 2FA is required.",
+				"Handles the OAuth2 callback from 42. Verifies the authorization code and state, retrieves the user information from 42, and either logs in an existing user or signs up a new user. \
+				`Stores refresh token in cookies` if login/signup is successful and `put the user's id in query`, or returns a two-factor authentication token if 2FA is required. ",
 			querystring: {
 				type: "object",
 				required: ["code", "state"],
@@ -36,7 +37,7 @@ export function ft_OAuth2_callback(server) {
 					},
 				},
 				302: {
-					description: "Sucess: Redirects to the frontend",
+					description: "Sucess: Redirects to the frontend, stores the user's id in query parameters",
 					headers: {
 						location: { type: "string" },
 					},
@@ -69,7 +70,7 @@ export function ft_OAuth2_callback(server) {
 				}
 				console.log("42 USER HAS 2FA DISABLED, GENERATING TOKENS");
 				await generateTokens(server, user, reply);
-				return reply.status(302).redirect(redirectUrl);
+				return reply.status(302).redirect(`${redirectUrl}?id=${user.id}`);
 			} else {
 				console.log("42 USER NOT IN DB, SIGNING UP THE USER");
 				//SIGNUP THE USER THEN GENERATE TOKENS
@@ -81,7 +82,7 @@ export function ft_OAuth2_callback(server) {
 				server.db.prepare(`UPDATE users SET avatar = ? WHERE id = ?`).run(avatarPath, newUser.id);
 				console.log("42 USER HAS BEEN CREATED, GENERATING TOKENS");
 				await generateTokens(server, newUser, reply);
-				return reply.status(302).redirect(redirectUrl);
+				return reply.status(302).redirect(`${redirectUrl}?id=${newUser.id}`);
 			}
 		} catch (err) {
 			console.log(err);
