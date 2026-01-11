@@ -43,6 +43,10 @@ class Router
 		this.userState = userState;
 		this.rootElement = document.querySelector(rootSelector) as HTMLElement;
 
+		if (window.location.pathname === '/oauth/callback') {
+			return;
+		}
+
 		this.initializeHistory();
 
 		// plug into back / forward browser buttons to render the last state
@@ -92,7 +96,10 @@ class Router
 	render()
 	{
 		const currentPath = window.location.pathname;
+		const currentSearch = window.location.search;
 		const user = this.userState.getUser();
+
+		console.log(`initial route is ${currentPath} with query ${currentSearch}`);
 
 		let route = this.routes.find(route => route.path === currentPath);
 
@@ -137,13 +144,15 @@ class Router
 		if (!route)
 			return;
 
-		console.log(route && `corrected route is ${route.path}`)
+		console.log(route && `corrected route is ${route.path} with query ${currentSearch}`)
 
 		this.rootElement.innerHTML = route.getPage();
 
 		this.renderNavbar(user);
 
-		const event = new CustomEvent('pageLoaded', { detail: route.path });
+		const event = new CustomEvent('pageLoaded', { detail: { path: currentPath, search: currentSearch } });
+		console.log("dispatching event:");
+		console.log(event);
 		document.dispatchEvent(event);
 	}
 
@@ -168,6 +177,13 @@ class Router
 	private initializeHistory()
 	{
 		const initialPath = window.location.pathname;
+		const initialSearch = window.location.search;
+
+		if (initialPath === '/oauth/callback') {
+			window.history.replaceState({ path: initialPath }, '', initialPath);
+			return;
+		}
+
 		const hasHistory = window.history.state && initialPath != '/'
 			&& initialPath != '' && initialPath != '/connection'
 
@@ -178,7 +194,7 @@ class Router
 		if (this.userState.getUser())
 		{
 			if (hasHistory)
-				targetPath = initialPath;
+				targetPath = initialPath + initialSearch;
 			else
 				targetPath = '/dashboard';
 		}

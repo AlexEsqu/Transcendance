@@ -6,11 +6,13 @@ import { getDashboardPage, initDashboardPageListeners } from "./dashboard/dashbo
 import { getGameHtml, getGameOptionHtml, initGamePageListeners } from "./game/display"
 import { getErrorPage } from "./error/error";
 import { initNavBarListeners } from "./navigation/navSection";
+import { initOAuthCallback } from "./auth/OAuth";
 
 export { userState, router };
 
 const userState = UserState.getInstance();
 const router = new Router(userState, '#main');
+const isOAuthPopup = window.location.pathname === '/oauth/callback';
 
 router.addRoute('/connection', getConnectionLandingHtml);
 router.addRoute('/connection/login', getConnectionForm);
@@ -30,12 +32,23 @@ router.addRoute('/game', getGameHtml, true);
 
 router.addRoute('/error', getErrorPage);
 
-initConnectionPageListeners();
-initDashboardPageListeners();
-initGamePageListeners();
-initNavBarListeners();
+router.addRoute('/oauth/callback', () => {
+	initOAuthCallback();
+	return '<div id="oauth-callback"></div>';
+}, false, false);
 
-router.render();
+if (!isOAuthPopup)
+{
+	initConnectionPageListeners();
+	initDashboardPageListeners();
+	initGamePageListeners();
+	initNavBarListeners();
+	router.render();
+}
+else
+{
+	initOAuthCallback();
+}
 
 
 

@@ -43,7 +43,8 @@ function get2FACheck(): string
 function initConnectionPageListeners(): void
 {
 	document.addEventListener('pageLoaded', (event: Event) => {
-		const { detail: path } = event as CustomEvent<string>;
+		const customEvent = event as CustomEvent<{ path: string; search: string }>;
+		const { path, search } = customEvent.detail;
 
 		switch (path)
 		{
@@ -209,7 +210,7 @@ function onLoginLoaded(): void
 			e.preventDefault();
 			try
 			{
-				await userState.oAuth.login();
+				await userState.oAuth.register();
 			}
 			catch (error)
 			{

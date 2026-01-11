@@ -26,7 +26,8 @@ function getDashboardPage(): string
 function initDashboardPageListeners(): void
 {
 	document.addEventListener('pageLoaded', (event: Event) => {
-		const { detail: path } = event as CustomEvent<string>;
+		const customEvent = event as CustomEvent<{ path: string; search: string }>;
+		const { path, search } = customEvent.detail;
 
 		// reinitializing any possibly existing listener
 		cleanupDashboardListeners();
