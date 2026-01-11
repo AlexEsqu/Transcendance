@@ -1,0 +1,48 @@
+<div class="modal-overlay">
+	<form
+		id="info-container"
+		class="modal glow-anim glow-form">
+
+		<h1 class="text-3xl m-3" id="info-title">Two Factor Authentication</h1>
+
+		<p class="m-2" id="info-text">
+			To log into your account, you need to verify your identity.
+			We sent an email to the account email address.
+		</p>
+
+		<section>
+			<label
+				for="input-2fa"
+				class="m-2">
+				Check your inbox and copy the received code to finish login
+			</label>
+			<input
+				id="input-2fa"
+				name="input-2fa"
+				type="text"
+				required
+				class="confirmation-input"
+				placeholder="********" />
+			<span
+				aria-live="polite"
+				class="error-hint text-center text-red-500 text-xs mt-1 hidden">
+			</span>
+		</section>
+
+		<button
+			id="btn-submit-2fa"
+			name="btn-submit-2fa"
+			type="submit"
+			class="modal-confirm mt-3">
+			Submit 2FA Code
+		</button>
+
+		<button
+			id="btn-cancel-2fa"
+			name="btn-cancel-2fa"
+			class="modal-cancel mt-3">
+			Cancel
+		</button>
+
+	</form>
+</div>

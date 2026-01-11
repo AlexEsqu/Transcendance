@@ -24,7 +24,7 @@ export class OAuthService
 		this.openOAuthPopup();
 	}
 
-	private openOAuthPopup(): void
+	openOAuthPopup(): void
 	{
 		const width = 600;
 		const height = 700;
@@ -52,7 +52,7 @@ export class OAuthService
 
 	async handleOAuthMessage(event: MessageEvent): Promise<void>
 	{
-		if (event.origin !== window.location.origin)
+		if (event.source !== this.oauthWindow)
 			return;
 
 		const { type, userId, error } = event.data;
@@ -77,10 +77,10 @@ export class OAuthService
 			throw new Error('No user ID received');
 		}
 
-		await this.completeLogin(userId);
+		await this.login(userId);
 	}
 
-	async completeLogin(userId: string): Promise<void>
+	async login(userId: string): Promise<void>
 	{
 		try {
 			const response = await fetch(
@@ -103,13 +103,27 @@ export class OAuthService
 
 			console.log('User authenticated:', data);
 
-			const user = new RegisteredUser(
-				data.username,
-				Number(userId),
-				data.accessToken
-			);
+			if (data.twoFactorRequired && data.twoFactorToken)
+			{
+				try
+				{
+					const code = await this.userState.twoFactor.prompt2faCode();
+					const verifiedData = await this.userState.twoFactor.check2faCode(code, data.twoFactorToken);
+					const user = new RegisteredUser(data.username, verifiedData.id, verifiedData.accessToken);
+					this.userState.setUser(user);
+					router.render();
+				}
+				catch (err)
+				{
+					console.error('2FA failed:', err);
+				}
+			}
+			else
+			{
+				const user = new RegisteredUser(data.username, Number(userId), data.accessToken);
+				this.userState.setUser(user);
+			}
 
-			this.userState.setUser(user);
 		}
 		catch (error) {
 			console.error('OAuth callback error:', error);
@@ -119,20 +133,19 @@ export class OAuthService
 
 	static sendCallbackToParent(): void
 	{
-		if (window.opener) {
-			const urlParams = new URLSearchParams(window.location.search);
-			const userId = urlParams.get('id');
-			const error = urlParams.get('error');
+		const targetOrigin = window.opener ? window.opener.location.origin : '*';
 
+		const urlParams = new URLSearchParams(window.location.search);
+		const userId = urlParams.get('id');
+		const error = urlParams.get('error');
+
+		if (window.opener) {
 			window.opener.postMessage(
-				{
-					type: 'oauth-callback',
-					userId,
-					error
-				},
-				window.location.origin
+				{ type: 'oauth-callback', userId, error },
+				targetOrigin
 			);
 		}
+		setTimeout(() => window.close(), 300);
 	}
 }
 

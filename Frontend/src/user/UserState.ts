@@ -3,7 +3,7 @@ import { router } from "../app";
 import { EmailAuthService } from "../auth/EmailAuth";
 import { OAuthService } from "../auth/OAuth";
 import { GuestService } from "../auth/Guest";
-import { TwoFactorService } from "../auth/TwoFactor";
+import { TwoFactorAuthService } from "../auth/TwoFactorAuth";
 import { CustomizeService } from "./Customize";
 import { SocialService } from "./Social";
 
@@ -39,7 +39,7 @@ class UserState
 	emailAuth: EmailAuthService;
 	oAuth: OAuthService;
 	guest: GuestService;
-	twoFactor: TwoFactorService;
+	twoFactor: TwoFactorAuthService;
 	customize: CustomizeService;
 	social: SocialService;
 
@@ -51,7 +51,7 @@ class UserState
 		this.emailAuth = new EmailAuthService(apiDomainName, apiKey, this);
 		this.oAuth = new OAuthService(apiDomainName, apiKey, this);
 		this.guest = new GuestService(this);
-		this.twoFactor = new TwoFactorService(this);
+		this.twoFactor = new TwoFactorAuthService(this);
 		this.customize = new CustomizeService(this);
 		this.social = new SocialService(this);
 

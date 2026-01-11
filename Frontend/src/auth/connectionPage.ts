@@ -6,12 +6,11 @@ import guestFormHtml from "../html/forms/guestForm.html?raw"
 import loginFormHtml from "../html/forms/loginForm.html?raw"
 import registerFormHtml from "../html/forms/registerForm.html?raw"
 import checkEmailHtml from "../html/info/checkEmail.html?raw"
-import check2faHtml from "../html/info/twoFactorCheck.html"
 
 export {
 	getConnectionLandingHtml,
 	getConnectionForm,
-	getEmailCheck, get2FACheck,
+	getEmailCheck,
 	initConnectionPageListeners }
 
 
@@ -30,11 +29,6 @@ function getConnectionForm(): string {
 function getEmailCheck(): string
 {
 	return checkEmailHtml;
-}
-
-function get2FACheck(): string
-{
-	return check2faHtml;
 }
 
 // FUNCTION TO ACTIVATE THE EVENT LISTENERS AND POSSIBLE BUTTON INTERACTIONS
