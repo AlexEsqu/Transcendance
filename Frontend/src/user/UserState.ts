@@ -157,7 +157,7 @@ class UserState
 			try
 			{
 				const data = JSON.parse(registeredData);
-				this.user = new RegisteredUser(data.username, data.id, data.accessToken);
+				this.user = new RegisteredUser(data.id, data.accessToken, data.username);
 				this.user.avatar = data.avatar;
 				this.user.friends = data.friends ?? [];
 				this.notifySubscribers();

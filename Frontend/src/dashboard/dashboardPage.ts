@@ -116,18 +116,18 @@ function activateTfaButton(user : RegisteredUser)
 
 	const newBtn = twoFactorAuthBtn.cloneNode(true) as HTMLElement;
 	twoFactorAuthBtn.parentNode?.replaceChild(newBtn, twoFactorAuthBtn);
-	twoFactorAuthBtn.textContent = "";
+
 	if (user.hasTwoFactorAuth)
 	{
-		twoFactorAuthBtn.textContent = 'Disable Two Factor Authentication';
-		twoFactorAuthBtn.addEventListener('click', () => {
+		newBtn.textContent = 'Disable Two Factor Authentication';
+		newBtn.addEventListener('click', () => {
 			userState.twoFactor.toggle2fa(false);
 		});
 	}
 	else
 	{
-		twoFactorAuthBtn.textContent = 'Enable Two Factor Authentication';
-		twoFactorAuthBtn.addEventListener('click', () => {
+		newBtn.textContent = 'Enable Two Factor Authentication';
+		newBtn.addEventListener('click', () => {
 			userState.twoFactor.toggle2fa(true);
 		});
 	}

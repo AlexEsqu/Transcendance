@@ -62,21 +62,11 @@ export class EmailAuthService
 
 		if (data.twoFactorRequired && data.twoFactorToken)
 		{
-			try
-			{
-				const code = await this.userState.twoFactor.prompt2faCode();
-				const verifiedData = await this.userState.twoFactor.check2faCode(code, data.twoFactorToken);
-				const user = new RegisteredUser(login, verifiedData.id, verifiedData.accessToken);
-				this.userState.setUser(user);
-			}
-			catch (err)
-			{
-				console.error('2FA failed:', err);
-			}
+			this.userState.twoFactor.login(data.twoFactorToken);
 		}
 		else
 		{
-			const user = new RegisteredUser(login, data.id, data.accessToken);
+			const user = new RegisteredUser( data.id, data.accessToken, login );
 			this.userState.setUser(user);
 		}
 	}
