@@ -77,10 +77,10 @@ export class OAuthService
 			throw new Error('No user ID received');
 		}
 
-		await this.login(userId);
+		await this.login(Number(userId));
 	}
 
-	async login(userId: string): Promise<void>
+	async login(userId: number): Promise<void>
 	{
 		try {
 			const response = await fetch(
@@ -101,6 +101,7 @@ export class OAuthService
 			if (!response.ok)
 				throw new Error(data.error ?? 'Failed to authenticate with OAuth');
 
+			console.log('User id:', userId);
 			console.log('User authenticated:', data);
 
 			if (data.twoFactorRequired && data.twoFactorToken)
@@ -109,8 +110,8 @@ export class OAuthService
 				{
 					const code = await this.userState.twoFactor.prompt2faCode();
 					const verifiedData = await this.userState.twoFactor.check2faCode(code, data.twoFactorToken);
-					const user = new RegisteredUser(data.username, verifiedData.id, verifiedData.accessToken);
-					this.userState.setUser(user);
+					const user = new RegisteredUser(data.username, userId, verifiedData.accessToken);
+					await this.userState.setUser(user);
 					router.render();
 				}
 				catch (err)
@@ -120,8 +121,8 @@ export class OAuthService
 			}
 			else
 			{
-				const user = new RegisteredUser(data.username, Number(userId), data.accessToken);
-				this.userState.setUser(user);
+				const user = new RegisteredUser(data.username, userId, data.accessToken);
+				await this.userState.setUser(user);
 			}
 
 		}

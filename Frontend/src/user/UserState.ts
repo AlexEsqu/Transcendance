@@ -76,13 +76,13 @@ class UserState
 	//--------------------------- SETTER ------------------------------------//
 
 	// modified User objects and notifies subscribers for state changes
-	setUser(newUser: User | null): void
+	async setUser(newUser: User | null): Promise<void>
 	{
 		this.user = newUser;
 
 		// wait for the backend to confirm data on the user
 		if (newUser instanceof RegisteredUser)
-			this.refreshUser();
+			await this.refreshUser();
 
 		this.saveToLocalStorage();
 		this.notifySubscribers();
