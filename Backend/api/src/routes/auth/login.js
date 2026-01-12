@@ -19,53 +19,53 @@ export default function login(server) {
 			body: { $ref: "authCredentialsBody" },
 			response: {
 				200: {
-	description: "Login successful or 2FA required",
-	content: {
-		"application/json": {
-			schema: {
-				oneOf: [
-					{
-						description: "Login successful",
-						type: "object",
-						required: ["accessToken", "id"],
-						properties: {
-							accessToken: { type: "string" },
-							id: { type: "integer" },
-						},
-					},
-					{
-						description: "Two-factor authentication required",
-						type: "object",
-						required: ["twoFactorRequired", "twoFactorToken"],
-						properties: {
-							twoFactorRequired: { type: "boolean", example: true },
-							twoFactorToken: {
-								type: "string",
-								description: "2FA continuation token",
+					description: "Login successful or 2FA required",
+					content: {
+						"application/json": {
+							schema: {
+								oneOf: [
+									{
+										description: "Login successful",
+										type: "object",
+										required: ["accessToken", "id"],
+										properties: {
+											accessToken: { type: "string" },
+											id: { type: "integer" },
+										},
+									},
+									{
+										description: "Two-factor authentication required",
+										type: "object",
+										required: ["twoFactorRequired", "twoFactorToken"],
+										properties: {
+											twoFactorRequired: { type: "boolean", example: true },
+											twoFactorToken: {
+												type: "string",
+												description: "2FA continuation token",
+											},
+										},
+									},
+								],
+							},
+							examples: {
+								no2faExample: {
+									summary: "Successful response when no 2FA is required",
+									value: {
+										accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+										id: 12,
+									},
+								},
+								twoFaExample: {
+									summary: "Successful response when 2FA is required",
+									value: {
+										twoFactorRequired: true,
+										twoFactorToken: "2fa_continuation_token",
+									},
+								},
 							},
 						},
 					},
-				],
-			},
-			examples: {
-				no2faExample: {
-					summary: "Successful response when no 2FA is required",
-					value: {
-						accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-						id: 12,
-					},
 				},
-				twoFaExample: {
-					summary: "Successful response when 2FA is required",
-					value: {
-						twoFactorRequired: true,
-						twoFactorToken: "2fa_continuation_token",
-					},
-				},
-			},
-		},
-	},
-},
 
 				302: {
 					description: "Redirect: Email not verified",
@@ -93,23 +93,28 @@ export default function login(server) {
 	server.post("/login", opts, async (req, reply) => {
 		try {
 			const { login, password } = req.body;
+			
 			//looks for the user in the db if it exists
-
 			const user = await server.db.prepare(`SELECT * FROM users WHERE email = ? OR username = ? `).get(login, login);
-			console.log(user);
 			if (!user) {
 				return reply.status(401).send({ error: "Unauthorized", message: "Invalid credentials" });
 			}
 			if (!user.email_verified) {
 				return reply.status(403).send({ error: "Forbidden", message: "Email not verified" });
 			}
-
+			if (!user.password_hash) {
+				return reply.status(400).send({
+					error: "This account uses OAuth. Please log in with 42 or set a password.",
+				});
+			}
 			//checks if the password matches
 			const match = await bcrypt.compare(password, user.password_hash);
-
 			if (!match) {
 				return reply.status(401).send({ error: "Unauthorized", message: "Invalid credentials" });
 			}
+			const tokens = await generateTokens(server, user, reply);
+			return reply.status(200).send(tokens);
+
 			if (user.is_2fa_enabled) {
 				const twoFaToken = await sendVerificationCodeEmail(server, user);
 				return reply.status(200).send({
@@ -117,8 +122,6 @@ export default function login(server) {
 					twoFactorToken: twoFaToken,
 				});
 			}
-			const tokens = await generateTokens(server, user, reply);
-			return reply.status(200).send(tokens);
 		} catch (err) {
 			console.log(err);
 			return reply.status(500).send({ error: "Internal server error" });
