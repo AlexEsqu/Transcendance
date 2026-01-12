@@ -104,7 +104,8 @@ export default function login(server) {
 			}
 			if (!user.password_hash) {
 				return reply.status(400).send({
-					error: "This account uses OAuth. Please log in with 42 or set a password.",
+					error: "Bad Request",
+					message: "This account uses OAuth. Please log in with 42 or set a password.",
 				});
 			}
 			//checks if the password matches
@@ -112,7 +113,7 @@ export default function login(server) {
 			if (!match) {
 				return reply.status(401).send({ error: "Unauthorized", message: "Invalid credentials" });
 			}
-			
+
 			if (user.is_2fa_enabled) {
 				const twoFaToken = await sendVerificationCodeEmail(server, user);
 				return reply.status(200).send({
@@ -122,7 +123,6 @@ export default function login(server) {
 			}
 			const tokens = await generateTokens(server, user, reply);
 			return reply.status(200).send(tokens);
-
 		} catch (err) {
 			console.log(err);
 			return reply.status(500).send({ error: "Internal server error" });
