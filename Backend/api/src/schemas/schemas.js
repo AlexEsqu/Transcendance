@@ -1,3 +1,5 @@
+import { Security } from "../utils/openApiSecurity.js";
+
 export const errorResponse = {
 	$id: "errorResponse",
 	additionalProperties: false,
@@ -71,36 +73,86 @@ export const publicUserObject = {
 		username: { type: "string" },
 		avatar: { type: ["string", "null"] },
 		is_active: { type: "boolean" },
-		oauth: {type: "boolean"}
+		oauth: { type: "boolean" },
 	},
 };
 
 export const loginTokenObject = {
-  $id: "loginTokenObject",
-  type: "object",
-  required: ["accessToken", "id"],
-  properties: {
-    accessToken: { type: "string" },
-    id: { type: "integer" },
-  },
-  example: {
-    accessToken: "a3f9c8e2b4d74e0c9f...",
-    id: 1,
-  },
-  description: "Login successful",
+	$id: "loginTokenObject",
+	type: "object",
+	required: ["accessToken", "id"],
+	properties: {
+		accessToken: { type: "string" },
+		id: { type: "integer" },
+	},
+	example: {
+		accessToken: "a3f9c8e2b4d74e0c9f...",
+		id: 1,
+	},
+	description: "Login successful",
 };
 
 export const twoFactorRequiredObject = {
-  $id: "twoFactorRequiredObject",
-  type: "object",
-  required: ["twoFactorRequired", "token"],
-  properties: {
-    twoFactorRequired: { type: "boolean", example: true },
-    token: { type: "string" },
-  },
-  example: {
-    twoFactorRequired: true,
-    token: "a3f9c8e2b4d74e0c9f...",
-  },
-  description: "Two-factor authentication required",
+	$id: "twoFactorRequiredObject",
+	type: "object",
+	required: ["twoFactorRequired", "token"],
+	properties: {
+		twoFactorRequired: { type: "boolean", example: true },
+		token: { type: "string" },
+	},
+	example: {
+		twoFactorRequired: true,
+		token: "a3f9c8e2b4d74e0c9f...",
+	},
+	description: "Two-factor authentication required",
 };
+
+export const deleteUserSchema = {
+	$id: "deleteUserSchema",
+	tags: ["user"],
+	description: "Deletes the user account and all its data. `This endpoint requires client AND user authentication.`",
+	security: Security.UserAuth,
+	response: {
+		204: {
+			description: "Success: User deleted successfully",
+			type: "null",
+		},
+		401: {
+			description: "Unauthorized: Invalid credentials",
+			$ref: "errorResponse#",
+		},
+		500: {
+			description: "Internal Server Error",
+			$ref: "errorResponse#",
+		},
+		default: {
+			description: "Unexpected error",
+			$ref: "errorResponse#",
+		},
+	}
+};
+
+export const deleteUserAvatarSchema = {
+	$id: "deleteUserAvatarSchema",
+	tags: ["user"],
+			description: "Deletes the avatar of the user. `This endpoint requires client AND user authentication.`",
+			security: Security.UserAuth,
+			response: {
+				204: {
+					description: "Success: Avatar deleted successfully",
+					type: "null",
+				},
+				401: {
+					description: "Unauthorized: Invalid credentials",
+					$ref: "errorResponse#",
+				},
+				500: {
+					description: "Internal Server Error",
+					$ref: "errorResponse#",
+				},
+				default: {
+					description: "Unexpected error",
+					$ref: "errorResponse#",
+				},
+			},
+}
