@@ -46,7 +46,7 @@ export class TwoFactorAuthService
 		if (!response.ok)
 			throw new Error(data.message || data.error || '2FA enable failed');
 
-		user.hasTwoFactorAuth = true;
+		user.hasTwoFactorAuth = val;
 		this.userState.setUser(user);
 	}
 
