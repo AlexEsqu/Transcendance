@@ -10,7 +10,7 @@ export async function initDB(db) {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
 		last_activity DATETIME,
         username TEXT NOT NULL UNIQUE,
-        password_hash TEXT,
+        password_hash TEXT DEFAULT NULL,
 		email TEXT NOT NULL UNIQUE,
 		avatar TEXT,
         refresh_token_hash TEXT,

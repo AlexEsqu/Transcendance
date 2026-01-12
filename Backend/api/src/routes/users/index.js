@@ -10,11 +10,13 @@ import putUsername from "./putUsername.js";
 import toggle_2fa from "./toggle2fa.js";
 import get_2fa_status from "./get2fa.js";
 import postGuest from "./guests/postGuest.js";
+import postUserPassword from "./postPassword.js";
 
 export default async function userRoutes(server) {
 	server.register(getUsers, { prefix: "api" });
 	server.register(getUser, { prefix: "api" });
 	server.register(putUserPassword, { prefix: "api/users" });
+	server.register(postUserPassword, { prefix: "api/users" })
 	server.register(putUserAvatar, { prefix: "api/users" });
 	server.register(putUsername, { prefix: "api/users" });
 	server.register(deleteUserAvatar, { prefix: "api/users" });
