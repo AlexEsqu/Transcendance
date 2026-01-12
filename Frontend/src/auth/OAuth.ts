@@ -1,6 +1,7 @@
 import type { UserState } from "../user/UserState";
 import { RegisteredUser } from "../user/User";
 import { router } from "../app";
+import { TwoFactorAuthService } from "./TwoFactorAuth";
 
 export { initOAuthCallback }
 export class OAuthService
@@ -55,7 +56,8 @@ export class OAuthService
 		if (event.source !== this.oauthWindow)
 			return;
 
-		const { type, userId, error } = event.data;
+		const { type, userId, twoFactorToken, error } = event.data;
+		console.log('received data', event.data);
 
 		if (type !== 'oauth-callback')
 			return;
@@ -72,17 +74,35 @@ export class OAuthService
 			throw new Error(error);
 		}
 
-		if (!userId || Number.isNaN(userId))
+		try
 		{
-			throw new Error('No user ID received');
+			// If we have a twoFactorToken, prompt for 2FA
+			if (twoFactorToken)
+			{
+				console.log('2FA required, prompting for code...');
+				await this.userState.twoFactor.login(twoFactorToken);
+			}
+			else if (userId)
+			{
+				this.login(userId);
+			}
+			else
+			{
+				throw new Error('Unrecognized api response');
+			}
+			router.render();
 		}
-
-		await this.login(userId);
+		catch (error)
+		{
+			console.error('OAuth login error:', error);
+			throw error;
+		}
 	}
 
-	async login(userId: string): Promise<void>
+	async login(userId: number): Promise<void>
 	{
 		try {
+			console.log('Fetching refresh token...');
 			const response = await fetch(
 				`${this.apiDomainName}/users/auth/refresh`,
 				{
@@ -101,63 +121,71 @@ export class OAuthService
 			if (!response.ok)
 				throw new Error(data.error ?? 'Failed to authenticate with OAuth');
 
+			console.log('User id:', userId);
 			console.log('User authenticated:', data);
 
-			if (data.twoFactorRequired && data.twoFactorToken)
+			if (data.twoFactorRequired)
 			{
-				try
-				{
-					const code = await this.userState.twoFactor.prompt2faCode();
-					const verifiedData = await this.userState.twoFactor.check2faCode(code, data.twoFactorToken);
-					const user = new RegisteredUser(data.username, verifiedData.id, verifiedData.accessToken);
-					this.userState.setUser(user);
-					router.render();
-				}
-				catch (err)
-				{
-					console.error('2FA failed:', err);
-				}
+				await this.userState.twoFactor.login(data.twoFactorToken);
 			}
 			else
 			{
-				const user = new RegisteredUser(data.username, Number(userId), data.accessToken);
-				this.userState.setUser(user);
+				const user = new RegisteredUser(userId, data.accessToken, data.username);
+				await this.userState.setUser(user);
 			}
+			router.render();
 
 		}
 		catch (error) {
-			console.error('OAuth callback error:', error);
+			console.error('OAuth login error:', error);
 			throw error;
 		}
 	}
 
 	static sendCallbackToParent(): void
 	{
+		console.log('sendCallbackToParent called');
+		console.log('Current URL:', window.location.href);
+
 		const targetOrigin = window.opener ? window.opener.location.origin : '*';
 
 		const urlParams = new URLSearchParams(window.location.search);
 		const userId = urlParams.get('id');
+		const twoFactorToken = urlParams.get('twoFactorToken');
 		const error = urlParams.get('error');
+
+		console.log('URL params - userId:', userId, 'twoFactorToken:', twoFactorToken, 'error:', error);
 
 		if (window.opener) {
 			window.opener.postMessage(
-				{ type: 'oauth-callback', userId, error },
+				{ type: 'oauth-callback', userId: userId ? Number(userId) : null, twoFactorToken, error },
 				targetOrigin
 			);
 		}
-		setTimeout(() => window.close(), 300);
 	}
 }
 
 function initOAuthCallback(): void
 {
-	if (window.location.search.includes('id=') || window.location.search.includes('error=')) {
+	console.log('initOAuthCallback() called');
+	console.log('Current URL:', window.location.href);
+
+	const isOAuthCallback = window.location.pathname.includes('/oauth/callback') ||
+		window.location.search.includes('id=') ||
+		window.location.search.includes('error=') ||
+		window.location.search.includes('code=');
+
+	console.log('Is OAuth callback:', isOAuthCallback);
+
+	if (isOAuthCallback)
+	{
+		console.log('Detected OAuth callback, sending to parent...');
 		OAuthService.sendCallbackToParent();
 
 		document.body.innerHTML = '<div style="text-align: center; padding: 2rem;">Authentication successful. This window will close automatically...</div>';
-
 		setTimeout(() => {
+			console.log('Closing popup window...');
 			window.close();
-		}, 1000);
+		}, 500);
 	}
 }

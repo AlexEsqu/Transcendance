@@ -53,9 +53,9 @@ class RegisteredUser extends User
 	isRefreshed: boolean;
 	hasTwoFactorAuth: boolean;
 
-	constructor(username: string, id: number, accessToken: string)
+	constructor( id: number, accessToken: string, username?: string )
 	{
-		super(username);
+		super(username || 'Loading...');
 		this.id = id;
 		this.accessToken = accessToken;
 		this.isRefreshed = false;

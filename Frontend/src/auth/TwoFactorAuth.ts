@@ -46,12 +46,13 @@ export class TwoFactorAuthService
 		if (!response.ok)
 			throw new Error(data.message || data.error || '2FA enable failed');
 
-		user.hasTwoFactorAuth = true;
-		this.userState.setUser(user);
+		user.hasTwoFactorAuth = val;
+		this.userState.notifySubscribers();
 	}
 
 	async prompt2faCode(): Promise<string>
 	{
+		console.log('Creating 2FA modal...');
 		return new Promise((resolve, reject) => {
 			const modal = new Modal(
 				modalHtml,
@@ -91,5 +92,22 @@ export class TwoFactorAuthService
 		console.log(`data received is ${data}`);
 
 		return data;
+	}
+
+	async login(twoFactorToken: string)
+	{
+		try
+		{
+			console.log('2FA required, prompting for code...');
+			const code = await this.userState.twoFactor.prompt2faCode();
+			const verifiedData = await this.userState.twoFactor.check2faCode(code, twoFactorToken);
+			const user = new RegisteredUser(verifiedData.id, verifiedData.accessToken);
+			await this.userState.setUser(user);
+		}
+		catch (err)
+		{
+			console.error('2FA failed:', err);
+			throw err;
+		}
 	}
 }
