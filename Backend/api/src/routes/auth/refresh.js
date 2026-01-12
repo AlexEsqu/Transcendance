@@ -13,6 +13,7 @@ function refresh(server) {
 					type: "object",
 					properties: {
 						accessToken: { type: "string" },
+						id: { type: "integer" },
 					},
 					required: ["accessToken"],
 				},
@@ -62,7 +63,7 @@ function refresh(server) {
 			});
 
 			// Send access token
-			return reply.send({ accessToken: newAccessToken });
+			return reply.send({ accessToken: newAccessToken , id: id});
 		} catch (err) {
 			console.log(err);
 			return reply.status(401).send({ error: "Invalid token" });
