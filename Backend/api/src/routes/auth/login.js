@@ -93,7 +93,7 @@ export default function login(server) {
 	server.post("/login", opts, async (req, reply) => {
 		try {
 			const { login, password } = req.body;
-			
+
 			//looks for the user in the db if it exists
 			const user = await server.db.prepare(`SELECT * FROM users WHERE email = ? OR username = ? `).get(login, login);
 			if (!user) {
@@ -112,9 +112,7 @@ export default function login(server) {
 			if (!match) {
 				return reply.status(401).send({ error: "Unauthorized", message: "Invalid credentials" });
 			}
-			const tokens = await generateTokens(server, user, reply);
-			return reply.status(200).send(tokens);
-
+			
 			if (user.is_2fa_enabled) {
 				const twoFaToken = await sendVerificationCodeEmail(server, user);
 				return reply.status(200).send({
@@ -122,6 +120,9 @@ export default function login(server) {
 					twoFactorToken: twoFaToken,
 				});
 			}
+			const tokens = await generateTokens(server, user, reply);
+			return reply.status(200).send(tokens);
+
 		} catch (err) {
 			console.log(err);
 			return reply.status(500).send({ error: "Internal server error" });
