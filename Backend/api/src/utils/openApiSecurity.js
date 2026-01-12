@@ -1,4 +1,4 @@
-export const Security = {
+ export const  Security = {
   UserAuth: [{ BearerAuth: [], AppClientAuth: [] }],
   SessionAuth: [{ cookieAuth: [], AppClientAuth: [] }],
   AppAuth: [{ AppClientAuth: [] }],

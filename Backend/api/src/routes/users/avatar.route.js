@@ -1,46 +1,8 @@
 import fs from "fs";
-
-export default function putUserAvatar(server) {
+import { putUserAvatarSchema, deleteUserAvatarSchema } from "../schemas/avatar.schema.js";
+export function putUserAvatar(server) {
 	const opts = {
-		schema: {
-			tags: ["user"],
-			description: "Modifies the avatar of the user. `This endpoint requires client AND user authentication.`",
-			security: server.security.UserAuth,
-			consumes: ["multipart/form-data"],
-			body: {
-				type: "object",
-				required: ["avatar"],
-				properties: {
-					avatar: { isFile: true },
-				},
-			},
-			response: {
-				200: {
-					description: "Updated avatar successfully",
-					$ref: "SuccessMessageResponse#",
-				},
-				400: {
-					description: "Bad Request: Invalid input or missing fields",
-					$ref: "errorResponse#",
-				},
-				401: {
-					description: "Unauthorized: Invalid credentials",
-					$ref: "errorResponse#",
-				},
-				413: {
-					description: "Payload too large",
-					$ref: "errorResponse#",
-				},
-				500: {
-					description: "Internal Server Error",
-					$ref: "errorResponse#",
-				},
-				default: {
-					description: "Unexpected error",
-					$ref: "errorResponse#",
-				},
-			},
-		},
+		$ref: putUserAvatarSchema,
 		onRequest: [server.authenticateUser, server.authenticateClient],
 	};
 	server.put("/me/avatar", opts, async (req, reply) => {
@@ -52,7 +14,7 @@ export default function putUserAvatar(server) {
 			const old_avatar = avatar;
 
 			const data = req.body.avatar;
-			
+
 			//get the full upload path
 			const uploadPath = `${process.env.AVATARS_UPLOAD_PATH}/user_${id}_${data.filename}`;
 			console.log(uploadPath);
@@ -67,6 +29,33 @@ export default function putUserAvatar(server) {
 				});
 			}
 			reply.status(200).send({ success: true, message: "Updated avatar successfully" });
+		} catch (err) {
+			console.log(err);
+			reply.status(500).send("internal server error");
+		}
+	});
+}
+
+export function deleteUserAvatar(server) {
+	const opts = {
+		$ref: deleteUserAvatarSchema,
+		onRequest: [server.authenticateUser, server.authenticateClient],
+	};
+	server.delete("/me/avatar", opts, async (req, reply) => {
+		try {
+			const id = req.user.id;
+
+			//retrive avatar path
+			const { avatar } = server.db.prepare(`SELECT avatar FROM users WHERE id = ?`).get(id);
+
+			if (avatar) {
+				server.db.prepare(`UPDATE users SET avatar = NULL WHERE id = ?`).run(id);
+
+				fs.unlink(avatar, () => {
+					console.log(avatar + " was deleted");
+				});
+			}
+			reply.status(204).send();
 		} catch (err) {
 			console.log(err);
 			reply.status(500).send("internal server error");

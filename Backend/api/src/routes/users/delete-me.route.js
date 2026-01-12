@@ -1,10 +1,10 @@
 import fs from "fs";
-
+import { deleteUserSchema } from "../schemas/delete-me.schema.js";
 //TODO: GDPR => DONT FORGET TO ANONIMIZE THE USER EVERYWHERE IN DB
 function deleteUser(server) {
 	const opts = {
 		schema: {
-			$ref: "deleteUserSchema#",
+			$ref: deleteUserSchema,
 		},
 		onRequest: [server.authenticateUser, server.authenticateClient],
 	};

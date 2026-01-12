@@ -1,25 +1,8 @@
-export default function ft_OAuth2(server) {
+import { oauthSchema } from "../../schemas/redirect.schema.js";
+
+export default function oauthRoute(server) {
 	const opts = {
-		schema: {
-			tags: ["OAuth"],
-			description: "Redirects the user to the 42 authorize page",
-			responses: {
-				302: {
-					description: "Redirects to the 42 authorization page",
-					headers: {
-						location: { type: "string" },
-					},
-				},
-				500: {
-					description: "Internal Server Error",
-					$ref: "errorResponse#",
-				},
-				default: {
-					description: "Unexpected error",
-					$ref: "errorResponse#",
-				},
-			},
-		},
+		$ref: oauthSchema,
 	};
 	server.get("/oauth/42", opts, (req, reply) => {
 		try {

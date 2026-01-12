@@ -1,35 +1,9 @@
 import crypto from "crypto";
-export default function sendMailVerification(server) {
+import { sendEmailVerificationSchema } from "../schemas/email-verification.schema.js";
+
+export default function sendEmailVerificationRoute(server) {
 	const opts = {
-		schema: {
-			tags: ["auth"],
-			description: "Sends an email verification email to the user's email address",
-			body: {
-				type: "object",
-				required: ["email"],
-				properties: {
-					email: { type: "string", format: "email" },
-				},
-			},
-			response: {
-				200: {
-					description: "Success: Email verification email sent",
-					$ref: "SuccessMessageResponse#",
-				},
-				400: {
-					description: "Bad Request: Invalid input or missing fields",
-					$ref: "errorResponse#",
-				},
-				500: {
-					description: "Internal Server Error",
-					$ref: "errorResponse#",
-				},
-				default: {
-					description: "Unexpected error",
-					$ref: "errorResponse#",
-				},
-			},
-		},
+		$ref: sendEmailVerificationSchema,
 	};
 	server.post("/send-mail-verification", opts, async (request, reply) => {
 		const token = crypto.randomBytes(32).toString("hex");

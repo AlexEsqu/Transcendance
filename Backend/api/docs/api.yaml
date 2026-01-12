@@ -115,9 +115,61 @@ components:
             - string
         is_active:
           type: boolean
+        oauth:
+          type: boolean
       title: publicUserObject
+    def-7:
+      type: object
+      required:
+        - accessToken
+        - id
+      properties:
+        accessToken:
+          type: string
+        id:
+          type: integer
+      example:
+        accessToken: a3f9c8e2b4d74e0c9f...
+        id: 1
+      description: Login successful
+      title: loginTokenObject
+    def-8:
+      type: object
+      required:
+        - twoFactorRequired
+        - token
+      properties:
+        twoFactorRequired:
+          type: boolean
+          example: true
+        token:
+          type: string
+      example:
+        twoFactorRequired: true
+        token: a3f9c8e2b4d74e0c9f...
+      description: Two-factor authentication required
+      title: twoFactorRequiredObject
+    def-9:
+      tags:
+        - user
+      description: Deletes the user account and all its data. `This endpoint requires
+        client AND user authentication.`
+      security:
+        - BearerAuth: []
+          AppClientAuth: []
+      response:
+        "204":
+          description: "Success: User deleted successfully"
+          type: "null"
+        "401":
+          $ref: "#/components/schemas/def-1"
+        "500":
+          $ref: "#/components/schemas/def-1"
+        default:
+          $ref: "#/components/schemas/def-1"
+      title: deleteUserSchema
 paths:
-  /matches:
+  /api/matches:
     post:
       tags:
         - matches
@@ -195,7 +247,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/def-1"
-  /users/{id}/matches:
+  /api/users/{id}/matches:
     get:
       tags:
         - matches
@@ -241,7 +293,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/def-1"
-  /users:
+  /api/users:
     get:
       tags:
         - user
@@ -257,7 +309,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/def-6"
-  /users/{id}:
+  /api/users/{id}:
     get:
       tags:
         - user
@@ -313,7 +365,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/def-1"
-  /users/me/password:
+  /api/users/me/password:
     put:
       tags:
         - user
@@ -369,7 +421,63 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/def-1"
-  /users/me/avatar:
+    post:
+      tags:
+        - user
+      description: Sets the password of an user that doesnt already have a password
+        (oAuth signup). `This endpoint requires client AND user authentication.`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - password
+              properties:
+                password:
+                  type: string
+                  minLength: 8
+              additionalProperties: false
+        required: true
+      security: *a2
+      responses:
+        "200":
+          description: Uploaded password successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-3"
+        "400":
+          description: "Bad Request: Invalid input or missing fields"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "401":
+          description: "Unauthorized: Invalid credentials"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "403":
+          description: "Forbidden: User already has a password"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+  /api/users/me/avatar:
     put:
       tags:
         - user
@@ -452,7 +560,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/def-1"
-  /users/me/username:
+  /api/users/me/username:
     put:
       tags:
         - user
@@ -510,7 +618,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/def-1"
-  /users/me/friends:
+  /api/users/me/friends:
     post:
       tags:
         - user
@@ -652,35 +760,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/def-1"
-  /users/me:
+  /api/users/me:
     delete:
-      tags:
-        - user
-      description: Deletes the user account and all its data. `This endpoint requires
-        client AND user authentication.`
-      security: *a2
       responses:
-        "204":
-          description: "Success: User deleted successfully"
-        "401":
-          description: "Unauthorized: Invalid credentials"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/def-1"
-        "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/def-1"
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/def-1"
-  /users/me/2fa:
+        "200":
+          description: Default Response
+  /api/users/me/2fa:
     put:
       tags:
         - user
@@ -691,6 +776,7 @@ paths:
             schema:
               required:
                 - enabled
+              type: object
               properties:
                 enabled:
                   type: boolean
@@ -703,7 +789,75 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/def-3"
-  /users/signup:
+    get:
+      tags:
+        - user
+      description: Returns 2fa activation status
+      security: *a2
+      responses:
+        "200":
+          description: Returns 2fa activation status
+          content:
+            application/json:
+              schema:
+                description: Returns 2fa activation status
+                type: object
+                required:
+                  - is_2fa_enabled
+                properties:
+                  is_2fa_enabled:
+                    type: boolean
+        "401":
+          description: "Unauthorized: Invalid credentials"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+  /api/guests:
+    post:
+      tags:
+        - guests
+      description: Add a guest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - alias
+              properties:
+                alias:
+                  type: string
+                  description: Alias chosen by user
+        required: true
+      security: *a1
+      responses:
+        "201":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  alias:
+                    type: string
+                  sessionToken:
+                    type: string
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+  /api/users/signup:
     post:
       tags:
         - auth
@@ -746,7 +900,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/def-1"
-  /users/auth/login:
+  /api/users/auth/login:
     post:
       tags:
         - auth
@@ -759,8 +913,9 @@ paths:
         immediately.    Instead, a one-time 6-digit verification code is sent to
         the user's email and    a temporary 2FA continuation token is generated,
         which must be used to complete    authentication via the 2FA
-        verification endpoint.    `This endpoint requires the client to have a
-        verified email address.`
+        verification endpoint through the api route `POST
+        /api/users/auth/login/2fa`.    `This endpoint requires the client to
+        have a verified email address.`
       requestBody:
         content:
           application/json:
@@ -768,7 +923,7 @@ paths:
               $ref: "#/components/schemas/def-0"
       responses:
         "200":
-          description: Default Response
+          description: Login successful or 2FA required
           content:
             application/json:
               schema:
@@ -787,14 +942,25 @@ paths:
                     type: object
                     required:
                       - twoFactorRequired
-                      - token
+                      - twoFactorToken
                     properties:
                       twoFactorRequired:
                         type: boolean
                         example: true
-                      token:
+                      twoFactorToken:
                         type: string
                         description: 2FA continuation token
+              examples:
+                no2faExample:
+                  summary: Successful response when no 2FA is required
+                  value:
+                    accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                    id: 12
+                twoFaExample:
+                  summary: Successful response when 2FA is required
+                  value:
+                    twoFactorRequired: true
+                    twoFactorToken: 2fa_continuation_token
         "302":
           description: "Redirect: Email not verified"
           content:
@@ -825,7 +991,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/def-1"
-  /users/auth/refresh:
+  /api/users/auth/refresh:
     post:
       tags:
         - auth
@@ -835,8 +1001,7 @@ paths:
         authentification` AND the refresh cookie stored in the `HttpOnly
         refreshToken cookie`
       security: &a3
-        - BearerAuth: []
-          cookieAuth: []
+        - cookieAuth: []
           AppClientAuth: []
       responses:
         "200":
@@ -849,6 +1014,8 @@ paths:
                 properties:
                   accessToken:
                     type: string
+                  id:
+                    type: integer
                 required:
                   - accessToken
         "401":
@@ -869,7 +1036,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/def-1"
-  /users/auth/logout:
+  /api/users/auth/logout:
     post:
       tags:
         - auth
@@ -905,7 +1072,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/def-1"
-  /users/auth/verify-email:
+  /api/users/auth/verify-email:
     get:
       tags:
         - auth
@@ -941,7 +1108,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/def-1"
-  /users/auth/send-mail-verification:
+  /api/users/auth/send-mail-verification:
     post:
       tags:
         - auth
@@ -983,7 +1150,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/def-1"
-  /users/auth/login/2fa:
+  /api/users/auth/login/2fa:
     post:
       tags:
         - auth
@@ -1008,7 +1175,7 @@ paths:
             type: string
             example: a3f9c8e2b4d74e0c9f...
           in: query
-          name: token
+          name: twoFactorToken
           required: true
           description: Token generated by the login endpoint
       responses:
@@ -1041,6 +1208,80 @@ paths:
                 $ref: "#/components/schemas/def-1"
         default:
           description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+  /api/users/auth/oauth/42:
+    get:
+      tags:
+        - OAuth
+      description: Redirects the user to the 42 authorize page
+      responses:
+        "200":
+          description: Default Response
+  /api/users/auth/oauth/42/callback:
+    get:
+      tags:
+        - OAuth
+      description: "Handles the OAuth2 callback from 42. Verifies the authorization
+        code and state, retrieves the user information from 42, and either logs
+        in an existing user or signs up a new user. \t\t\t\t`Stores refresh
+        token in cookies` if login/signup is successful and `put the user's id
+        in query`, or returns a two-factor authentication token if 2FA is
+        required. "
+      parameters:
+        - schema:
+            type: string
+            example: a3f9c8e2b4d74e0c9f...
+          in: query
+          name: code
+          required: true
+          description: The code you received as a response of `GET api/users/auth/oauth/42`
+        - schema:
+            type: string
+            example: a3f9c8e2b4d74e0c9f...
+          in: query
+          name: state
+          required: true
+          description: Unguessable string provided in the in by backend for verification
+            `GET api/users/auth/oauth/42`
+      responses:
+        "200":
+          description: Two-factor authentication required
+          content:
+            application/json:
+              schema:
+                description: Two-factor authentication required
+                type: object
+                required:
+                  - twoFactorRequired
+                  - token
+                properties:
+                  twoFactorRequired:
+                    type: boolean
+                  token:
+                    type: string
+        "302":
+          description: "Sucess: Redirects to the frontend, stores the user's id in query
+            parameters"
+          headers:
+            location:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                description: "Sucess: Redirects to the frontend, stores the user's id in query
+                  parameters"
+        "500":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        default:
+          description: Default Response
           content:
             application/json:
               schema:
