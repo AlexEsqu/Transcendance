@@ -51,7 +51,7 @@ export default function postUserPassword(server) {
 			const { id } = req.user;
 			const user = await getUserbyId(id, server.db);
 			console.log(user)
-			if (user.oauth_provider && !user.password)
+			if (user.oauth_provider && !user.password_hash )
 			{
 				//hash password and update db
 				const password_hash = await bcrypt.hash(password, await bcrypt.genSalt(10));
