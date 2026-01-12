@@ -2,6 +2,7 @@ import { userState, router } from "../app"
 import { showFriend, showUsers } from "./socialSection";
 import { RegisteredUser } from "../user/User";
 import type { Subscriber } from "../user/UserState";
+import type { User } from "../user/User";
 import { displayMatchHistory } from "./graphSection";
 import { onAvatarLoaded, onEmailLoaded, onPasswordLoaded, onRenameLoaded } from "./settingSection";
 
@@ -13,6 +14,7 @@ export { getDashboardPage, initDashboardPageListeners }
 
 let currentFriendsListener: Subscriber | null = null;
 let currentUsersListener: Subscriber | null = null;
+let currentOptionsListener: Subscriber | null = null;
 
 // Getting base html for the pages
 
@@ -79,6 +81,14 @@ async function onDashboardLoaded()
 	if (isRegistered)
 	{
 		showRegisteredUserOptions(user);
+
+		currentOptionsListener = (updatedUser: User | null) => {
+			if (updatedUser instanceof RegisteredUser) {
+				activateTfaButton(updatedUser);
+			}
+		};
+
+		userState.subscribe(currentOptionsListener);
 		userState.subscribe(currentFriendsListener);
 		displayMatchHistory();
 	}
@@ -94,9 +104,16 @@ function showRegisteredUserOptions(user : RegisteredUser)
 		}
 	);
 
+	activateDeleteButton();
+	activateTfaButton(user);
+}
+
+function activateTfaButton(user : RegisteredUser)
+{
 	const twoFactorAuthBtn = document.getElementById('enable-tfa-btn');
 	if (twoFactorAuthBtn)
 	{
+		twoFactorAuthBtn.textContent = "";
 		if (user.hasTwoFactorAuth)
 		{
 			twoFactorAuthBtn.textContent = 'Disable Two Factor Authentication';
@@ -112,12 +129,18 @@ function showRegisteredUserOptions(user : RegisteredUser)
 			});
 		}
 	}
+}
 
+function activateDeleteButton()
+{
 	const deleteAccBtn = document.getElementById('delete-account-btn');
-	deleteAccBtn?.addEventListener('click', () => {
+	if (!deleteAccBtn)
+		return;
+
+	deleteAccBtn.addEventListener('click', () => {
 		userState.emailAuth.deleteAccount();
-		router.navigateTo('')
-	})
+		router.navigateTo('/connection')
+	});
 }
 
 function cleanupDashboardListeners()
@@ -131,5 +154,10 @@ function cleanupDashboardListeners()
 	{
 		userState.unsubscribe(currentUsersListener);
 		currentUsersListener = null;
+	}
+	if (currentOptionsListener)
+	{
+		userState.unsubscribe(currentOptionsListener);
+		currentOptionsListener = null;
 	}
 }
