@@ -75,8 +75,8 @@ export function ft_OAuth2_callback(server) {
 				console.log("42 USER NOT IN DB, SIGNING UP THE USER");
 				//SIGNUP THE USER THEN GENERATE TOKENS
 				const result = server.db
-					.prepare(`INSERT INTO users (username, email, email_verified, oauth_provider) VALUES (?, ?, 1, 42)`)
-					.run(fortyTwoUserData.login, fortyTwoUserData.email);
+					.prepare(`INSERT INTO users (username, email, email_verified, oauth_provider) VALUES (?, ?, ?, ?)`)
+					.run(fortyTwoUserData.login, fortyTwoUserData.email, 1, "42");
 				const newUser = server.db.prepare(`SELECT * FROM users WHERE id = ?`).get(result.lastInsertRowid);
 				const avatarPath = await downloadAvatar(fortyTwoUserData.image.versions.small, newUser.id);
 				server.db.prepare(`UPDATE users SET avatar = ? WHERE id = ?`).run(avatarPath, newUser.id);

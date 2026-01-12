@@ -71,6 +71,7 @@ export const publicUserObject = {
 		username: { type: "string" },
 		avatar: { type: ["string", "null"] },
 		is_active: { type: "boolean" },
+		oauth: {type: "boolean"}
 	},
 };
 

@@ -77,12 +77,11 @@ export function getUsers(server) {
 	};
 	server.get("/users", allUsersSchema, (req, reply) => {
 		const users = server.db
-			.prepare(`SELECT id, username, avatar, last_activity FROM users`)
+			.prepare(`SELECT id, username, avatar, last_activity, oauth_provider FROM users`)
 			.all();
 		users.forEach((user) => {
 			formatUserObject(user);
 		});
-		console.log(users);
 		reply.send(users);
 	});
 }
