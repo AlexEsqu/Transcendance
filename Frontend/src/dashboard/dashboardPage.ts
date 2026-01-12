@@ -111,23 +111,25 @@ function showRegisteredUserOptions(user : RegisteredUser)
 function activateTfaButton(user : RegisteredUser)
 {
 	const twoFactorAuthBtn = document.getElementById('enable-tfa-btn');
-	if (twoFactorAuthBtn)
+	if (!twoFactorAuthBtn)
+		return;
+
+	const newBtn = twoFactorAuthBtn.cloneNode(true) as HTMLElement;
+	twoFactorAuthBtn.parentNode?.replaceChild(newBtn, twoFactorAuthBtn);
+	twoFactorAuthBtn.textContent = "";
+	if (user.hasTwoFactorAuth)
 	{
-		twoFactorAuthBtn.textContent = "";
-		if (user.hasTwoFactorAuth)
-		{
-			twoFactorAuthBtn.textContent = 'Disable Two Factor Authentication';
-			twoFactorAuthBtn.addEventListener('click', () => {
-				userState.twoFactor.toggle2fa(false);
-			});
-		}
-		else
-		{
-			twoFactorAuthBtn.textContent = 'Enable Two Factor Authentication';
-			twoFactorAuthBtn.addEventListener('click', () => {
-				userState.twoFactor.toggle2fa(true);
-			});
-		}
+		twoFactorAuthBtn.textContent = 'Disable Two Factor Authentication';
+		twoFactorAuthBtn.addEventListener('click', () => {
+			userState.twoFactor.toggle2fa(false);
+		});
+	}
+	else
+	{
+		twoFactorAuthBtn.textContent = 'Enable Two Factor Authentication';
+		twoFactorAuthBtn.addEventListener('click', () => {
+			userState.twoFactor.toggle2fa(true);
+		});
 	}
 }
 
