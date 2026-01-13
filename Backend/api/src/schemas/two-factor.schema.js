@@ -1,4 +1,4 @@
-import { Security } from "../../utils/openApiSecurity.js";
+import { Security } from "../utils/openApiSecurity.js";
 
 export const getTwoFactorStatusSchema = {
 	schema: {
