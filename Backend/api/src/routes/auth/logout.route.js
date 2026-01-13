@@ -1,4 +1,4 @@
-import { logoutSchema } from "../schemas/logout.schema.js";
+import { logoutSchema } from "../../schemas/logout.schema.js";
 
 export default function logout(server) {
 	const opts = {

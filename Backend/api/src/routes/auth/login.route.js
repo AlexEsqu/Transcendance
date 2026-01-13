@@ -1,6 +1,6 @@
 import { generateTokens, sendVerificationCodeEmail } from "../../services/authServices.js";
 import bcrypt from "bcrypt";
-import { loginSchema } from "../schemas/login.schema.js";
+import { loginSchema } from "../../schemas/login.schema.js";
 
 export default function login(server) {
 	const opts = {

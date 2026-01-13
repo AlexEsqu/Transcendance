@@ -1,5 +1,5 @@
 import { getUserbyId, formatUserObject } from "../../../utils/utils.js";
-import { addFriendSchema, deleteFriendSchema, getFriendsSchema } from "../../schemas/friends.schema.js";
+import { addFriendSchema, deleteFriendSchema, getFriendsSchema } from "../../../schemas/friends.schema.js";
 export function getFriends(server) {
 	const opts = {
 		$ref: getFriendsSchema,

@@ -1,5 +1,5 @@
 import { formatUserObject, getUserbyId } from "../../utils/utils.js";
-import { getUserSchema , getUsersSchema} from "../schemas/list.schema.js";
+import { getUserSchema , getUsersSchema} from "../../schemas/list.schema.js";
 
 export function getUser(server) {
 	const singleUserSchema = {

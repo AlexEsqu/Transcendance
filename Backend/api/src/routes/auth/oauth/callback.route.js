@@ -1,5 +1,5 @@
 import { generateTokens, sendVerificationCodeEmail } from "../../../services/authServices.js";
-import { oauthCallbackRouteSchema } from "../../schemas/callback.schema.js";
+import { oauthCallbackRouteSchema } from "../../../schemas/callback.schema.js";
 import fs from "fs"
 
 const redirectUrl = encodeURI(`${process.env.FRONTEND_DOMAIN_NAME}/oauth/callback`);

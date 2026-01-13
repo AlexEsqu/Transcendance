@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { sendEmailVerificationSchema } from "../schemas/email-verification.schema.js";
+import { sendEmailVerificationSchema } from "../../schemas/email-verification.schema.js";
 
 export default function sendEmailVerificationRoute(server) {
 	const opts = {

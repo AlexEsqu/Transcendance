@@ -1,4 +1,4 @@
-import { oauthSchema } from "../../schemas/redirect.schema.js";
+import { oauthSchema } from "../../../schemas/redirect.schema.js";
 
 export default function oauthRoute(server) {
 	const opts = {

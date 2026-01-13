@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import { handleSQLiteError } from "../../errors/sqliteErrors.js";
 import crypto from "crypto";
-import { signupSchema } from "../schemas/signup.schema.js";
+import { signupSchema } from "../../schemas/signup.schema.js";
 export default function signup(server) {
 	const opts = {
 		$ref: signupSchema,

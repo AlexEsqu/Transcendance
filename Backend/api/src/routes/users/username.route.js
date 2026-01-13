@@ -1,4 +1,4 @@
-import { updateUsernameSchema } from "../schemas/username.schema.js";
+import { updateUsernameSchema } from "../../schemas/username.schema.js";
 
 export default function updateUsername(server) {
 	const opts = {

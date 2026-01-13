@@ -1,4 +1,4 @@
-import { getTwoFactorStatusSchema, updateTwoFactorStatusSchema } from "../schemas/two-factor.schema.js";
+import { getTwoFactorStatusSchema, updateTwoFactorStatusSchema } from "../../schemas/two-factor.schema.js";
 
 export function getTwoFactorStatusRoute(server) {
 	const opts = {

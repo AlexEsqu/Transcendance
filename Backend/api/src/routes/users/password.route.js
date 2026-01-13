@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import { getUserbyId } from "../../utils/utils.js";
-import {putUserPasswordSchema, postUserPasswordSchema} from "../schemas/password.schema.js";
+import {putUserPasswordSchema, postUserPasswordSchema} from "../../schemas/password.schema.js";
 
 // TODO: https://stackoverflow.com/questions/21978658/invalidating-json-web-tokens
 //DELOG USER

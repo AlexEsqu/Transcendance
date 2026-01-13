@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { generateTokens } from "../../services/authServices.js";
-import { twoFactorLoginSchema } from "../schemas/two-factor.schema.js";
+import { twoFactorLoginSchema } from "../../schemas/two-factor.schema.js";
 
 export default function twoFactorLoginRoute(server) {
 	const opts = {

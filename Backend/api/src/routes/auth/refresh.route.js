@@ -1,5 +1,5 @@
 import { createRefreshToken, createAccessToken, hashRefreshToken } from "../../services/authServices.js";
-import { refreshSchema } from "../schemas/refresh.schema.js";
+import { refreshSchema } from "../../schemas/refresh.schema.js";
 
 function refresh(server) {
 	const opts = {

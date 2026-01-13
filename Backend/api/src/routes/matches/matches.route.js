@@ -1,4 +1,4 @@
-import { postMatchSchema, getUserMatchesSchema, getMatchesSchema } from "../schemas/matches.schema.js";
+import { postMatchSchema, getUserMatchesSchema, getMatchesSchema } from "../../schemas/matches.schema.js";
 export function getUserMatches(server) {
 	const opts = {
 		$ref: getUserMatchesSchema,

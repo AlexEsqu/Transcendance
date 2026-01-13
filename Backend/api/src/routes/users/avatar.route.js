@@ -1,5 +1,5 @@
 import fs from "fs";
-import { putUserAvatarSchema, deleteUserAvatarSchema } from "../schemas/avatar.schema.js";
+import { putUserAvatarSchema, deleteUserAvatarSchema } from "../../schemas/avatar.schema.js";
 export function putUserAvatar(server) {
 	const opts = {
 		$ref: putUserAvatarSchema,
