@@ -1,4 +1,4 @@
-import { GameLocation, MatchType, IPlayer } from '../config/pongData';
+import { GameLocation, MatchType, IPlayer, State } from '../config/pongData';
 import { WebSocket as WSWebSocket } from 'ws';
 import { notifyPlayersInRoom } from '../utils/broadcast'
 import { Room } from './Room';
@@ -139,20 +139,32 @@ export class GameControl
 		return true;
 	}
 
-	deletePlayerFromRoom(player: string, roomId: number): void
+	deletePlayerFromRoom(player: string, roomId: number, roomType: string): void
 	{
-		let room: Room | undefined;
-		if (this.waitingRoom.has(roomId)) {
-			room = this.waitingRoom.get(roomId);
-			console.log("GAME-SERVER: a player has left the waiting room");
-			notifyPlayersInRoom(room, "A player has left the waiting room");
+		let room: Room | undefined = undefined;
+
+		switch (roomType)
+		{
+			case 'waiting':
+				if (this.waitingRoom.has(roomId)) {
+					room = this.waitingRoom.get(roomId);
+					console.log("GAME-SERVER: a player has left the waiting room");
+					notifyPlayersInRoom(room, "A player has left the waiting room");
+				}
+				break ;
+			
+			case 'game':
+				if (this.gamingRooms.has(roomId)) {
+					room = this.gamingRooms.get(roomId);
+					console.log("GAME-SERVER: a player has left the gaming room");
+					notifyPlayersInRoom(room, "A player has left the gaming room");
+				}
+				break ;
 		}
-		else if (this.gamingRooms.has(roomId)) {
-			room = this.gamingRooms.get(roomId);
-			console.log("GAME-SERVER: a player has left the gaming room");
-			notifyPlayersInRoom(room, "A player has left the gaming room");
-		}
-		if (room && room.players.has(player))
+		if (room !== undefined && room.players.has(player)) {
 			room.players.delete(player);
+			if (room.gameLoop)
+				room.gameLoop.state = State.end;
+		}
 	}
 }

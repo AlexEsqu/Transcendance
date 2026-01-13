@@ -4,7 +4,7 @@ import { WebSocket as WSWebSocket } from 'ws';
 import { GameControl } from '../services/GameControl';
 import { getJSONError } from '../errors/input.error';
 import { JSONRoomDemand } from '../config/schemas';
-import { IPlayer } from '../config/pongData';
+import { IPlayer, State } from '../config/pongData';
 
 /***********************************************************************************************************/
 
@@ -40,6 +40,6 @@ function handleMessage(socket: WSWebSocket, message: Buffer,
 
 function handleDisconnection(player: { playerId: string, roomId: number }, gameControl: GameControl)
 {
-	console.log("GAME-HANDLER: disconnection of client ", player.playerId);
-	gameControl.deletePlayerFromRoom(player.playerId, player.roomId);
+	console.log("GAME-HANDLER: on route '/room/waiting' disconnection of client ", player.playerId);
+	gameControl.deletePlayerFromRoom(player.playerId, player.roomId, 'waiting');
 }

@@ -2,7 +2,7 @@ import { isBallHittingWall, isBallHittingPaddle, isBallOutOfBounds, isNewPaddPos
 	adjustBallHorizontalPos, adjustBallVerticalPos, scaleVelocity, normalizeVector, processRobotOpponent 
 } from './physics';
 
-import { GAME, IBall, IPaddle, IPlayer, State, Level, MatchType, IRound, IResult } from '../config/pongData'
+import { GAME, IBall, IPaddle, IPlayer, State, Level, MatchType, IRound, IResult, PlayerState } from '../config/pongData'
 import { initBall, initPadd, initPlayers } from '../utils/init'
 import { notifyPlayersInRoom } from '../utils/broadcast';
 import { JSONGameState } from '../config/schemas';
@@ -37,9 +37,9 @@ export class GameLoop
 		this.players = initPlayers(players);
 		this.rounds = { results: null, waitingPlayers: this.players, nbOfRounds: 0 };
 		this.requestNewRound();
-		this.state = State.opening;
+		this.state = State.launch;
 		this.isGameRunning = false;
-		this.timestamp = -1;
+		this.timestamp = Date.now();
 	}
 
 	runGameLoop(gameControl: GameControl): void
@@ -50,10 +50,14 @@ export class GameLoop
 		let isNewRound: boolean = false;
 		let gameStateInfo: JSONGameState;
 
+		this.state = State.play;
+
 		console.log("GAME-LOOP: game loop started");
 		const interval = setInterval(() => {
-			//	update data & check collisions
-			if (this.state === State.play && this.isGameRunning) {
+			// console.log(this.state);
+			
+			if (this.state === State.play) {
+				//	update data & check collisions
 				this.updateGameData();
 				//	monitor score/rounds
 				isNewRound = this.isPlayerHittingMaxScore();
@@ -61,16 +65,20 @@ export class GameLoop
 			if (isNewRound)
 				this.requestNewRound();
 			isNewRound = false;
+			
 			this.timestamp = Date.now();
 			//	broadcast to players = send game state/data to all players
 			gameStateInfo = this.composeGameState();
-			notifyPlayersInRoom(room, JSON.stringify(gameStateInfo));
-			if (this.state === State.end)
+			notifyPlayersInRoom(room, gameStateInfo);
+
+			if (this.state === State.end) {
+				clearInterval(interval);
+				if (this.rounds.results)
+					sendMatchesToDataBase(this.rounds.results[this.rounds.results.length - 1], Date.now());
 				return ;
+			}
 		}, 1000 / 60); // 60fps
 
-		if (this.state === State.end && this.rounds.results)
-			sendMatchesToDataBase(this.rounds.results[this.rounds.results.length - 1], Date.now());
 	}
 
 	updateGameData(): void
@@ -142,7 +150,8 @@ export class GameLoop
 	{
 		let paddle: IPaddle;
 
-		this.state = state as State;
+		// this.state = state as State;
+		// if (state !== PlayerState.opening && state !==)
 	
 		if (this.leftPadd.player?.username === player)
 			paddle = this.leftPadd;
@@ -183,7 +192,7 @@ export class GameLoop
 	 */
 	requestNewRound(): void
 	{
-		this.state = State.pause;
+		this.state = State.launch;
 		this.isGameRunning = false;
 
 		//	Save the results of the previous match, if there was one
@@ -266,7 +275,10 @@ export class GameLoop
 			rightPaddPos: this.rightPadd.pos.z,
 			leftPaddScore: this.leftPadd.score,
 			rightPaddScore: this.rightPadd.score,
-			ball: { x: this.ball.posistion.x, z: this.ball.posistion.z }
+			leftPaddUsername: this.leftPadd.player?.username ?? 'NaN',
+			rightPaddUsername: this.rightPadd.player?.username ?? 'NaN',
+			ball: { x: this.ball.posistion.x, z: this.ball.posistion.z },
+			isBallOutOfBounds: this.state === State.launch ? true : false 
 		};
 		return gameStateInfo;
 	}

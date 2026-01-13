@@ -25,8 +25,14 @@ class GameApp
 	play(): void
 	{
 		requestAnimationFrame(() => {
-			if (!this.pong) return ;
-			this.pong.launch(3);
+			if (!this.pong) return;
+			this.pong.ready = true;
+			const players = this.pong.scene.players;
+			for (const player of players)
+			{
+				this.pong.sendUpdateToGameServer(player.username, 'none', true);
+			}
+			// this.pong.launch(3);
 		});
 	}
 

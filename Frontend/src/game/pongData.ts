@@ -2,7 +2,7 @@ import { Scene, ArcRotateCamera, Mesh } from '@babylonjs/core';
 
 /************************************************************************************************************/
 
-export { GAME_SIZE, State }
+export { GAME_SIZE, PlayerState, ServerState }
 export type { IPlayer, IPaddle, IOptions, IScene, IResult }
 
 /************************************************************************************************************
@@ -25,9 +25,14 @@ const GAME_SIZE = {
  * 		Declare enums																						*
  ***********************************************************************************************************/
 
-enum State {
-	waiting, opening, launch, play, pause, end, stop
+enum PlayerState {
+	waiting, play, launch, end, opening, stop
 };
+
+enum ServerState {
+	waiting, play, launch, end
+};
+
 
 /************************************************************************************************************
  * 		Declare interfaces																					*
@@ -50,11 +55,11 @@ interface IPaddle {
 
 interface IScene {
 	id: Scene | null;
-	state: State;
+	state: PlayerState;
 	camera: ArcRotateCamera | null;
 	ball: Mesh | null;
-	leftPadd: IPaddle | null;
-	rightPadd: IPaddle | null;
+	leftPadd: IPaddle;
+	rightPadd: IPaddle;
 	options: IOptions;
 	players: Array<IPlayer>;
 };

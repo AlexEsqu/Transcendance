@@ -9,6 +9,7 @@ export class Room
 	id: number;
 	type: MatchType;
 	gameLoop: GameLoop | null;
+	gameLoopStarted: boolean = false;
 	players: Map<string, IPlayer> = new Map<string, IPlayer>();
 
 	constructor(roomId: number, players: Map<string, IPlayer> | IPlayer, matchType: MatchType)
@@ -54,8 +55,11 @@ export class Room
 
 	startGame(gameControl: GameControl): void
 	{
-		this.gameLoop = new GameLoop(this.id, this.type, this.players);
-		this.gameLoop.runGameLoop(gameControl);
+		if (!this.gameLoopStarted) {
+			this.gameLoop = new GameLoop(this.id, this.type, this.players);
+			this.gameLoopStarted = true;
+			this.gameLoop.runGameLoop(gameControl);
+		}
 	}
 
 	handlePlayerInput(player: string, state: number, input: string): void

@@ -44,7 +44,10 @@ interface JSONGameState {
 	rightPaddPos: number;
 	leftPaddScore: number;
 	rightPaddScore: number;
+	leftPaddUsername: string;
+	rightPaddUsername: string;
 	ball: { x: number, z: number };
+	isBallOutOfBounds: boolean;
 };
 
 interface JSONInputsUpdate {

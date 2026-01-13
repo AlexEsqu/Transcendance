@@ -27,7 +27,7 @@ export async function registerGameRoutes(gameServer: FastifyInstance, gameContro
 
 			//	Handler: receiving message from a client
 			socket.on('message', (message: Buffer) => {
-				console.log("GAME-SERVER: received a message from the client on route '/room/game'");
+				// console.log("GAME-SERVER: received a message from the client on route '/room/game'");
 				player = handleMessage(socket, message, validateGameMessage, gameControl);
 			});
 	

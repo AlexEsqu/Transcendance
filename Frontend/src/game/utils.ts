@@ -1,10 +1,10 @@
-import { IPlayer } from './pongData';
-import { JSONRoomDemand } from './submit.json';
+import { IPlayer, PlayerState, ServerState } from './pongData';
+import { JSONRoomDemand, JSONGameState } from './submit.json';
 import { userState, } from "../app";
 
 /************************************************************************************************************/
 
-export { getCanvasConfig, getPlayers, fillRoomDemand }
+export { getCanvasConfig, getPlayers, fillRoomDemand, processNewPlayerState, assignPlayers }
 
 /************************************************************************************************************/
 
@@ -73,4 +73,45 @@ function fillRoomDemand(
 		location: location
 	}
 	return request;
+}
+
+function processNewPlayerState(serverInput: number): PlayerState
+{
+	const serverState  = serverInput as ServerState;
+
+	switch (serverState)
+	{
+		case ServerState.play:
+			return PlayerState.play;
+
+		case ServerState.waiting:
+			return PlayerState.waiting;
+
+		case ServerState.end:
+			return PlayerState.end;
+
+		case ServerState.launch:
+			return PlayerState.launch;
+
+		default:
+			return PlayerState.play;
+	}
+}
+
+function findPlayer(players: IPlayer[], username: string): IPlayer | null
+{
+	for (const player of players)
+	{
+		if (player.username === username)
+			return player;
+	}
+	return null;
+}
+
+function assignPlayers(gameState: JSONGameState, players: IPlayer[], side: string): IPlayer | null
+{
+	if (side === 'left')
+		return findPlayer(players, gameState.leftPaddUsername);
+	else
+		return findPlayer(players, gameState.rightPaddUsername);
 }

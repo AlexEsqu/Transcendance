@@ -2,7 +2,7 @@ import { WebSocket as WSWebSocket } from 'ws';
 
 /************************************************************************************************************/
 
-export { GAME, MatchType, GameLocation, State, Level, GAMING_ROOM_URL, WAITING_ROOM_URL }
+export { GAME, MatchType, GameLocation, State, Level, GAMING_ROOM_URL, WAITING_ROOM_URL, PlayerState }
 export type { IBall, IPaddle, IPlayer, IRound, IResult }
 
 /************************************************************************************************************
@@ -43,8 +43,12 @@ enum GameLocation {
 	local, remote
 };
 
+enum PlayerState {
+	waiting, play, launch, end, pause, opening, stop
+};
+
 enum State {
-	waiting, opening, launch, play, pause, end, stop
+	waiting, play, launch, end
 };
 
 enum Level {

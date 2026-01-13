@@ -130,9 +130,12 @@ function setupPaddle(scene: Scene, color: string, side: string): Mesh | null
 
 	const paddle: Mesh = creatPaddleMesh(scene, color);
 	paddle.rotation.y = Math.PI / 2;
-	paddle.position = new Vector3((GAME_SIZE.MAP_WIDTH / 2), GAME_SIZE.MAP_Y, 0.0);
+	// paddle.position = new Vector3((GAME_SIZE.MAP_WIDTH / 2), GAME_SIZE.MAP_Y, 0.0);
 	if (side === 'left')
-		paddle.position.z *= -1;
+		paddle.position = new Vector3(-(GAME_SIZE.MAP_WIDTH / 2), GAME_SIZE.MAP_Y, 0.0);
+	else
+		paddle.position = new Vector3((GAME_SIZE.MAP_WIDTH / 2), GAME_SIZE.MAP_Y, 0.0);
+
 
 	return paddle;
 }
@@ -188,7 +191,7 @@ function loadGame(engine: Engine, canvas: HTMLCanvasElement, options: IOptions):
 		leftPadd: { mesh: leftPadd, player: null },
 		rightPadd: { mesh: rightPadd, player: null },
 		options: options,
-		players: null,
+		players: [],
 		state: 0
 	};
 

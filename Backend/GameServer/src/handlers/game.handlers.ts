@@ -3,7 +3,7 @@ import { WebSocket as WSWebSocket } from 'ws';
 import { getJSONError } from '../errors/input.error';
 import { GameControl } from '../services/GameControl';
 import { Room } from '../services/Room';
-import { IPlayer } from '../config/pongData';
+import { IPlayer, State } from '../config/pongData';
 import { JSONInputsUpdate } from '../config/schemas';
 
 /***********************************************************************************************************/
@@ -17,7 +17,6 @@ export { handleMessage, handleDisconnection}
 function handleMessage(socket: WSWebSocket, message: Buffer, 
 	validateSchema: ValidateFunction, gameControl: GameControl): IPlayer | undefined
 {
-	console.log("GAME-HANDLER: handle received message from '/room/game' route");
 	try {
 		//	Must parse and validate received message
 		const data: JSONInputsUpdate = JSON.parse(message.toString());
@@ -26,11 +25,15 @@ function handleMessage(socket: WSWebSocket, message: Buffer,
 			throw new Error("GAME-HANDLER: message received doesn't match with 'validateSchema' on '/room/game' route") ;
 		}
 
+		console.log("GAME-HANDLER: handle received message from '/room/game' route : ", data);
+
 		const player: IPlayer | undefined = gameControl.getPlayer(data.roomId, data.username);
 		const gamingRoom: Room | undefined = gameControl.getGamingRoom(data.roomId);
 
 		if (player === undefined || gamingRoom === undefined)
 			throw new Error("GAME-HANDLER: player or gaming room not found, can't handle user message on 'room/game' route");
+
+		player.socket = socket;
 
 		//	Check if player informs that its ready
 		if (data.ready === true)
@@ -56,7 +59,8 @@ function handleMessage(socket: WSWebSocket, message: Buffer,
 
 function handleDisconnection(player: IPlayer | undefined, gameControl: GameControl)
 {
-	console.log("GAME-HANDLER: disconnection of client ", player?.id);
-	if (player)
-		gameControl.deletePlayerFromRoom(player.username, player.roomId ?? -1);
+	console.log("GAME-HANDLER: on route '/room/game' disconnection of client ", player?.id);
+	if (player) {
+		gameControl.deletePlayerFromRoom(player.username, player.roomId ?? -1, 'game');
+	}
 }

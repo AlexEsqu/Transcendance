@@ -1,7 +1,7 @@
 import { JSONInputsUpdate, JSONGameState, JSONRoomAccess, JSONRoomDemand } from './submit.json';
-import { State, IPlayer, IOptions, IScene, IResult } from "./pongData";
+import { IOptions, IScene, IResult, PlayerState, ServerState } from "./pongData";
 import { createText, createAnimation, loadGame, drawScore, drawName } from './Graphics';
-import { getCanvasConfig, getPlayers, fillRoomDemand } from './utils';
+import { getCanvasConfig, getPlayers, fillRoomDemand, processNewPlayerState, assignPlayers } from './utils';
 import { AdvancedDynamicTexture } from "@babylonjs/gui";
 import { Engine } from '@babylonjs/core';
 
@@ -15,13 +15,15 @@ export class Pong
 
 	canvas: HTMLCanvasElement;
 	engine: Engine | null = null;
-	scene: IScene | null = null;
+	scene: IScene;
 	gui: AdvancedDynamicTexture | null = null;
-	isRunning: boolean;
 	waitingSocket: WebSocket | null = null;
 	gamingSocket: WebSocket | null = null;
+	// socket: WebSocket;
 	roomId: number | undefined = undefined;
 	mainPlayer: string;
+	round: number = 0;
+	ready: boolean = false;
 	timestamp: number = 0;
 	onNewRound?: () => void;
 
@@ -34,14 +36,14 @@ export class Pong
 		const players = getPlayers(options.players, options.paddColors, options.nbOfPlayers, options.matchLocation);
 		if (!players)
 			throw new Error("players are not found");
-		this.scene = loadGame(this.engine, this.canvas, options);
-		if (!this.scene)
+		const scene = loadGame(this.engine, this.canvas, options);
+		if (!scene)
 			throw new Error("'scene' creation failed");
+		this.scene = scene;
 		this.scene.players = players;
 		this.mainPlayer = players[0].username;
-		this.scene.state = State.waiting;
+		this.scene.state = PlayerState.opening;
 		this.onNewRound = onNewRound;
-		this.isRunning = false;
 		this.waitingSocket = new WebSocket(Pong.WAITING_ROOM_URL);
 		if (!this.waitingSocket)
 			throw new Error("'waitingSocket' creation failed");
@@ -68,83 +70,119 @@ export class Pong
 					this.waitingSocket.send(JSON.stringify(demand));
 				}
 			}
-		}
+		};
 
 		//	Wait for the server to manage waiting rooms and assign current user to a gaming room
-		this.waitingSocket.onmessage = (e) => {
-			const serverMsg: JSONRoomAccess = JSON.parse(e.data);
+		this.waitingSocket.onmessage = (event) => {
+			const serverMsg: JSONRoomAccess = JSON.parse(event.data);
 			// console.log(`GAME-FRONT: received message from server =`, serverMsg);
-			
 			// console.log(`roomID ${this.roomId}`);
 			// console.log(`state.roomID ${serverMsg.roomId}`);
 			if (this.roomId === undefined && serverMsg.roomId !== undefined) {
 				this.roomId = serverMsg.roomId;
-				this.gamingSocket = new WebSocket(Pong.GAMING_ROOM_URL);
+				this.waitingSocket?.close();
+				this.waitingSocket = null;
+				// this.gamingSocket = new WebSocket(Pong.GAMING_ROOM_URL);
 				this.goToGamingRoom();
 			}
-		}
+		};
 
 		this.waitingSocket.onerror = (error) => {
 			// console.error(error);
+			this.waitingSocket?.close();
+			this.waitingSocket = null;
 			throw new Error(error.toString());
-		}
+		};
+
+		this.waitingSocket.onclose = () => {
+			console.log("GAME-FRONT: websocket (for route 'waiting') is closed");
+		};
 	}
 
 	goToGamingRoom(): void
 	{
-		if (!this.gamingSocket)
-			throw new Error("'gamingSocket' not found");
-
-		this.gamingSocket.onopen = (e) => {
-			if (this.roomId === undefined)
-				throw new Error("'roomId' is undefined, can't enter to gaming room");
+		setTimeout(() => {
+			this.gamingSocket = new WebSocket(Pong.GAMING_ROOM_URL);
 			if (!this.gamingSocket)
 				throw new Error("'gamingSocket' not found");
-			if (!this.scene)
-				throw new Error("'scene' not found");
+	
+			this.gamingSocket.onopen = (event) => {
+				if (this.roomId === undefined || !this.gamingSocket) {
+					console.error("GAME-FRONT: can't identify client, impossible to enter the gaming room");
+					throw new Error("GAME-FRONT: can't identify client, impossible to enter the gaming room");
+				}
+	
+				console.log(`GAME-FRONT: joining the gaming room(${this.roomId})`);
+				this.scene.state = PlayerState.opening;
+				this.runGame();
+			};
+	
+			this.gamingSocket.onmessage = (event) => {
+				try {
+					if (this.roomId === undefined || !this.gamingSocket)
+						throw new Error("GAME-FRONT: can't identify client, impossible to enter the gaming room");
+		
+					const gameState: JSONGameState = JSON.parse(event.data);
+					this.processNewGameState(gameState);	
+					// console.log(`GAME-FRONT: game state from room(${this.roomId}) =`, gameState);
+	
+				} catch (error) {
+					console.error(error);
+					return ;
+				}
+			};
+	
+			this.gamingSocket.onerror = (error) => {
+				// console.error(error);
+				this.gamingSocket?.close();
+				this.gamingSocket = null;
+				throw new Error(error.toString());
+			};
 
-			console.log(`GAME-FRONT: joining the gaming room(${this.roomId})`);
-			this.scene.state = State.opening;
-			const players = this.scene.players;
-			for (const player of players)
-			{
-				this.sendUpdateToGameServer(player.username, 'none', true);
-			}
-			this.runGame();
-		}
+			this.gamingSocket.onclose = () => {
+				console.log("GAME-FRONT: websocket (for route 'game') is closed");
+			};
+		}, 100);
+	}
 
-		this.gamingSocket.onerror = (error) => {
-			// console.error(error);
-			throw new Error(error.toString());
+	stateBasedScene(state: PlayerState, results: IResult | undefined): void
+	{
+		switch (state)
+		{
+			case PlayerState.opening:
+				this.opening();
+				break ;
+
+			case PlayerState.launch:
+					this.launch(3);
+				break ;
+
+			case PlayerState.end:
+				this.endGame(results);
+				break ;
+
+			default:
+				break ;
 		}
 	}
 
 	runGame(): void
 	{
-		if (!this.engine || !this.scene || !this.scene.id) {
+		if (!this.engine || !this.scene.id) {
 			console.error("error occured while loading 'Pong' game");
 			return ;
 		}
 
 		const keys: Record<string, boolean> = {};
 		let result: IResult = { winner: null, maxScore: 0, loser: null, minScore: 0};
-		let isNewRound: boolean = true;
 
 		//	Manage user input and update data before render
 		this.handleInput(keys);
 		this.scene.id.registerBeforeRender(() => {
-			if (!this.scene)
-				return ;
-			console.log(`GAME-FRONT-STATE: ${this.scene.state}`);
-			if (this.scene.state === State.opening)
-				this.opening();
-			if (isNewRound && this.scene.state === State.launch)
-				this.launch(3);
-			if (this.scene.state === State.end)
-				this.endGame(result);
-			if (this.scene.state === State.play)
-				isNewRound = this.updateGame(keys);
-			isNewRound = false;
+			// console.log(`GAME-FRONT-STATE: ${this.scene.state}`);
+			this.stateBasedScene(this.scene.state, result);
+			if (this.scene.state === PlayerState.play)
+				this.updateGame(keys);
 			this.timestamp = Date.now();
 		});
 
@@ -152,20 +190,19 @@ export class Pong
 		this.engine.runRenderLoop(() => {
 			if (!this.engine)
 				return ;
-			if (!this.scene || !this.scene.id || this.scene.state === State.stop) {
+			if (!this.scene || !this.scene.id || this.scene.state === PlayerState.stop) {
 				this.engine.stopRenderLoop();
 				return ;
 			}
-
 			this.scene.id.render();
 		});
 	}
 
-	updateGame(keys: Record<string, boolean>): boolean
+	updateGame(keys: Record<string, boolean>): void
 	{
-		if (!this.scene) return false;
+		// if (!this.scene) return false;
 
-		let isBallOutOfBounds: boolean = false;
+		// let isBallOutOfBounds: boolean = false;
 		let player: string | undefined;
 		let action: string = 'none';
 
@@ -193,33 +230,39 @@ export class Pong
 				this.sendUpdateToGameServer(player ?? 'NaN', action, true);
 		}
 
-		const newGameState: JSONGameState | null = this.getGameStateUpdated();
-		if (!newGameState)
-			return isBallOutOfBounds;
-
-		this.processNewGameState(newGameState);
-
-		return isBallOutOfBounds;
+		if (this.scene.leftPadd.player && this.scene.rightPadd.player) {
+			drawName(this.scene.leftPadd.player.username, this.scene.rightPadd.player.username, this.round);
+			drawScore(this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
+		}
+		else
+			console.log("GAME-FRONT: NO PLAYERS WARNING");
 	}
 
 	processNewGameState(gameState: JSONGameState): void
 	{
-		if (!this.scene)
-			return ;
-
-		this.scene.state = gameState.state as State;
 		this.timestamp = gameState.timestamp;
-		if (this.scene.leftPadd && this.scene.leftPadd.mesh && this.scene.leftPadd.player) {
-			this.scene.leftPadd.mesh.position.z = gameState.leftPaddPos;
-			this.scene.leftPadd.player.score = gameState.leftPaddScore;
-		}
-		if (this.scene.rightPadd && this.scene.rightPadd.mesh && this.scene.rightPadd.player) {
-			this.scene.rightPadd.mesh.position.z = gameState.rightPaddPos;
-			this.scene.rightPadd.player.score = gameState.rightPaddScore;
-		}
+		this.scene.state = processNewPlayerState(gameState.state);
+
 		if (this.scene.ball) {
 			this.scene.ball.position.x = gameState.ball.x;
 			this.scene.ball.position.z = gameState.ball.z;
+		}
+
+		if (this.round !== gameState.round || !this.scene.leftPadd.player || !this.scene.rightPadd.player) {
+			this.round = gameState.round;
+			this.scene.leftPadd.player = assignPlayers(gameState, this.scene.players, 'left');
+			this.scene.rightPadd.player = assignPlayers(gameState, this.scene.players, 'right');
+			this.ready = false;
+		}
+
+		if (this.scene.leftPadd.mesh && this.scene.leftPadd.player) {
+			this.scene.leftPadd.mesh.position.z = gameState.leftPaddPos;
+			this.scene.leftPadd.player.score = gameState.leftPaddScore;
+		}
+
+		if (this.scene.rightPadd.mesh && this.scene.rightPadd.player) {
+			this.scene.rightPadd.mesh.position.z = gameState.rightPaddPos;
+			this.scene.rightPadd.player.score = gameState.rightPaddScore;
 		}
 	}
 
@@ -241,37 +284,19 @@ export class Pong
 		this.gamingSocket.send(JSON.stringify(gameUpdateMsg));
 	}
 
-	getGameStateUpdated(): JSONGameState | null
-	{
-		if (!this.gamingSocket)
-			throw new Error("'gamingSocket' not found");
-
-		this.gamingSocket.onmessage = (e) => {
-			if (this.roomId === undefined)
-				throw new Error("'roomId' is undefined, can't enter to gaming room");
-			if (!this.gamingSocket)
-				throw new Error("'gamingSocket' not found");
-
-			const gameState: JSONGameState = JSON.parse(e.data);
-			// console.log(`GAME-FRONT: game state from room(${this.roomId}) =`, gameState);
-			return gameState;
-		}
-		return null;
-	}
-
 	/**
 	 * 	- Start the ball motion after the animation-countdown
 	 */
 	launch(countdown: number): void
 	{
-		if (!this.scene || !this.scene.leftPadd?.player || !this.scene.rightPadd?.player) return ;
+		// if (!this.scene || !this.scene.leftPadd?.player || !this.scene.rightPadd?.player) return ;
 
-		if (countdown <= 0 && this.scene && this.scene.ball) {
-			this.scene.state = State.play;
-			this.isRunning = true;
+		if (countdown <= 0 && this.scene.ball) {
+			this.scene.state = PlayerState.play;
 			return ;
 		}
-		if (this.scene) this.scene.state = State.launch;
+		if (this.scene)
+			this.scene.state = PlayerState.launch;
 
 		const keys = [
 			{ frame: 0, value: 60 },
@@ -279,7 +304,7 @@ export class Pong
 		];
 		this.gui = AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
-		if (this.scene && this.scene.options && this.scene.id) {
+		if (this.scene.options && this.scene.id) {
 			const timer = createText(countdown.toString(), this.scene.options.ballColor, 60, "200px", "0px", this.gui);
 			const animation = createAnimation("timer", "fontSize", keys);
 
@@ -303,21 +328,23 @@ export class Pong
 		];
 		const animation = createAnimation("cameraBetaAnim", "beta", keys);
 
-		if (this.scene && this.scene.camera && this.scene.id) {
+		if (this.scene.camera && this.scene.id) {
 			this.scene.camera.animations = [];
 			this.scene.camera.animations.push(animation);
 			this.scene.id.beginAnimation(this.scene.camera, 0, 60, false);
-			this.scene.state = State.pause;
+			this.scene.state = PlayerState.waiting;
 		}
 	}
 
-	endGame(result: IResult): void
+	endGame(result: IResult | undefined): void
 	{
-		if (!result) {
+		if (!result || result === undefined) {
 			console.error("results of matches are lost");
 			return ;
 		}
 		console.log("GAME-FRONT: end");
+		this.gamingSocket?.close();
+		this.gamingSocket = null;
 
 		const winnerSpot = document.getElementById('match-results');
 		if (winnerSpot && result.winner?.username)
@@ -335,20 +362,21 @@ export class Pong
 	{
 		//	Resize the game with the window
 		window.addEventListener('resize', () => {
-		if (this.engine)
-			this.engine.resize();
-		if (this.scene && this.scene.leftPadd && this.scene.leftPadd.player && this.scene.rightPadd && this.scene.rightPadd.player)
-		{
-			drawName(this.scene.leftPadd.player.username, this.scene.rightPadd.player.username, this.scene.options.nbOfPlayers);
-			drawScore(this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
-		}
+			if (this.engine)
+				this.engine.resize();
+			if (this.scene.leftPadd && this.scene.leftPadd.player && this.scene.rightPadd && this.scene.rightPadd.player)
+			{
+				drawName(this.scene.leftPadd.player.username, this.scene.rightPadd.player.username, this.scene.options.nbOfPlayers);
+				drawScore(this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
+			}
+		});
 
 		//	Shift+Ctrl+Alt+I == Hide/show the Inspector
 		window.addEventListener("keydown", (ev) => {
             if (ev.shiftKey && ev.ctrlKey && ev.altKey && (ev.key === "I" || ev.key === "i")) {
-                if (this.scene && this.scene.id && this.scene.id.debugLayer.isVisible()) {
+                if (this.scene.id && this.scene.id.debugLayer.isVisible()) {
                     this.scene.id.debugLayer.hide();
-                } else if (this.scene && this.scene.id) {
+                } else if (this.scene.id) {
                     this.scene.id.debugLayer.show();
                 }
             }
@@ -362,7 +390,6 @@ export class Pong
 		});
 		window.addEventListener("keyup", (evt) => {
 			keys[evt.key] = false;
-		});
 		});
 	}
 }
