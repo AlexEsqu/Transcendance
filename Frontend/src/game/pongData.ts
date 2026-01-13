@@ -26,7 +26,7 @@ const GAME_SIZE = {
  ***********************************************************************************************************/
 
 enum PlayerState {
-	waiting, play, launch, end, opening, stop
+	waiting, play, launch, end, pause, opening, stop
 };
 
 enum ServerState {

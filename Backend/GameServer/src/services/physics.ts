@@ -47,9 +47,11 @@ function isBallOutOfBounds(ball: IBall): boolean
 {
 	const ballLeftEdge: number = ball.posistion.x - GAME.BALL_RADIUS;
 	const ballRightEdge: number = ball.posistion.x + GAME.BALL_RADIUS;
-	const mapLimit: number = GAME.MAP_WIDTH / 2;
+	const mapLimit: number = (GAME.MAP_WIDTH / 2) - 0.5;
 
-	if (ballLeftEdge < -(mapLimit) || ballRightEdge > mapLimit)
+	if (mapLimit - ballRightEdge < 0.50)
+		console.log(`left edge : ${ballLeftEdge} // right edge : ${ballRightEdge} // map limit : ${mapLimit}`);
+	if (ballLeftEdge <= -(mapLimit) || ballRightEdge >= mapLimit)
 		return true;
 	return false;
 }
@@ -112,9 +114,10 @@ function normalizeVector(v: { x: number, z: number }): { x: number, z: number }
 
 function scaleVelocity(ball: IBall, deltaTime: number): { x: number, z: number }
 {
+	const scalar = ball.speed * deltaTime;
 	const velocity = {
-		x: ball.direction.x * (ball.speed * deltaTime),
-		z: ball.direction.z * (ball.speed * deltaTime)
+		x: ball.direction.x * scalar,
+		z: ball.direction.z * scalar
 	}
 	return velocity;
 }

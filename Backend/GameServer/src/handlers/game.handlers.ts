@@ -25,7 +25,7 @@ function handleMessage(socket: WSWebSocket, message: Buffer,
 			throw new Error("GAME-HANDLER: message received doesn't match with 'validateSchema' on '/room/game' route") ;
 		}
 
-		console.log("GAME-HANDLER: handle received message from '/room/game' route : ", data);
+		// console.log("GAME-HANDLER: handle received message from '/room/game' route : ", data);
 
 		const player: IPlayer | undefined = gameControl.getPlayer(data.roomId, data.username);
 		const gamingRoom: Room | undefined = gameControl.getGamingRoom(data.roomId);

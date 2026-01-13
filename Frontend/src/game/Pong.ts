@@ -154,6 +154,7 @@ export class Pong
 				break ;
 
 			case PlayerState.launch:
+					this.scene.state = PlayerState.pause;
 					this.launch(3);
 				break ;
 
@@ -295,8 +296,6 @@ export class Pong
 			this.scene.state = PlayerState.play;
 			return ;
 		}
-		if (this.scene)
-			this.scene.state = PlayerState.launch;
 
 		const keys = [
 			{ frame: 0, value: 60 },
@@ -331,7 +330,7 @@ export class Pong
 		if (this.scene.camera && this.scene.id) {
 			this.scene.camera.animations = [];
 			this.scene.camera.animations.push(animation);
-			this.scene.id.beginAnimation(this.scene.camera, 0, 60, false);
+			// this.scene.id.beginAnimation(this.scene.camera, 0, 60, false);
 			this.scene.state = PlayerState.waiting;
 		}
 	}

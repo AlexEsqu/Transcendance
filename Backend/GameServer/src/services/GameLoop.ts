@@ -9,6 +9,7 @@ import { JSONGameState } from '../config/schemas';
 import { GameControl } from './GameControl';
 import { Room } from './Room';
 import { sendMatchesToDataBase } from '../utils/sendMatchResult';
+import { Serializer } from 'node:v8';
 
 /************************************************************************************************************/
 
@@ -103,6 +104,7 @@ export class GameLoop
 	{
 		if (isBallHittingPaddle(this.ball, this.leftPadd) || isBallHittingPaddle(this.ball, this.rightPadd))
 		{
+			// console.log("GAME-LOOP: ball hits a paddle");
 			//	Invert X direction
 			this.ball.posistion.x = adjustBallHorizontalPos(this.ball);
 			this.ball.direction.x = -(this.ball.direction.x);
@@ -130,12 +132,16 @@ export class GameLoop
 
 		if (isBallHittingWall(this.ball))
 		{
+			// console.log("GAME-LOOP: ball hits a wall");
 			this.ball.direction.z = -(this.ball.direction.z);
 			this.ball.posistion.z = adjustBallVerticalPos(this.ball);
+			
 		}
 
 		if (isBallOutOfBounds(this.ball))
 		{
+			console.log("GAME-LOOP: ball is out of bounds");
+
 			if (this.ball.posistion.x > 0)
 				this.leftPadd.score += 1;
 			else
@@ -150,8 +156,8 @@ export class GameLoop
 	{
 		let paddle: IPaddle;
 
-		// this.state = state as State;
-		// if (state !== PlayerState.opening && state !==)
+		if (state !== PlayerState.pause)
+			this.state = State.play;
 	
 		if (this.leftPadd.player?.username === player)
 			paddle = this.leftPadd;
