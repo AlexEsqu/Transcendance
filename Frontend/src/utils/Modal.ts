@@ -1,77 +1,118 @@
-export class Modal
+export abstract class Modal
 {
 	modalElem: HTMLElement;
-	inputElement: HTMLInputElement | null = null;
 	htmlContent: string;
-	onConfirm: (value: string) => void | Promise<void>;
-	onCancel: () => void;
 
-	constructor(htmlContent: string, onConfirm: (value: string) => void | Promise<void>, onCancel: () => void )
+	constructor(htmlContent: string)
 	{
 		this.htmlContent = htmlContent;
-		this.onConfirm = onConfirm;
-		this.onCancel = onCancel;
-		this.modalElem = this.createModal(this.htmlContent);
-		this.setupModal(onConfirm, onCancel);
+		this.modalElem = this.createModalElem(this.htmlContent);
 	}
 
-	createModal(htmlContent: string): HTMLElement
+	createModalElem(htmlContent: string): HTMLElement
 	{
 		const template = document.createElement('div');
 		template.innerHTML = htmlContent.trim();
-		return template.firstElementChild as HTMLElement;
+		return template.querySelector('.modal-overlay') as HTMLElement;
 	}
 
-	setupModal(onConfirm: (value: string) => void | Promise<void>, onCancel: () => void ): void
-	{
-		this.inputElement = this.modalElem.querySelector('input') as HTMLInputElement | null;
-		const cancelBtn = this.modalElem.querySelector('.modal-cancel') as HTMLButtonElement;
-		const confirmBtn = this.modalElem.querySelector('.modal-confirm') as HTMLButtonElement;
-
-		const form = this.modalElem.querySelector('form') as HTMLFormElement | null;
-		if (form) {
-			form.addEventListener('submit', (e) => {
-				e.preventDefault();
-			});
-		}
-
-		cancelBtn.addEventListener('click', () =>
-			{
-				onCancel();
-				this.close();
-			}
-		);
-
-		confirmBtn.addEventListener('click', async () =>
-			{
-				const value = this.inputElement?.value || '';
-				if (onConfirm)
-					await onConfirm(value);
-				this.close();
-			}
-		);
-
-		this.modalElem.addEventListener('click', (e) =>
-			{
-				if (e.target === this.modalElem)
-					this.close();
-			}
-		);
-	}
+	abstract setupModal(): void;
 
 	show(): void
 	{
 		document.body.appendChild(this.modalElem);
-		this.inputElement?.focus();
 	}
 
 	close(): void
 	{
 		this.modalElem.remove();
 	}
+}
 
-	getValue(): string
+export class FormModal extends Modal
+{
+	formElement: HTMLFormElement | null = null;
+	onConfirm: (formData: FormData) => void | Promise<void>;
+	onCancel: () => void;
+
+	/**
+     * Creates an input modal with text entry field.
+     * @param htmlContent - HTML template string with form, submit button with .modal-confirm class and cancel button .modal-cancel
+     * @param onConfirm - Callback when user confirms, using the form data
+     * @param onCancel - Callback when user cancels, by default a no-op (empty function doing nothing)
+     */
+	constructor(
+		htmlContent: string,
+		onConfirm: (formData: FormData) => void | Promise<void>,
+		onCancel: () => void = () => {}
+	)
 	{
-		return this.inputElement?.value || '';
+		super(htmlContent);
+		this.onConfirm = onConfirm;
+		this.onCancel = onCancel;
+		this.setupModal();
+	}
+
+	setupModal(): void
+	{
+		this.formElement = this.modalElem.querySelector('form') as HTMLFormElement;
+		if (this.formElement) {
+			this.formElement.addEventListener('submit', async (e) => {
+				e.preventDefault();
+				const formData = new FormData(this.formElement!);
+				await this.onConfirm(formData);
+				this.close();
+			});
+		}
+
+		const cancelBtn = this.modalElem.querySelector('.modal-cancel') as HTMLButtonElement;
+		if (cancelBtn) {
+			cancelBtn.addEventListener('click', () => {
+				this.onCancel();
+				this.close();
+			});
+		}
+
+		this.modalElem.addEventListener('click', (e) => {
+			if (e.target === this.modalElem)
+				this.close();
+		});
+	}
+
+	show(): void
+	{
+		super.show();
+		this.formElement?.focus();
+	}
+
+	getFormData(): FormData | null
+	{
+		return this.formElement ? new FormData(this.formElement) : null;
+	}
+}
+
+export class ErrorModal extends Modal
+{
+	/**
+	 * Creates an error/message modal.
+	 * @param htmlContent - HTML template string with message and confirm button with .modal-confirm class
+	 */
+	constructor(htmlContent: string)
+	{
+		super(htmlContent);
+		this.setupModal();
+	}
+
+	setupModal(): void
+	{
+		const confirmBtn = this.modalElem.querySelector('.modal-confirm') as HTMLButtonElement;
+		confirmBtn.addEventListener('click', () => {
+			this.close();
+		});
+
+		this.modalElem.addEventListener('click', (e) => {
+			if (e.target === this.modalElem)
+				this.close();
+		});
 	}
 }

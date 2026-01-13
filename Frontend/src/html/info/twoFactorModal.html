@@ -1,11 +1,11 @@
 <div class="modal-overlay">
 	<form
-		id="info-container"
+		id="form-container"
 		class="modal glow-anim glow-form">
 
-		<h1 class="text-3xl m-3" id="info-title">Two Factor Authentication</h1>
+		<h1 class="text-3xl m-3" id="form-title">Two Factor Authentication</h1>
 
-		<p class="m-2" id="info-text">
+		<p class="m-2" id="form-intro-text">
 			To log into your account, you need to verify your identity.
 			We sent an email to the account email address.
 		</p>
@@ -19,7 +19,7 @@
 			<input
 				id="input-2fa"
 				name="input-2fa"
-				type="number"
+				type="text"
 				required
 				minlength="6"
 				maxlength="6"
@@ -35,7 +35,7 @@
 			id="btn-submit-2fa"
 			name="btn-submit-2fa"
 			type="submit"
-			class="modal-confirm mt-3">
+			class="modal-confirm modal-submit mt-3">
 			Submit 2FA Code
 		</button>
 
