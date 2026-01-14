@@ -74,11 +74,6 @@ class GuestUser extends User
 	{
 		super(username);
 	}
-
-	rename(newName : string): void
-	{
-		this.username = newName;
-	}
 }
 
 

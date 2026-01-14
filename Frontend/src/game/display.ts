@@ -1,10 +1,11 @@
 import { userState, router } from "../app";
+import { getNavBarHtml, initNavBarListeners } from "../navigation/navSection";
 import { launchPongGame } from "./GameApp"
 import { clearOptions, loadOptions, saveOptions } from "./options";
 import { IOptions } from "./pongData";
 
-import gameHtml from '../pages/game.html?raw'
-import optionsHtml from '../pages/options.html?raw'
+import gameHtml from '../html/game.html?raw'
+import optionsHtml from '../html/options.html?raw'
 
 /************************************************************************************************************/
 

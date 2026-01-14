@@ -1,5 +1,8 @@
-import { Pong } from "./Pong"
-import { IOptions } from "./pongData"
+import { Pong } from "../game/Pong"
+import { IOptions } from "../game/pongData"
+import gameHtml from '../html/game.html?raw'
+import optionsHtml from '../html/options.html?raw'
+
 import { clearOptions, loadOptions } from "./options"
 
 /************************************************************************************************************/

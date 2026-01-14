@@ -1,7 +1,7 @@
 import { userState } from "../app";
-import { RegisteredUser, type BaseUser } from './User'
-import { apiKey, apiDomainName } from '../auth/UserState';
-import { friendTemplate, userTemplate } from "../components/loader";
+import { RegisteredUser, type BaseUser } from '../user/User'
+import { apiKey, apiDomainName } from '../user/UserState';
+import { friendTemplate, userTemplate } from "../utils/templateLoader";
 
 export { showFriend, showUsers }
 
@@ -175,7 +175,7 @@ function attachAddRemoveFriendButtonListener(): void
 
 			try
 			{
-				await userState.addToFriendList(Number(userId));
+				await userState.social.addToFriendList(Number(userId));
 				target.textContent = 'Added!';
 				target.disabled = true;
 			}
@@ -198,7 +198,7 @@ function attachAddRemoveFriendButtonListener(): void
 
 			try
 			{
-				await userState.removeFromFriendList(Number(friendId));
+				await userState.social.removeFromFriendList(Number(friendId));
 				target.textContent = 'Removed!';
 				target.disabled = true;
 			}

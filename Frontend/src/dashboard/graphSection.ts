@@ -18,7 +18,7 @@ async function displayMatchHistory(): Promise<void>
 
 	try
 	{
-		matches = await userState.fetchMatchHistory();
+		matches = await userState.customize.fetchMatchHistory();
 		if (matches.length < 1)
 			throw new Error("No history yet...")
 	}

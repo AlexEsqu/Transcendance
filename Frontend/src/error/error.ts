@@ -1,4 +1,4 @@
-import errorHtml from '../pages/info/error.html?raw'
+import errorHtml from '../html/info/error.html?raw'
 
 export { getErrorPage }
 

@@ -1,0 +1,327 @@
+import { RegisteredUser, GuestUser, User, BaseUser } from "./User";
+import { router } from "../app";
+import { EmailAuthService } from "../auth/EmailAuth";
+import { OAuthService } from "../auth/OAuth";
+import { GuestService } from "../auth/Guest";
+import { TwoFactorService } from "../auth/TwoFactor";
+import { CustomizeService } from "./Customize";
+import { SocialService } from "./Social";
+
+const apiKey : string = import.meta.env.VITE_APP_SECRET_KEY ?? "";
+const apiDomainName : string = import.meta.env.VITE_API_DOMAIN_NAME ?? "";
+console.log(apiKey);
+console.log(apiDomainName);
+
+export type { Subscriber }
+export { UserState, apiKey, apiDomainName }
+
+type Subscriber = (user: User | null) => void;
+
+const localStorageKeyForGuestUser : string = "PongGuestUser"
+const localStorageKeyForRegisteredUser : string = "PongRegisteredUser"
+
+// wrapping the User element in a observer class with singleton
+class UserState
+{
+
+	//--------------------------- ATTRIBUTES -------------------------------//
+
+	// user object containing the data
+	private user: User | null = null;
+
+	// list of elements which need to be notified if user state changes
+	private subscriberVector: Subscriber[] = [];
+
+	// singleton of the class object, to only ever get one user active
+	private static instance: UserState;
+
+	// sub services (to subdivide the class and look neater)
+	emailAuth: EmailAuthService;
+	oAuth: OAuthService;
+	guest: GuestService;
+	twoFactor: TwoFactorService;
+	customize: CustomizeService;
+	social: SocialService;
+
+	//--------------------------- CONSTRUCTORS ------------------------------//
+
+	// singleton constructor is private
+	private constructor()
+	{
+		this.emailAuth = new EmailAuthService(apiDomainName, apiKey, this);
+		this.oAuth = new OAuthService(apiDomainName, apiKey, this);
+		this.guest = new GuestService(this);
+		this.twoFactor = new TwoFactorService(this);
+		this.customize = new CustomizeService(this);
+		this.social = new SocialService(this);
+
+		this.loadFromLocalStorage();
+	}
+
+	//---------------------------- GETTER -----------------------------------//
+
+	static getInstance(): UserState
+	{
+		if (!UserState.instance)
+			UserState.instance = new UserState();
+
+		return UserState.instance;
+	}
+
+	getUser(): User | null
+	{
+		return this.user;
+	}
+
+	//--------------------------- SETTER ------------------------------------//
+
+	// modified User objects and notifies subscribers for state changes
+	setUser(newUser: User | null): void
+	{
+		this.user = newUser;
+
+		// wait for the backend to confirm data on the user
+		if (newUser instanceof RegisteredUser)
+			this.refreshUser();
+
+		this.saveToLocalStorage();
+		this.notifySubscribers();
+	}
+
+	//----------------------- OBSERVER PATTERN ------------------------------//
+
+	// callback is the function that will be called when an event is notified
+	subscribe(callback: Subscriber): void
+	{
+		this.subscriberVector.push(callback);
+		callback(this.user);
+	}
+
+	unsubscribe(callback: Subscriber): void
+	{
+		this.subscriberVector = this.subscriberVector.filter
+		(
+			subscriber => subscriber !== callback
+		);
+	}
+
+	notifySubscribers(): void
+	{
+		this.subscriberVector.forEach(callback => callback(this.user));
+	}
+
+	//--------------------------- STORAGE ----------------------------------//
+
+	private saveToLocalStorage(): void
+	{
+		// clearing out any possible remaining User object from local
+		localStorage.removeItem(localStorageKeyForGuestUser);
+		localStorage.removeItem(localStorageKeyForRegisteredUser);
+
+		if (!this.user)
+			return;
+
+		if (this.user instanceof RegisteredUser)
+		{
+			localStorage.setItem(localStorageKeyForRegisteredUser, JSON.stringify(
+				{
+					username: this.user.username,
+					id: this.user.id,
+					accessToken: this.user.accessToken,
+					hasTwoFactorAuth: this.user.hasTwoFactorAuth,
+					avatar: this.user.avatar,
+					friends: this.user.friends
+				}
+			));
+		}
+		else if (this.user instanceof GuestUser)
+		{
+			localStorage.setItem(localStorageKeyForGuestUser, JSON.stringify(
+				{
+					username: this.user.username,
+					avatar: this.user.avatar
+				}
+			));
+		}
+	}
+
+	private loadFromLocalStorage(): void
+	{
+		const registeredData = localStorage.getItem(localStorageKeyForRegisteredUser);
+		const guestData = localStorage.getItem(localStorageKeyForGuestUser);
+		localStorage.removeItem(localStorageKeyForGuestUser);
+		localStorage.removeItem(localStorageKeyForRegisteredUser);
+
+		if (registeredData)
+		{
+			try
+			{
+				const data = JSON.parse(registeredData);
+				this.user = new RegisteredUser(data.username, data.id, data.accessToken);
+				this.user.avatar = data.avatar;
+				this.user.friends = data.friends ?? [];
+				this.notifySubscribers();
+				this.refreshUser();
+			}
+			catch (error)
+			{
+				const msg = error instanceof Error
+					? error.message
+					: "Unknown error when loading user from local storage";
+				console.log(msg);
+				this.setUser(null);
+				router.navigateTo('/connection')
+			}
+		}
+		else if (guestData)
+		{
+			const data = JSON.parse(guestData);
+			const user = new GuestUser(data.username);
+			user.avatar = data.avatar;
+			this.setUser(user);
+		}
+		console.log(this.user);
+	}
+
+	//------------------------ TOKEN REFRESHER -------------------------------//
+
+	async refreshToken(): Promise<boolean>
+	{
+		if (!(this.user instanceof RegisteredUser))
+			return false;
+
+		const response = await fetch(
+			`${apiDomainName}/users/auth/refresh`,
+			{
+				method: 'POST',
+				headers:
+				{
+					'accept': 'application/json',
+					'Authorization': `Bearer ${this.user.accessToken}`,
+					'X-App-Secret': `${apiKey}`
+				},
+			}
+		);
+		const data = await response.json();
+
+		if (!response.ok || !data.accessToken)
+		{
+			console.log(data.message || data.error || 'Faied to refresh token');
+			this.setUser(null);
+			return false;
+		}
+
+
+		this.user.accessToken = data.accessToken;
+		this.saveToLocalStorage();
+		return true;
+	}
+
+	async fetchWithTokenRefresh(requestURL: RequestInfo, requestContent: RequestInit = {}): Promise<Response>
+	{
+		if (!(this.user instanceof RegisteredUser))
+			throw new Error("Not authenticated");
+
+		// Typescript annoyance to be able to update the incoming request header with new token
+		let headers: Record<string, string> =
+		{
+			'accept': 'application/json',
+			...(typeof requestContent.headers === 'object'
+				&& !Array.isArray(requestContent.headers)
+				&& !(requestContent.headers instanceof Headers)
+				? requestContent.headers as Record<string, string>
+				: {})
+		};
+		requestContent.headers = headers;
+
+		let response = await fetch(requestURL, requestContent);
+
+		if (response.status === 401)
+		{
+			const refreshed = await this.refreshToken();
+			if (refreshed)
+			{
+				headers['Authorization'] = `Bearer ${this.user.accessToken}`;
+				requestContent.headers = headers;
+				response = await fetch(requestURL, requestContent);
+			}
+			else
+				throw new Error("Failed to refresh token");
+		}
+
+		return response;
+	}
+
+	//------------------------ REFRESH FROM BACKEND -------------------------------//
+
+	async refreshUser(): Promise<void>
+	{
+		if (!(this.user instanceof RegisteredUser))
+		{
+			console.log("No registered user to refresh");
+			return;
+		}
+
+		if (this.user.id === null || this.user.id === undefined)
+			throw new Error("User id is missing");
+
+		const response = await this.fetchWithTokenRefresh(
+			`${apiDomainName}/users/${this.user.id}`,
+			{
+				method: 'GET',
+				headers:
+				{
+					'accept': 'application/json',
+					'X-App-Secret': `${apiKey}`,
+					'Authorization': `Bearer ${this.user.accessToken}`
+				}
+			}
+		);
+
+		const data = await response.json();
+		console.log(data);
+		if (!response.ok)
+			throw new Error(data.message || data.error || `Failed to fetch user (${response.status})`);
+
+		this.user.username = data.username ?? data.username ?? this.user.username;
+		this.user.avatar = data.avatar ?? this.user.avatar;
+
+		await this.refreshFriendList();
+		this.user.isRefreshed = true;
+
+		this.saveToLocalStorage();
+	}
+
+	async refreshFriendList()
+	{
+		if (!(this.user instanceof RegisteredUser))
+		{
+			console.log("No registered user to refresh");
+			return;
+		}
+
+		if (this.user.id === null || this.user.id === undefined)
+			throw new Error("User id is missing");
+
+		const response = await this.fetchWithTokenRefresh(
+			`${apiDomainName}/users/me/friends`,
+			{
+				method: 'GET',
+				headers:
+				{
+					'accept': 'application/json',
+					'X-App-Secret': `${apiKey}`,
+					'Authorization': `Bearer ${this.user.accessToken}`
+				}
+			}
+		);
+
+		const data = await response.json();
+		console.log(`received friends as:`);
+		console.log(data);
+		if (!response.ok)
+			throw new Error(data.message || data.error || `Failed to fetch user friends (${response.status})`);
+
+		this.user.setFriends(data);
+	}
+}
