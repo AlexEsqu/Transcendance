@@ -1,7 +1,8 @@
 import { UserState } from '../user/UserState';
 import { RegisteredUser } from '../user/User';
 import { apiDomainName, apiKey } from '../user/UserState';
-import { Modal } from '../utils/Modal';
+import { FormModal, ErrorModal } from '../utils/Modal';
+import { openErrorModal } from '../error/error';
 
 import modalHtml from '../html/info/twoFactorModal.html?raw';
 
@@ -54,10 +55,11 @@ export class TwoFactorAuthService
 	{
 		console.log('Creating 2FA modal...');
 		return new Promise((resolve, reject) => {
-			const modal = new Modal(
+			const modal = new FormModal(
 				modalHtml,
-				async (code) =>
+				async (formData) =>
 					{
+						const code = formData.get('input-2fa') as string;
 						console.log(code);
 						resolve(code)
 					}, // if user click submit 2fa
@@ -77,7 +79,6 @@ export class TwoFactorAuthService
 				method: 'POST',
 				headers: {
 					'accept': 'application/json',
-					// 'Authorization': `Bearer ${user.accessToken}`,
 					'X-App-Secret': `${apiKey}`,
 					'Content-Type': 'application/json'
 				},
@@ -104,10 +105,11 @@ export class TwoFactorAuthService
 			const user = new RegisteredUser(verifiedData.id, verifiedData.accessToken);
 			await this.userState.setUser(user);
 		}
-		catch (err)
+		catch (err )
 		{
-			console.error('2FA failed:', err);
-			throw err;
+			console.log('2FA failed:', err);
+			if (err instanceof Error)
+				openErrorModal(err);
 		}
 	}
 }
