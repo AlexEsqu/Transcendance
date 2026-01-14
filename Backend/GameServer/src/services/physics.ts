@@ -12,8 +12,8 @@ export { isBallHittingPaddle, isBallHittingWall, isBallOutOfBounds, isNewPaddPos
 
 function isBallHittingPaddle(ball: IBall, paddle: IPaddle): boolean
 {
-	const paddTopEdge: number = paddle.pos.z + (GAME.MAP_WIDTH / 2);
-	const paddDownEdge: number = paddle.pos.z - (GAME.MAP_WIDTH / 2);
+	const paddTopEdge: number = paddle.pos.z + (GAME.PADD_WIDTH / 2);
+	const paddDownEdge: number = paddle.pos.z - (GAME.PADD_WIDTH / 2);
 	const ballLeftEdge: number = ball.posistion.x - GAME.BALL_RADIUS;
 	const ballRightEdge: number = ball.posistion.x + GAME.BALL_RADIUS;
 	const ballTopEdge: number = ball.posistion.z + GAME.BALL_RADIUS;
@@ -26,7 +26,8 @@ function isBallHittingPaddle(ball: IBall, paddle: IPaddle): boolean
 		return false;
 
 	//	Check if the ball fits in the paddle's coordinates range (Z-axis)
-	if (ballTopEdge <= paddTopEdge + (GAME.BALL_RADIUS * 2) && ballDownEdge >= paddDownEdge - (GAME.BALL_RADIUS * 2))
+	// if (ballTopEdge <= paddTopEdge + (GAME.BALL_RADIUS * 2) && ballDownEdge >= paddDownEdge - (GAME.BALL_RADIUS * 2))
+	if (ballTopEdge <= paddTopEdge + (GAME.BALL_RADIUS) && ballDownEdge >= paddDownEdge - (GAME.BALL_RADIUS))
 		return true;
 
 	return false;
@@ -47,10 +48,10 @@ function isBallOutOfBounds(ball: IBall): boolean
 {
 	const ballLeftEdge: number = ball.posistion.x - GAME.BALL_RADIUS;
 	const ballRightEdge: number = ball.posistion.x + GAME.BALL_RADIUS;
-	const mapLimit: number = (GAME.MAP_WIDTH / 2) - 0.5;
+	const mapLimit: number = (GAME.MAP_WIDTH / 2);
 
-	if (mapLimit - ballRightEdge < 0.50)
-		console.log(`left edge : ${ballLeftEdge} // right edge : ${ballRightEdge} // map limit : ${mapLimit}`);
+	// if (mapLimit - ballRightEdge < 0.50)
+	// 	console.log(`left edge : ${ballLeftEdge} // right edge : ${ballRightEdge} // map limit : ${mapLimit}`);
 	if (ballLeftEdge <= -(mapLimit) || ballRightEdge >= mapLimit)
 		return true;
 	return false;

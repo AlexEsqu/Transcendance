@@ -39,14 +39,14 @@ function handleMessage(socket: WSWebSocket, message: Buffer,
 		if (data.ready === true)
 			player.isReady = true;
 		else
-			return (player);
+			player.isReady = false;
 		
 		//	If all players are ready launch the game
-		if (gamingRoom.isEveryoneReady() === true)
+		if (gamingRoom.isEveryoneReady() === true && gamingRoom.gameLoopStarted === false)
 			gamingRoom.startGame(gameControl);
 
 		//	If player is ready & wants to move, update its paddle pos
-		if (player.isReady && data.move)
+		if (gamingRoom.isEveryoneReady() === true && data.move)
 			gamingRoom.handlePlayerInput(player.username, data.state, data.move);
 
 		return (player);

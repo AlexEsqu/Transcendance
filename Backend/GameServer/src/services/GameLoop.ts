@@ -9,7 +9,6 @@ import { JSONGameState } from '../config/schemas';
 import { GameControl } from './GameControl';
 import { Room } from './Room';
 import { sendMatchesToDataBase } from '../utils/sendMatchResult';
-import { Serializer } from 'node:v8';
 
 /************************************************************************************************************/
 
@@ -198,14 +197,13 @@ export class GameLoop
 	 */
 	requestNewRound(): void
 	{
-		this.state = State.launch;
-		this.isGameRunning = false;
+		if (this.state !== State.end)
+			this.state = State.launch;
 
 		//	Save the results of the previous match, if there was one
 		if (this.rounds)
 			this.saveResults();
 
-		console.log("GAME-LOOP: new round");
 		//	Who should play now ?
 		let match = this.matchType;
 		if (match === MatchType.tournament && this.rounds.nbOfRounds >= 0 && this.rounds.nbOfRounds < 2)
@@ -225,6 +223,7 @@ export class GameLoop
 			this.leftPadd.player = this.rounds.waitingPlayers.pop();
 			this.rightPadd.player = this.rounds.waitingPlayers.pop();
 		}
+		console.log("GAME-LOOP: start round ", this.rounds.nbOfRounds);
 		this.rounds.nbOfRounds += 1;
 
 		//	Reset game's data

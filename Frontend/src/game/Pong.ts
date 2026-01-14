@@ -47,6 +47,7 @@ export class Pong
 		this.waitingSocket = new WebSocket(Pong.WAITING_ROOM_URL);
 		if (!this.waitingSocket)
 			throw new Error("'waitingSocket' creation failed");
+		this.gui = AdvancedDynamicTexture.CreateFullscreenUI("UI");
 		this.timestamp = Date.now();
 	}
 
@@ -123,7 +124,9 @@ export class Pong
 						throw new Error("GAME-FRONT: can't identify client, impossible to enter the gaming room");
 		
 					const gameState: JSONGameState = JSON.parse(event.data);
-					this.processNewGameState(gameState);	
+					this.processNewGameState(gameState);
+					if (gameState.state !== 1)
+						console.log(`for player game state ${gameState.state}`);
 					// console.log(`GAME-FRONT: game state from room(${this.roomId}) =`, gameState);
 	
 				} catch (error) {
@@ -155,7 +158,7 @@ export class Pong
 
 			case PlayerState.launch:
 					this.scene.state = PlayerState.pause;
-					this.launch(3);
+					// this.launch(3);
 				break ;
 
 			case PlayerState.end:
@@ -191,7 +194,7 @@ export class Pong
 		this.engine.runRenderLoop(() => {
 			if (!this.engine)
 				return ;
-			if (!this.scene || !this.scene.id || this.scene.state === PlayerState.stop) {
+			if (!this.scene || !this.scene.id || this.scene.state === PlayerState.stop || !this.gamingSocket) {
 				this.engine.stopRenderLoop();
 				return ;
 			}
@@ -235,8 +238,8 @@ export class Pong
 			drawName(this.scene.leftPadd.player.username, this.scene.rightPadd.player.username, this.round);
 			drawScore(this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
 		}
-		else
-			console.log("GAME-FRONT: NO PLAYERS WARNING");
+		// else
+		// 	console.log("GAME-FRONT: NO PLAYERS WARNING");
 	}
 
 	processNewGameState(gameState: JSONGameState): void
@@ -291,7 +294,6 @@ export class Pong
 	launch(countdown: number): void
 	{
 		// if (!this.scene || !this.scene.leftPadd?.player || !this.scene.rightPadd?.player) return ;
-
 		if (countdown <= 0 && this.scene.ball) {
 			this.scene.state = PlayerState.play;
 			return ;
@@ -301,9 +303,8 @@ export class Pong
 			{ frame: 0, value: 60 },
 			{ frame: 30, value: 30 }
 		];
-		this.gui = AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
-		if (this.scene.options && this.scene.id) {
+		if (this.scene.options && this.scene.id && this.gui) {
 			const timer = createText(countdown.toString(), this.scene.options.ballColor, 60, "200px", "0px", this.gui);
 			const animation = createAnimation("timer", "fontSize", keys);
 
