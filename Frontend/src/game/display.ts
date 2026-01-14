@@ -143,6 +143,14 @@ function initializePlayerInputs(): void
 		generatePlayersInputs(newNbOfPlayers);
 		generatePaddleColorsInputs(newNbOfPlayers);
 	});
+
+	locationSelect.addEventListener('change', function() {
+		let newNbOfPlayers: number = parseInt(gameTypeSelect.value);
+		if (locationSelect.value === 'remote')
+			newNbOfPlayers = 1;
+		generatePlayersInputs(newNbOfPlayers);
+		generatePaddleColorsInputs(newNbOfPlayers);
+	});
 }
 
 function getPlayerNames(): string[]

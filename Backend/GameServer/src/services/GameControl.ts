@@ -76,7 +76,7 @@ export class GameControl
 		if (this.waitingRoom.size <= 0) return undefined;
 
 		for (const [key, value] of this.waitingRoom) {
-			if (value.type === matchType && value.players.size + 1 <= value.type)
+			if (value.type === matchType && value.players.size + 1 <= value.type && gameLocation === value.location)
 				return key;
 		}
 
@@ -89,7 +89,7 @@ export class GameControl
 		const roomId = Date.now();
 		if (!roomId) return undefined;
 
-		const room = new Room(roomId, player, player.matchType);
+		const room = new Room(roomId, player, player.matchType, player.gameLocation);
 		if (!room) return undefined;
 		if (player.matchType === MatchType.solo) {
 			const playerRobot: IPlayer = {

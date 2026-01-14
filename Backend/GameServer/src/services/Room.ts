@@ -1,4 +1,4 @@
-import { MatchType, IPlayer } from '../config/pongData.js';
+import { MatchType, IPlayer, GameLocation } from '../config/pongData.js';
 import { GameLoop } from './GameLoop';
 import { GameControl } from './GameControl';
 
@@ -8,14 +8,16 @@ export class Room
 {
 	id: number;
 	type: MatchType;
+	location: GameLocation;
 	gameLoop: GameLoop | null;
 	gameLoopStarted: boolean = false;
 	players: Map<string, IPlayer> = new Map<string, IPlayer>();
 
-	constructor(roomId: number, players: Map<string, IPlayer> | IPlayer, matchType: MatchType)
+	constructor(roomId: number, players: Map<string, IPlayer> | IPlayer, matchType: MatchType, matchLocation: GameLocation)
 	{
 		this.id = roomId;
 		this.type = matchType;
+		this.location = matchLocation;
 		this.gameLoop = null;
 
 		if (players instanceof Map) {

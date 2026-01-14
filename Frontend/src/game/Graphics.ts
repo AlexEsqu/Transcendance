@@ -178,7 +178,7 @@ function loadGame(engine: Engine, canvas: HTMLCanvasElement, options: IOptions):
 
 	//	Creates 2 paddles, one for each players
 	const leftPadd: Mesh | null = setupPaddle(id, options.paddColors[0], 'left');
-	const rightPadd: Mesh | null = setupPaddle(id, options.paddColors[1] ??  "#a2c2e8", 'right');
+	const rightPadd: Mesh | null = setupPaddle(id, options.paddColors[Math.min(1, options.paddColors.length - 1)] ?? "#a2c2e8", 'right');
 	if (!leftPadd || !rightPadd) {
 		console.error("GAME-FRONT: failed to create 'Paddle', can't load game");
 		return null;

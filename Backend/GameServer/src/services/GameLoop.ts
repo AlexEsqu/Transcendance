@@ -55,7 +55,7 @@ export class GameLoop
 		console.log("GAME-LOOP: game loop started");
 		const interval = setInterval(() => {
 			// console.log(this.state);
-			
+			this.timestamp = Date.now();
 			if (this.state === State.play) {
 				//	update data & check collisions
 				this.updateGameData();
@@ -268,6 +268,8 @@ export class GameLoop
 	{
 		this.leftPadd.pos.z = 0.0;
 		this.leftPadd.score = 0;
+		this.rightPadd.pos.z = 0.0;
+		this.rightPadd.score = 0;
 	}
 
 	composeGameState(): JSONGameState
