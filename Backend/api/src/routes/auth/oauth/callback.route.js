@@ -19,12 +19,8 @@ export default function oauthCallbackRoute(server) {
 				console.log("42 USER IN DB, LOGGING IN THE USER");
 				if (user.is_2fa_enabled) {
 					console.log("42 USER HAS 2FA ENABLED, SENDING VERIFICATION CODE");
-					const twoFaToken = await sendVerificationCodeEmail(server, user);
-					// return reply.status(200).send({
-					// 	twoFactorRequired: true,
-					// 	token: twoFaToken,
-					// });
-					return reply.status(302).redirect(`${redirectUrl}?twoFactorToken=${twoFaToken}`);
+					sendVerificationCodeEmail(server, user);
+					return reply.status(302).redirect(`${redirectUrl}?twoFactorRequired=true`);
 				}
 				console.log("42 USER HAS 2FA DISABLED, GENERATING TOKENS");
 				await generateTokens(server, user, reply);

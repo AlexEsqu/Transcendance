@@ -7,8 +7,8 @@ export const loginSchema = {
    \
    If 2FA is enabled for the user, the endpoint does not issue tokens immediately. \
    Instead, a one-time 6-digit verification code is sent to the user's email and \
-   a temporary 2FA continuation token is generated, which must be used to complete \
-   authentication via the 2FA verification endpoint through the api route `POST /api/users/auth/login/2fa`. \
+   a boolean value is returned to indicate that the authentication process continues \
+   by calling the `two-factor login` endpoint. \
    `This endpoint requires the client to have a verified email address.`",
 	tags: ["auth"],
 	body: { $ref: "authCredentialsBody" },
@@ -31,19 +31,15 @@ export const loginSchema = {
 							{
 								description: "Two-factor authentication required",
 								type: "object",
-								required: ["twoFactorRequired", "twoFactorToken"],
+								required: ["twoFactorRequired"],
 								properties: {
 									twoFactorRequired: { type: "boolean", example: true },
-									twoFactorToken: {
-										type: "string",
-										description: "2FA continuation token",
-									},
 								},
 							},
 						],
 					},
 					examples: {
-						no2faExample: {
+						noTwoFaExample: {
 							summary: "Successful response when no 2FA is required",
 							value: {
 								accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -53,15 +49,13 @@ export const loginSchema = {
 						twoFaExample: {
 							summary: "Successful response when 2FA is required",
 							value: {
-								twoFactorRequired: true,
-								twoFactorToken: "2fa_continuation_token",
+								twoFactorRequired: true
 							},
 						},
 					},
 				},
 			},
 		},
-
 		302: {
 			description: "Redirect: Email not verified",
 			$ref: "SuccessMessageResponse#",

@@ -29,13 +29,9 @@ export default function login(server) {
 			if (!match) {
 				return reply.status(401).send({ error: "Unauthorized", message: "Invalid credentials" });
 			}
-
 			if (user.is_2fa_enabled) {
-				const twoFaToken = await sendVerificationCodeEmail(server, user);
-				return reply.status(200).send({
-					twoFactorRequired: true,
-					twoFactorToken: twoFaToken,
-				});
+				sendVerificationCodeEmail(server, user);
+				return reply.status(200).send({twoFactorRequired: true});
 			}
 			const tokens = await generateTokens(server, user, reply);
 			return reply.status(200).send(tokens);
