@@ -155,8 +155,8 @@ export class GameLoop
 	{
 		let paddle: IPaddle;
 
-		if (state !== PlayerState.pause)
-			this.state = State.play;
+		// if (state !== PlayerState.pause)
+		this.state = State.play;
 	
 		if (this.leftPadd.player?.username === player)
 			paddle = this.leftPadd;
@@ -185,6 +185,7 @@ export class GameLoop
 			return false;
 
 		if (this.leftPadd.score === GAME.MAX_SCORE || this.rightPadd.score === GAME.MAX_SCORE) {
+			this.state = State.waiting;
 			if (this.rounds.nbOfRounds >= GAME.MAX_ROUNDS)
 				this.state = State.end;
 			return true;
@@ -223,8 +224,8 @@ export class GameLoop
 			this.leftPadd.player = this.rounds.waitingPlayers.pop();
 			this.rightPadd.player = this.rounds.waitingPlayers.pop();
 		}
-		console.log("GAME-LOOP: start round ", this.rounds.nbOfRounds);
 		this.rounds.nbOfRounds += 1;
+		console.log("GAME-LOOP: start round ", this.rounds.nbOfRounds);
 
 		//	Reset game's data
 		// this.ball = initBall();

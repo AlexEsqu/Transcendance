@@ -157,12 +157,22 @@ export class Pong
 				break ;
 
 			case PlayerState.launch:
-					this.scene.state = PlayerState.pause;
-					// this.launch(3);
+					this.launch(3);
+				break ;
+			
+			case PlayerState.waiting:
+				this.ready = false;
+				if (this.onNewRound)
+					this.onNewRound();
 				break ;
 
 			case PlayerState.end:
 				this.endGame(results);
+				break ;
+			
+			case PlayerState.stop:
+				this.gamingSocket?.close();
+				this.gamingSocket = null;
 				break ;
 
 			default:
@@ -343,8 +353,6 @@ export class Pong
 			return ;
 		}
 		console.log("GAME-FRONT: end");
-		this.gamingSocket?.close();
-		this.gamingSocket = null;
 
 		const winnerSpot = document.getElementById('match-results');
 		if (winnerSpot && result.winner?.username)
@@ -352,6 +360,7 @@ export class Pong
 			winnerSpot.textContent = `${result.winner?.username} wins!`;
 			winnerSpot.classList.remove('invisible');
 		}
+		this.scene.state = PlayerState.stop;
 	}
 
 	/**

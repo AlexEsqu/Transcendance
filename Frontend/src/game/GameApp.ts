@@ -32,7 +32,7 @@ class GameApp
 			{
 				this.pong.sendUpdateToGameServer(player.username, 'none', true);
 			}
-			// this.pong.launch(3);
+			this.pong.launch(3);
 		});
 	}
 

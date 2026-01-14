@@ -44,7 +44,7 @@ enum GameLocation {
 };
 
 enum PlayerState {
-	waiting, play, launch, end, pause, opening, stop
+	waiting, play, launch, end, opening, stop
 };
 
 enum State {
