@@ -17,8 +17,7 @@ import mailerPlugin from "./plugins/mailer.js";
 
 import Routes from "./routes/index.js";
 
-
-export async function buildServer({ useHttps = null, dbOverride = null, apiKeyPluginOverride = null, sessionPluginOverride = null, jwtFake = null, mailerOverride = null } = {}) {
+export function buildServer({ useHttps = null, dbOverride = null, apiKeyPluginOverride = null, sessionPluginOverride = null, jwtFake = null, mailerOverride = null } = {}) {
 	const server = Fastify({
 		https: useHttps
 			? {
@@ -49,11 +48,11 @@ export async function buildServer({ useHttps = null, dbOverride = null, apiKeyPl
 		origin: "https://localhost:8443",
 		credentials: true,
 		methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-		logLevel: "trace"
+		logLevel: "trace",
 	});
 
 	server.register(Schemas);
-	server.register(Routes)
+	server.register(Routes);
 	// Register routes
 	server.register(fastifyRateLimit, {
 		max: 100,
@@ -62,11 +61,10 @@ export async function buildServer({ useHttps = null, dbOverride = null, apiKeyPl
 		ban: 2,
 	});
 	server.register(fastifyStatic, {
-		root: process.env.AVATARS_UPLOAD_PATH ,
+		root: process.env.AVATARS_UPLOAD_PATH,
 		prefix: "/api/avatars/",
 	});
 	server.register(mailerOverride ?? mailerPlugin);
-	
 
 	return server;
 }

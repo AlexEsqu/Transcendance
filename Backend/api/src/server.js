@@ -1,7 +1,7 @@
 import { buildServer } from "./app.js";
 import { seedDatabase } from "./seed.js";
 
-export const server = await buildServer({ useHttps: false });
+export const server = buildServer({ useHttps: false });
 
 const start = async () => {
 	try {
@@ -19,9 +19,6 @@ const start = async () => {
 };
 
 start();
-
-
-
 
 // // write the api as yaml
 // import yaml from "yaml"
