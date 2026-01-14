@@ -13,6 +13,15 @@ export default defineConfig({
       "nginx"
     ],
   },
+  hmr: {
+      // Configuration HMR pour fonctionner derrière Nginx
+      clientPort: 8443,
+      protocol: 'wss',
+      host: 'localhost'
+    },
+    watch: {
+      usePolling: true, // Nécessaire dans Docker
+    },
   build: {
     outDir: 'dist',
     emptyOutDir: true,

@@ -10,8 +10,8 @@ import { Engine } from '@babylonjs/core';
 export class Pong
 {
 
-	static WAITING_ROOM_URL = "ws://localhost:4001/room/waiting";
-	static GAMING_ROOM_URL = "ws://localhost:4001/room/gaming";
+	static WAITING_ROOM_URL = `/room/waiting`;
+	static GAMING_ROOM_URL = "/room/gaming";
 
 	canvas: HTMLCanvasElement;
 	engine: Engine | null = null;
@@ -44,7 +44,7 @@ export class Pong
 		this.mainPlayer = players[0].username;
 		this.scene.state = PlayerState.opening;
 		this.onNewRound = onNewRound;
-		this.waitingSocket = new WebSocket(Pong.WAITING_ROOM_URL);
+		this.waitingSocket = new WebSocket(`wss://${window.location.host}${Pong.WAITING_ROOM_URL}`);
 		if (!this.waitingSocket)
 			throw new Error("'waitingSocket' creation failed");
 		this.gui = AdvancedDynamicTexture.CreateFullscreenUI("UI");
@@ -103,7 +103,7 @@ export class Pong
 	goToGamingRoom(): void
 	{
 		setTimeout(() => {
-			this.gamingSocket = new WebSocket(Pong.GAMING_ROOM_URL);
+			this.gamingSocket = new WebSocket(`wss://${window.location.host}${Pong.GAMING_ROOM_URL}`);
 			if (!this.gamingSocket)
 				throw new Error("'gamingSocket' not found");
 	
