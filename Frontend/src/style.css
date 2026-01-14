@@ -4,6 +4,12 @@
 @tailwind utilities;
 
 @layer utilities {
+
+  * {
+	font-family: 'Courier New', Courier, monospace;
+  }
+
+
   .input-field {
     background-color: rgb(23, 26, 37);
   }
@@ -78,7 +84,7 @@
   }
 
   .glow-form section label {
-	margin: 0 1rem;
+	margin: 0 0.75rem;
   }
 
   .glow-form section input {

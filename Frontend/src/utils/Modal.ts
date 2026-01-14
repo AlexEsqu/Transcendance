@@ -1,3 +1,5 @@
+import { isValidInputs, checkInputValidityOnUnfocus } from "./inputValidation";
+
 export abstract class Modal
 {
 	modalElem: HTMLElement;
@@ -57,11 +59,16 @@ export class FormModal extends Modal
 	{
 		this.formElement = this.modalElem.querySelector('form') as HTMLFormElement;
 		if (this.formElement) {
+			checkInputValidityOnUnfocus(this.formElement);
 			this.formElement.addEventListener('submit', async (e) => {
 				e.preventDefault();
-				const formData = new FormData(this.formElement!);
-				await this.onConfirm(formData);
-				this.close();
+				if (this.formElement
+					&& isValidInputs(this.formElement.querySelectorAll('input')))
+				{
+					const formData = new FormData(this.formElement!);
+					await this.onConfirm(formData);
+					// this.close();
+				}
 			});
 		}
 
