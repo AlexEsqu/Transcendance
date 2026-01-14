@@ -25,8 +25,8 @@ export function handleSQLiteError(err, reply) {
 }
 
 
-class VerificationError extends Error {
-	constructor(message, statusCode = 400) {
+export class VerificationError extends Error {
+	constructor(message, statusCode = 500) {
 		super(message);
 		this.statusCode = statusCode;
 	}

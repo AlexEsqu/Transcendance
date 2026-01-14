@@ -4,7 +4,7 @@ import { twoFactorLoginSchema } from "../../schemas/two-factor.schema.js";
 
 export default function twoFactorLoginRoute(server) {
 	const opts = {
-		$ref: twoFactorLoginSchema,
+		schema: twoFactorLoginSchema,
 	};
 	server.post("/login/2fa", opts, async (req, reply) => {
 		const { code } = req.body;

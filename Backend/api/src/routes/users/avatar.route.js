@@ -2,7 +2,7 @@ import fs from "fs";
 import { putUserAvatarSchema, deleteUserAvatarSchema } from "../../schemas/avatar.schema.js";
 export function putUserAvatar(server) {
 	const opts = {
-		$ref: putUserAvatarSchema,
+		schema: putUserAvatarSchema,
 		onRequest: [server.authenticateUser, server.authenticateClient],
 	};
 	server.put("/me/avatar", opts, async (req, reply) => {
@@ -38,7 +38,7 @@ export function putUserAvatar(server) {
 
 export function deleteUserAvatar(server) {
 	const opts = {
-		$ref: deleteUserAvatarSchema,
+		schema: deleteUserAvatarSchema,
 		onRequest: [server.authenticateUser, server.authenticateClient],
 	};
 	server.delete("/me/avatar", opts, async (req, reply) => {

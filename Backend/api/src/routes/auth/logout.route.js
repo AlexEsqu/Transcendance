@@ -2,7 +2,7 @@ import { logoutSchema } from "../../schemas/logout.schema.js";
 
 export default function logout(server) {
 	const opts = {
-		$ref: logoutSchema,
+		schema: logoutSchema,
 		onRequest: [server.authenticateClient, server.authenticateRefreshToken],
 	};
 	server.post("/logout", opts, async (req, reply) => {

@@ -2,7 +2,7 @@ import { getUserbyId, formatUserObject } from "../../../utils/utils.js";
 import { addFriendSchema, deleteFriendSchema, getFriendsSchema } from "../../../schemas/friends.schema.js";
 export function getFriends(server) {
 	const opts = {
-		$ref: getFriendsSchema,
+		schema: getFriendsSchema,
 		onRequest: [server.authenticateClient, server.authenticateUser],
 	};
 	server.get("/me/friends", opts, async (req, reply) => {
@@ -30,7 +30,7 @@ export function getFriends(server) {
 
 export function addFriend(server) {
 	const opts = {
-		$ref: addFriendSchema,
+		schema: addFriendSchema,
 		onRequest: [server.authenticateUser, server.authenticateClient],
 		preHandler: async (req, reply) => {
 			// Verify the id passed as parameter
@@ -69,7 +69,7 @@ export function addFriend(server) {
 
 export  function deleteFriend(server) {
 	const opts = {
-		$ref: deleteFriendSchema,
+		schema: deleteFriendSchema,
 		onRequest: [server.authenticateUser, server.authenticateClient],
 		preHandler: async (req, reply) => {
 			// Verify the id passed as parameter

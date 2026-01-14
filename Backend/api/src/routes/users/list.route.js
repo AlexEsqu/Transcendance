@@ -3,7 +3,7 @@ import { getUserSchema , getUsersSchema} from "../../schemas/list.schema.js";
 
 export function getUser(server) {
 	const singleUserSchema = {
-		$ref: getUserSchema,
+		schema: getUserSchema,
 		onRequest: [server.authenticateClient],
 	};
 	server.get("/users/:id", singleUserSchema, async (req, reply) => {
@@ -27,7 +27,7 @@ export function getUser(server) {
 
 export function getUsers(server) {
 	const opts = {
-		$ref: getUsersSchema,
+		schema: getUsersSchema,
 		onRequest: [server.authenticateClient],
 	};
 	server.get("/users", opts, (req, reply) => {

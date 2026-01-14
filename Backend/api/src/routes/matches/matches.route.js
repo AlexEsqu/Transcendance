@@ -1,7 +1,7 @@
 import { postMatchSchema, getUserMatchesSchema, getMatchesSchema } from "../../schemas/matches.schema.js";
 export function getUserMatches(server) {
 	const opts = {
-		$ref: getUserMatchesSchema,
+		schema: getUserMatchesSchema,
 		onRequest: [server.authenticateClient],
 	};
 	server.get("/:id/matches", opts, async (req, reply) => {
@@ -24,7 +24,7 @@ export function getUserMatches(server) {
 
 export function getMatches(server) {
 	const opts = {
-		$ref: getMatchesSchema,
+		schema: getMatchesSchema,
 		onRequest: [server.authenticateClient],
 	};
 	server.get("/matches", opts, (req, reply) => {
@@ -40,7 +40,7 @@ export function getMatches(server) {
 
 export function postMatches(server) {
 	const opts = {
-		$ref: postMatchSchema,
+		schema: postMatchSchema,
 		onRequest: [server.authenticateClient],
 		preHandler: async (req, reply) => {
 			//Verifies the users ids

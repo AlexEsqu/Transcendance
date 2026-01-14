@@ -6,7 +6,7 @@ const redirectUrl = encodeURI(`${process.env.FRONTEND_DOMAIN_NAME}/oauth/callbac
 
 export default function oauthCallbackRoute(server) {
 	const opts = {
-		$ref: oauthCallbackRouteSchema,
+		schema: oauthCallbackRouteSchema,
 	};
 	server.get("/oauth/42/callback", opts, async (req, reply) => {
 		try {

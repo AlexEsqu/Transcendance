@@ -3,7 +3,7 @@ import { refreshSchema } from "../../schemas/refresh.schema.js";
 
 function refresh(server) {
 	const opts = {
-		$ref: refreshSchema,
+		schema: refreshSchema,
 		onRequest: [server.authenticateClient, server.authenticateRefreshToken],
 	};
 	server.post("/refresh", opts, async (req, reply) => {

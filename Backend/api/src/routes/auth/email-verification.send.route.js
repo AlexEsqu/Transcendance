@@ -3,7 +3,7 @@ import { sendEmailVerificationSchema } from "../../schemas/email-verification.sc
 
 export default function sendEmailVerificationRoute(server) {
 	const opts = {
-		$ref: sendEmailVerificationSchema,
+		schema: sendEmailVerificationSchema,
 	};
 	server.post("/send-mail-verification", opts, async (request, reply) => {
 		const token = crypto.randomBytes(32).toString("hex");

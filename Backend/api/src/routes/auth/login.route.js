@@ -4,7 +4,7 @@ import { loginSchema } from "../../schemas/login.schema.js";
 
 export default function login(server) {
 	const opts = {
-		$ref: loginSchema,
+		schema: loginSchema,
 	};
 	server.post("/login", opts, async (req, reply) => {
 		try {

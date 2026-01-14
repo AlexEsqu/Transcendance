@@ -4,7 +4,7 @@ import crypto from "crypto";
 import { signupSchema } from "../../schemas/signup.schema.js";
 export default function signup(server) {
 	const opts = {
-		$ref: signupSchema,
+		schema: signupSchema,
 	};
 	server.post("/signup", opts, async (request, reply) => {
 		const { username, password, email } = request.body;

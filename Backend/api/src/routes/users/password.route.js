@@ -6,7 +6,7 @@ import {putUserPasswordSchema, postUserPasswordSchema} from "../../schemas/passw
 //DELOG USER
 export function putUserPassword(server) {
 	const opts = {
-		$ref: putUserPasswordSchema,
+		schema: putUserPasswordSchema,
 		onRequest: [server.authenticateUser, server.authenticateClient],
 	};
 	server.put("/me/password", opts, async (req, reply) => {
@@ -31,7 +31,7 @@ export function putUserPassword(server) {
 
 export function postUserPassword(server) {
 	const opts = {
-		$ref: postUserPasswordSchema,
+		schema: postUserPasswordSchema,
 		onRequest: [server.authenticateUser, server.authenticateClient],
 	};
 	server.post("/me/password", opts, async (req, reply) => {

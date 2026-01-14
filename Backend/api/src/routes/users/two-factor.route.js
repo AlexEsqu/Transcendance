@@ -2,7 +2,7 @@ import { getTwoFactorStatusSchema, updateTwoFactorStatusSchema } from "../../sch
 
 export function getTwoFactorStatusRoute(server) {
 	const opts = {
-		$ref: getTwoFactorStatusSchema,
+		schema: getTwoFactorStatusSchema,
 		onRequest: [server.authenticateUser, server.authenticateClient],
 	};
 	server.get("/me/2fa", opts, async (req, reply) => {
@@ -19,7 +19,7 @@ export function getTwoFactorStatusRoute(server) {
 
 export function updateTwoFactorStatusRoute(server) {
 	const opts = {
-		$ref: updateTwoFactorStatusSchema,
+		schema: updateTwoFactorStatusSchema,
 		onRequest: [server.authenticateUser, server.authenticateClient],
 	};
 	server.put("/me/2fa", opts, async (req, reply) => {

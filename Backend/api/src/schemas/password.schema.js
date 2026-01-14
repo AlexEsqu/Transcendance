@@ -1,84 +1,78 @@
 import { Security } from "../utils/openApiSecurity.js";
 
 export const putUserPasswordSchema = {
-	schema: {
-		id$: "putUserPasswordSchema",
-		tags: ["user"],
-		security: Security.UserAuth,
-		description: "Modifies the password of the user. `This endpoint requires client AND user authentication.`",
-		body: {
-			type: "object",
-			required: ["oldPassword", "newPassword"],
-			properties: {
-				oldPassword: { type: "string" },
-				newPassword: { type: "string", minLength: 8 },
-			},
-			additionalProperties: false,
+	tags: ["user"],
+	security: Security.UserAuth,
+	description: "Modifies the password of the user. `This endpoint requires client AND user authentication.`",
+	body: {
+		type: "object",
+		required: ["oldPassword", "newPassword"],
+		properties: {
+			oldPassword: { type: "string" },
+			newPassword: { type: "string", minLength: 8 },
 		},
-		response: {
-			200: {
-				description: "Updated password successfully",
-				$ref: "SuccessMessageResponse#",
-			},
-			400: {
-				description: "Bad Request: Invalid input or missing fields",
-				$ref: "errorResponse#",
-			},
-			401: {
-				description: "Unauthorized: Invalid credentials",
-				$ref: "errorResponse#",
-			},
-			500: {
-				description: "Internal Server Error",
-				$ref: "errorResponse#",
-			},
-			default: {
-				description: "Unexpected error",
-				$ref: "errorResponse#",
-			},
+		additionalProperties: false,
+	},
+	response: {
+		200: {
+			description: "Updated password successfully",
+			$ref: "SuccessMessageResponse#",
+		},
+		400: {
+			description: "Bad Request: Invalid input or missing fields",
+			$ref: "errorResponse#",
+		},
+		401: {
+			description: "Unauthorized: Invalid credentials",
+			$ref: "errorResponse#",
+		},
+		500: {
+			description: "Internal Server Error",
+			$ref: "errorResponse#",
+		},
+		default: {
+			description: "Unexpected error",
+			$ref: "errorResponse#",
 		},
 	},
 };
 
 export const postUserPasswordSchema = {
-	schema: {
-		id$: "postUserPasswordSchema",
-		tags: ["user"],
-		security: Security.UserAuth,
-		description: "Sets the password of an user that doesnt already have a password (oAuth signup). `This endpoint requires client AND user authentication.`",
-		body: {
-			type: "object",
-			required: ["password"],
-			properties: {
-				password: { type: "string", minLength: 8 },
-			},
-			additionalProperties: false,
+	tags: ["user"],
+	security: Security.UserAuth,
+	description: "Sets the password of an user that doesnt already have a password (oAuth signup). `This endpoint requires client AND user authentication.`",
+	body: {
+		type: "object",
+		required: ["password"],
+		properties: {
+			password: { type: "string", minLength: 8 },
 		},
-		response: {
-			200: {
-				description: "Uploaded password successfully",
-				$ref: "SuccessMessageResponse#",
-			},
-			400: {
-				description: "Bad Request: Invalid input or missing fields",
-				$ref: "errorResponse#",
-			},
-			401: {
-				description: "Unauthorized: Invalid credentials",
-				$ref: "errorResponse#",
-			},
-			403: {
-				description: "Forbidden: User already has a password",
-				$ref: "errorResponse#",
-			},
-			500: {
-				description: "Internal Server Error",
-				$ref: "errorResponse#",
-			},
-			default: {
-				description: "Unexpected error",
-				$ref: "errorResponse#",
-			},
+		additionalProperties: false,
+	},
+	response: {
+		200: {
+			description: "Uploaded password successfully",
+			$ref: "SuccessMessageResponse#",
+		},
+		400: {
+			description: "Bad Request: Invalid input or missing fields",
+			$ref: "errorResponse#",
+		},
+		401: {
+			description: "Unauthorized: Invalid credentials",
+			$ref: "errorResponse#",
+		},
+		403: {
+			description: "Forbidden: User already has a password",
+			$ref: "errorResponse#",
+		},
+		500: {
+			description: "Internal Server Error",
+			$ref: "errorResponse#",
+		},
+		default: {
+			description: "Unexpected error",
+			$ref: "errorResponse#",
 		},
 	},
 };

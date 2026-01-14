@@ -2,7 +2,7 @@ import { updateUsernameSchema } from "../../schemas/username.schema.js";
 
 export default function updateUsername(server) {
 	const opts = {
-		$ref: updateUsernameSchema,
+		schema: updateUsernameSchema,
 		onRequest: [server.authenticateUser, server.authenticateClient],
 	};
 	server.put("/me/username", opts, async (req, reply) => {

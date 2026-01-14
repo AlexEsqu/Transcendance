@@ -1,5 +1,3 @@
-import { Security } from "../utils/openApiSecurity.js";
-
 export const errorResponse = {
 	$id: "errorResponse",
 	additionalProperties: false,
@@ -106,8 +104,3 @@ export const twoFactorRequiredObject = {
 	},
 	description: "Two-factor authentication required",
 };
-
-
-
-// MATCHES
-

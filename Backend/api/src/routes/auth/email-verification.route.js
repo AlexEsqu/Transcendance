@@ -3,7 +3,7 @@ import { verifyEmailSchema } from "../../schemas/email-verification.schema.js";
 
 export default function verifyEmail(server) {
 	const opts = {
-		$ref: verifyEmailSchema,
+		schema: verifyEmailSchema,
 	};
 	server.get("/verify-email", opts, async (request, reply) => {
 		try {
