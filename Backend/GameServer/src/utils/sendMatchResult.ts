@@ -33,8 +33,8 @@ function sendMatchesToDataBase(results: IResult | null, time?: number): void
 
 		if (!results)
 			throw new Error("GAME-SERVER: results not found, can't send matches results");
-
-		const matchesURL: string = "https://localhost:8443/api/matches";
+		console.log(process.env.APP_SECRET_KEY);
+		const matchesURL: string = "http://api:3000/api/matches";
 		const matchesJSON: JSONMatchesResults = fillMatchesJSON(results, time);
 		const headers = {
 			'Content-Type': 'application/json',
