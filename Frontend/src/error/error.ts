@@ -1,14 +1,12 @@
 import { ErrorModal } from "../utils/Modal";
+import errorHtml from "../html/info/error.html"
 
 export { getErrorPage, openErrorModal }
 
-async function getErrorPage(): Promise<string>
+function getErrorPage(): string
 {
 	const errorMessage = window.sessionStorage.getItem("errorMessage") ?? "Unknown error";
 	console.log(errorMessage);
-
-	const response = await fetch('/src/html/info/error.html?raw');
-	const errorHtml = await response.text();
 
 	return errorHtml.replace("{{ERROR_MESSAGE}}", errorMessage);
 }

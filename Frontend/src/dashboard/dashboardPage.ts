@@ -4,17 +4,17 @@ import { RegisteredUser } from "../user/User";
 import type { Subscriber } from "../user/UserState";
 import type { User } from "../user/User";
 import { displayMatchHistory } from "./graphSection";
-import { onAvatarLoaded, onEmailLoaded, onPasswordLoaded, onRenameLoaded } from "./settingSection";
+import { onSettingsLoaded } from "../settings/settingPage";
 
 import dashboardHtml from "../html/dashboard.html?raw";
 
-export { getDashboardPage, initDashboardPageListeners }
+export { getDashboardPage, initDashboardPageListeners, showRegisteredUserOptions }
 
 // variable to hold current listener functions
 
 let currentFriendsListener: Subscriber | null = null;
 let currentUsersListener: Subscriber | null = null;
-let currentOptionsListener: Subscriber | null = null;
+// let currentOptionsListener: Subscriber | null = null;
 
 // Getting base html for the pages
 
@@ -36,27 +36,15 @@ function initDashboardPageListeners(): void
 
 		switch (path)
 		{
-			case '/dashboard/rename':
+			case '/dashboard':
 			{
-				onRenameLoaded();
+				onDashboardLoaded()
 				return;
 			}
 
-			case '/dashboard/avatar':
+			case '/settings':
 			{
-				onAvatarLoaded();
-				return;
-			}
-
-			case '/dashboard/password':
-			{
-				onPasswordLoaded();
-				return;
-			}
-
-			case '/dashboard/email':
-			{
-				onEmailLoaded(); // TO DO : add api route
+				onSettingsLoaded();
 				return;
 			}
 
@@ -82,13 +70,13 @@ async function onDashboardLoaded()
 	{
 		showRegisteredUserOptions(user);
 
-		currentOptionsListener = (updatedUser: User | null) => {
-			if (updatedUser instanceof RegisteredUser) {
-				activateTfaButton(updatedUser);
-			}
-		};
+		// currentOptionsListener = (updatedUser: User | null) => {
+		// 	if (updatedUser instanceof RegisteredUser) {
+		// 		activateTfaButton(updatedUser);
+		// 	}
+		// };
 
-		userState.subscribe(currentOptionsListener);
+		// userState.subscribe(currentOptionsListener);
 		userState.subscribe(currentFriendsListener);
 		displayMatchHistory();
 	}
@@ -103,46 +91,6 @@ function showRegisteredUserOptions(user : RegisteredUser)
 			(el as HTMLElement).style.display = 'flex';
 		}
 	);
-
-	activateDeleteButton();
-	activateTfaButton(user);
-}
-
-function activateTfaButton(user : RegisteredUser)
-{
-	const twoFactorAuthBtn = document.getElementById('enable-tfa-btn');
-	if (!twoFactorAuthBtn)
-		return;
-
-	const newBtn = twoFactorAuthBtn.cloneNode(true) as HTMLElement;
-	twoFactorAuthBtn.parentNode?.replaceChild(newBtn, twoFactorAuthBtn);
-
-	if (user.hasTwoFactorAuth)
-	{
-		newBtn.textContent = 'Disable Two Factor Authentication';
-		newBtn.addEventListener('click', () => {
-			userState.twoFactor.toggle2fa(false);
-		});
-	}
-	else
-	{
-		newBtn.textContent = 'Enable Two Factor Authentication';
-		newBtn.addEventListener('click', () => {
-			userState.twoFactor.toggle2fa(true);
-		});
-	}
-}
-
-function activateDeleteButton()
-{
-	const deleteAccBtn = document.getElementById('delete-account-btn');
-	if (!deleteAccBtn)
-		return;
-
-	deleteAccBtn.addEventListener('click', () => {
-		userState.emailAuth.deleteAccount();
-		router.navigateTo('/connection')
-	});
 }
 
 function cleanupDashboardListeners()
@@ -157,9 +105,9 @@ function cleanupDashboardListeners()
 		userState.unsubscribe(currentUsersListener);
 		currentUsersListener = null;
 	}
-	if (currentOptionsListener)
-	{
-		userState.unsubscribe(currentOptionsListener);
-		currentOptionsListener = null;
-	}
+	// if (currentOptionsListener)
+	// {
+	// 	userState.unsubscribe(currentOptionsListener);
+	// 	currentOptionsListener = null;
+	// }
 }
