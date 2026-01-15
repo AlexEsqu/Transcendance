@@ -165,16 +165,13 @@ class Router
 		{
 			navbar.classList.remove('hidden');
 
-			if (!this.navbarInitialized)
-			{
-				navbar.innerHTML = getNavBarHtml();
-				this.navbarInitialized = true;
+			navbar.innerHTML = getNavBarHtml();
+			this.navbarInitialized = true;
 
-				// signals to navbar that it can attach the buttons
-				// that have been loaded into the DOM / are in the displayed html
-				const navEvent = new CustomEvent('navbarLoaded');
-				document.dispatchEvent(navEvent);
-			}
+			// signals to navbar that it can attach the buttons
+			// that have been loaded into the DOM / are in the displayed html
+			const navEvent = new CustomEvent('navbarLoaded');
+			document.dispatchEvent(navEvent);
 		}
 		else
 		{
