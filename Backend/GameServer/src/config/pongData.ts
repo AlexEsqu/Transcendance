@@ -13,7 +13,7 @@ const GAME = {
 	MAX_SCORE: 11,
 	MAX_ROUNDS: 1,
 
-	BALL_START_SPEED: 6,
+	BALL_START_SPEED: 4,
 	BALL_MAX_SPEED: 10,
 	BALL_RADIUS: 0.15,
 
@@ -44,11 +44,11 @@ enum GameLocation {
 };
 
 enum PlayerState {
-	waiting, play, launch, end, opening, stop
+	waiting, play, end, opening, stop
 };
 
 enum State {
-	waiting, play, launch, end
+	waiting, play, end
 };
 
 enum Level {

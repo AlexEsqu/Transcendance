@@ -91,8 +91,8 @@ export class GameLoop
 		//	Check if the ball hits the edge of map/paddles or is out of bounds -> update its direction accordingly
 		//	Depending on what/where the ball hits an object or a limit, its direction is reversed and gains speed
 		const isBallOutOfBounds: boolean = this.bouncingBallProcess();
-		if (isBallOutOfBounds)
-			this.state = State.launch;
+		// if (isBallOutOfBounds)
+		// 	this.state = State.launch;
 
 		if (this.leftPadd.robot)
 			this.processPlayerInput('Robot', this.state, processRobotOpponent(this.leftPadd, this.ball));
@@ -123,7 +123,7 @@ export class GameLoop
 			this.ball.direction = normalizeVector(this.ball.direction);
 
 			//	Increase gradually the speed
-			this.ball.speed = Math.min(GAME.BALL_MAX_SPEED, this.ball.speed * 1.05);
+			this.ball.speed = Math.min(GAME.BALL_MAX_SPEED, this.ball.speed * 1.1);
 
 			return false;
 		}
@@ -198,7 +198,8 @@ export class GameLoop
 	requestNewRound(): void
 	{
 		if (this.state !== State.end)
-			this.state = State.launch;
+			this.state = State.waiting;
+			// this.state = State.launch;
 
 		//	Save the results of the previous match, if there was one
 		if (this.rounds)
@@ -256,6 +257,7 @@ export class GameLoop
 	{
 		this.ball.speed = GAME.BALL_START_SPEED;
 		this.ball.posistion.x = 0.0;
+		this.ball.posistion.z = 0.0
 		if (Math.floor(Math.random() * 2) === 1)
 			this.ball.direction.x = 1;
 		else

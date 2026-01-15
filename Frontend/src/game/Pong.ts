@@ -19,15 +19,12 @@ export class Pong
 	gui: AdvancedDynamicTexture | null = null;
 	waitingSocket: WebSocket | null = null;
 	gamingSocket: WebSocket | null = null;
-	// socket: WebSocket;
 	roomId: number | undefined = undefined;
-	mainPlayer: string;
 	round: number = 0;
-	ready: boolean = false;
+	isPlayerReady: boolean = false;
 	timestamp: number = 0;
-	onNewRound?: () => void;
 
-	constructor(canvasId: string, options: IOptions, onNewRound?: () => void)
+	constructor(canvasId: string, options: IOptions)
 	{
 		this.canvas = getCanvasConfig(canvasId);
 		this.engine = new Engine(this.canvas, true);
@@ -41,9 +38,7 @@ export class Pong
 			throw new Error("'scene' creation failed");
 		this.scene = scene;
 		this.scene.players = players;
-		this.mainPlayer = players[0].username;
 		this.scene.state = PlayerState.opening;
-		this.onNewRound = onNewRound;
 		this.gui = AdvancedDynamicTexture.CreateFullscreenUI("UI");
 		this.waitingSocket = new WebSocket(`wss://${window.location.host}${Pong.WAITING_ROOM_URL}`);
 		if (!this.waitingSocket)
@@ -142,38 +137,6 @@ export class Pong
 		}, 100);
 	}
 
-	stateBasedScene(state: PlayerState, results: IResult | undefined): void
-	{
-		switch (state)
-		{
-			case PlayerState.opening:
-				this.opening();
-				break ;
-
-			case PlayerState.launch:
-					this.launch(3);
-				break ;
-			
-			case PlayerState.waiting:
-				this.ready = false;
-				if (this.onNewRound)
-					this.onNewRound();
-				break ;
-
-			case PlayerState.end:
-				this.endGame(results);
-				break ;
-			
-			case PlayerState.stop:
-				this.gamingSocket?.close();
-				this.gamingSocket = null;
-				break ;
-
-			default:
-				break ;
-		}
-	}
-
 	runGame(): void
 	{
 		if (!this.engine || !this.scene.id) {
@@ -188,9 +151,7 @@ export class Pong
 		this.handleInput(keys);
 		this.scene.id.registerBeforeRender(() => {
 			// console.log(`GAME-FRONT-STATE: ${this.scene.state}`);
-			this.stateBasedScene(this.scene.state, result);
-			if (this.scene.state === PlayerState.play)
-				this.updateGame(keys);
+			this.stateBasedScene(this.scene.state, result, keys);
 			// this.timestamp = Date.now();
 		});
 
@@ -204,6 +165,36 @@ export class Pong
 			}
 			this.scene.id.render();
 		});
+	}
+
+	stateBasedScene(state: PlayerState, results: IResult | undefined, keys: Record<string, boolean>): void
+	{
+		switch (state)
+		{
+			case PlayerState.opening:
+				this.opening();
+				break ;
+
+			case PlayerState.play:
+				this.updateGame(keys);
+				break ;
+
+			case PlayerState.waiting:
+				this.getReadyToPlay(keys);
+				break ;
+
+			case PlayerState.end:
+				this.endGame(results);
+				break ;
+			
+			case PlayerState.stop:
+				this.gamingSocket?.close();
+				this.gamingSocket = null;
+				break ;
+
+			default:
+				break ;
+		}
 	}
 
 	updateGame(keys: Record<string, boolean>): void
@@ -241,6 +232,31 @@ export class Pong
 		}
 	}
 
+	getReadyToPlay(keys: Record<string, boolean>): void
+	{
+		const element = document.getElementById('player-ready-input') as HTMLElement;
+		if (!element)
+			return ;
+
+		// if player isnt ready display "press space bar when you're ready" then listen for inputs
+		if (!this.isPlayerReady) {
+
+			element.style.display = 'flex';
+
+			if (keys[" "]) {
+				this.isPlayerReady = true;
+				element.style.display = 'none';
+				
+				//	Notify the server that player(s) is ready to play
+				const players = this.scene.players;
+				for (const player of players)
+				{
+					this.sendUpdateToGameServer(player.username, 'none', true);
+				}
+			}
+		}
+	}
+
 	processNewGameState(gameState: JSONGameState): void
 	{
 		this.timestamp = gameState.timestamp;
@@ -255,7 +271,7 @@ export class Pong
 			this.round = gameState.round;
 			this.scene.leftPadd.player = assignPlayers(gameState, this.scene.players, 'left');
 			this.scene.rightPadd.player = assignPlayers(gameState, this.scene.players, 'right');
-			this.ready = false;
+			this.isPlayerReady = false;
 		}
 
 		if (this.scene.leftPadd.mesh && this.scene.leftPadd.player) {
@@ -388,6 +404,8 @@ export class Pong
 		});
 		window.addEventListener("keyup", (evt) => {
 			keys[evt.key] = false;
+			if (evt.key === ' ' && !this.isPlayerReady)
+				keys[evt.key] = true;
 		});
 	}
 }

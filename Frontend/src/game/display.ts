@@ -226,6 +226,22 @@ function getPaddColors(): string[]
 	return result;
 }
 
+function getMatchType(): number
+{
+	const matchContainer = document.getElementById('match-type-container');
+	if (!matchContainer)
+		throw new Error("No match type found");
+
+	userState.refreshUser();
+
+	const selection = matchContainer.querySelector('select');
+	if (!selection)
+		throw new Error("No selection found");
+
+	const result = parseInt(selection.value);
+	return (result);
+}
+
 function onGameOptionLoaded(): void
 {
 	try {
@@ -241,7 +257,6 @@ function onGameOptionLoaded(): void
 			const formData = new FormData(optionsForm) as FormData;
 	
 			// identify form values
-			const gameType = formData.get('game-type') as string | null;
 			const level = formData.get('level') as string | null;
 			const matchLoc = formData.get('match-location') as string | null;
 	
@@ -249,7 +264,7 @@ function onGameOptionLoaded(): void
 			const options: IOptions = {
 				matchLocation: matchLoc ? matchLoc : 'local',
 				level: level ? parseInt(level) : 0,
-				nbOfPlayers: gameType ? parseInt(gameType) : 1,
+				nbOfPlayers: getMatchType(),
 				paddColors: getPaddColors() || '#a2c2e8',
 				players: getPlayerNames(),
 				ballColor: '#a2c2e8',
