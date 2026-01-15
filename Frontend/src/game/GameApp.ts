@@ -1,7 +1,7 @@
 import { Pong } from "../game/Pong"
 import { IOptions, Level } from "../game/Data"
-import gameHtml from '../pages/game.html?raw'
-import optionsHtml from '../pages/options.html?raw'
+import gameHtml from '../html/game.html?raw'
+import optionsHtml from '../html/options.html?raw'
 
 import { clearOptions, loadOptions } from "./options"
 import { userState } from "../app"

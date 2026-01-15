@@ -1,11 +1,11 @@
 import { userState, router } from "../app";
-import { apiDomainName, apiKey } from "./UserState";
+import { apiDomainName, apiKey } from "../user/UserState";
 
-import connectionHtml from "../pages/connection.html?raw";
-import guestFormHtml from "../pages/forms/guestForm.html?raw"
-import loginFormHtml from "../pages/forms/loginForm.html?raw"
-import registerFormHtml from "../pages/forms/registerForm.html?raw"
-import checkEmailHtml from "../pages/info/checkEmail.html?raw"
+import connectionHtml from "../html/connection.html?raw";
+import guestFormHtml from "../html/forms/guestForm.html?raw"
+import loginFormHtml from "../html/forms/loginForm.html?raw"
+import registerFormHtml from "../html/forms/registerForm.html?raw"
+import checkEmailHtml from "../html/info/checkEmail.html?raw"
 
 export {
 	getConnectionLandingHtml,
@@ -80,31 +80,20 @@ function onConnectionLoaded(): void
 	oauthBtn.addEventListener('click', async (e) =>
 		{
 			e.preventDefault();
-			/* Not an api call but a button that redirects to my route that will itself redirect to 42's api, 
+			/* Not an api call but a button that redirects to my route that will itself redirect to 42's api,
 			  I process the info and store a refresh token in the users cookies, you can now follow the same
 			  process as the usual login ;) */
-			
 
-			window.location.replace(`${apiDomainName}/users/auth/oauth/42`)
-			//now that its successful, the user now has a refresh token, you can now login the user
+			userState.oAuth.register();
 
-			// const response = await fetch(`${apiDomainName}/users/auth/oauth/42`,
-			// 		{
-			// 			method: 'GET',
-			// 			headers:
-			// 			{
-			// 				'accept': 'application/json',
-			// 				'X-App-Secret': `${apiKey}`
-			// 			},
-			// 		});
-			// 		const data = await response.json();
+		}
+	);
 
-			// 		if (!response.ok || !data.accessToken)
-			// 		{
-			// 			console.log(data.message || data.error || 'Faied to refresh token');
-			// 			return false;
-			// 		}
-			// 		console.log(data);
+	const oauthLogInBtn = document.getElementById('oauth-login-btn') as HTMLButtonElement;
+	oauthLogInBtn.addEventListener('click', async (e) =>
+		{
+			e.preventDefault();
+			userState.oAuth.login();
 		}
 	);
 }
@@ -122,7 +111,7 @@ function onAliasLoaded(): void
 			const formData = new FormData(guestForm);
 			const alias = formData.get('input-alias') as string | null;
 			if (alias)
-				userState.loginAsGuest(alias);
+				userState.guest.guestin(alias);
 		}
 	);
 }
@@ -154,7 +143,7 @@ function onRegisterLoaded(): void
 
 			try
 			{
-				await userState.register(login, password, email);
+				await userState.emailAuth.register(login, password, email);
 				router.navigateTo("/connection/emailcheck");
 			}
 			catch (error)
@@ -186,7 +175,7 @@ function onLoginLoaded(): void
 			{
 				try
 				{
-					await userState.loginAsRegistered(login, password);
+					await userState.emailAuth.login(login, password);
 				}
 				catch (error)
 				{
