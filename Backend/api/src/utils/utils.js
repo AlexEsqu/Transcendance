@@ -3,7 +3,7 @@ export function formatUserObject(user) {
 		user.avatar = user.avatar.replace(process.env.AVATARS_UPLOAD_PATH, `${process.env.API_DOMAIN_NAME}/avatars`);
 	}
 	user.is_active = computeActive(user.last_activity);
-	user.oauth = user.oauth_provider ? true : false;
+	user.oauth = user.oauth_provider ? "true" : "false";
 	delete user.last_activity;
 }
 

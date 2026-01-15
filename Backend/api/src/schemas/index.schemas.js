@@ -75,6 +75,80 @@ export const publicUserObject = {
 	},
 };
 
+export const privateUserObject = {
+  $id: "privateUserObject",
+  type: "object",
+  description: "Private authenticated user data",
+  required: [
+    "id",
+    "username",
+    "email",
+    "avatar",
+    "email_verified",
+    "is_2fa_enabled",
+    "oauth_provider",
+    "matches",
+    "is_active",
+    "oauth"
+  ],
+  properties: {
+    id: {
+      type: "integer",
+      example: 1
+    },
+    username: {
+      type: "string",
+      minLength: 3,
+      maxLength: 32,
+      example: "lasablon"
+    },
+    email: {
+      type: "string",
+      format: "email",
+      example: "lasablon@student.42.fr"
+    },
+    avatar: {
+      type: ["string", "null"],
+      format: "uri",
+      example: "https://localhost:8443/api/avatars/user_1.jpg"
+    },
+    email_verified: {
+      type: "boolean",
+      description: "Whether the user's email is verified",
+      example: true
+    },
+    is_2fa_enabled: {
+      type: "boolean",
+      description: "Whether two-factor authentication is enabled",
+      example: false
+    },
+    oauth_provider: {
+      type: ["string", "null"],
+      description: "OAuth provider used for signup",
+      example: "42"
+    },
+    oauth: {
+      type: "boolean",
+      description: "Whether the user authenticated via OAuth",
+      example: true
+    },
+    is_active: {
+      type: "boolean",
+      description: "Whether the user account is active",
+      example: true
+    },
+    matches: {
+      type: "array",
+      description: "List of matches played by the user",
+      items: {
+        $ref: "matchObject#"
+      }
+    }
+  },
+  additionalProperties: false
+};
+
+
 export const loginTokenObject = {
 	$id: "loginTokenObject",
 	type: "object",

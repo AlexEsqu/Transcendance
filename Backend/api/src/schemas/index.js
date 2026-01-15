@@ -4,6 +4,7 @@ import {
 	errorResponse,
 	loginTokenObject,
 	matchObject,
+	privateUserObject,
 	publicUserObject,
 	SignupBody,
 	SuccessMessageResponse,
@@ -21,6 +22,7 @@ async function Schemas(server) {
 	server.addSchema(publicUserObject);
 	server.addSchema(loginTokenObject);
 	server.addSchema(twoFactorRequiredObject);
+	server.addSchema(privateUserObject);
 }
 
 export default fp(Schemas);
