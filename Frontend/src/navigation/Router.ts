@@ -31,16 +31,16 @@ class Router
 	//--------------------------- ATTRIBUTES --------------------------------//
 
 	// available routes
-	private routes: Route[] = [];
+	routes: Route[] = [];
 
 	// current user state
-	private userState: UserState;
+	userState: UserState;
 
 	// container within which to display the html content
-	private rootElement: HTMLElement;
+	rootElement: HTMLElement;
 
 	// track if navbar is currently initialized
-	private navbarInitialized: boolean = false;
+	navbarInitialized: boolean = false;
 
 	//--------------------------- CONSTRUCTORS ------------------------------//
 
@@ -54,8 +54,7 @@ class Router
 		}
 
 		this.registerRoutes();
-
-		this.initializePageTo();
+		this.initializeFirstPage();
 
 		// plug into back / forward browser buttons to render the last state
 		window.addEventListener('popstate', () => this.render());
@@ -100,12 +99,8 @@ class Router
 		const currentSearch = window.location.search;
 		const user = this.userState.getUser();
 
-		console.log(`initial route is ${currentPath} with query ${currentSearch}`);
-
 		const route = this.validateRoute(currentPath);
 		const targetPath = route.path;
-
-		console.log(route && `corrected route is ${targetPath} with query ${currentSearch}`)
 
 		this.rootElement.innerHTML = route.getPage();
 
@@ -118,16 +113,22 @@ class Router
 	}
 
 	// uses window.history.pushState, for app navigation (allow back and forth)
+	// and path validation to make sure no innaccessible page is accessed
 	navigateTo(path: string)
 	{
-		console.log(`navigating to ${path}`)
-
-		window.history.pushState(null, '', path);
-		this.render();
+		if (this.isValidPath(path))
+		{
+			window.history.pushState(null, '', path);
+			this.render();
+		}
+		else
+		{
+			console.log(`Inaccessible page: ${path}`);
+		}
 	}
 
 	// uses window.history.replaceState, for app initialization (no back button)
-	initializePageTo()
+	initializeFirstPage()
 	{
 		const initialPath = window.location.pathname;
 		const initialSearch = window.location.search;
@@ -185,14 +186,22 @@ class Router
 
 	//-------------------------- UTILITIES ----------------------------------//
 
-
-	getDefaultPage(user : User | null): Route
+	getDefaultPath(user: User | null): string
 	{
-		const defaultPath = user ? '/dashboard' : '/connection';
-		const defaultRoute = this.routes.find(route => route.path === defaultPath);
+		return user ? '/dashboard' : '/connection';
+	}
+
+	getDefaultRoute(user : User | null): Route
+	{
+		const defaultRoute = this.routes.find(route => route.path === this.getDefaultPath(user));
 		if (!defaultRoute)
-			throw new Error('Page not found')
+			throw new Error('Default Page not found')
 		return defaultRoute;
+	}
+
+	getRoute(path : string): Route | undefined
+	{
+		return this.routes.find(route => route.path === path);
 	}
 
 	isAccessibleRoute(route: Route, user: User | null): boolean
@@ -206,12 +215,21 @@ class Router
 		return true;
 	}
 
+	isValidPath(path: string): boolean
+	{
+		const user = this.userState.getUser();
+		let currentRoute = this.routes.find(route => route.path === path);
+		if (!currentRoute || !this.isAccessibleRoute(currentRoute, user))
+			return false;
+		return true;
+	}
+
 	validateRoute(path: string): Route
 	{
 		const user = this.userState.getUser();
 		let currentRoute = this.routes.find(route => route.path === path);
 		if (!currentRoute || !this.isAccessibleRoute(currentRoute, user))
-			currentRoute = this.getDefaultPage(user);
+			currentRoute = this.getDefaultRoute(user);
 		return currentRoute;
 	}
 
