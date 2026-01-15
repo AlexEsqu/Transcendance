@@ -4,32 +4,38 @@
 	class="glow-form glow-anim"
 	novalidate>
 
-	<section>
-		<label
-			for="input-alias"
-			class="">
-			Alias:
-		</label>
-		<input
-			name="input-alias"
-			id="input-alias"
-			type="text"
-			class=""
-			required
-			maxlength="20"
-			placeholder="Wisely, Lilith, V..." />
-		<span
-			aria-live="polite"
-			class="error-hint text-center text-red-500 text-xs mt-1 hidden">
-		</span>
-	</section>
+	<h1>
+		Guest Login
+	</h1>
 
-	<button
-		class=""
-		type="submit"
-		id="btn-submit-alias"
-		name="btn-submit-alias">
-		Play as a Guest
-	</button>
+	<article>
+		<section>
+			<label
+				for="input-alias"
+				class="">
+				Alias:
+			</label>
+			<input
+				name="input-alias"
+				id="input-alias"
+				type="text"
+				class=""
+				required
+				maxlength="20"
+				placeholder="Wisely, Lilith, V..." />
+			<span
+				aria-live="polite"
+				class="error-hint text-center text-red-500 text-xs mt-1 hidden">
+			</span>
+		</section>
+
+		<button
+			class="mt-3"
+			type="submit"
+			id="btn-submit-alias"
+			name="btn-submit-alias">
+			Play as Guest
+		</button>
+	</article>
 
 </form>

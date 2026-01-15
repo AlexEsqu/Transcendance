@@ -3,51 +3,68 @@
 	name="login-form"
 	class="glow-form glow-anim">
 
-	<section>
-		<label
-			for="input-login"
-			class="">
-			Username or Email
-		</label>
-		<input
-			id="input-login"
-			name="input-login"
-			type="login"
-			required
-			class=""
-			placeholder="André De La Jacopière" />
-		<span
-			aria-live="polite"
-			class="error-hint text-center text-red-500 text-xs mt-1 hidden">
-		</span>
-	</section>
+	<h1>
+		Login
+	</h1>
 
-	<section>
-		<label
-			for="input-password"
-			class="">
-			Password:
-		</label>
-		<input
-			id="input-password"
-			name="input-password"
-			type="password"
-			required
-			minlength="8"
-			class=""
-			placeholder="********" />
-		<span
-			aria-live="polite"
-			class="error-hint text-center text-red-500 text-xs mt-1 hidden">
-		</span>
-	</section>
+	<article id="email-login-container">
+		<section>
+			<label
+				for="input-login"
+				class="">
+				Username or Email
+			</label>
+			<input
+				id="input-login"
+				name="input-login"
+				type="login"
+				required
+				class=""
+				placeholder="André De La Jacopière" />
+			<span
+				aria-live="polite"
+				class="error-hint text-center text-red-500 text-xs mt-1 hidden">
+			</span>
+		</section>
 
-	<button
-		id="btn-submit-login"
-		name="btn-submit-login"
-		type="submit"
-		class="">
-		Login as User
-	</button>
+		<section>
+			<label
+				for="input-password"
+				class="">
+				Password:
+			</label>
+			<input
+				id="input-password"
+				name="input-password"
+				type="password"
+				required
+				minlength="8"
+				class=""
+				placeholder="********" />
+			<span
+				aria-live="polite"
+				class="error-hint text-center text-red-500 text-xs mt-1 hidden">
+			</span>
+		</section>
+
+		<button
+			id="btn-submit-login"
+			name="btn-submit-login"
+			type="submit"
+			class="mt-3">
+			Login with Email Address
+		</button>
+	</article>
+
+		<span
+			class="text-center block mb-4 mt-4">
+			Or
+		</span>
+
+	<article id="oauth-login-container">
+		<button class="" id="oauth-login-btn">
+			Login with 42Intra
+		</button>
+	</article>
 
 </form>

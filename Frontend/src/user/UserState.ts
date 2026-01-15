@@ -3,7 +3,7 @@ import { router } from "../app";
 import { EmailAuthService } from "../auth/EmailAuth";
 import { OAuthService } from "../auth/OAuth";
 import { GuestService } from "../auth/Guest";
-import { TwoFactorService } from "../auth/TwoFactor";
+import { TwoFactorAuthService } from "../auth/TwoFactorAuth";
 import { CustomizeService } from "./Customize";
 import { SocialService } from "./Social";
 
@@ -39,7 +39,7 @@ class UserState
 	emailAuth: EmailAuthService;
 	oAuth: OAuthService;
 	guest: GuestService;
-	twoFactor: TwoFactorService;
+	twoFactor: TwoFactorAuthService;
 	customize: CustomizeService;
 	social: SocialService;
 
@@ -51,7 +51,7 @@ class UserState
 		this.emailAuth = new EmailAuthService(apiDomainName, apiKey, this);
 		this.oAuth = new OAuthService(apiDomainName, apiKey, this);
 		this.guest = new GuestService(this);
-		this.twoFactor = new TwoFactorService(this);
+		this.twoFactor = new TwoFactorAuthService(this);
 		this.customize = new CustomizeService(this);
 		this.social = new SocialService(this);
 
@@ -76,13 +76,13 @@ class UserState
 	//--------------------------- SETTER ------------------------------------//
 
 	// modified User objects and notifies subscribers for state changes
-	setUser(newUser: User | null): void
+	async setUser(newUser: User | null): Promise<void>
 	{
 		this.user = newUser;
 
 		// wait for the backend to confirm data on the user
 		if (newUser instanceof RegisteredUser)
-			this.refreshUser();
+			await this.refreshUser();
 
 		this.saveToLocalStorage();
 		this.notifySubscribers();
@@ -157,7 +157,7 @@ class UserState
 			try
 			{
 				const data = JSON.parse(registeredData);
-				this.user = new RegisteredUser(data.username, data.id, data.accessToken);
+				this.user = new RegisteredUser(data.id, data.accessToken, data.username);
 				this.user.avatar = data.avatar;
 				this.user.friends = data.friends ?? [];
 				this.notifySubscribers();
@@ -169,8 +169,7 @@ class UserState
 					? error.message
 					: "Unknown error when loading user from local storage";
 				console.log(msg);
-				this.setUser(null);
-				router.navigateTo('/connection')
+				this.resetUser();
 			}
 		}
 		else if (guestData)
@@ -207,10 +206,9 @@ class UserState
 		if (!response.ok || !data.accessToken)
 		{
 			console.log(data.message || data.error || 'Faied to refresh token');
-			this.setUser(null);
+			this.resetUser();
 			return false;
 		}
-
 
 		this.user.accessToken = data.accessToken;
 		this.saveToLocalStorage();
@@ -283,24 +281,19 @@ class UserState
 		if (!response.ok)
 			throw new Error(data.message || data.error || `Failed to fetch user (${response.status})`);
 
-		this.user.username = data.username ?? data.username ?? this.user.username;
+		this.user.username = data.username ?? this.user.username;
 		this.user.avatar = data.avatar ?? this.user.avatar;
 
-		await this.refreshFriendList();
+		await this.refreshFriendList(this.user);
+		await this.refreshHas2fa(this.user);
 		this.user.isRefreshed = true;
 
 		this.saveToLocalStorage();
 	}
 
-	async refreshFriendList()
+	async refreshFriendList(user : RegisteredUser)
 	{
-		if (!(this.user instanceof RegisteredUser))
-		{
-			console.log("No registered user to refresh");
-			return;
-		}
-
-		if (this.user.id === null || this.user.id === undefined)
+		if (user.id === null || user.id === undefined)
 			throw new Error("User id is missing");
 
 		const response = await this.fetchWithTokenRefresh(
@@ -311,7 +304,7 @@ class UserState
 				{
 					'accept': 'application/json',
 					'X-App-Secret': `${apiKey}`,
-					'Authorization': `Bearer ${this.user.accessToken}`
+					'Authorization': `Bearer ${user.accessToken}`
 				}
 			}
 		);
@@ -322,6 +315,52 @@ class UserState
 		if (!response.ok)
 			throw new Error(data.message || data.error || `Failed to fetch user friends (${response.status})`);
 
-		this.user.setFriends(data);
+		user.setFriends(data);
+	}
+
+	async refreshHas2fa(user : RegisteredUser)
+	{
+		const response = await this.fetchWithTokenRefresh(
+			`${apiDomainName}/users/me/2fa`,
+			{
+				method: 'GET',
+				headers:
+				{
+					'accept': 'application/json',
+					'X-App-Secret': `${apiKey}`,
+					'Authorization': `Bearer ${user.accessToken}`
+				}
+			}
+		);
+
+		const data = await response.json();
+		console.log(`has 2fa active:`);
+		console.log(data);
+		if (!response.ok)
+			throw new Error(data.message || data.error || `Failed to fetch tfa status (${response.status})`);
+
+		user.hasTwoFactorAuth = data.is_2fa_enabled;
+	}
+
+	async logout()
+	{
+		const user = this.getUser();
+
+		if (user instanceof RegisteredUser)
+			await this.emailAuth.logout();
+		else
+			this.guest.guestout();
+	}
+
+	resetUser(): void
+	{
+		this.user = null;
+
+		localStorage.removeItem(localStorageKeyForGuestUser);
+		localStorage.removeItem(localStorageKeyForRegisteredUser);
+
+		this.notifySubscribers();
+
+		router.navigateTo('/connection');
 	}
 }

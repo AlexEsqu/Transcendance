@@ -1,5 +1,5 @@
 import { userState, router } from "../app";
-import { apiDomainName, apiKey } from "../user/UserState";
+import { isValidInputs, checkInputValidityOnUnfocus } from "../utils/inputValidation";
 
 import connectionHtml from "../html/connection.html?raw";
 import guestFormHtml from "../html/forms/guestForm.html?raw"
@@ -37,7 +37,8 @@ function getEmailCheck(): string
 function initConnectionPageListeners(): void
 {
 	document.addEventListener('pageLoaded', (event: Event) => {
-		const { detail: path } = event as CustomEvent<string>;
+		const customEvent = event as CustomEvent<{ path: string; search: string }>;
+		const { path, search } = customEvent.detail;
 
 		switch (path)
 		{
@@ -59,12 +60,6 @@ function initConnectionPageListeners(): void
 				return;
 			}
 
-			case '/connection':
-			{
-				onConnectionLoaded();
-				return;
-			}
-
 			default:
 			{
 				return;
@@ -74,30 +69,6 @@ function initConnectionPageListeners(): void
 	});
 }
 
-function onConnectionLoaded(): void
-{
-	const oauthBtn = document.getElementById('oauth-btn') as HTMLButtonElement;
-	oauthBtn.addEventListener('click', async (e) =>
-		{
-			e.preventDefault();
-			/* Not an api call but a button that redirects to my route that will itself redirect to 42's api,
-			  I process the info and store a refresh token in the users cookies, you can now follow the same
-			  process as the usual login ;) */
-
-			userState.oAuth.register();
-
-		}
-	);
-
-	const oauthLogInBtn = document.getElementById('oauth-login-btn') as HTMLButtonElement;
-	oauthLogInBtn.addEventListener('click', async (e) =>
-		{
-			e.preventDefault();
-			userState.oAuth.login();
-		}
-	);
-}
-
 function onAliasLoaded(): void
 {
 	const mainContainer = document.getElementById('main')
@@ -105,13 +76,20 @@ function onAliasLoaded(): void
 		mainContainer.insertAdjacentHTML('beforeend', guestFormHtml);
 
 	const guestForm = document.getElementById('guest-form') as HTMLFormElement | null;
+	if (!guestForm)
+		return
+
+	checkInputValidityOnUnfocus(guestForm);
 	guestForm?.addEventListener('submit', (e) =>
 		{
 			e.preventDefault();
 			const formData = new FormData(guestForm);
-			const alias = formData.get('input-alias') as string | null;
-			if (alias)
-				userState.guest.guestin(alias);
+			if (isValidInputs(guestForm.querySelectorAll('input')))
+			{
+				const alias = formData.get('input-alias') as string | null;
+				if (alias)
+					userState.guest.guestin(alias);
+			}
 		}
 	);
 }
@@ -123,32 +101,57 @@ function onRegisterLoaded(): void
 		mainContainer.insertAdjacentHTML('beforeend', registerFormHtml);
 
 	const registerForm = document.getElementById('register-form') as HTMLFormElement | null;
-	registerForm?.addEventListener('submit', async (e) =>
+	if (!registerForm)
+		return;
+
+	checkInputValidityOnUnfocus(registerForm);
+	registerForm.addEventListener('submit', async (e) =>
 		{
 			e.preventDefault();
 			const formData = new FormData(registerForm);
-			const login = formData.get('input-login') as string | null;
-			const email = formData.get('input-email') as string | null;
-			const password = formData.get('input-password') as string | null;
-			const check = formData.get('input-password-check') as string | null;
 
-			if (!login || !password || !email)
-				return;
-
-			if (password !== check)
+			if (isValidInputs(registerForm.querySelectorAll('input')))
 			{
-				alert("The passwords don't match...");
-				return;
-			}
+				const login = formData.get('input-login') as string | null;
+				const email = formData.get('input-email') as string | null;
+				const password = formData.get('input-password') as string | null;
+				const check = formData.get('input-password-check') as string | null;
 
+				if (!login || !password || !email)
+					return;
+
+				if (password !== check)
+				{
+					alert("The passwords don't match...");
+					return;
+				}
+
+				try
+				{
+					await userState.emailAuth.register(login, password, email);
+					router.navigateTo("/connection/emailcheck");
+				}
+				catch (error)
+				{
+					const msg = error instanceof Error ? error.message : "Unknown error";
+					window.sessionStorage.setItem("errorMessage", msg);
+					router.navigateTo("/error");
+				}
+			}
+		}
+	);
+
+	const oauthRegisterBtn = document.getElementById('oauth-btn') as HTMLButtonElement;
+	oauthRegisterBtn.addEventListener('click', async (e) =>
+		{
+			e.preventDefault();
 			try
 			{
-				await userState.emailAuth.register(login, password, email);
-				router.navigateTo("/connection/emailcheck");
+				await userState.oAuth.register();
 			}
 			catch (error)
 			{
-				const msg = error instanceof Error ? error.message : "Unknown error";
+				const msg = error instanceof Error ? error.message : "OAuth failed";
 				window.sessionStorage.setItem("errorMessage", msg);
 				router.navigateTo("/error");
 			}
@@ -163,27 +166,51 @@ function onLoginLoaded(): void
 		mainContainer.insertAdjacentHTML('beforeend', loginFormHtml);
 
 	const loginForm = document.getElementById('login-form') as HTMLFormElement | null;
-	loginForm?.addEventListener('submit', async (e) =>
+	if (!loginForm)
+		return;
+
+	checkInputValidityOnUnfocus(loginForm);
+	loginForm.addEventListener('submit', async (e) =>
 		{
 			e.preventDefault();
 
-			const formData = new FormData(loginForm);
-			const login = formData.get('input-login') as string | null;
-			const password = formData.get('input-password') as string | null;
-
-			if (login && password)
+			if (isValidInputs(loginForm.querySelectorAll('input')))
 			{
-				try
+				const formData = new FormData(loginForm);
+				const login = formData.get('input-login') as string | null;
+				const password = formData.get('input-password') as string | null;
+
+				if (login && password)
 				{
-					await userState.emailAuth.login(login, password);
+					try
+					{
+						await userState.emailAuth.login(login, password);
+					}
+					catch (error)
+					{
+						const msg = error instanceof Error ? error.message : "Unknown error";
+						console.log(`error message is ${msg}`);
+						window.sessionStorage.setItem("errorMessage", msg);
+						router.navigateTo("/error");
+					}
 				}
-				catch (error)
-				{
-					const msg = error instanceof Error ? error.message : "Unknown error";
-					console.log(`error message is ${msg}`);
-					window.sessionStorage.setItem("errorMessage", msg);
-					router.navigateTo("/error");
-				}
+			}
+		}
+	);
+
+	const oauthLogInBtn = document.getElementById('oauth-login-btn') as HTMLButtonElement;
+	oauthLogInBtn.addEventListener('click', async (e) =>
+		{
+			e.preventDefault();
+			try
+			{
+				await userState.oAuth.register();
+			}
+			catch (error)
+			{
+				const msg = error instanceof Error ? error.message : "OAuth failed";
+				window.sessionStorage.setItem("errorMessage", msg);
+				router.navigateTo("/error");
 			}
 		}
 	);

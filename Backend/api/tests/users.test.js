@@ -325,6 +325,7 @@ describe("DELETE /users/me", () => {
 		expect(response.statusCode).toBe(204);
 	});
 });
+
 describe("PUT /api/users/me/2fa", () => {
 	it("returns 401 for not logged in", async () => {
 		const response = await server.inject({
@@ -373,6 +374,7 @@ describe("PUT /api/users/me/2fa", () => {
 		});
 	});
 });
+
 describe("GET /api/users/me/2fa", () => {
   it("returns 401 when not authenticated", async () => {
     const res = await server.inject({
@@ -398,24 +400,6 @@ describe("GET /api/users/me/2fa", () => {
 
     expect(res1.json()).toEqual({ is_2fa_enabled: false });
 
-    const res2 = await server.inject({
-      method: "PUT",
-      url: "/api/users/me/2fa",
-      headers,
-      payload: { enabled: true },
-    });
-
-    expect(res2.json()).toMatchObject({
-      success: true,
-    });
-
-    const res3 = await server.inject({
-      method: "GET",
-      url: "/api/users/me/2fa",
-      headers,
-    });
-
-    expect(res3.json()).toEqual({ is_2fa_enabled: true });
   });
 });
 

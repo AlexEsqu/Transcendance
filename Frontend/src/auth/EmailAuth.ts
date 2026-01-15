@@ -60,9 +60,16 @@ export class EmailAuthService
 		if (!response.ok)
 			throw new Error(data.message || data.error || 'Login Failed');
 
-		const user = new RegisteredUser(login, data.id, data.accessToken);
-
-		this.userState.setUser(user);
+		if (data.twoFactorRequired)
+		{
+			console.log('2FA required in login response');
+			this.userState.twoFactor.login();
+		}
+		else
+		{
+			const user = new RegisteredUser( data.id, data.accessToken, login );
+			this.userState.setUser(user);
+		}
 	}
 
 	async logout(): Promise<void>
@@ -88,7 +95,7 @@ export class EmailAuthService
 				throw new Error(data.message || data.error || 'Logout Failed');
 		}
 
-		this.userState.setUser(null);
+		this.userState.resetUser();
 	}
 
 	async deleteAccount(): Promise<void>
@@ -114,6 +121,6 @@ export class EmailAuthService
 				throw new Error(data.message || data.error || 'Delete account Failed');
 		}
 
-		this.userState.setUser(null);
+		this.userState.resetUser();
 	}
 }

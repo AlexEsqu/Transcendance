@@ -10,7 +10,7 @@ export async function initDB(db) {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
 		last_activity DATETIME,
         username TEXT NOT NULL UNIQUE,
-        password_hash TEXT,
+        password_hash TEXT DEFAULT NULL,
 		email TEXT NOT NULL UNIQUE,
 		avatar TEXT,
         refresh_token_hash TEXT,
@@ -20,7 +20,7 @@ export async function initDB(db) {
 		is_2fa_enabled INTEGER DEFAULT 0,
 		code_hash_2fa TEXT,
 		code_expires_2fa INTEGER,
-		token_2fa TEXT,
+		code_attempts_2fa INTEGER DEFAULT 0,
 		oauth_provider TEXT DEFAULT NULL);
 `).run();
 

@@ -7,19 +7,15 @@ import fastifyCookie from "@fastify/cookie";
 import cors from "@fastify/cors";
 import fastifyRateLimit from "@fastify/rate-limit";
 import fastifyStatic from "@fastify/static";
-import path from "node:path";
-
+import Schemas from "./schemas/index.js";
 import db from "./database.js";
 import clientAuthPlugin from "./plugins/validateApiKey.js";
 import sessionAuthPlugin from "./plugins/validateSessionToken.js";
 import authPlugin from "./plugins/jwt.js";
 import swaggerPlugin from "./plugins/swagger.js";
 import mailerPlugin from "./plugins/mailer.js";
-import matchesRoutes from "./routes/matches/index.js";
-import userRoutes from "./routes/users/index.js";
-import authRoutes from "./routes/auth/index.js";
-import nodemailer from "nodemailer";
-import { authCredentialsBody, errorResponse, SignupBody, SuccessMessageResponse, matchObject, userIdObject, publicUserObject, loginTokenObject, twoFactorRequiredObject  } from "./schemas/schemas.js";
+
+import Routes from "./routes/index.js";
 
 export function buildServer({ useHttps = null, dbOverride = null, apiKeyPluginOverride = null, sessionPluginOverride = null, jwtFake = null, mailerOverride = null } = {}) {
 	const server = Fastify({
@@ -52,11 +48,12 @@ export function buildServer({ useHttps = null, dbOverride = null, apiKeyPluginOv
 		origin: "https://localhost:8443",
 		credentials: true,
 		methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-		logLevel: "trace"
+		logLevel: "trace",
 	});
-	server.register(matchesRoutes);
-	server.register(userRoutes);
-	server.register(authRoutes);
+
+	server.register(Schemas);
+	server.register(Routes);
+	// Register routes
 	server.register(fastifyRateLimit, {
 		max: 100,
 		timeWindow: "1 minute",
@@ -64,22 +61,10 @@ export function buildServer({ useHttps = null, dbOverride = null, apiKeyPluginOv
 		ban: 2,
 	});
 	server.register(fastifyStatic, {
-		root: process.env.AVATARS_UPLOAD_PATH ,
+		root: process.env.AVATARS_UPLOAD_PATH,
 		prefix: "/api/avatars/",
 	});
-
 	server.register(mailerOverride ?? mailerPlugin);
 
-	// Schemas
-	server.addSchema(authCredentialsBody);
-	server.addSchema(errorResponse);
-	server.addSchema(SignupBody);
-	server.addSchema(SuccessMessageResponse);
-	server.addSchema(matchObject);
-	server.addSchema(userIdObject);
-	server.addSchema(publicUserObject);
-	server.addSchema(loginTokenObject);
-	server.addSchema(twoFactorRequiredObject);
-	// server.listen({ port: 8080 });
 	return server;
 }

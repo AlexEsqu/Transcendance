@@ -2,6 +2,13 @@ import { UserState } from "../user/UserState";
 import { User, RegisteredUser } from "../user/User";
 
 import { getNavBarHtml } from './navSection';
+import { apiDomainName } from "../user/UserState";
+import { initOAuthCallback } from "../auth/OAuth";
+import { getConnectionLandingHtml, getConnectionForm, getEmailCheck, initConnectionPageListeners} from '../auth/connectionPage'
+import { getDashboardPage, initDashboardPageListeners } from "../dashboard/dashboardPage";
+import { getGameHtml, getGameOptionHtml, initGamePageListeners } from "../game/display";
+import { getSettingPage } from "../settings/settingPage";
+import { getErrorPage } from "../error/error";
 
 export { Router }
 export type { Route, getPageHtmlFunction }
@@ -42,7 +49,13 @@ class Router
 		this.userState = userState;
 		this.rootElement = document.querySelector(rootSelector) as HTMLElement;
 
-		this.initializeHistory();
+		if (window.location.pathname === '/oauth/callback') {
+			return;
+		}
+
+		this.registerRoutes();
+
+		this.initializePageTo();
 
 		// plug into back / forward browser buttons to render the last state
 		window.addEventListener('popstate', () => this.render());
@@ -53,7 +66,10 @@ class Router
 
 		// automatically kicks out user if log out, or display dashboard if log in
 		this.userState.subscribe((user) => {
-			if (!user && window.location.pathname !== '/connection')
+			if (!user &&
+				(window.location.pathname !== '/connection'
+					&& window.location.pathname !== `${apiDomainName}/users/auth/oauth/42`)
+				)
 				this.navigateTo('/connection');
 			if (user && window.location.pathname.includes('/connection'))
 				this.navigateTo('/dashboard');
@@ -78,75 +94,49 @@ class Router
 		this.routes.push({ path, getPage, needUser, needRegisteredUser });
 	}
 
-	navigateTo(path: string)
-	{
-		console.log(`navigating to ${path}`)
-		window.history.pushState(null, '', path);
-		this.render();
-	}
-
 	render()
 	{
 		const currentPath = window.location.pathname;
+		const currentSearch = window.location.search;
 		const user = this.userState.getUser();
 
-		let route = this.routes.find(route => route.path === currentPath);
+		console.log(`initial route is ${currentPath} with query ${currentSearch}`);
 
-		// if no route found, defaulting to the connection page
-		if (!route || !route.path)
-		{
-			this.redirectToDefaultPage();
-			return;
-		}
+		const route = this.validateRoute(currentPath);
+		const targetPath = route.path;
 
-		// if route requires no user, defaulting to the dashboard page
-		if (!route.needUser && user)
-		{
-			this.redirectToDefaultPage();
-			return;
-		}
-
-		// if route requires a user, defaulting to the connection page
-		if (route.needUser && !user)
-		{
-			this.redirectToDefaultPage();
-			return;
-		}
-
-		// if route requires a registerd user, defaulting to the connection page
-		if (route && route.needRegisteredUser && !(user instanceof RegisteredUser))
-		{
-			this.redirectToDefaultPage();
-			return;
-		}
-
-		// if the user is currently on a game page, warn them that leaving will end game
-		if (user && currentPath.includes('/game'))
-		{
-			const confirmed = window.confirm(
-				'Leaving the game page will end the game.\n Are you sure you want to continue?'
-			);
-			if (!confirmed)
-				return;
-		}
-
-		if (!route)
-			return;
-
-		console.log(route && `corrected route is ${route.path}`)
+		console.log(route && `corrected route is ${targetPath} with query ${currentSearch}`)
 
 		this.rootElement.innerHTML = route.getPage();
 
 		this.renderNavbar(user);
 
-		const event = new CustomEvent('pageLoaded', { detail: route.path });
+		const event = new CustomEvent('pageLoaded', { detail: { path: targetPath, search: currentSearch } });
+		console.log("dispatching event:");
+		console.log(event);
 		document.dispatchEvent(event);
 	}
 
+	// uses window.history.pushState, for app navigation (allow back and forth)
+	navigateTo(path: string)
+	{
+		console.log(`navigating to ${path}`)
 
-	//-------------------------- UTILITIES ----------------------------------//
+		window.history.pushState(null, '', path);
+		this.render();
+	}
 
-	private handleClickInSinglePage = (event: MouseEvent) =>
+	// uses window.history.replaceState, for app initialization (no back button)
+	initializePageTo()
+	{
+		const initialPath = window.location.pathname;
+		const initialSearch = window.location.search;
+
+		window.history.replaceState({ detail: { path: initialPath, search: initialSearch }}, '', initialPath);
+		this.render();
+	}
+
+	handleClickInSinglePage = (event: MouseEvent) =>
 	{
 		console.log('in handle click redirect')
 		const link = (event.target as Element | null)?.closest('[data-link]') as HTMLAnchorElement | null;
@@ -161,37 +151,7 @@ class Router
 		}
 	}
 
-	private initializeHistory()
-	{
-		const initialPath = window.location.pathname;
-		const hasHistory = window.history.state && initialPath != '/'
-			&& initialPath != '' && initialPath != '/connection'
-
-		let targetPath = '/connection';
-
-		console.log(this.userState.getUser());
-
-		if (this.userState.getUser())
-		{
-			if (hasHistory)
-				targetPath = initialPath;
-			else
-				targetPath = '/dashboard';
-		}
-
-		console.log(`going to ${targetPath}`);
-
-		window.history.replaceState({ path: targetPath }, '', targetPath);
-	}
-
-	private redirectToDefaultPage()
-	{
-		const user = this.userState.getUser();
-		window.history.replaceState(null, '', (user ? '/dashboard' : '/connection'));
-		this.render();
-	}
-
-	private renderNavbar(user: User | null): void
+	renderNavbar(user: User | null): void
 	{
 		const navbar = document.getElementById('nav');
 		if (!navbar)
@@ -222,4 +182,59 @@ class Router
 			this.navbarInitialized = false;
 		}
 	}
+
+	//-------------------------- UTILITIES ----------------------------------//
+
+
+	getDefaultPage(user : User | null): Route
+	{
+		const defaultPath = user ? '/dashboard' : '/connection';
+		const defaultRoute = this.routes.find(route => route.path === defaultPath);
+		if (!defaultRoute)
+			throw new Error('Page not found')
+		return defaultRoute;
+	}
+
+	isAccessibleRoute(route: Route, user: User | null): boolean
+	{
+		if (!user && route.needUser)
+			return false;
+		if (user && !route.needUser)
+			return false;
+		if (!(user instanceof RegisteredUser) && route.needRegisteredUser)
+			return false;
+		return true;
+	}
+
+	validateRoute(path: string): Route
+	{
+		const user = this.userState.getUser();
+		let currentRoute = this.routes.find(route => route.path === path);
+		if (!currentRoute || !this.isAccessibleRoute(currentRoute, user))
+			currentRoute = this.getDefaultPage(user);
+		return currentRoute;
+	}
+
+	registerRoutes()
+	{
+		this.addRoute('/connection', getConnectionLandingHtml);
+		this.addRoute('/connection/login', getConnectionForm);
+		this.addRoute('/connection/register', getConnectionForm);
+		this.addRoute('/connection/emailcheck', getEmailCheck);
+		this.addRoute('/connection/alias', getConnectionForm);
+
+		this.addRoute('/dashboard', getDashboardPage, true);
+		this.addRoute('/settings', getSettingPage, true);
+
+		this.addRoute('/game/options', getGameOptionHtml, true);
+		this.addRoute('/game', getGameHtml, true);
+
+		this.addRoute('/error', getErrorPage);
+
+		this.addRoute('/oauth/callback', () => {
+			initOAuthCallback();
+			return '<div id="oauth-callback"></div>';
+		}, false, false);
+	}
+
 }
