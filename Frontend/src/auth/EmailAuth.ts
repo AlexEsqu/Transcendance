@@ -60,9 +60,10 @@ export class EmailAuthService
 		if (!response.ok)
 			throw new Error(data.message || data.error || 'Login Failed');
 
-		if (data.twoFactorRequired && data.twoFactorToken)
+		if (data.twoFactorRequired)
 		{
-			this.userState.twoFactor.login(data.twoFactorToken);
+			console.log('2FA required in login response');
+			this.userState.twoFactor.login();
 		}
 		else
 		{

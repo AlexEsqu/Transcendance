@@ -13,7 +13,7 @@ export default function verifyEmail(server) {
 			}
 			const user = server.db.prepare(`SELECT email_verify_expires, id FROM users WHERE email_verify_token = ?`).get(token);
 			if (!user) {
-				resetEmailVerificationToken(server, user);
+				console.log("User not found");
 				throw new Error("Invalid token", 400);
 			}
 			if (!user.email_verify_expires || user.email_verify_expires < Date.now()) {
@@ -23,6 +23,7 @@ export default function verifyEmail(server) {
 			server.db.prepare(`UPDATE users SET email_verify_token = NULL, email_verify_expires = NULL, email_verified = 1 WHERE id = ?`).run(user.id);
 			return reply.redirect(`${process.env.FRONTEND_DOMAIN_NAME}/connection/login?verified=true`);
 		} catch (error) {
+			console.log(error);
 			if (token) {
 				resetEmailVerificationToken(server, user);
 			}
@@ -32,7 +33,6 @@ export default function verifyEmail(server) {
 					message: error.message,
 				});
 			}
-
 			return reply.status(500).send({
 				error: "Internal Server Error",
 				message: error.message,
@@ -42,5 +42,6 @@ export default function verifyEmail(server) {
 }
 
 function resetEmailVerificationToken(server, user) {
+	console.log("Resetting email verification token");
 	server.db.prepare(`UPDATE users SET email_verify_token = NULL, email_verify_expires = NULL, email_verified = 0 WHERE id = ?`).run(user.id);
 }

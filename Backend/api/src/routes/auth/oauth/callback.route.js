@@ -1,6 +1,6 @@
 import { generateTokens, sendVerificationCodeEmail } from "../../../services/authServices.js";
 import { oauthCallbackRouteSchema } from "../../../schemas/callback.schema.js";
-import fs from "fs"
+import fs from "fs";
 
 const redirectUrl = encodeURI(`${process.env.FRONTEND_DOMAIN_NAME}/oauth/callback`);
 
@@ -19,8 +19,15 @@ export default function oauthCallbackRoute(server) {
 				console.log("42 USER IN DB, LOGGING IN THE USER");
 				if (user.is_2fa_enabled) {
 					console.log("42 USER HAS 2FA ENABLED, SENDING VERIFICATION CODE");
-					sendVerificationCodeEmail(server, user);
-					return reply.status(302).redirect(`${redirectUrl}?twoFactorRequired=true`);
+					sendVerificationCodeEmail(server, user, reply);
+					reply.setCookie("pending_2fa_uid", user.id, {
+						httpOnly: true,
+						sameSite: "lax",
+						secure: true,
+						path: "/api/users/auth/",
+						maxAge: 60 * 60, // 1 hour
+					});
+					return reply.status(302).redirect(`${redirectUrl}?twoFactorRequired=true&id=${user.id}`);
 				}
 				console.log("42 USER HAS 2FA DISABLED, GENERATING TOKENS");
 				await generateTokens(server, user, reply);

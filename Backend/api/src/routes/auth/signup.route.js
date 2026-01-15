@@ -41,13 +41,13 @@ export default function signup(server) {
 						message: "Username is already taken",
 					});
 				}
-				// const user = await server.db.prepare(`SELECT * FROM users WHERE email = ?`).get(email);
-				// 	if (err.message.includes("email") && user.email_verified == 0) {
-				// 	reply.status(409).send({
-				// 		error: "Conflict",
-				// 		message: "Email is already taken",
-				// 	});
-				// }
+				const user = await server.db.prepare(`SELECT * FROM users WHERE email = ?`).get(email);
+					if (err.message.includes("email") && user.email_verified == 0) {
+					reply.status(409).send({
+						error: "Conflict",
+						message: "Email is already taken",
+					});
+				}
 				if (err.message.includes("email")) {
 					reply.status(409).send({
 						error: "Conflict",

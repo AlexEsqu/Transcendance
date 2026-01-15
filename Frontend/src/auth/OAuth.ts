@@ -3,30 +3,26 @@ import { RegisteredUser } from "../user/User";
 import { router } from "../app";
 import { TwoFactorAuthService } from "./TwoFactorAuth";
 
-export { initOAuthCallback }
-export class OAuthService
-{
+export { initOAuthCallback };
+export class OAuthService {
 	apiDomainName: string;
 	apiKey: string;
 	userState: UserState;
 	oauthWindow: Window | null = null;
 
-	constructor(apiDomainName: string, apiKey: string, userState: UserState)
-	{
+	constructor(apiDomainName: string, apiKey: string, userState: UserState) {
 		this.apiDomainName = apiDomainName;
 		this.apiKey = apiKey;
 		this.userState = userState;
 
-		window.addEventListener('message', this.handleOAuthMessage.bind(this));
+		window.addEventListener("message", this.handleOAuthMessage.bind(this));
 	}
 
-	async register(): Promise<void>
-	{
+	async register(): Promise<void> {
 		this.openOAuthPopup();
 	}
 
-	openOAuthPopup(): void
-	{
+	openOAuthPopup(): void {
 		const width = 600;
 		const height = 700;
 		const left = (window.screen.width - width) / 2;
@@ -34,157 +30,124 @@ export class OAuthService
 
 		const features = `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no,scrollbars=yes,resizable=yes`;
 
-		this.oauthWindow = window.open(
-			`${this.apiDomainName}/users/auth/oauth/42`,
-			'OAuth Login',
-			features
-		);
+		this.oauthWindow = window.open(`${this.apiDomainName}/users/auth/oauth/42`, "OAuth Login", features);
 
-		const checkClosed = setInterval(() =>
-			{
-				if (this.oauthWindow?.closed)
-				{
-					clearInterval(checkClosed);
-					this.oauthWindow = null;
-				}
-			},
-		500);
+		const checkClosed = setInterval(() => {
+			if (this.oauthWindow?.closed) {
+				clearInterval(checkClosed);
+				this.oauthWindow = null;
+			}
+		}, 500);
 	}
 
-	async handleOAuthMessage(event: MessageEvent): Promise<void>
-	{
-		if (event.source !== this.oauthWindow)
-			return;
+	async handleOAuthMessage(event: MessageEvent): Promise<void> {
+		if (event.source !== this.oauthWindow) return;
+		const locationHref = event.source?.window?.location?.href;
+		const url = new URL(locationHref ?? "");
+		const twoFactorRequired = url.searchParams.get("twoFactorRequired") === "true";
+		console.log("twoFactorRequired", twoFactorRequired);
+		const { type, userId, error } = event.data;
+		console.log("received data", event.data);
+		if (type !== "oauth-callback") return;
 
-		const { type, userId, twoFactorToken, error } = event.data;
-		console.log('received data', event.data);
-
-		if (type !== 'oauth-callback')
-			return;
-
-		if (this.oauthWindow)
-		{
+		if (this.oauthWindow) {
 			this.oauthWindow.close();
 			this.oauthWindow = null;
 		}
 
-		if (error)
-		{
-			console.error('OAuth error:', error);
+		if (error) {
+			console.error("OAuth error:", error);
 			throw new Error(error);
 		}
 
-		try
-		{
-			// If we have a twoFactorToken, prompt for 2FA
-			if (twoFactorToken)
+		try {
+			// If we have a twoFactorRequired, prompt for 2FA
+			if (twoFactorRequired)
 			{
 				console.log('2FA required, prompting for code...');
-				await this.userState.twoFactor.login(twoFactorToken);
+				await this.userState.twoFactor.login();
 			}
-			else if (userId)
-			{
+			if (userId) {
 				this.login(userId);
-			}
-			else
-			{
-				throw new Error('Unrecognized api response');
+			} else {
+				throw new Error("Unrecognized api response");
 			}
 			router.render();
-		}
-		catch (error)
-		{
-			console.error('OAuth login error:', error);
+		} catch (error) {
+			console.error("OAuth login error:", error);
 			throw error;
 		}
 	}
 
-	async login(userId: number): Promise<void>
-	{
+	async login(userId: number): Promise<void> {
 		try {
-			console.log('Fetching refresh token...');
-			const response = await fetch(
-				`${this.apiDomainName}/users/auth/refresh`,
-				{
-					method: 'POST',
-					credentials: 'include',
-					headers:
-					{
-						'accept': 'application/json',
-						'X-App-Secret': `${this.apiKey}`
-					}
-				}
-			);
+			console.log("Fetching refresh token...");
+			const response = await fetch(`${this.apiDomainName}/users/auth/refresh`, {
+				method: "POST",
+				credentials: "include",
+				headers: {
+					accept: "application/json",
+					"X-App-Secret": `${this.apiKey}`,
+				},
+			});
 
 			const data = await response.json();
 
-			if (!response.ok)
-				throw new Error(data.error ?? 'Failed to authenticate with OAuth');
+			if (!response.ok) throw new Error(data.error ?? "Failed to authenticate with OAuth");
 
-			console.log('User id:', userId);
-			console.log('User authenticated:', data);
+			console.log("User id:", userId);
+			console.log("User authenticated:", data);
 
-			if (data.twoFactorRequired)
-			{
-				await this.userState.twoFactor.login(data.twoFactorToken);
-			}
-			else
-			{
+			if (data.twoFactorRequired) {
+				await this.userState.twoFactor.login();
+			} else {
 				const user = new RegisteredUser(userId, data.accessToken, data.username);
 				await this.userState.setUser(user);
 			}
 			router.render();
-
-		}
-		catch (error) {
-			console.error('OAuth login error:', error);
+		} catch (error) {
+			console.error("OAuth login error:", error);
 			throw error;
 		}
 	}
 
-	static sendCallbackToParent(): void
-	{
-		console.log('sendCallbackToParent called');
-		console.log('Current URL:', window.location.href);
+	static sendCallbackToParent(): void {
+		console.log("sendCallbackToParent called");
+		console.log("Current URL:", window.location.href);
 
-		const targetOrigin = window.opener ? window.opener.location.origin : '*';
+		const targetOrigin = window.opener ? window.opener.location.origin : "*";
 
 		const urlParams = new URLSearchParams(window.location.search);
-		const userId = urlParams.get('id');
-		const twoFactorToken = urlParams.get('twoFactorToken');
-		const error = urlParams.get('error');
+		const userId = urlParams.get("id");
+		const error = urlParams.get("error");
 
-		console.log('URL params - userId:', userId, 'twoFactorToken:', twoFactorToken, 'error:', error);
+		console.log("URL params - userId:", userId, "error:", error);
 
 		if (window.opener) {
-			window.opener.postMessage(
-				{ type: 'oauth-callback', userId: userId ? Number(userId) : null, twoFactorToken, error },
-				targetOrigin
-			);
+			window.opener.postMessage({ type: "oauth-callback", userId: userId ? Number(userId) : null, error }, targetOrigin);
 		}
 	}
 }
 
-function initOAuthCallback(): void
-{
-	console.log('initOAuthCallback() called');
-	console.log('Current URL:', window.location.href);
+function initOAuthCallback(): void {
+	console.log("initOAuthCallback() called");
+	console.log("Current URL:", window.location.href);
 
-	const isOAuthCallback = window.location.pathname.includes('/oauth/callback') ||
-		window.location.search.includes('id=') ||
-		window.location.search.includes('error=') ||
-		window.location.search.includes('code=');
+	const isOAuthCallback =
+		window.location.pathname.includes("/oauth/callback") ||
+		window.location.search.includes("id=") ||
+		window.location.search.includes("error=") ||
+		window.location.search.includes("code=");
 
-	console.log('Is OAuth callback:', isOAuthCallback);
+	console.log("Is OAuth callback:", isOAuthCallback);
 
-	if (isOAuthCallback)
-	{
-		console.log('Detected OAuth callback, sending to parent...');
+	if (isOAuthCallback) {
+		console.log("Detected OAuth callback, sending to parent...");
 		OAuthService.sendCallbackToParent();
 
 		document.body.innerHTML = '<div style="text-align: center; padding: 2rem;">Authentication successful. This window will close automatically...</div>';
 		setTimeout(() => {
-			console.log('Closing popup window...');
+			console.log("Closing popup window...");
 			window.close();
 		}, 500);
 	}

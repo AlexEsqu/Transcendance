@@ -13,8 +13,7 @@ export default function twoFactorLoginRoute(server) {
 		if(!userId){
 			return reply.status(401).send({ error: "Unauthorized", message: "Invalid user" });
 		}
-		const user = getUserbyId(userId, server.db);
-		reply.clearCookie("pending_2fa_uid");
+		const user = await getUserbyId(userId, server.db);
 		if (!user) {
 			return reply.status(401).send({ error: "Unauthorized", message: "Invalid user" });
 		}

@@ -30,8 +30,15 @@ export default function login(server) {
 				return reply.status(401).send({ error: "Unauthorized", message: "Invalid credentials" });
 			}
 			if (user.is_2fa_enabled) {
-				sendVerificationCodeEmail(server, user);
-				return reply.status(200).send({twoFactorRequired: true});
+				sendVerificationCodeEmail(server, user, reply);
+				reply.setCookie("pending_2fa_uid", user.id, {
+					httpOnly: true,
+					sameSite: "lax",
+					secure: true,
+					path: "/api/users/auth/",
+					maxAge: 60 * 60, // 1 hour
+				});
+				return reply.status(200).send({ twoFactorRequired: true });
 			}
 			const tokens = await generateTokens(server, user, reply);
 			return reply.status(200).send(tokens);
