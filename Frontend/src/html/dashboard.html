@@ -1,42 +1,43 @@
 <div id="dashboard-container"
-	class="flex flex-1 flex-col justify-between m-3">
+	class="flex flex-1 flex-col justify-between m-3 max-h-full">
 
-	<div  class="flex flex-1 gap-2 justify-between">
+	<div  class="flex flex-1 gap-2 justify-between max-h-full">
 
-		<section id='friend-section' class="flex flex-col border-box w-full sm:flex-2 sm:w-1/4 gap-2">
+		<div id='left-section' class="flex flex-col border-box w-full sm:flex-2 sm:w-1/4 gap-2 min-h-0 max-h-full">
+
 			<section id="friend-section"
-				class="hidden need-registered-user flex-col w-full flex-0 p-4 input-field">
+				class="hidden need-registered-user flex-col w-full flex-0 input-field p-4 max-h-[37%]">
 
 				<h2
-					class="text-xl p-0 mb-3">
+					class="text-xl p-0 mb-2 flex-shrink-0">
 					Friends
 				</h2>
 
 				<ul
 					id="friend-list"
-					class="overflow-y-auto m-0 p-0 text-sm">
+					class="overflow-y-auto h-0 flex-1 scroll-smooth scrollbar-hide m-0 p-0 text-sm min-h-0">
 
 				</ul>
 
 			</section>
 
 			<section id="user-section"
-				class="flex flex-col w-full flex-1 p-4 input-field">
+				class="flex flex-col w-full flex-1 input-field p-4 max-h-[61%]">
 
 				<h2
-					class="text-xl p-0 mb-3">
+					class="text-xl p-0 mb-2 flex-shrink-0">
 					Users
 				</h2>
 
 				<ul
 					id="user-list"
-					class="overflow-y-auto scroll-smooth scrollbar-hide text-sm">
+					class="overflow-y-auto h-0 flex-1 scroll-smooth scrollbar-hide text-sm min-h-0">
 
 				</ul>
 
 			</section>
 
-		</section>
+		</div>
 
 		<section id="statistic-section" class="flex flex-1 flex-col p-4 input-field">
 
