@@ -7,10 +7,13 @@ export function getUserMatches(server) {
 	server.get("/:id/matches", opts, async (req, reply) => {
 		try {
 			const { id } = req.params;
-			const user = server.db.prepare(`SELECT id FROM users WHERE id = ?`).get(id);
-			if (!user) {
-				return reply.status(404).send({ error: "Not Found", message: "User not found" });
+			if (id != 0) {
+				const user = server.db.prepare(`SELECT id FROM users WHERE id = ?`).get(id);
+				if (!user) {
+					return reply.status(404).send({ error: "Not Found", message: "User not found" });
+				}
 			}
+
 			const stmnt = server.db.prepare(`SELECT * FROM matches WHERE winner_id = ? OR loser_id = ?`);
 			const matches = stmnt.all(id, id);
 			console.log(matches);
@@ -51,10 +54,10 @@ export function postMatches(server) {
 			if (winner_id == loser_id) {
 				return reply.code(400).send({ error: "Invalid winner_id and loser_id (users are the same)" });
 			}
-			if (!winner) {
+			if (!winner && winner_id != 0) {
 				return reply.code(400).send({ error: "Invalid winner_id (user not found)" });
 			}
-			if (!loser) {
+			if (!loser && loser_id != 0) {
 				return reply.code(400).send({ error: "Invalid loser_id (user not found)" });
 			}
 		},
