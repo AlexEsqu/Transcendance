@@ -1,11 +1,11 @@
 <div id="dashboard-container"
 	class="flex flex-1 flex-col justify-between ">
 
-	<div  class="flex flex-1 gap-2 justify-between mx-6 min-h-60">
+	<div  class="flex flex-1 gap-2 justify-between mx-6 mb-6 min-h-60">
 
-		<aside id='friend-aside' class="flex flex-2 flex-col gap-2 min-h-0 min-w-65">
+		<section id='friend-section' class="flex flex-col border-box w-full sm:flex-2 sm:w-1/4 gap-2">
 			<section id="friend-section"
-				class="hidden need-registered-user flex-col w-[100%] flex-0 p-4 input-field">
+				class="hidden need-registered-user flex-col w-full flex-0 p-4 input-field">
 
 				<h2
 					class="text-xl p-0 mb-3">
@@ -14,14 +14,14 @@
 
 				<ul
 					id="friend-list"
-					class="overflow-y-auto m-0 p-0">
+					class="overflow-y-auto m-0 p-0 text-sm">
 
 				</ul>
 
 			</section>
 
 			<section id="user-section"
-				class="flex flex-col w-[100%] flex-1 p-4 input-field">
+				class="flex flex-col w-full flex-1 p-4 input-field">
 
 				<h2
 					class="text-xl p-0 mb-3">
@@ -30,44 +30,13 @@
 
 				<ul
 					id="user-list"
-					class="overflow-y-auto">
+					class="overflow-y-auto text-sm">
 
 				</ul>
 
 			</section>
 
-			<!-- <section id="search-section"
-				class="hidden need-registered-user align-middle justify-center flex-col w-[100%] flex-0 p-4 input-field gap-4">
-
-				<form id="new-friend-form"
-					name="new-friend-form"
-					class="flex flex-col flex-center justify-between gap-2 text-sm">
-
-					<label for="new-friend-input"
-						class="text-xl mb-3">
-						Find a user
-					</label>
-
-					<div class="flex gap-2 justify-center">
-						<input id="new-friend-input"
-							name="new-friend-input"
-							type="text"
-							accept="text"
-							class="p-2 bg-slate-800 flex-1"
-							required/>
-
-						<button id="btn-submit-new-friend"
-							name="btn-submit-new-friend"
-							type="submit"
-							class="p-2 border border-slate-500">
-							Search
-						</button>
-					</div>
-				</form>
-
-			</section> -->
-
-		</aside>
+		</section>
 
 		<section id="statistic-section" class="flex flex-1 flex-col p-4 input-field">
 
@@ -105,31 +74,5 @@
 		</section>
 
 	</div>
-
-	<!-- <section id="options-container" class="flex-shrink-0 my-3 mx-6 pl-4 pr-4 input-field">
-		<fieldset class="flex gap-2 mb-3 justify-center w-full text-lg">
-			<legend class="flex justify-center w-full text-lg">Options</legend>
-			<div class="flex flex-wrap gap-2 mt-0 justify-center w-full ">
-				<a href="/dashboard/avatar" data-link class="glow-select need-registered-user hidden items-center justify-center align-center flex-wrap border p-1 text-center flex-1 border-slate-600 text-sm" id="btn-avatar">
-					Change Avatar
-				</a>
-				<a href="/dashboard/rename" data-link class="glow-select flex items-center justify-center align-center flex-wrap border p-1 text-center flex-1 border-slate-600 text-sm" id="btn-rename">
-					Change Username
-				</a>
-				<a href="/dashboard/email" data-link class="glow-select need-registered-user hidden items-center justify-center align-center flex-wrap border p-1 text-center flex-1 border-slate-600  text-sm" id="btn-email">
-					Change Email
-				</a>
-				<a href="/dashboard/password" data-link class="glow-select need-registered-user hidden items-center justify-center align-center flex-wrap border p-1 text-center flex-1 border-slate-600 text-sm" id="btn-password">
-					Change Password
-				</a>
-				<button id="enable-tfa-btn" class="glow-select need-registered-user hidden items-center justify-center align-center flex-wrap border p-1 text-center flex-1 border-slate-600 text-sm" id="btn-password">
-					Enable Two Factor Authentication
-				</button>
-				<button id="delete-account-btn" class="glow-select need-registered-user hidden items-center justify-center align-center flex-wrap border p-1 text-center flex-1 border-slate-600 text-sm" id="btn-password">
-					Delete Account
-				</button>
-			</div>
-		</fieldset>
-	</section> -->
 
 </div>

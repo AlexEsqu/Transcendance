@@ -1,40 +1,42 @@
-<nav class="p-4 flex flex-shrink-0 justify-between ">
+<nav class="flex flex-1 flex-wrap gap-2 border-box pt-2 pl-2 pr-2">
 
-	<div id="user-menu-container" class="flex">
+	<a id="avatar-btn" class="cursor-pointer glow-select size-24 border border-slate-600 p-0"
+		href="/dashboard" data-link>
+		<img id="user-avatar-nav" src="/assets/placeholder/avatarPlaceholder.png"
+			class="size-24 object-cover object-center block " />
+	</a>
 
-		<a id="avatar-btn" class="cursor-pointer glow-select w-[130px] h-[130px] border border-slate-600 p-0 m-2"
-			href="/dashboard" data-link>
+	<div class="flex flex-col flex-1">
 
-			<img id="user-avatar-nav" src="/assets/placeholder/avatarPlaceholder.png"
-				class="w-full h-full object-cover object-center block " />
+		<div id="nav-info" class="flex justify-between items-start flex-1 mb-2">
 
-		</a>
-
-		<div id="username-container" class="m-2">
-
-			<div id="user-name-nav" class="text-6xl m-0 p-0 self-start">
+			<h1 id="user-name-nav" class="text-2xl sm:text-3xl font-[Orbitron] flex-1">
 				USERNAME
-			</div>
+			</h1>
 
-			<div id="user-menu-container" class="mt-5 flex gap-2 items-start">
+			<button id="logout-btn"
+				class="glow-select cursor-pointer border border-slate-600 p-2 text-sm sm:text-base flex items-center justify-center">
+				Logout
+			</button>
 
-				<a class="text-base glow-select cursor-pointer border border-slate-600 p-3 text-center " href="/settings"
-					data-link>
-					Settings
-				</a>
+		</div>
 
-				<a class="text-base glow-select cursor-pointer border border-slate-600 p-3 text-center " href="/game"
-					data-link>
-					Pong
-				</a>
+		<div id="nav-user-menu" class="flex gap-2 flex-1 flex-wrap justify-between">
 
-				<button id="logout-btn"
-					class="text-base glow-select cursor-pointer border border-slate-600 p-3 text-center ">
-					Logout
-				</button>
+			<a class="glow-select cursor-pointer border border-slate-600 p-2 text-sm sm:text-base flex-1 flex items-center justify-center" href="/settings"
+				data-link>
+				Settings
+			</a>
 
-			</div>
+			<a class="glow-select cursor-pointer border border-slate-600 p-2 text-sm sm:text-base flex-1 flex items-center justify-center" href="/dashboard"
+				data-link>
+				Dashboard
+			</a>
 
+			<a class="glow-select cursor-pointer border border-slate-600 p-2 text-sm sm:text-base flex-1 flex items-center justify-center" href="/game"
+				data-link>
+				Game
+			</a>
 		</div>
 
 	</div>

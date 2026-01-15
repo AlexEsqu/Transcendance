@@ -1,5 +1,5 @@
 <div id="settings-container"
-	class="flex flex-1 flex-wrap gap-2 justify-between mx-6 min-h-60">
+	class="flex flex-1 flex-wrap gap-2 justify-between mx-6 mb-6 min-h-60">
 
 	<article id="avatar-setting-container" class="flex flex-col border-box w-full sm:flex-2 sm:w-1/4 input-field p-4">
 		<section id="user-avatar-container w-full flex gap-4">
@@ -44,16 +44,16 @@
 			User Information
 		</h2>
 
-		<section id="user-name-container" class="flex flex-col px-2 mb-4">
+		<section id="user-name-container" class="flex flex-col px-2 mb-2">
 
 			<div class="flex items-center justify-between mb-2">
 				<div>
 					<h2 class="text-sm text-slate-400 p-0 m-0">Username</h2>
-					<p id="current-username" class="font-semibold text-xl">Loading...</p>
+					<p id="current-username" class="font-semibold">Loading...</p>
 				</div>
 
 				<button id="btn-toggle-username" class="glow-select border px-4 py-2 border-slate-600 text-sm">
-					Change
+					Change Username
 				</button>
 			</div>
 
@@ -88,14 +88,14 @@
 			</form>
 		</section>
 
-		<section id="user-email-container" class="flex flex-col px-2 mb-4">
+		<section id="user-email-container" class="flex flex-col px-2 mb-2">
 			<div class="flex items-center justify-between mb-2">
 				<div class="">
 					<h2 class="text-sm text-slate-400">Email</h2>
-					<p id="current-email" class="font-semibold text-xl">Loading...</p>
+					<p id="current-email" class="font-semibold">Loading...</p>
 				</div>
 				<button id="btn-toggle-email" class="glow-select need-registered-user hidden border px-4 py-2 border-slate-600 text-sm">
-					Change
+					Change Email
 				</button>
 			</div>
 
@@ -144,14 +144,14 @@
 			</form>
 		</section>
 
-		<section id="user-pass-container" class="flex flex-col px-2 gap-2 mb-4">
+		<section id="user-pass-container" class="flex flex-col px-2 mb-2">
 			<div class="flex items-center justify-between">
 				<div>
 					<h2 class="text-sm text-slate-400 ">Password</h2>
-					<p class="font-semibold text-xl">••••••••</p>
+					<p class="font-semibold">••••••••</p>
 				</div>
 				<button id="btn-toggle-password" class="glow-select need-registered-user hidden border px-4 py-2 border-slate-600 text-sm">
-					Change
+					Change Password
 				</button>
 			</div>
 
@@ -219,15 +219,15 @@
 
 	</article>
 
-	<article id="account-setting-content" class="flex flex-col w-full border-box p-4 input-field">
+	<article id="security-setting-content" class="flex flex-col w-full lg:flex-1 lg:w-1/4 border-box p-4 input-field">
 		<h2 class="text-xl">
 			Security Settings
 		</h2>
 
-		<section id="toggle-tfa-container" class="p-4 ">
+		<section id="toggle-tfa-container" class="flex flex-col px-2 my-4">
 			<div class="flex items-center justify-between">
 				<div>
-					<h2 class="font-semibold text-lg">Two Factor Authentication</h2>
+					<h2 class="font-semibold">Two Factor Authentication</h2>
 					<p class="text-sm text-slate-400">Add an extra layer of security</p>
 				</div>
 				<button id="btn-enable-tfa" class="glow-select need-registered-user hidden border px-4 py-2 border-slate-600 text-sm">
@@ -236,13 +236,13 @@
 			</div>
 		</section>
 
-		<section id="delete-account-container" class="p-4 border border-red-600 mt-8">
+		<section id="delete-account-container" class="flex flex-col px-2  py-2 my-2">
 			<div class="flex items-center justify-between">
 				<div>
-					<h2 class="font-semibold text-lg text-red-400">Delete Account</h2>
-					<p class="text-sm text-slate-400">Permanently delete your account and all data</p>
+					<h2 class="font-semibold text-red-400">Delete Account</h2>
+					<p class="text-sm text-red-300">Permanently delete your account and all your data</p>
 				</div>
-				<button id="btn-delete-account" class="glow-select need-registered-user hidden border px-4 py-2 border-red-600 text-red-400 text-sm">
+				<button id="btn-delete-account" class="glow-select need-registered-user hidden border px-4 py-2 border-red-600 text-red-500 text-sm">
 					Delete Account
 				</button>
 			</div>
