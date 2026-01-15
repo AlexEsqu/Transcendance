@@ -1,12 +1,14 @@
 import { deleteUserAvatar, putUserAvatar } from "./avatar.route.js";
 import deleteUser from "./delete-me.route.js";
 import { addFriend, deleteFriend, getFriends } from "./friends/friends.route.js";
-import { getUser, getUsers } from "./list.route.js";
+import { getUser, getUsers } from "./users.route.js";
 import { postUserPassword, putUserPassword } from "./password.route.js";
 import { getTwoFactorStatusRoute, updateTwoFactorStatusRoute } from "./two-factor.route.js";
 import updateUsername from "./username.route.js";
+import { getMe } from "./me.route.js";
 
 export default async function userRoutes(server) {
+	server.register(getMe, { prefix: "api/users" });
 	server.register(getUsers, { prefix: "api" });
 	server.register(getUser, { prefix: "api" });
 	server.register(putUserPassword, { prefix: "api/users" });

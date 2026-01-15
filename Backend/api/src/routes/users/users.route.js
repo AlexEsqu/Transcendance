@@ -1,5 +1,5 @@
 import { formatUserObject, getUserbyId } from "../../utils/utils.js";
-import { getUserSchema , getUsersSchema} from "../../schemas/list.schema.js";
+import { getUserSchema , getUsersSchema} from "../../schemas/users.schema.js";
 
 export function getUser(server) {
 	const singleUserSchema = {
@@ -11,7 +11,6 @@ export function getUser(server) {
 			const { id } = req.params;
 
 			const user = await getUserbyId(id, server.db);
-			console.log(user);
 
 			if (!user) {
 				return reply.status(404).send({ error: "Not Found", message: "User not found" });
