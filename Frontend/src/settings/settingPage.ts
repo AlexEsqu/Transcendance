@@ -3,8 +3,11 @@ import { User, RegisteredUser } from '../user/User';
 import { checkInputValidityOnUnfocus, isValidInputs } from "../utils/inputValidation"
 import { showRegisteredUserOptions } from '../dashboard/dashboardPage'
 import settingPageHtml from "../html/settings.html?raw"
+import { Subscriber } from "../user/UserState";
 
 export { getSettingPage, onSettingsLoaded }
+
+let currentOptionsListener: Subscriber | null = null;
 
 function getSettingPage(): string
 {
@@ -16,17 +19,28 @@ function onSettingsLoaded(): void
 	const user = userState.getUser();
 	const isRegistered = user instanceof RegisteredUser;
 
+	cleanupSettingListeners();
+
 	if (isRegistered)
 	{
 		showRegisteredUserOptions(user);
+		setupAvatarForm();
+		setupEmailForm();
+		setupPasswordForm();
+		activateTfaButton(user);
+		activateDeleteButton();
+
+		currentOptionsListener = (updatedUser: User | null) => {
+			if (updatedUser instanceof RegisteredUser) {
+				activateTfaButton(updatedUser);
+			}
+		};
+
+		userState.subscribe(currentOptionsListener);
 	}
 
-	updateCurrentSettings();
-
-	setupAvatarForm();
 	setupUsernameForm();
-	setupEmailForm();
-	setupPasswordForm();
+	updateCurrentSettings();
 }
 
 
@@ -232,25 +246,29 @@ function updateCurrentSettings(): void
 
 function activateTfaButton(user : RegisteredUser)
 {
-	const twoFactorAuthBtn = document.getElementById('enable-tfa-btn');
+	const twoFactorAuthBtn = document.getElementById('toggle-tfa-btn');
 	if (!twoFactorAuthBtn)
 		return;
 
 	const newBtn = twoFactorAuthBtn.cloneNode(true) as HTMLElement;
 	twoFactorAuthBtn.parentNode?.replaceChild(newBtn, twoFactorAuthBtn);
 
+	console.log('user in tfa toggle is')
+	console.log(user);
+
 	if (user.hasTwoFactorAuth)
 	{
-		newBtn.textContent = 'Disable Two Factor Authentication';
-		newBtn.addEventListener('click', () => {
-			userState.twoFactor.toggle2fa(false);
+		newBtn.textContent = 'Disable 2FA';
+		newBtn.addEventListener('click', async () => {
+			await userState.twoFactor.toggle2fa(false);
+
 		});
 	}
 	else
 	{
-		newBtn.textContent = 'Enable Two Factor Authentication';
-		newBtn.addEventListener('click', () => {
-			userState.twoFactor.toggle2fa(true);
+		newBtn.textContent = 'Enable 2FA';
+		newBtn.addEventListener('click', async () => {
+			await userState.twoFactor.toggle2fa(true);
 		});
 	}
 }
@@ -261,8 +279,24 @@ function activateDeleteButton()
 	if (!deleteAccBtn)
 		return;
 
-	deleteAccBtn.addEventListener('click', () => {
-		userState.emailAuth.deleteAccount();
-		router.navigateTo('/connection')
-	});
+	const newBtn = deleteAccBtn.cloneNode(true) as HTMLElement;
+	deleteAccBtn.parentNode?.replaceChild(newBtn, deleteAccBtn);
+
+	newBtn.addEventListener('click', () => {
+		if (confirm('Are you sure you want to delete your account? This cannot be undone.'))
+			{
+				userState.emailAuth.deleteAccount();
+				router.navigateTo('/connection');
+			}
+		}
+	);
+}
+
+function cleanupSettingListeners()
+{
+	if (currentOptionsListener)
+	{
+		userState.unsubscribe(currentOptionsListener);
+		currentOptionsListener = null;
+	}
 }

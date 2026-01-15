@@ -93,12 +93,12 @@ function initializePlayerInputs(): void
 	});
 }
 
-function getPlayerNames(): string[] {
+async function getPlayerNames(): Promise<string[]> {
 	const playersContainer = document.getElementById('players-container');
 	if (!playersContainer)
 		throw new Error("No players found");
 
-	userState.refreshUser();
+	await userState.refreshUser();
 
 	const inputs = playersContainer.querySelectorAll('input');
 	const result = Array.from(inputs).map(input => (input as HTMLInputElement).value || `Player ${input.id.replace('player', '')}`);
@@ -113,7 +113,7 @@ function onGameOptionLoaded(): void
 	initializePlayerInputs();
 
 	const optionsForm = document.getElementById("game-option-form") as HTMLFormElement | null;
-	optionsForm?.addEventListener('submit', (event) =>
+	optionsForm?.addEventListener('submit', async (event) =>
 	{
 		// prevent HTML form default actions such as add query strings to url, resetting...
 		event.preventDefault();
@@ -135,7 +135,7 @@ function onGameOptionLoaded(): void
 			ballColor: ballColor || '#a2c2e8',
 			mapColor: backColor || '#01011a',
 			paddColor: paddColor || '#a2c2e8',
-			players: getPlayerNames()
+			players: await getPlayerNames()
 		}
 		saveOptions(options);
 		router.navigateTo('/game');

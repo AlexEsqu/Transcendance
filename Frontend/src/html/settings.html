@@ -2,7 +2,7 @@
 	class="flex flex-1 flex-wrap gap-2 justify-between m-3">
 
 	<article id="avatar-setting-container" class="flex flex-col border-box w-full sm:flex-2 sm:w-1/4 input-field p-4">
-		<section id="user-avatar-container w-full flex gap-4">
+		<section id="user-avatar-container" class="flex flex-col px-2">
 
 			<h2 class="text-xl mb-4">
 				User Avatar
@@ -230,7 +230,7 @@
 					<h2 class="font-semibold">Two Factor Authentication</h2>
 					<p class="text-sm text-slate-400">Add an extra layer of security</p>
 				</div>
-				<button id="btn-enable-tfa" class="glow-select need-registered-user hidden justify-center border px-4 py-2 border-slate-600 text-sm flex-1">
+				<button id="toggle-tfa-btn" class="glow-select need-registered-user hidden justify-center border px-4 py-2 border-slate-600 text-sm flex-1">
 					Enable 2FA
 				</button>
 			</div>
@@ -242,7 +242,7 @@
 					<h2 class="font-semibold text-red-400">Delete Account</h2>
 					<p class="text-sm text-red-300">Permanently delete your account</p>
 				</div>
-				<button id="btn-delete-account" class="glow-select need-registered-user hidden justify-center border px-4 py-2 border-red-600 text-red-500 text-sm flex-1">
+				<button id="delete-account-btn" class="glow-select need-registered-user hidden justify-center border px-4 py-2 border-red-600 text-red-500 text-sm flex-1">
 					Delete Account
 				</button>
 			</div>

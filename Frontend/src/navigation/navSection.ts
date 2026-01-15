@@ -34,8 +34,12 @@ function initNavBarListeners()
 
 function attachNavListeners()
 {
+	const user = userState.getUser();
 	const logoutButton = document.getElementById('logout-btn');
-	if (logoutButton)
+	if (!logoutButton || !user)
+		return;
+
+	if (user instanceof RegisteredUser)
 	{
 		logoutButton.addEventListener('click', async () => {
 			try
@@ -48,6 +52,26 @@ function attachNavListeners()
 				console.log(`error message is ${msg}`);
 				window.sessionStorage.setItem("errorMessage", msg);
 				router.navigateTo("/error");
+			}
+		});
+	}
+	else
+	{
+		logoutButton.innerText = 'Quit';
+		logoutButton.addEventListener('click', async () => {
+			if (confirm('Are you sure you want to quit?'))
+			{
+				try
+				{
+					await userState.emailAuth.logout();
+				}
+				catch (error)
+				{
+					const msg = error instanceof Error ? error.message : "Unknown error";
+					console.log(`error message is ${msg}`);
+					window.sessionStorage.setItem("errorMessage", msg);
+					router.navigateTo("/error");
+				}
 			}
 		});
 	}
