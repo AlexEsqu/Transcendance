@@ -90,9 +90,6 @@ function processNewPlayerState(serverInput: number): PlayerState
 		case ServerState.end:
 			return PlayerState.end;
 
-		case ServerState.launch:
-			return PlayerState.launch;
-
 		default:
 			return PlayerState.play;
 	}

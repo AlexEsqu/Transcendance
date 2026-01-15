@@ -37,7 +37,7 @@ export class GameLoop
 		this.players = initPlayers(players);
 		this.rounds = { results: null, waitingPlayers: this.players, nbOfRounds: 0 };
 		this.requestNewRound();
-		this.state = State.launch;
+		this.state = State.waiting;
 		this.isGameRunning = false;
 		this.timestamp = Date.now();
 	}
@@ -49,7 +49,6 @@ export class GameLoop
 
 		let isNewRound: boolean = false;
 		let gameStateInfo: JSONGameState;
-
 		this.state = State.play;
 
 		console.log("GAME-LOOP: game loop started");
@@ -61,10 +60,10 @@ export class GameLoop
 				//	monitor score/rounds
 				isNewRound = this.isPlayerHittingMaxScore();
 			}
-			if (isNewRound)
+			if (isNewRound) {
 				this.requestNewRound();
-			isNewRound = false;
-			this.timestamp = Date.now();
+				isNewRound = false;
+			}
 
 			//	broadcast to players = send game state/data to all players
 			gameStateInfo = this.composeGameState();
@@ -76,6 +75,8 @@ export class GameLoop
 					sendMatchesToDataBase(this.rounds.results[this.rounds.results.length - 1], Date.now());
 				return ;
 			}
+
+			this.timestamp = Date.now();
 		}, 1000 / 60); // 60fps
 
 	}
@@ -91,8 +92,6 @@ export class GameLoop
 		//	Check if the ball hits the edge of map/paddles or is out of bounds -> update its direction accordingly
 		//	Depending on what/where the ball hits an object or a limit, its direction is reversed and gains speed
 		const isBallOutOfBounds: boolean = this.bouncingBallProcess();
-		// if (isBallOutOfBounds)
-		// 	this.state = State.launch;
 
 		if (this.leftPadd.robot)
 			this.processPlayerInput('Robot', this.state, processRobotOpponent(this.leftPadd, this.ball));
@@ -102,7 +101,6 @@ export class GameLoop
 	{
 		if (isBallHittingPaddle(this.ball, this.leftPadd) || isBallHittingPaddle(this.ball, this.rightPadd))
 		{
-			// console.log("GAME-LOOP: ball hits a paddle");
 			//	Invert X direction
 			this.ball.posistion.x = adjustBallHorizontalPos(this.ball);
 			this.ball.direction.x = -(this.ball.direction.x);
@@ -130,7 +128,6 @@ export class GameLoop
 
 		if (isBallHittingWall(this.ball))
 		{
-			// console.log("GAME-LOOP: ball hits a wall");
 			this.ball.direction.z = -(this.ball.direction.z);
 			this.ball.posistion.z = adjustBallVerticalPos(this.ball);
 			
@@ -139,7 +136,6 @@ export class GameLoop
 		if (isBallOutOfBounds(this.ball))
 		{
 			console.log("GAME-LOOP: ball is out of bounds");
-
 			if (this.ball.posistion.x > 0)
 				this.leftPadd.score += 1;
 			else
@@ -154,7 +150,6 @@ export class GameLoop
 	{
 		let paddle: IPaddle;
 
-		// if (state !== PlayerState.pause)
 		this.state = State.play;
 	
 		if (this.leftPadd.player?.username === player)
@@ -199,7 +194,8 @@ export class GameLoop
 	{
 		if (this.state !== State.end)
 			this.state = State.waiting;
-			// this.state = State.launch;
+		else if (this.state === State.end)
+			return ;
 
 		//	Save the results of the previous match, if there was one
 		if (this.rounds)
@@ -267,9 +263,11 @@ export class GameLoop
 	resetPaddles(): void
 	{
 		this.leftPadd.pos.z = 0.0;
-		this.leftPadd.score = 0;
 		this.rightPadd.pos.z = 0.0;
-		this.rightPadd.score = 0;
+		if (this.state !== State.end) {
+			this.leftPadd.score = 0;
+			this.rightPadd.score = 0;
+		}
 	}
 
 	composeGameState(): JSONGameState
@@ -286,7 +284,6 @@ export class GameLoop
 			leftPaddUsername: this.leftPadd.player?.username ?? 'NaN',
 			rightPaddUsername: this.rightPadd.player?.username ?? 'NaN',
 			ball: { x: this.ball.posistion.x, z: this.ball.posistion.z },
-			isBallOutOfBounds: this.state === State.launch ? true : false 
 		};
 		return gameStateInfo;
 	}

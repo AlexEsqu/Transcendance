@@ -304,35 +304,6 @@ export class Pong
 	}
 
 	/**
-	 * 	- Start the ball motion after the animation-countdown
-	 */
-	launch(countdown: number): void
-	{
-		// if (!this.scene || !this.scene.leftPadd?.player || !this.scene.rightPadd?.player) return ;
-		if (countdown <= 0 && this.scene.ball) {
-			this.scene.state = PlayerState.play;
-			return ;
-		}
-
-		const keys = [
-			{ frame: 0, value: 60 },
-			{ frame: 30, value: 30 }
-		];
-
-		if (this.scene.options && this.scene.id && this.gui) {
-			const timer = createText(countdown.toString(), this.scene.options.ballColor, 60, "200px", "0px", this.gui);
-			const animation = createAnimation("timer", "fontSize", keys);
-
-			timer.animations = [animation];
-			this.scene.id.beginAnimation(timer, 0, 30, false, 1, () => {
-				if (this.gui) this.gui.removeControl(timer);
-				countdown--;
-				this.launch(countdown);
-			});
-		}
-	}
-
-	/**
 	 * 	- Camera tilt animation when the game launches
 	 */
 	opening(): void {
@@ -359,6 +330,9 @@ export class Pong
 		}
 		console.log("GAME-FRONT: end");
 
+		if (this.scene.leftPadd.player && this.scene.rightPadd.player)
+			drawScore(this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
+		
 		const winnerSpot = document.getElementById('match-results');
 		if (winnerSpot && result.winner?.username)
 		{
