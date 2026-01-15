@@ -118,36 +118,80 @@ function generatePaddleColorsInputs(nbOfPlayers: number): void
 	}
 }
 
+function generateMatchType(match: HTMLElement, location: HTMLSelectElement)
+{
+	match.innerHTML = '';
+
+	const container = document.createElement('div');
+	container.className = 'flex flex-col flex-center gap-1 m-1 text-center';
+
+	const selection = document.createElement('select');
+	selection.className = 'gentle-select';
+	selection.title = 'Choose which type of match you want to play';
+	
+	if (location.value === 'local') {
+		const robotOpponent = document.createElement('option');
+		robotOpponent.value = '1';
+		robotOpponent.textContent = 'One player and a robot';
+		selection.appendChild(robotOpponent);
+	}
+
+	const twoPlayers = document.createElement('option');
+	twoPlayers.value = '2';
+	twoPlayers.textContent = 'Two players';
+	
+	const tournament = document.createElement('option');
+	tournament.value = '4';
+	tournament.textContent = 'Tournament with 4 players';
+
+	selection.appendChild(twoPlayers);
+	selection.appendChild(tournament);
+	container.appendChild(selection);
+	match.appendChild(container);
+}
+
 function initializePlayerInputs(): void
 {
-	const gameTypeSelect = document.getElementById('game-type') as HTMLSelectElement;
+	const macthTypeContainer = document.getElementById('match-type-container') as HTMLElement;
 	const locationSelect = document.getElementById('match-location') as HTMLSelectElement;
-	if (!gameTypeSelect)
-		throw new Error("'game-type' select not found");
+
+	if (!macthTypeContainer)
+		throw new Error("'match-type-container' select not found");
 	else if (!locationSelect)
 		throw new Error("'match-location' select not found");
 
-	let nbOfPlayers: number = parseInt(gameTypeSelect.value);
+	generateMatchType(macthTypeContainer, locationSelect);
+
+	const matchSelect = macthTypeContainer.querySelector('select') as HTMLSelectElement;
+	console.log(matchSelect.value);
+
+	let nbOfPlayers: number = parseInt(matchSelect.value);
 	if (locationSelect.value === 'remote')
 		nbOfPlayers = 1;
 
 	generatePlayersInputs(nbOfPlayers);
 	generatePaddleColorsInputs(nbOfPlayers);
 
-	gameTypeSelect.addEventListener('change', function() {
-		const locationSelect = document.getElementById('match-location') as HTMLSelectElement;
+	macthTypeContainer.addEventListener('change', function() {
+		const matchSelect = macthTypeContainer.querySelector('select') as HTMLSelectElement;
 
-		let newNbOfPlayers: number = parseInt(gameTypeSelect.value);
+		let newNbOfPlayers: number = parseInt(matchSelect.value);
 		if (locationSelect.value === 'remote')
 			newNbOfPlayers = 1;
+
 		generatePlayersInputs(newNbOfPlayers);
 		generatePaddleColorsInputs(newNbOfPlayers);
 	});
 
 	locationSelect.addEventListener('change', function() {
-		let newNbOfPlayers: number = parseInt(gameTypeSelect.value);
+		generateMatchType(macthTypeContainer, locationSelect);
+
+		const matchSelect = macthTypeContainer.querySelector('select') as HTMLSelectElement;
+
+		let newNbOfPlayers: number = parseInt(matchSelect.value);
 		if (locationSelect.value === 'remote')
 			newNbOfPlayers = 1;
+
 		generatePlayersInputs(newNbOfPlayers);
 		generatePaddleColorsInputs(newNbOfPlayers);
 	});
@@ -185,35 +229,39 @@ function getPaddColors(): string[]
 
 function onGameOptionLoaded(): void
 {
-	initializePlayerInputs();
-
-	const optionsForm = document.getElementById("game-option-form") as HTMLFormElement | null;
-	optionsForm?.addEventListener('submit', (event) =>
-	{
-		// prevent HTML form default actions such as add query strings to url, resetting...
-		event.preventDefault();
-
-		// dump all form results in a variable
-		const formData = new FormData(optionsForm) as FormData;
-
-		// identify form values
-		const gameType = formData.get('game-type') as string | null;
-		const level = formData.get('level') as string | null;
-		const matchLoc = formData.get('match-location') as string | null;
-
-		// extracting data but putting default just in case some is missing
-		const options: IOptions = {
-			matchLocation: matchLoc ? matchLoc : 'local',
-			level: level ? parseInt(level) : 0,
-			nbOfPlayers: gameType ? parseInt(gameType) : 1,
-			paddColors: getPaddColors() || '#a2c2e8',
-			players: getPlayerNames(),
-			ballColor: '#a2c2e8',
-			mapColor: "#01011a"
-		}
-		saveOptions(options);
-		router.navigateTo('/game');
-	})
+	try {
+		initializePlayerInputs();
+	
+		const optionsForm = document.getElementById("game-option-form") as HTMLFormElement | null;
+		optionsForm?.addEventListener('submit', (event) =>
+		{
+			// prevent HTML form default actions such as add query strings to url, resetting...
+			event.preventDefault();
+	
+			// dump all form results in a variable
+			const formData = new FormData(optionsForm) as FormData;
+	
+			// identify form values
+			const gameType = formData.get('game-type') as string | null;
+			const level = formData.get('level') as string | null;
+			const matchLoc = formData.get('match-location') as string | null;
+	
+			// extracting data but putting default just in case some is missing
+			const options: IOptions = {
+				matchLocation: matchLoc ? matchLoc : 'local',
+				level: level ? parseInt(level) : 0,
+				nbOfPlayers: gameType ? parseInt(gameType) : 1,
+				paddColors: getPaddColors() || '#a2c2e8',
+				players: getPlayerNames(),
+				ballColor: '#a2c2e8',
+				mapColor: "#01011a"
+			}
+			saveOptions(options);
+			router.navigateTo('/game');
+		})
+	} catch (error) {
+		console.error(error);
+	}
 }
 
 function onGameLoaded(): void
