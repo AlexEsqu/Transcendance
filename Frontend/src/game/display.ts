@@ -163,7 +163,6 @@ function initializePlayerInputs(): void
 	generateMatchType(macthTypeContainer, locationSelect);
 
 	const matchSelect = macthTypeContainer.querySelector('select') as HTMLSelectElement;
-	console.log(matchSelect.value);
 
 	let nbOfPlayers: number = parseInt(matchSelect.value);
 	if (locationSelect.value === 'remote')

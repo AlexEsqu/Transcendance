@@ -35,7 +35,7 @@ class GameApp
 			{
 				this.pong.sendUpdateToGameServer(player.username, 'none', true);
 			}
-			this.pong.launch(3);
+			// this.pong.launch(3);
 		});
 	}
 
@@ -45,6 +45,7 @@ class GameApp
 			console.error("'start button' UI not found");
 			return ;
 		}
+		this.startBtnDisplay.style.display = 'none';
 
 		this.startBtn.addEventListener('click', () => {
 			if (this.startBtnDisplay) this.startBtnDisplay.style.display = 'none';
@@ -55,7 +56,8 @@ class GameApp
 
 	showStartButton(): void
 	{
-		if (this.startBtnDisplay) this.startBtnDisplay.style.display = 'flex';
+		if (this.startBtnDisplay)
+			this.startBtnDisplay.style.display = 'flex';
 	}
 }
 

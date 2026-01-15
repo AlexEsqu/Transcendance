@@ -55,7 +55,6 @@ export class GameLoop
 		console.log("GAME-LOOP: game loop started");
 		const interval = setInterval(() => {
 			// console.log(this.state);
-			this.timestamp = Date.now();
 			if (this.state === State.play) {
 				//	update data & check collisions
 				this.updateGameData();
@@ -65,8 +64,8 @@ export class GameLoop
 			if (isNewRound)
 				this.requestNewRound();
 			isNewRound = false;
-			
 			this.timestamp = Date.now();
+
 			//	broadcast to players = send game state/data to all players
 			gameStateInfo = this.composeGameState();
 			notifyPlayersInRoom(room, gameStateInfo);
@@ -228,7 +227,6 @@ export class GameLoop
 		console.log("GAME-LOOP: start round ", this.rounds.nbOfRounds);
 
 		//	Reset game's data
-		// this.ball = initBall();
 		this.resetBall();
 		this.resetPaddles();
 	}

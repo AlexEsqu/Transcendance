@@ -44,10 +44,10 @@ export class Pong
 		this.mainPlayer = players[0].username;
 		this.scene.state = PlayerState.opening;
 		this.onNewRound = onNewRound;
+		this.gui = AdvancedDynamicTexture.CreateFullscreenUI("UI");
 		this.waitingSocket = new WebSocket(`wss://${window.location.host}${Pong.WAITING_ROOM_URL}`);
 		if (!this.waitingSocket)
 			throw new Error("'waitingSocket' creation failed");
-		this.gui = AdvancedDynamicTexture.CreateFullscreenUI("UI");
 		this.timestamp = Date.now();
 	}
 
@@ -76,14 +76,10 @@ export class Pong
 		//	Wait for the server to manage waiting rooms and assign current user to a gaming room
 		this.waitingSocket.onmessage = (event) => {
 			const serverMsg: JSONRoomAccess = JSON.parse(event.data);
-			// console.log(`GAME-FRONT: received message from server =`, serverMsg);
-			// console.log(`roomID ${this.roomId}`);
-			// console.log(`state.roomID ${serverMsg.roomId}`);
 			if (this.roomId === undefined && serverMsg.roomId !== undefined) {
 				this.roomId = serverMsg.roomId;
 				this.waitingSocket?.close();
 				this.waitingSocket = null;
-				// this.gamingSocket = new WebSocket(Pong.GAMING_ROOM_URL);
 				this.goToGamingRoom();
 			}
 		};
@@ -125,8 +121,6 @@ export class Pong
 		
 					const gameState: JSONGameState = JSON.parse(event.data);
 					this.processNewGameState(gameState);
-					if (gameState.state !== 1)
-						console.log(`for player game state ${gameState.state}`);
 					// console.log(`GAME-FRONT: game state from room(${this.roomId}) =`, gameState);
 	
 				} catch (error) {
@@ -197,7 +191,7 @@ export class Pong
 			this.stateBasedScene(this.scene.state, result);
 			if (this.scene.state === PlayerState.play)
 				this.updateGame(keys);
-			this.timestamp = Date.now();
+			// this.timestamp = Date.now();
 		});
 
 		//	Rendering loop
@@ -214,9 +208,6 @@ export class Pong
 
 	updateGame(keys: Record<string, boolean>): void
 	{
-		// if (!this.scene) return false;
-
-		// let isBallOutOfBounds: boolean = false;
 		let player: string | undefined;
 		let action: string = 'none';
 
@@ -248,8 +239,6 @@ export class Pong
 			drawName(this.scene.leftPadd.player.username, this.scene.rightPadd.player.username, this.round);
 			drawScore(this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
 		}
-		// else
-		// 	console.log("GAME-FRONT: NO PLAYERS WARNING");
 	}
 
 	processNewGameState(gameState: JSONGameState): void
@@ -341,7 +330,7 @@ export class Pong
 		if (this.scene.camera && this.scene.id) {
 			this.scene.camera.animations = [];
 			this.scene.camera.animations.push(animation);
-			// this.scene.id.beginAnimation(this.scene.camera, 0, 60, false);
+			this.scene.id.beginAnimation(this.scene.camera, 0, 60, false);
 			this.scene.state = PlayerState.waiting;
 		}
 	}
