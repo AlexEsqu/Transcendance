@@ -69,12 +69,12 @@ export class TwoFactorAuthService
 		});
 	}
 
-	async check2faCode(code: string, twoFactorToken: string): Promise<TwoFactorResult>
+	async check2faCode(code: string): Promise<TwoFactorResult>
 	{
 		console.log(`sending code : ${code}`);
 
 		const response = await fetch(
-			`${apiDomainName}/users/auth/login/2fa?twoFactorToken=${twoFactorToken}`,
+			`${apiDomainName}/users/auth/login/2fa`,
 			{
 				method: 'POST',
 				headers: {
@@ -95,13 +95,13 @@ export class TwoFactorAuthService
 		return data;
 	}
 
-	async login(twoFactorToken: string)
+	async login()
 	{
 		try
 		{
-			console.log('2FA required, prompting for code...');
+			console.log('Enter 2FA login');
 			const code = await this.userState.twoFactor.prompt2faCode();
-			const verifiedData = await this.userState.twoFactor.check2faCode(code, twoFactorToken);
+			const verifiedData = await this.userState.twoFactor.check2faCode(code);
 			const user = new RegisteredUser(verifiedData.id, verifiedData.accessToken);
 			await this.userState.setUser(user);
 		}

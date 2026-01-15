@@ -23,3 +23,11 @@ export function handleSQLiteError(err, reply) {
 	}
 	reply.status(statusCode).send({ error: err.message });
 }
+
+
+export class VerificationError extends Error {
+	constructor(message, statusCode = 500) {
+		super(message);
+		this.statusCode = statusCode;
+	}
+}

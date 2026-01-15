@@ -1,12 +1,12 @@
-import login from "./login.js";
-import logout from "./logout.js";
-import refresh from "./refresh.js";
-import sendMailVerification from "./sendMailVerification.js";
-import signup from "./signup.js";
-import verifyEmail from "./verifyEmail.js";
-import login_2fa from "./2faLogin.js";
-import { ft_OAuth2_callback } from "./ft_oauthCallback.js";
-import ft_OAuth2 from "./ft_oauth.js";
+import login from "./login.route.js";
+import logout from "./logout.route.js";
+import refresh from "./refresh.route.js";
+import sendEmailVerificationRoute from "./email-verification.send.route.js";
+import signup from "./signup.route.js";
+import verifyEmail from "./email-verification.route.js";
+import twoFactorLoginRoute from "./two-factor-login.route.js";
+import oauthCallbackRoute from "./oauth/callback.route.js";
+import oauthRoute from "./oauth/redirect.route.js";
 
 export default async function authRoutes(server) {
 	server.register(signup, { prefix: "api/users" });
@@ -14,8 +14,8 @@ export default async function authRoutes(server) {
 	server.register(refresh, { prefix: "api/users/auth" });
 	server.register(logout, { prefix: "api/users/auth" });
 	server.register(verifyEmail, { prefix: "api/users/auth" });
-	server.register(sendMailVerification, { prefix: "api/users/auth" });
-	server.register(login_2fa, { prefix: "api/users/auth" });
-	server.register(ft_OAuth2, { prefix: "api/users/auth" });
-	server.register(ft_OAuth2_callback, { prefix: "api/users/auth" });
+	server.register(sendEmailVerificationRoute, { prefix: "api/users/auth" });
+	server.register(twoFactorLoginRoute, { prefix: "api/users/auth" });
+	server.register(oauthRoute, { prefix: "api/users/auth" });
+	server.register(oauthCallbackRoute, { prefix: "api/users/auth" });
 }
