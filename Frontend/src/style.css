@@ -321,7 +321,7 @@
 	cursor: pointer;
 	border: 1px solid theme('colors.red.600');
 	color: theme('colors.red.400');
-	padding: 0.35em 0.5em;
+	padding: 0.5em 0.75em;
 	justify-content: center;
 	align-items: center;
 	@apply base-text;

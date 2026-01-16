@@ -146,7 +146,7 @@
 				</form>
 			</section>
 
-			<section id="user-pass-container" class="hidden need-registered-user flex-col px-2 gap-4">
+			<section id="user-pass-container" class="hidden need-registered-user flex-col px-2 gap-2">
 				<div class="hidden need-registered-user items-center justify-between flex-wrap gap-2">
 					<div class="w-full">
 						<h2 class="text-fluid-base text-slate-400 ">Password</h2>
@@ -228,28 +228,24 @@
 			Security Settings
 		</h2>
 
-		<section id="toggle-tfa-container" class="flex flex-col px-2 gap-4">
-			<div class="flex items-center justify-between flex-wrap gap-2">
-				<div class="w-full">
-					<h2 class="sm-title">Two Factor Authentication</h2>
-					<p class="text-fluid-base text-slate-400">Add an extra layer of security</p>
-				</div>
-				<button id="toggle-tfa-btn" class="flex glow-button flex-1">
-					Enable 2FA
-				</button>
+		<section id="toggle-tfa-container" class="flex items-center justify-between flex-wrap gap-2 px-2">
+			<div class="w-full">
+				<h2 id="tfa-title" class="sm-title">Two Factor Authentication</h2>
+				<p  id="tfa-info" class="text-fluid-base text-slate-400">Add an extra layer of security</p>
 			</div>
+			<button id="tfa-toggle-btn" class="flex glow-button flex-1">
+				Enable 2FA
+			</button>
 		</section>
 
-		<section id="delete-account-container" class="flex flex-col px-2 gap-4">
-			<div class="flex items-center justify-between flex-wrap gap-2">
-				<div class="w-full">
-					<h2 class="text-red-400 sm-title">Delete Account</h2>
-					<p class="text-fluid-base text-red-300">Permanently delete your account</p>
-				</div>
-				<button id="delete-account-btn" class="flex red-glow-button flex-1">
-					Delete Account
-				</button>
+		<section id="delete-account-container" class="flex items-center justify-between flex-wrap gap-2 px-2">
+			<div class="w-full">
+				<h2 class="text-red-400 sm-title">Delete Account</h2>
+				<p class="text-fluid-base text-red-300">Permanently delete your account</p>
 			</div>
+			<button id="delete-account-btn" class="flex red-glow-button flex-1">
+				Delete Account
+			</button>
 		</section>
 
 	</article>

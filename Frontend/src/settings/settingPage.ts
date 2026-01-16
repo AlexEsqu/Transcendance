@@ -246,30 +246,49 @@ function updateCurrentSettings(): void
 
 function activateTfaButton(user : RegisteredUser)
 {
-	const twoFactorAuthBtn = document.getElementById('toggle-tfa-btn');
-	if (!twoFactorAuthBtn)
+	const twoFactorAuthSection = document.getElementById('toggle-tfa-container');
+	if (!twoFactorAuthSection)
 		return;
 
-	const newBtn = twoFactorAuthBtn.cloneNode(true) as HTMLElement;
-	twoFactorAuthBtn.parentNode?.replaceChild(newBtn, twoFactorAuthBtn);
+	const new2FASection = twoFactorAuthSection.cloneNode(true) as HTMLElement;
+	const new2FATitle = new2FASection.querySelector('#tfa-title');
+	const new2FAInfo = new2FASection.querySelector('#tfa-info');
+	const new2FAButton = new2FASection.querySelector('#tfa-toggle-btn');
+	if (!new2FASection || !new2FATitle || !new2FAInfo || !new2FAButton)
+		return;
+
+	twoFactorAuthSection.parentNode?.replaceChild(new2FASection, twoFactorAuthSection);
 
 	console.log('user in tfa toggle is')
 	console.log(user);
 
 	if (user.hasTwoFactorAuth)
 	{
-		newBtn.textContent = 'Disable 2FA';
-		newBtn.addEventListener('click', async () => {
+		new2FATitle.textContent = "Disable Two Factor Setting";
+		new2FAInfo.textContent = "Remove secure email verified login"
+		new2FAButton.textContent = 'Disable 2FA';
+		new2FAButton.addEventListener('click', async () => {
 			await userState.twoFactor.toggle2fa(false);
-
 		});
+		new2FAButton.classList.remove('glow-button');
+		new2FAButton.classList.add('red-glow-button');
+		new2FATitle.classList.add('text-red-400');
+		new2FAInfo.classList.remove('text-slate-400');
+		new2FAInfo.classList.add('text-red-300');
 	}
 	else
 	{
-		newBtn.textContent = 'Enable 2FA';
-		newBtn.addEventListener('click', async () => {
+		new2FATitle.textContent = "Enable Two Factor Setting";
+		new2FAInfo.textContent = "Add an email verification on login"
+		new2FAButton.textContent = 'Enable 2FA';
+		new2FAButton.addEventListener('click', async () => {
 			await userState.twoFactor.toggle2fa(true);
 		});
+		new2FAButton.classList.add('glow-button');
+		new2FAButton.classList.remove('red-glow-button');
+		new2FATitle.classList.remove('text-red-400');
+		new2FAInfo.classList.add('text-slate-400');
+		new2FAInfo.classList.remove('text-red-300');
 	}
 }
 
