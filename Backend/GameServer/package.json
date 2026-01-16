@@ -1,0 +1,28 @@
+{
+	"name": "pong-game-server",
+	"version": "1.0.0",
+	"main": "index.js",
+	"description": "A game server using fastify/websocket and Typescript",
+	"scripts": {
+		"dev": "npx tsx watch src/server.ts",
+		"build": "tsc",
+		"start": "node dist/server.js",
+		"clean": "rm -rf dist"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"fastify": "^5.6.2",
+		"@fastify/websocket": "^11.2.0",
+		"ws": "^8.18.3",
+		"typescript": "^5.9.3",
+		"ajv": "^8.12.0",
+		"tsx": "^4.21.0"
+	},
+	"devDependencies": {
+		"@types/node": "^20.0.0",
+		"@types/ws": "^8.5.0",
+		"ts-loader": "^9.5.4"
+	}
+}

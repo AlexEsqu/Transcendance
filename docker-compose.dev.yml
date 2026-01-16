@@ -45,8 +45,25 @@ services:
     depends_on:
       - api
       - typescript
+      - game_server
     networks:
       - app-network
+    
+  game_server:
+    build: ./Backend/GameServer
+    container_name: game_server
+    expose:
+      - "4001"
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - APP_SECRET_KEY=${APP_SECRET_KEY}
+      - API_DOMAIN_NAME=${API_DOMAIN_NAME}
+      - PORT=4001
+    volumes:
+      - ./Backend/GameServer/src:/app/src
+    networks:
+      - app-network
+    command: npm run dev
 
 volumes:
   sqlite:

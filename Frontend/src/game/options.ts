@@ -1,6 +1,10 @@
-import { IOptions, Level } from "./Data";
+import { IOptions } from "./pongData";
+
+/************************************************************************************************************/
 
 export {saveOptions, loadOptions, clearOptions }
+
+/************************************************************************************************************/
 
 const gameOPtionStorageKey = 'gameOptions';
 

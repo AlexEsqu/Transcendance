@@ -12,6 +12,7 @@ WEB_DIR				=	pages
 FRONT_SERVICES		=	typescript
 BACK_SERVICES		=	api
 REVERSE_PROXY		=	nginx
+GAME_SERVICES		=	gameServer
 
 USER := $(shell whoami)
 CERT_DIR := ./nginx/certs
