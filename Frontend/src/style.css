@@ -1,12 +1,27 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  @font-face {
+    font-family: 'Orbitron';
+    src: url('/assets/fonts/Orbitron-VariableFont_wght.ttf') format('truetype');
+    font-weight: 400 900;
+    font-display: swap;
+  }
+
+   @font-face {
+    font-family: 'Goldman';
+  	src: url('/assets/fonts/Goldman-Regular.ttf') format('truetype');
+	font-weight: 400;
+    font-display: swap;
+  }
+}
+
 @layer utilities {
 
   * {
-	font-family: 'Courier New', Courier, monospace;
+	font-family: 'Goldman', monospace;
   }
 
 
@@ -166,7 +181,7 @@
     from { text-shadow: 0 0 5px rgba(255, 0, 0, 0.4), 0 0 10px rgba(255, 50, 50, 0.3); }
     to   { text-shadow: 0 0 25px rgba(255, 0, 0, 0.8), 0 0 25px rgba(255, 100, 100, 0.6); }
   }
-  
+
   .player1 {
       /* text-shadow: 0 0 4px #00fff7, 0 0 8px #00fff744; */
       color: #6dd3f1;
@@ -240,27 +255,32 @@
 
   .big-title {
 	font-size: theme('fontSize.fluid-xll');
-	font-family: 'Orbitron', 'Courier New', Courier, monospace;
+	letter-spacing: 0.05em;
+	font-family: 'Orbitron', monospace;
   }
 
   .md-title {
 	font-size: theme('fontSize.fluid-xl');
-	font-family: 'Orbitron', 'Courier New', Courier, monospace;
+	letter-spacing: 0.05em;
+	font-family: 'Orbitron', monospace;
   }
 
   .sm-title {
 	font-size: theme('fontSize.fluid-lg');
-	font-family: 'Orbitron', 'Courier New', Courier, monospace;
+	letter-spacing: 0.05em;
+	font-family: 'Orbitron', monospace;
   }
 
   .base-text {
 	font-size: theme('fontSize.fluid-base');
-	font-family: 'Courier New', Courier, monospace;
+	letter-spacing: 0.05em;
+	font-family: 'Goldman', monospace;
   }
 
   .sm-text {
 	font-size: theme('fontSize.fluid-sm');
-	font-family: 'Courier New', Courier, monospace;
+	letter-spacing: 0.05em;
+	font-family: 'Goldman', monospace;
   }
 
   /* BUTTON */
@@ -278,7 +298,7 @@
   .glow-button {
 	cursor: pointer;
 	border: 1px solid theme('colors.slate.600');
-	padding: 0.35em 0.5em;
+	padding: 0.5em 0.75em;
 	justify-content: center;
 	align-items: center;
 	@apply base-text;
