@@ -1,39 +1,38 @@
 <div class="flex flex-wrap gap-2 border-box mt-3 mr-3 ml-3">
 
-	<a id="avatar-btn" class="cursor-pointer glow-select size-24 xl:size-36 border border-slate-600 p-0"
+	<a id="avatar-btn" class="cursor-pointer glow-select aspect-square w-20 sm:w-24 lg:w-28 xl:w-36 border border-slate-600 p-0"
 		href="/dashboard" data-link>
 		<img id="user-avatar-nav" src="/assets/placeholder/avatarPlaceholder.png"
-			class="size-24 lg:size-36 object-cover object-center block " />
+			class="w-full h-full object-cover object-center block " />
 	</a>
 
 	<div class="flex flex-col flex-1 gap-2 min-w-0 justify-between">
 
 		<div id="nav-info" class="flex flex-wrap gap-2 justify-between">
 
-			<h1 id="user-name-nav" class="text-fluid-xl font-[Orbitron] break-all overflow-wrap-break-word">
+			<h1 id="user-name-nav" class="big-title font-[Orbitron] break-all overflow-wrap-break-word">
 				USERNAME
 			</h1>
 
 			<button id="logout-btn"
-				class="glow-select cursor-pointer border border-slate-600 py-2 px-4 self-start flex items-center justify-center">
+				class="glow-select big-glow-button">
 				Logout
 			</button>
 
 		</div>
 
 		<div id="nav-user-menu" class="hidden sm:flex gap-2 flex-wrap">
-
-			<a class="glow-select cursor-pointer border border-slate-600 p-2 flex-1 min-w-[80px] flex items-center justify-center" href="/settings"
+			<a class="flex glow-select big-glow-button flex-1 min-w-24" href="/settings"
 				data-link>
 				Settings
 			</a>
 
-			<a class="glow-select cursor-pointer border border-slate-600 p-2 flex-1 min-w-[80px] flex items-center justify-center" href="/dashboard"
+			<a class="flex glow-select big-glow-button flex-1 min-w-24" href="/dashboard"
 				data-link>
 				Dashboard
 			</a>
 
-			<a class="glow-select cursor-pointer border border-slate-600 p-2 flex-1 min-w-[80px] flex items-center justify-center" href="/game"
+			<a class="flex glow-select big-glow-button flex-1 min-w-24" href="/game"
 				data-link>
 				Game
 			</a>
@@ -41,19 +40,19 @@
 
 	</div>
 
+	<!-- nav links for small screens, copy of previous for nicer layout switch -->
 	<div id="nav-user-menu-mobile" class="flex sm:hidden gap-2 flex-wrap w-full">
-
-		<a class="glow-select cursor-pointer border border-slate-600 p-2 flex-auto flex items-center justify-center" href="/settings"
+		<a class="flex glow-select big-glow-button flex-1 min-w-24" href="/settings"
 			data-link>
 			Settings
 		</a>
 
-		<a class="glow-select cursor-pointer border border-slate-600 p-2 flex-auto flex items-center justify-center" href="/dashboard"
+		<a class="flex glow-select big-glow-button flex-1 min-w-24" href="/dashboard"
 			data-link>
 			Dashboard
 		</a>
 
-		<a class="glow-select cursor-pointer border border-slate-600 p-2 flex-auto flex items-center justify-center" href="/game"
+		<a class="flex glow-select big-glow-button flex-1 min-w-24" href="/game"
 			data-link>
 			Game
 		</a>

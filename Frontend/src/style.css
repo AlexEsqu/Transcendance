@@ -111,27 +111,30 @@
 
   /* GlOWY STUFF */
 
-  .glow-select:hover, .glow-select:active, .glow-select:focus {
-    box-shadow: 0 0 8px 2px #2ed2ff66, 0 0 20px 6px #2ed2ffcc;
-    transition: box-shadow 0.3s;
+  .glow-select:hover, .glow-select:focus {
     border-color: #2ed2ff66;
     border-style: solid;
-    animation: text-glow 2s ease-in-out infinite alternate;
     outline: none;
     background-color: #0C0D11;
+    animation: box-glow 2s ease-in-out infinite alternate;
   }
 
-
-  .glow {
-    -webkit-box-shadow: 0 0 110px 11px oklch(68.5% 0.169 237.323);
-    -moz-box-shadow: 0 0 110px 11px oklch(60.9% 0.126 221.723);
-    box-shadow: 0 0 110px 11px oklch(50% 0.134 242.749);
+  @keyframes box-glow {
+    from { box-shadow: 0 0 4px 1px #2ed2ff66, 0 0 8px 2px #2ed2ffcc; }
+    to   { box-shadow: 0 0 12px 3px #2ed2ff66, 0 0 24px 4px #2ed2ffcc; }
   }
 
-  .glow-anim { animation: glow 2s ease-in-out infinite alternate; }
-  @keyframes glow {
-    from { box-shadow: 0 0 5px 2px oklch(44.3% 0.11 240.79); }
-    to   { box-shadow: 0 0 10px 4px oklch(68.5% 0.169 237.323); }
+  .red-glow-select:hover, .red-glow-select:focus {
+    border-color: theme('colors.red.600');
+    border-style: solid;
+    outline: none;
+    background-color: #0C0D11;
+    animation: box-glow-red 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes box-glow-red {
+    from { box-shadow: 0 0 4px 1px #ff2e3866, 0 0 8px 2px #ff2e2ecc; }
+    to   { box-shadow: 0 0 12px 3px #ff2e3866, 0 0 24px 6px #ff2e2ecc; }
   }
 
   .text-glow {
@@ -163,15 +166,7 @@
     from { text-shadow: 0 0 5px rgba(255, 0, 0, 0.4), 0 0 10px rgba(255, 50, 50, 0.3); }
     to   { text-shadow: 0 0 25px rgba(255, 0, 0, 0.8), 0 0 25px rgba(255, 100, 100, 0.6); }
   }
-
-  .big-glow:hover {
-    box-shadow: 0 0 8px 2px #2ed2ff66, 0 0 20px 6px #2ed2ffcc;
-    transition: box-shadow 0.3s;
-    border-color: #2ed2ff66;
-    border-style: solid;
-    animation: text-glow 2s ease-in-out infinite alternate;
-  }
-
+  
   .player1 {
       /* text-shadow: 0 0 4px #00fff7, 0 0 8px #00fff744; */
       color: #6dd3f1;
@@ -242,6 +237,64 @@
 
 
   /* FONTS SIZE */
+
+  .big-title {
+	font-size: theme('fontSize.fluid-xll');
+	font-family: 'Orbitron', 'Courier New', Courier, monospace;
+  }
+
+  .md-title {
+	font-size: theme('fontSize.fluid-xl');
+	font-family: 'Orbitron', 'Courier New', Courier, monospace;
+  }
+
+  .sm-title {
+	font-size: theme('fontSize.fluid-lg');
+	font-family: 'Orbitron', 'Courier New', Courier, monospace;
+  }
+
+  .base-text {
+	font-size: theme('fontSize.fluid-base');
+	font-family: 'Courier New', Courier, monospace;
+  }
+
+  .sm-text {
+	font-size: theme('fontSize.fluid-sm');
+	font-family: 'Courier New', Courier, monospace;
+  }
+
+  /* BUTTON */
+
+  .big-glow-button {
+	cursor: pointer;
+	border: 1px solid theme('colors.slate.600');
+	padding: 0.5em 0.75em;
+	justify-content: center;
+	align-items: center;
+	@apply sm-title;
+	@apply glow-select;
+  }
+
+  .glow-button {
+	cursor: pointer;
+	border: 1px solid theme('colors.slate.600');
+	padding: 0.35em 0.5em;
+	justify-content: center;
+	align-items: center;
+	@apply base-text;
+	@apply glow-select;
+  }
+
+  .red-glow-button {
+	cursor: pointer;
+	border: 1px solid theme('colors.red.600');
+	color: theme('colors.red.400');
+	padding: 0.35em 0.5em;
+	justify-content: center;
+	align-items: center;
+	@apply base-text;
+	@apply red-glow-select;
+  }
 
 }
 
