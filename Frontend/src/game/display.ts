@@ -9,7 +9,7 @@ import optionsHtml from '../html/options.html?raw'
 
 /************************************************************************************************************/
 
-export { getGameHtml, getGameOptionHtml, initGamePageListeners };
+export { getGameHtml, getGameOptionHtml, initGamePageListeners, setNotification };
 
 /************************************************************************************************************/
 
@@ -238,6 +238,24 @@ function getMatchType(): number
 
 	const result = parseInt(selection.value);
 	return (result);
+}
+
+function setNotification(show: boolean, message: string | undefined): void
+{
+	const notification = document.getElementById('game-notification') as HTMLElement;
+	if (!notification)
+		return ;
+
+	if (!show)
+	{
+		notification.style.display = 'none';
+		return ;
+	}
+
+	notification.textContent = message ?? '';
+	notification.className = 'text-2xl text-center';
+	notification.style.display = 'flex';
+	// notification.style.display = 'flex flex-col items-center gap-4 font-bold p-6';
 }
 
 function onGameOptionLoaded(): void

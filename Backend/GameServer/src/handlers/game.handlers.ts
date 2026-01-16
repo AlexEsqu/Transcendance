@@ -44,7 +44,6 @@ function handleMessage(socket: WSWebSocket, message: Buffer,
 
 		//	Check if player informs that its ready
 		if (data.ready === true) {
-			console.log(`GAME-HANDLER: ${player.username} is ready to play`);
 			player.isReady = true;
 		}
 		else
@@ -68,8 +67,13 @@ function handleMessage(socket: WSWebSocket, message: Buffer,
 
 function handleDisconnection(player: IPlayer | undefined, gameControl: GameControl)
 {
-	console.log("GAME-HANDLER: on route '/room/game' disconnection of client ", player?.id);
+	console.log("GAME-HANDLER: on route '/room/game' disconnection of player ", player?.username);
 	if (player) {
+		// get la room 
+		// faire gagner l'adversaire, sauvegarder les results
+		// Si deux joeurs == fin de la game
+		// Si tournois continuer le deroulement prevu
+		//	Supprimer ou pas ? Pose probleme si tenter de communiquer avec ou pas ?
 		gameControl.deletePlayerFromRoom(player.username, player.roomId ?? -1, 'game');
 	}
 }

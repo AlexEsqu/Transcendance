@@ -10,7 +10,7 @@ export type { IBall, IPaddle, IPlayer, IRound, IResult }
  ***********************************************************************************************************/
 
 const GAME = {
-	MAX_SCORE: 11,
+	MAX_SCORE: 3,
 	MAX_ROUNDS: 1,
 
 	BALL_START_SPEED: 4,
@@ -85,9 +85,9 @@ interface IPlayer {
 };
 
 interface IResult {
-	winner: IPlayer | undefined;
+	winner: IPlayer;
 	maxScore: number;
-	loser: IPlayer | undefined;
+	loser: IPlayer;
 	minScore: number;
 };
 
