@@ -195,12 +195,13 @@ export class GameLoop
 	{
 		if (this.state !== State.end)
 			this.state = State.waiting;
-		else if (this.state === State.end)
-			return ;
 
 		//	Save the results of the previous match, if there was one
 		if (this.rounds)
 			this.saveResults();
+
+		if (this.state === State.end)
+			return ;
 
 		//	Who should play now ?
 		let match = this.matchType;
@@ -236,6 +237,9 @@ export class GameLoop
 	{
 		const winner: IPaddle = this.leftPadd.score === GAME.MAX_SCORE ? this.leftPadd : this.rightPadd;
 		const loser: IPaddle = this.leftPadd.score === GAME.MAX_SCORE ? this.rightPadd : this.leftPadd;
+		
+		if (winner.player === undefined || loser.player === undefined)
+			return ;
 
 		const results: IResult = {
 			winner: winner.player,
@@ -286,6 +290,16 @@ export class GameLoop
 			rightPaddUsername: this.rightPadd.player?.username ?? 'NaN',
 			ball: { x: this.ball.posistion.x, z: this.ball.posistion.z },
 		};
+
+		if (this.state === State.end, this.rounds.results)
+		{
+			const finalMatch: IResult = this.rounds.results[this.rounds.results.length - 1];
+			gameStateInfo.results = { 
+				winner: finalMatch.winner.username, 
+				loser: finalMatch.loser.username 
+			};
+		}
+
 		return gameStateInfo;
 	}
 }

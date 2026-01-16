@@ -65,9 +65,12 @@ export class GameControl
 			notifyPlayersInRoom(this.waitingRoom.get(roomId), `new player ${player.username} added in the waiting room n'${roomId}`);
 
 		//	Waiting room completed ? create a gaming room
-		const fullWaitingRoomId: number | undefined = this.checkFullWaitingRoom();
-		if (fullWaitingRoomId !== undefined)
+		let fullWaitingRoomId: number | undefined = this.checkFullWaitingRoom();
+		while (fullWaitingRoomId !== undefined)
+		{
 			this.createGamingRoom(fullWaitingRoomId, player);
+			fullWaitingRoomId = this.checkFullWaitingRoom();
+		}
 		return roomId;
 	}
 

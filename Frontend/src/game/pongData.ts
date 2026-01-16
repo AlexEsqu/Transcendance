@@ -3,7 +3,7 @@ import { Scene, ArcRotateCamera, Mesh } from '@babylonjs/core';
 /************************************************************************************************************/
 
 export { GAME_SIZE, PlayerState, ServerState }
-export type { IPlayer, IPaddle, IOptions, IScene, IResult }
+export type { IPlayer, IPaddle, IOptions, IScene }
 
 /************************************************************************************************************
  * 		Declare CONSTANT variables								 											*
@@ -71,9 +71,9 @@ interface IPlayer {
 	color: string;
 };
 
-interface IResult {
-	winner: IPlayer | null;
-	maxScore: number;
-	loser: IPlayer | null;
-	minScore: number;
-};
+// interface IResult {
+// 	winner: IPlayer | null;
+// 	maxScore: number;
+// 	loser: IPlayer | null;
+// 	minScore: number;
+// };

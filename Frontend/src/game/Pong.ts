@@ -1,8 +1,10 @@
 import { JSONInputsUpdate, JSONGameState, JSONRoomAccess, JSONRoomDemand } from './submit.json';
-import { IOptions, IScene, IResult, PlayerState, ServerState } from "./pongData";
+import { IOptions, IScene, PlayerState, ServerState } from "./pongData";
 import { createText, createAnimation, loadGame, drawScore, drawName } from './Graphics';
 import { getCanvasConfig, getPlayers, fillRoomDemand, processNewPlayerState, assignPlayers, getIPlayerFromStr } from './utils';
 import { Engine } from '@babylonjs/core';
+import { setNotification } from './display';
+import { stat } from 'fs';
 
 /************************************************************************************************************/
 
@@ -19,8 +21,8 @@ export class Pong
 	gamingSocket: WebSocket | null = null;
 	roomId: number | undefined = undefined;
 	round: number = 0;
+	results: { winner: string, loser: string } | undefined = undefined;
 	isPlayerReady: boolean = false;
-	timestamp: number = 0;
 
 	constructor(canvasId: string, options: IOptions)
 	{
@@ -40,7 +42,6 @@ export class Pong
 		this.waitingSocket = new WebSocket(`wss://${window.location.host}${Pong.WAITING_ROOM_URL}`);
 		if (!this.waitingSocket)
 			throw new Error("'waitingSocket' creation failed");
-		this.timestamp = Date.now();
 	}
 
 	goToWaitingRoom(): void
@@ -89,6 +90,9 @@ export class Pong
 
 		this.waitingSocket.onclose = () => {
 			console.log("GAME-FRONT: websocket (for route 'waiting') is closed");
+			//	TO DO --> display
+			setNotification(true, 'A player has left waiting room');
+			this.scene.state = PlayerState.stop;
 		};
 	}
 
@@ -135,6 +139,7 @@ export class Pong
 
 			this.gamingSocket.onclose = () => {
 				console.log("GAME-FRONT: websocket (for route 'game') is closed");
+				this.scene.state = PlayerState.stop;
 			};
 		}, 100);
 	}
@@ -147,13 +152,12 @@ export class Pong
 		}
 
 		const keys: Record<string, boolean> = {};
-		let result: IResult = { winner: null, maxScore: 0, loser: null, minScore: 0};
 
 		//	Manage user input and update data before render
 		this.handleInput(keys);
 		this.scene.id.registerBeforeRender(() => {
 			// console.log(`GAME-FRONT-STATE: ${this.scene.state}`);
-			this.stateBasedScene(this.scene.state, result, keys);
+			this.stateBasedScene(this.scene.state, keys);
 			// this.timestamp = Date.now();
 		});
 
@@ -173,7 +177,7 @@ export class Pong
 		});
 	}
 
-	stateBasedScene(state: PlayerState, results: IResult | undefined, keys: Record<string, boolean>): void
+	stateBasedScene(state: PlayerState, keys: Record<string, boolean>): void
 	{
 		switch (state)
 		{
@@ -190,7 +194,7 @@ export class Pong
 				break ;
 
 			case PlayerState.end:
-				this.endGame(results);
+				this.endGame();
 				break ;
 			
 			case PlayerState.stop:
@@ -207,6 +211,8 @@ export class Pong
 	{
 		let player: string | undefined;
 		let action: string = 'none';
+
+		setNotification(false, undefined);
 
 		//	If a user presses a key, ask the server to update paddle's position
 		if (keys["ArrowDown"]) {
@@ -235,18 +241,13 @@ export class Pong
 
 	getReadyToPlay(keys: Record<string, boolean>): void
 	{
-		const element = document.getElementById('player-ready-input') as HTMLElement;
-		if (!element)
-			return ;
-
 		// if player isnt ready display "press space bar when you're ready" then listen for inputs
 		if (!this.isPlayerReady) {
-
-			element.style.display = 'flex';
-
+			setNotification(true, "Press the space bar when you're ready");
 			if (keys[" "]) {
 				this.isPlayerReady = true;
-				element.style.display = 'none';
+				if (this.scene.options.matchLocation === 'remote')
+					setNotification(true, "Wait for the other player(s) to be ready");
 				
 				//	Notify the server that player(s) is ready to play
 				const players = this.scene.players;
@@ -260,7 +261,6 @@ export class Pong
 
 	processNewGameState(gameState: JSONGameState): void
 	{
-		this.timestamp = gameState.timestamp;
 		this.scene.state = processNewPlayerState(gameState.state);
 
 		if (this.scene.ball) {
@@ -284,6 +284,8 @@ export class Pong
 			this.scene.rightPadd.mesh.position.z = gameState.rightPaddPos;
 			this.scene.rightPadd.player.score = gameState.rightPaddScore;
 		}
+		if (gameState.results !== undefined)
+			this.results = gameState.results;
 	}
 
 	sendUpdateToGameServer(player: string, action: string, ready: boolean): void
@@ -323,21 +325,22 @@ export class Pong
 		}
 	}
 
-	endGame(result: IResult | undefined): void
+	endGame(): void
 	{
-		if (!result || result === undefined) {
-			console.error("results of matches are lost");
-			return ;
-		}
 		console.log("GAME-FRONT: end");
 
 		if (this.scene.leftPadd.player && this.scene.rightPadd.player)
 			drawScore(this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
 		
+		if (this.results === undefined) {
+			console.error("results of matches are lost");
+			return ;
+		}
+
 		const winnerSpot = document.getElementById('match-results');
-		if (winnerSpot && result.winner?.username)
+		if (winnerSpot && this.results.winner)
 		{
-			winnerSpot.textContent = `${result.winner?.username} wins!`;
+			winnerSpot.textContent = `${this.results.winner} wins!`;
 			winnerSpot.classList.remove('invisible');
 		}
 		this.scene.state = PlayerState.stop;
@@ -379,8 +382,6 @@ export class Pong
 		});
 		window.addEventListener("keyup", (evt) => {
 			keys[evt.key] = false;
-			if (evt.key === ' ' && !this.isPlayerReady)
-				keys[evt.key] = true;
 		});
 	}
 }
