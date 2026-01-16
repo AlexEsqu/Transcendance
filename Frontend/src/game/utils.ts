@@ -4,7 +4,7 @@ import { userState, } from "../app";
 
 /************************************************************************************************************/
 
-export { getCanvasConfig, getPlayers, fillRoomDemand, processNewPlayerState, assignPlayers }
+export { getCanvasConfig, getPlayers, fillRoomDemand, processNewPlayerState, assignPlayers, getIPlayerFromStr }
 
 /************************************************************************************************************/
 
@@ -43,6 +43,22 @@ function getPlayers(inputs: string[], colors: string[], nbOfPlayers: number, mat
 		// players.reverse();
 	}
 	return players;
+}
+
+function getIPlayerFromStr(players: string[]): IPlayer[]
+{
+	let newPlayerObject: IPlayer[] = [];
+	for (let i = 0; i < players.length; i++)
+	{
+		const playerId: IPlayer = {
+			id: -1,
+			username: players[i],
+			score: 0,
+			color: "#8dbcff"
+		}
+		newPlayerObject.push(playerId);
+	}
+	return newPlayerObject;
 }
 
 function fillRoomDemand(

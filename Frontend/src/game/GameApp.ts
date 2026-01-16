@@ -23,6 +23,10 @@ class GameApp
 
 export function launchPongGame(options: IOptions): void
 {
+	const element = document.getElementById('player-ready-input') as HTMLElement;
+	if (element)
+		element.style.display = 'none';
+
 	//	Launch Pong game when user click on start button
 	const app = new GameApp(options);
 }

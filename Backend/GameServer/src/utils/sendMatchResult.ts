@@ -30,9 +30,9 @@ function sendMatchesToDataBase(results: IResult | null, time?: number): void
 	try {
 		if (!process.env.APP_SECRET_KEY)
 			throw new Error("GAME-SERVER: 'APP_SECRET_KEY' not found");
-
 		if (!results)
 			throw new Error("GAME-SERVER: results not found, can't send matches results");
+
 		const matchesURL: string = "http://api:3000/api/matches";
 		const matchesJSON: JSONMatchesResults = fillMatchesJSON(results, time);
 		const headers = {
@@ -40,8 +40,6 @@ function sendMatchesToDataBase(results: IResult | null, time?: number): void
 			'accept': '*/*',
 			'X-App-Secret': process.env.APP_SECRET_KEY
 		};
-
-		console.log(JSON.stringify(matchesJSON));
 
 		const request = new Request(
 			matchesURL,

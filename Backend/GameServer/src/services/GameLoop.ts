@@ -47,9 +47,10 @@ export class GameLoop
 		const room: Room | undefined = gameControl.getGamingRoom(this.roomId);
 		if (room === undefined) return ; // TO DO: HANDLE ERROR LATER
 
+		this.state = State.play;
+
 		let isNewRound: boolean = false;
 		let gameStateInfo: JSONGameState;
-		this.state = State.play;
 
 		console.log("GAME-LOOP: game loop started");
 		const interval = setInterval(() => {

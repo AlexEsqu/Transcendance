@@ -1,3 +1,7 @@
+import { IPlayer } from './pongData'
+
+/************************************************************************************************************/
+
 export type { JSONInputsUpdate, JSONGameState, JSONRoomAccess, JSONRoomDemand }
 
 /************************************************************************************************************
@@ -14,6 +18,7 @@ interface JSONRoomDemand {
 interface JSONRoomAccess {
 	roomId: number;
 	message: string;
+	players: string[];
 };
 
 interface JSONGameState {

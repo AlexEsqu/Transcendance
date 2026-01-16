@@ -5,6 +5,7 @@ import { GameControl } from '../services/GameControl';
 import { Room } from '../services/Room';
 import { IPlayer, State } from '../config/pongData';
 import { JSONInputsUpdate } from '../config/schemas';
+import { notifyPlayersInRoom } from '../utils/broadcast';
 
 /***********************************************************************************************************/
 
@@ -35,9 +36,17 @@ function handleMessage(socket: WSWebSocket, message: Buffer,
 
 		player.socket = socket;
 
+		if (!gamingRoom.gameLoop)
+			gamingRoom.createGameLoop();
+
+		if (gamingRoom.gameLoop)
+			notifyPlayersInRoom(gamingRoom, gamingRoom.gameLoop.composeGameState());
+
 		//	Check if player informs that its ready
-		if (data.ready === true)
+		if (data.ready === true) {
+			console.log(`GAME-HANDLER: ${player.username} is ready to play`);
 			player.isReady = true;
+		}
 		else
 			player.isReady = false;
 		

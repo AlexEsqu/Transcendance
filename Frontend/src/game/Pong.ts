@@ -1,8 +1,7 @@
 import { JSONInputsUpdate, JSONGameState, JSONRoomAccess, JSONRoomDemand } from './submit.json';
 import { IOptions, IScene, IResult, PlayerState, ServerState } from "./pongData";
 import { createText, createAnimation, loadGame, drawScore, drawName } from './Graphics';
-import { getCanvasConfig, getPlayers, fillRoomDemand, processNewPlayerState, assignPlayers } from './utils';
-import { AdvancedDynamicTexture } from "@babylonjs/gui";
+import { getCanvasConfig, getPlayers, fillRoomDemand, processNewPlayerState, assignPlayers, getIPlayerFromStr } from './utils';
 import { Engine } from '@babylonjs/core';
 
 /************************************************************************************************************/
@@ -16,7 +15,6 @@ export class Pong
 	canvas: HTMLCanvasElement;
 	engine: Engine | null = null;
 	scene: IScene;
-	gui: AdvancedDynamicTexture | null = null;
 	waitingSocket: WebSocket | null = null;
 	gamingSocket: WebSocket | null = null;
 	roomId: number | undefined = undefined;
@@ -39,7 +37,6 @@ export class Pong
 		this.scene = scene;
 		this.scene.players = players;
 		this.scene.state = PlayerState.opening;
-		this.gui = AdvancedDynamicTexture.CreateFullscreenUI("UI");
 		this.waitingSocket = new WebSocket(`wss://${window.location.host}${Pong.WAITING_ROOM_URL}`);
 		if (!this.waitingSocket)
 			throw new Error("'waitingSocket' creation failed");
@@ -71,7 +68,11 @@ export class Pong
 		//	Wait for the server to manage waiting rooms and assign current user to a gaming room
 		this.waitingSocket.onmessage = (event) => {
 			const serverMsg: JSONRoomAccess = JSON.parse(event.data);
+			console.log("GAME-FRONT: received message from game-server = ", serverMsg);
+
+			//	If game server sends a valid roomId and that no roomId was already settled
 			if (this.roomId === undefined && serverMsg.roomId !== undefined) {
+				this.scene.players = getIPlayerFromStr(serverMsg.players);
 				this.roomId = serverMsg.roomId;
 				this.waitingSocket?.close();
 				this.waitingSocket = null;
@@ -105,6 +106,7 @@ export class Pong
 				}
 	
 				console.log(`GAME-FRONT: joining the gaming room(${this.roomId})`);
+				this.sendUpdateToGameServer(this.scene.players[0].username, 'none', false);
 				this.scene.state = PlayerState.opening;
 				this.runGame();
 			};
@@ -164,6 +166,10 @@ export class Pong
 				return ;
 			}
 			this.scene.id.render();
+			if (this.scene.leftPadd.player && this.scene.rightPadd.player) {
+				drawName(this.scene.leftPadd.player.username, this.scene.rightPadd.player.username, this.round);
+				drawScore(this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
+			}
 		});
 	}
 
@@ -224,11 +230,6 @@ export class Pong
 			}
 			if (action !== 'none')
 				this.sendUpdateToGameServer(player ?? 'NaN', action, true);
-		}
-
-		if (this.scene.leftPadd.player && this.scene.rightPadd.player) {
-			drawName(this.scene.leftPadd.player.username, this.scene.rightPadd.player.username, this.round);
-			drawScore(this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
 		}
 	}
 

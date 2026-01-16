@@ -10,7 +10,7 @@ export type { IBall, IPaddle, IPlayer, IRound, IResult }
  ***********************************************************************************************************/
 
 const GAME = {
-	MAX_SCORE: 3,
+	MAX_SCORE: 11,
 	MAX_ROUNDS: 1,
 
 	BALL_START_SPEED: 4,
@@ -76,7 +76,7 @@ interface IPaddle {
 interface IPlayer {
 	id: number;
 	username: string;
-	socket: WSWebSocket;
+	socket: WSWebSocket | null;
 	matchType: MatchType;
 	gameLocation: GameLocation;
 	isReady: boolean;

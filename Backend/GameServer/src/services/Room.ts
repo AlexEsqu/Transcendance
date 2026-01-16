@@ -48,7 +48,8 @@ export class Room
 
 	isEveryoneReady(): boolean
 	{
-		for (const [key, value] of this.players) {
+		for (const [key, value] of this.players)
+		{
 			if (value.isReady === false)
 				return false;
 		}
@@ -57,8 +58,7 @@ export class Room
 
 	startGame(gameControl: GameControl): void
 	{
-		if (!this.gameLoopStarted) {
-			this.gameLoop = new GameLoop(this.id, this.type, this.players);
+		if (!this.gameLoopStarted && this.gameLoop) {
 			this.gameLoopStarted = true;
 			this.gameLoop.runGameLoop(gameControl);
 		}
@@ -68,5 +68,23 @@ export class Room
 	{
 		if (this.gameLoop)
 			this.gameLoop.processPlayerInput(player, state, input);
+	}
+
+	createGameLoop(): void
+	{
+		if (!this.gameLoop) {
+			console.log("GAME-LOOP: game loop created");
+			this.gameLoop = new GameLoop(this.id, this.type, this.players);
+		}
+	}
+
+	getPlayersArray(): string[]
+	{
+		let playersArray: string[] = [];
+		for (const [key, value] of this.players)
+		{
+			playersArray.push(value.username);
+		}
+		return playersArray;
 	}
 }
