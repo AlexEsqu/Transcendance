@@ -1,4 +1,4 @@
-import { IOptions, IPaddle, IScene, PlayerState } from "./pongData";
+import { IOptions, IPaddle, IScene, IPlayer, PlayerState } from "./pongData";
 import { openingAnimation, loadGame, drawScore, drawName } from './Graphics';
 import { getCanvasConfig, getPlayers, processNewPlayerState, assignPlayer } from './utils';
 import { JSONGameState } from './submit.json';
@@ -19,6 +19,7 @@ export class Pong
 	engine: Engine | null = null;
 	scene: IScene;
 	round: number = 0;
+	mainPlayerUsername: string;
 	results: { winner: string, loser: string } | undefined = undefined;
 
 	constructor(canvasId: string, options: IOptions, app: GameApp)
@@ -30,6 +31,7 @@ export class Pong
 			throw new Error("'engine' creation failed");
 
 		const players = getPlayers(options.players, options.paddColors, options.nbOfPlayers, options.matchLocation);
+		console.log(players);
 		if (!players)
 			throw new Error("players are not found");
 
@@ -39,6 +41,7 @@ export class Pong
 
 		this.scene = scene;
 		this.scene.players = players;
+		this.mainPlayerUsername = players[0].username;
 		this.scene.state = PlayerState.opening;
 	}
 
@@ -55,7 +58,7 @@ export class Pong
 		this.processInputs(keys);
 		this.scene.id.registerBeforeRender(() => {
 			// console.log(`GAME-FRONT-STATE: ${this.scene.state}`);
-			this.stateBasedSAction(this.scene.state, keys);
+			this.stateBasedAction(this.scene.state, keys);
 		});
 
 		//	Rendering loop
@@ -76,7 +79,7 @@ export class Pong
 		});
 	}
 
-	stateBasedSAction(state: PlayerState, keys: Record<string, boolean>): void
+	stateBasedAction(state: PlayerState, keys: Record<string, boolean>): void
 	{
 		switch (state)
 		{
@@ -108,34 +111,36 @@ export class Pong
 
 	updateGame(keys: Record<string, boolean>): void
 	{
-		let player: string | undefined;
-		let action: string = 'none';
-
 		setNotification(false, undefined);
 
+		const rightPadd: IPaddle = this.scene.rightPadd;
+		const leftPadd: IPaddle = this.scene.leftPadd;
+
 		//	If a user presses a key, ask the server to update paddle's position
-		if (keys["ArrowDown"]) {
-			player = this.scene.rightPadd?.player?.username;
-			action = 'down';
-		} else if (keys["ArrowUp"]) {
-			player = this.scene.rightPadd?.player?.username;
-			action = 'up';
+		if (this.scene.options.matchLocation === 'local')
+		{
+			if (keys["ArrowDown"])
+				this.gameApp.sendUpdateToGameServer(rightPadd.player?.username ?? 'NaN', 'down', true);
+			if (keys["ArrowUp"])
+				this.gameApp.sendUpdateToGameServer(rightPadd.player?.username ?? 'NaN', 'up', true);
+			if (keys["s"])
+				this.gameApp.sendUpdateToGameServer(leftPadd.player?.username ?? 'NaN', 'down', true);
+			if (keys["w"])
+				this.gameApp.sendUpdateToGameServer(leftPadd.player?.username ?? 'NaN', 'up', true);
+			return ;
 		}
 
-		if (action !== 'none')
-			this.gameApp.sendUpdateToGameServer(player ?? 'NaN', action, true);
-
-		if (this.scene.options.matchLocation === 'local') {
-			if (keys["s"]) {
-				player = this.scene.leftPadd?.player?.username;
-				action = 'down';
-			} else if (keys["w"]) {
-				player = this.scene.leftPadd?.player?.username;
-				action = 'up';
-			}
-			if (action !== 'none')
-				this.gameApp.sendUpdateToGameServer(player ?? 'NaN', action, true);
-		}
+		//	Code bellow is executed only in 'remote' case
+		let mainPlayerPadd: IPaddle;
+		if (rightPadd.player?.username === this.mainPlayerUsername)
+			mainPlayerPadd = rightPadd;
+		else
+			mainPlayerPadd = leftPadd;
+		//	Update paddle's position (remote case)
+		if (keys["ArrowDown"])
+			this.gameApp.sendUpdateToGameServer(mainPlayerPadd.player?.username ?? 'NaN', 'down', true);
+		if (keys["ArrowUp"])
+			this.gameApp.sendUpdateToGameServer(mainPlayerPadd.player?.username ?? 'NaN', 'up', true);
 	}
 
 	processServerGameState(gameState: JSONGameState): boolean
