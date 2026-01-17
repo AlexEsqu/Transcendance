@@ -257,7 +257,6 @@ function setNotification(show: boolean, message: string | undefined): void
 	notification.textContent = message ?? '';
 	notification.className = 'text-2xl text-center';
 	notification.style.display = 'flex';
-	// notification.style.display = 'flex flex-col items-center gap-4 font-bold p-6';
 }
 
 function onGameOptionLoaded(): void

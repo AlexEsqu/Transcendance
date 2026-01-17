@@ -74,22 +74,36 @@ function createMap(scene: Scene, height: number, width: number, colorHex: string
  * 		CAMERA & ANIMATION																					*
  ***********************************************************************************************************/
 
-function createCamera(scene: Scene): ArcRotateCamera | null
+function createCamera(scene: Scene, matchLocation: string): ArcRotateCamera | null
 {
 	if (!scene || scene === undefined) return null;
 
-	const camera: ArcRotateCamera = new ArcRotateCamera(
-		'arCamera',
-		-(Math.PI / 2), // alpha
-		0, // beta
-		12, // radius
-		Vector3.Zero(), // target
-		scene
-	);
+	if (matchLocation === 'remote')
+	{
+		const camera: ArcRotateCamera = new ArcRotateCamera(
+			'arCamera',
+			0, // alpha
+			Math.PI / 3, // beta
+			9, // radius
+			new Vector3((GAME_SIZE.MAP_WIDTH / 2) - 3, 0.5, 0.0), // target
+			scene
+		);
+		return camera;
+	}
+	else
+	{
+		const camera: ArcRotateCamera = new ArcRotateCamera(
+			'arCamera',
+			-(Math.PI / 2), // alpha
+			0, // beta
+			8, // radius
+			new Vector3(0.0, -1, 0.0), // target
+			scene
+		);
+		return camera;
+	}
 	//	Allow to move the camera with the mouse -> uncomment for debug
 	// camera.attachControl(canvas, true);
-
-	return camera;
 }
 
 function createAnimation(username: string, target: string, keys: IAnimationKey[]): Animation
@@ -112,9 +126,11 @@ function openingAnimation(scene: IScene): void
 {
 	console.log("GAME-FRONT: opening scene animation");
 
+	const endCameraAngle: number = Math.PI / 4;
+
 	const keys = [
 		{ frame: 0, value: 0 },
-		{ frame: 60, value: (Math.PI / 4) }
+		{ frame: 60, value: endCameraAngle }
 	];
 	const animation = createAnimation("cameraBetaAnim", "beta", keys);
 
@@ -146,7 +162,7 @@ function loadGame(engine: Engine, canvas: HTMLCanvasElement, options: IOptions):
 	//	Remove default background color
 	id.clearColor = new Color4(0, 0, 0, 0);
 
-	const camera = createCamera(id);
+	const camera = createCamera(id, options.matchLocation);
 
 	//	Create a glow layer to add a bloom effect around meshes
 	const glowLayer: GlowLayer = new GlowLayer("glow", id, { mainTextureRatio: 0.6 });

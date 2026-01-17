@@ -15,16 +15,18 @@
 		<div id="match-results" class="text-3xl text-center invisible">Match Ongoing</div>
 	</div>
 
-	<div id="notification-container" class="flex flex-col justify-center">
+	<!-- <div id='game-window-container' class="flex-1 min-h-100 w-full aspect-video">
+		<canvas id="game-canvas" class="w-full h-full"></canvas>
+	</div> -->
+	<!-- Fixed canvas -->
+	<div id='game-window-container' class="flex-1 min-h-0 w-full relative overflow-hidden">
+        <canvas id="game-canvas" class="absolute inset-0 w-full h-full"></canvas>
+    </div>
 
-			<div class="flex flex-col items-center gap-4 font-bold p-6">
+	<div id="notification-container" class="flex flex-col justify-center">
+			<div class="flex flex-col items-center gap-2 font-bold p-6">
 				<span id="game-notification"></span>
 			</div>
-
-	</div>
-
-	<div id='game-window-container' class="flex-1 min-h-100 w-full aspect-video">
-		<canvas id="game-canvas" class="w-full h-full"></canvas>
 	</div>
 
 </div>

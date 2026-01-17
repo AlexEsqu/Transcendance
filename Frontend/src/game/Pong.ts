@@ -42,7 +42,7 @@ export class Pong
 		this.scene = scene;
 		this.scene.players = players;
 		this.mainPlayerUsername = players[0].username;
-		this.scene.state = PlayerState.opening;
+		this.scene.state = options.matchLocation === 'local' ? PlayerState.opening : PlayerState.waiting;
 	}
 
 	runGame(): void
