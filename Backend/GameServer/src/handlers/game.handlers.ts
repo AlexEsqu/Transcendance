@@ -26,21 +26,22 @@ function handleMessage(socket: WSWebSocket, message: Buffer,
 			throw new Error("GAME-HANDLER: message received doesn't match with 'validateSchema' on '/room/game' route") ;
 		}
 
-		// console.log("GAME-HANDLER: handle received message from '/room/game' route : ", data);
+		console.log("GAME-HANDLER: handle received message from '/room/game' route : ", data);
 
 		const player: IPlayer | undefined = gameControl.getPlayer(data.roomId, data.username);
 		const gamingRoom: Room | undefined = gameControl.getGamingRoom(data.roomId);
 
+		console.log(`DEBUG `, data.username);
 		if (player === undefined || gamingRoom === undefined)
 			throw new Error("GAME-HANDLER: player or gaming room not found, can't handle user message on 'room/game' route");
 
-		player.socket = socket;
+		// player.socket = socket;
 
-		if (!gamingRoom.gameLoop)
-			gamingRoom.createGameLoop();
+		// if (!gamingRoom.gameLoop)
+		// 	gamingRoom.createGameLoop();
 
-		if (gamingRoom.gameLoop)
-			notifyPlayersInRoom(gamingRoom, gamingRoom.gameLoop.composeGameState());
+		// if (gamingRoom.gameLoop)
+		// 	notifyPlayersInRoom(gamingRoom, gamingRoom.gameLoop.composeGameState());
 
 		//	Check if player informs that its ready
 		if (data.ready === true) {
@@ -51,7 +52,9 @@ function handleMessage(socket: WSWebSocket, message: Buffer,
 		
 		//	If all players are ready launch the game
 		if (gamingRoom.isEveryoneReady() === true && gamingRoom.gameLoopStarted === false)
+		{
 			gamingRoom.startGame(gameControl);
+		}
 
 		//	If player is ready & wants to move, update its paddle pos
 		if (gamingRoom.isEveryoneReady() === true && data.move)

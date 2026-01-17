@@ -43,6 +43,8 @@ export class Pong
 		this.scene.players = players;
 		this.mainPlayerUsername = players[0].username;
 		this.scene.state = options.matchLocation === 'local' ? PlayerState.opening : PlayerState.waiting;
+		console.log("SCENE STATE CONSTRUCTOR ", this.scene.state);
+		console.log("MAIN PLAYER ", this.mainPlayerUsername);
 	}
 
 	runGame(): void
@@ -149,8 +151,11 @@ export class Pong
 
 		if (this.scene.ball)
 		{
-			this.scene.ball.position.x = gameState.ball.x;
-			this.scene.ball.position.z = gameState.ball.z;
+			const alpha: number = 0.8;
+			this.scene.ball.position.x = this.scene.ball.position.x * (1 - alpha) + gameState.ball.x * alpha;
+			this.scene.ball.position.z = this.scene.ball.position.z * (1 - alpha) + gameState.ball.z * alpha;
+			// this.scene.ball.position.x = gameState.ball.x;
+			// this.scene.ball.position.z = gameState.ball.z;
 		}
 
 		if (this.round !== gameState.round || !this.scene.leftPadd.player || !this.scene.rightPadd.player)
@@ -171,8 +176,9 @@ export class Pong
 
 	updatePaddleInfo(paddle: IPaddle, newPos: number, newScore: number): void
 	{
+		const alpha: number = 0.9;
 		if (paddle.mesh)
-			paddle.mesh.position.z = newPos;
+			paddle.mesh.position.z = paddle.mesh.position.z * (1 - alpha) + newPos * alpha;
 
 		if (paddle.player)
 			paddle.player.score = newScore;

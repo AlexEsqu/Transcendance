@@ -95,9 +95,10 @@ export class GameApp
 				}
 	
 				console.log(`GAME-FRONT: joining the gaming room(${this.roomId})`);
-				this.sendUpdateToGameServer(this.pong.scene.players[0].username, 'none', false);
-				this.pong.scene.state = PlayerState.opening;
+				// this.pong.scene.state = PlayerState.waiting;
+				this.pong.scene.state = this.pong.scene.options.matchLocation === 'local' ? PlayerState.opening : PlayerState.waiting;
 				this.pong.runGame();
+				console.log(this.pong.scene.players);
 			};
 	
 			this.gamingSocket.onmessage = (event) => {
@@ -106,10 +107,10 @@ export class GameApp
 					if (this.roomId === undefined || !this.gamingSocket)
 						throw new Error("GAME-FRONT: can't identify client, impossible to process the message received from server");
 
-					const gameState: JSONGameState = JSON.parse(event.data);
-					// console.log(`GAME-FRONT: game state from room(${this.roomId}) =`, gameState);
-					if (!this.pong.processServerGameState(gameState))
-						this.isPlayerReady = false;
+						const gameState: JSONGameState = JSON.parse(event.data);
+						// console.log(`GAME-FRONT: game state from room(${this.roomId}) =`, gameState);
+						if (!this.pong.processServerGameState(gameState))
+							this.isPlayerReady = false;
 	
 				}
 				catch (error)
@@ -144,11 +145,16 @@ export class GameApp
 					setNotification(true, "Wait for the other player(s) to be ready");
 				
 				//	Notify the server that player(s) is ready to play
-				const players = this.pong.scene.players;
-				for (const player of players)
+				if (this.pong.scene.options.matchLocation === 'local')
 				{
-					this.sendUpdateToGameServer(player.username, 'none', true);
+					const players = this.pong.scene.players;
+					for (const player of players)
+					{
+						this.sendUpdateToGameServer(player.username, 'none', true);
+					}
 				}
+				else
+					this.sendUpdateToGameServer(this.pong.mainPlayerUsername, 'none', true);
 			}
 		}
 	}
