@@ -95,7 +95,10 @@ function handleDisconnection(player: IPlayer | undefined, gameControl: GameContr
 					//	If the match is a tournament && player disconnected but not currently playing
 					const disconnected = gamingRoom.players.get(player.username);
 					if (disconnected !== undefined)
+					{
+						disconnected.socket?.close();
 						disconnected.socket = null;
+					}
 				}
 			}
 

@@ -1,11 +1,10 @@
 import { Engine, Scene, Mesh, MeshBuilder, Vector3, Color3, GlowLayer, Color4, StandardMaterial,
 	 ArcRotateCamera, GroundMesh, Animation, IAnimationKey } from '@babylonjs/core';
-import { AdvancedDynamicTexture, TextBlock } from "@babylonjs/gui";
-import { GAME_SIZE, IOptions, IScene } from './pongData';
+import { GAME_SIZE, IOptions, IScene, PlayerState } from './pongData';
 
 /************************************************************************************************************/
 
-export { createText, createAnimation, loadGame, drawScore, drawName }
+export { loadGame, openingAnimation, drawScore, drawName }
 
 /************************************************************************************************************
  * 		SETTING 3D OBJECTS																					*
@@ -56,37 +55,6 @@ function creatPaddleMesh(scene: Scene, colorHex: string): Mesh
 	return mesh;
 }
 
-function createCamera(scene: Scene, canvas: HTMLCanvasElement): ArcRotateCamera | null
-{
-	if (!scene || scene === undefined) return null;
-
-	const camera: ArcRotateCamera = new ArcRotateCamera(
-		'arCamera',
-		-(Math.PI / 2), // alpha
-		0, // beta
-		12, // radius
-		Vector3.Zero(), // target
-		scene
-	);
-	//	Allow to move the camera -> uncomment for debug
-	// camera.attachControl(canvas, true);
-
-	return camera;
-}
-
-function createText(
-	text: string, color: string, fontSize: number, topPx: string, leftPx: string, gui: AdvancedDynamicTexture): TextBlock
-{
-	const block: TextBlock = new TextBlock();
-	block.text = text;
-	block.color = color;
-	block.fontSize = fontSize;
-	block.top = topPx;
-	block.left = leftPx;
-	gui.addControl(block);
-	return block;
-}
-
 function createMap(scene: Scene, height: number, width: number, colorHex: string): Mesh | null
 {
 	if (!scene || scene === undefined) return null;
@@ -102,6 +70,28 @@ function createMap(scene: Scene, height: number, width: number, colorHex: string
 	return map;
 }
 
+/************************************************************************************************************
+ * 		CAMERA & ANIMATION																					*
+ ***********************************************************************************************************/
+
+function createCamera(scene: Scene): ArcRotateCamera | null
+{
+	if (!scene || scene === undefined) return null;
+
+	const camera: ArcRotateCamera = new ArcRotateCamera(
+		'arCamera',
+		-(Math.PI / 2), // alpha
+		0, // beta
+		12, // radius
+		Vector3.Zero(), // target
+		scene
+	);
+	//	Allow to move the camera with the mouse -> uncomment for debug
+	// camera.attachControl(canvas, true);
+
+	return camera;
+}
+
 function createAnimation(username: string, target: string, keys: IAnimationKey[]): Animation
 {
 	const animation = new Animation(
@@ -115,30 +105,30 @@ function createAnimation(username: string, target: string, keys: IAnimationKey[]
 	return animation;
 }
 
-function setupBall(scene: Scene, color: string): Mesh | null
+/**
+ * 	- Camera tilt animation when the game launches
+ */
+function openingAnimation(scene: IScene): void
 {
-	if (!scene || scene === undefined) return null;
+	console.log("GAME-FRONT: opening scene animation");
 
-	const ball: Mesh = createBallMesh(scene, GAME_SIZE.BALL_RADIUS, color);
-	ball.position = new Vector3(0.0, GAME_SIZE.MAP_Y, 0.0);
-	return ball;
+	const keys = [
+		{ frame: 0, value: 0 },
+		{ frame: 60, value: (Math.PI / 4) }
+	];
+	const animation = createAnimation("cameraBetaAnim", "beta", keys);
+
+	if (scene.camera && scene.id) {
+		scene.camera.animations = [];
+		scene.camera.animations.push(animation);
+		scene.id.beginAnimation(scene.camera, 0, 60, false);
+		scene.state = PlayerState.waiting;
+	}
 }
 
-function setupPaddle(scene: Scene, color: string, side: string): Mesh | null
-{
-	if (!scene || scene === undefined) return null;
-
-	const paddle: Mesh = creatPaddleMesh(scene, color);
-	paddle.rotation.y = Math.PI / 2;
-	// paddle.position = new Vector3((GAME_SIZE.MAP_WIDTH / 2), GAME_SIZE.MAP_Y, 0.0);
-	if (side === 'left')
-		paddle.position = new Vector3(-(GAME_SIZE.MAP_WIDTH / 2), GAME_SIZE.MAP_Y, 0.0);
-	else
-		paddle.position = new Vector3((GAME_SIZE.MAP_WIDTH / 2), GAME_SIZE.MAP_Y, 0.0);
-
-
-	return paddle;
-}
+/************************************************************************************************************
+ * 		SETTING PONG GAME SCENE																				*
+ ***********************************************************************************************************/
 
 /**
  * 	- Create the main scene and all its elements
@@ -156,7 +146,7 @@ function loadGame(engine: Engine, canvas: HTMLCanvasElement, options: IOptions):
 	//	Remove default background color
 	id.clearColor = new Color4(0, 0, 0, 0);
 
-	const camera = createCamera(id, canvas);
+	const camera = createCamera(id);
 
 	//	Create a glow layer to add a bloom effect around meshes
 	const glowLayer: GlowLayer = new GlowLayer("glow", id, { mainTextureRatio: 0.6 });
@@ -195,12 +185,37 @@ function loadGame(engine: Engine, canvas: HTMLCanvasElement, options: IOptions):
 		state: 0
 	};
 
-	console.log("GAME-FRONT: game loaded");
+	console.log("GAME-FRONT: game scene loaded");
 	return scene;
 }
 
+function setupBall(scene: Scene, color: string): Mesh | null
+{
+	if (!scene || scene === undefined) return null;
+
+	const ball: Mesh = createBallMesh(scene, GAME_SIZE.BALL_RADIUS, color);
+	ball.position = new Vector3(0.0, GAME_SIZE.MAP_Y, 0.0);
+	return ball;
+}
+
+function setupPaddle(scene: Scene, color: string, side: string): Mesh | null
+{
+	if (!scene || scene === undefined) return null;
+
+	const paddle: Mesh = creatPaddleMesh(scene, color);
+	paddle.rotation.y = Math.PI / 2;
+	// paddle.position = new Vector3((GAME_SIZE.MAP_WIDTH / 2), GAME_SIZE.MAP_Y, 0.0);
+	if (side === 'left')
+		paddle.position = new Vector3(-(GAME_SIZE.MAP_WIDTH / 2), GAME_SIZE.MAP_Y, 0.0);
+	else
+		paddle.position = new Vector3((GAME_SIZE.MAP_WIDTH / 2), GAME_SIZE.MAP_Y, 0.0);
+
+
+	return paddle;
+}
+
 /************************************************************************************************************
- * 		DRAWING User Interface																				*
+ * 		DRAWING UserInterface																				*
  ***********************************************************************************************************/
 
 // FYI: score1 is the player2
