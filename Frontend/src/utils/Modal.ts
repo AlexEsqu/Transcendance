@@ -114,3 +114,67 @@ export class ErrorModal extends Modal
 		});
 	}
 }
+
+export class InfoModal extends Modal
+{
+	/**
+	 * Creates an error/message modal.
+	 * @param htmlContent - HTML template string with message and confirm button with .modal-confirm class
+	 */
+	constructor(htmlContent: string)
+	{
+		super(htmlContent);
+		this.setupModal();
+	}
+
+	setupModal(): void
+	{
+		const confirmBtn = this.modalElem.querySelector('.modal-confirm') as HTMLButtonElement;
+		confirmBtn.addEventListener('click', () => {
+			this.close();
+		});
+	}
+}
+
+import checkEmailHtml from "../html/info/checkEmailModal.html?raw";
+import { UserState } from "../user/UserState";
+import { userState } from "../app";
+
+export class EmailCheckModal extends Modal
+{
+	email: string;
+
+	constructor(email: string)
+	{
+		super(checkEmailHtml.replace('{{ EMAIL ADDRESS }}', email));
+		this.email = email;
+		this.setupModal();
+	}
+
+	setupModal(): void
+	{
+		const resendBtn = this.modalElem.querySelector('#resend-email-btn') as HTMLButtonElement;
+		resendBtn.addEventListener('click', async () => {
+			try {
+				await userState.emailAuth.resendVerifEmail(this.email);
+				resendBtn.textContent = 'Email Sent! Please wait 30 seconds';
+				resendBtn.disabled = true;
+				setTimeout(() => {
+					resendBtn.textContent = 'Send Email Again';
+					resendBtn.disabled = false;
+				}, 30000);
+			}
+			catch (error) {
+				if (error instanceof Error) {
+					console.error('Resend email failed:', error);
+					resendBtn.textContent = 'Failed to send';
+				}
+			}
+		});
+
+		const closeBtn = this.modalElem.querySelector('#back-btn') as HTMLButtonElement;
+		closeBtn.addEventListener('click', () => {
+			this.close();
+		});
+	}
+}

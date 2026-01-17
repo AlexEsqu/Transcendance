@@ -4,7 +4,7 @@ import { User, RegisteredUser } from "../user/User";
 import { getNavBarHtml } from './navSection';
 import { apiDomainName } from "../user/UserState";
 import { initOAuthCallback } from "../auth/OAuth";
-import { getConnectionLandingHtml, getConnectionForm, getEmailCheck, initConnectionPageListeners} from '../auth/connectionPage'
+import { getConnectionLandingHtml, getConnectionForm, initConnectionPageListeners} from '../auth/connectionPage'
 import { getDashboardPage, initDashboardPageListeners } from "../dashboard/dashboardPage";
 import { getGameHtml, getGameOptionHtml, initGamePageListeners } from "../game/display";
 import { getSettingPage } from "../settings/settingPage";
@@ -235,7 +235,6 @@ class Router
 		this.addRoute('/connection', getConnectionLandingHtml);
 		this.addRoute('/connection/login', getConnectionForm);
 		this.addRoute('/connection/register', getConnectionForm);
-		this.addRoute('/connection/emailcheck', getEmailCheck);
 		this.addRoute('/connection/alias', getConnectionForm);
 
 		this.addRoute('/dashboard', getDashboardPage, true);
