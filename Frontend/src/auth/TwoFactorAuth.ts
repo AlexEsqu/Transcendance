@@ -89,12 +89,13 @@ export class TwoFactorAuthService
 					try
 					{
 						verifiedData = await this.userState.twoFactor.check2faCode(code);
+						// if data checked without exception being thrown, can close modal
 						modal.close();
 						const user = new RegisteredUser(verifiedData.id, verifiedData.accessToken);
 						await this.userState.setUser(user);
 					}
 					catch (codeErr) {
-						console.log('Invalid 2FA code, retrying:', codeErr);
+						console.log('Error while using 2 Factor Authentication');
 						if (codeErr instanceof Error)
 							openErrorModal(codeErr);
 					}
