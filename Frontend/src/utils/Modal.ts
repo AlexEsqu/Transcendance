@@ -67,7 +67,6 @@ export class FormModal extends Modal
 				{
 					const formData = new FormData(this.formElement!);
 					await this.onConfirm(formData);
-					// this.close();
 				}
 			});
 		}
@@ -79,11 +78,6 @@ export class FormModal extends Modal
 				this.close();
 			});
 		}
-
-		this.modalElem.addEventListener('click', (e) => {
-			if (e.target === this.modalElem)
-				this.close();
-		});
 	}
 
 	show(): void
@@ -92,9 +86,11 @@ export class FormModal extends Modal
 		this.formElement?.focus();
 	}
 
-	getFormData(): FormData | null
+	getFormData(): FormData
 	{
-		return this.formElement ? new FormData(this.formElement) : null;
+		if (!this.formElement)
+			throw new Error('No form received to create the Form Modal')
+		return new FormData(this.formElement);
 	}
 }
 
@@ -115,11 +111,6 @@ export class ErrorModal extends Modal
 		const confirmBtn = this.modalElem.querySelector('.modal-confirm') as HTMLButtonElement;
 		confirmBtn.addEventListener('click', () => {
 			this.close();
-		});
-
-		this.modalElem.addEventListener('click', (e) => {
-			if (e.target === this.modalElem)
-				this.close();
 		});
 	}
 }
