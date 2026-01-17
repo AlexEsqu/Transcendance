@@ -87,4 +87,14 @@ export class Room
 		}
 		return playersArray;
 	}
+
+	closeRoom(): void
+	{
+		for (const [key, value] of this.players)
+		{
+			if (value.socket)
+				value.socket.close();
+		}
+		this.gameLoop = null;
+	}
 }

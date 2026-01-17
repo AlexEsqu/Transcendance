@@ -89,10 +89,7 @@ export class Pong
 		};
 
 		this.waitingSocket.onclose = () => {
-			console.log("GAME-FRONT: websocket (for route 'waiting') is closed");
-			//	TO DO --> display
-			setNotification(true, 'A player has left waiting room');
-			this.scene.state = PlayerState.stop;
+			console.log("GAME-FRONT: You left the waiting room, websocket (for route 'waiting') is closed");
 		};
 	}
 
@@ -138,7 +135,7 @@ export class Pong
 			};
 
 			this.gamingSocket.onclose = () => {
-				console.log("GAME-FRONT: websocket (for route 'game') is closed");
+				console.log("GAME-FRONT: You left the game, websocket (for route 'game') is closed");
 				this.scene.state = PlayerState.stop;
 			};
 		}, 100);

@@ -21,7 +21,7 @@ export async function registerWaitingRoomRoutes(gameServer: FastifyInstance, gam
 		fastify.get(WAITING_ROOM_URL, { websocket: true }, (socket: WSWebSocket, request) => {
 			if (!socket) throw new Error("Websocket is missing");
 
-			let player = { playerId: 'NaN', roomId: -1 };
+			let client = { username: 'NaN', roomId: -1 };
 
 			//	Handle: first connection of a client
 			console.log("GAME-SERVER: new connection from a client on route '/room/waiting'");
@@ -29,13 +29,13 @@ export async function registerWaitingRoomRoutes(gameServer: FastifyInstance, gam
 			//	Handler: receiving message from a client
 			socket.on('message', (message: Buffer) => {
 				console.log("GAME-SERVER: received a message from the client on route '/room/waiting");
-				player = handleMessage(socket, message, validateWaitingMessage, gameControl);
+				client = handleMessage(socket, message, validateWaitingMessage, gameControl);
 			});
 	
 			//	Handle: ending client connection properly for the server
 			socket.on('close', () => {
 				console.log("GAME-SERVER: client closed connection on route '/room/waiting");
-				handleDisconnection(player, gameControl);
+				handleDisconnection(client, gameControl);
 			});
 	
 			//	Handle: errors!!
