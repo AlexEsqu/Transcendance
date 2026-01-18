@@ -124,8 +124,8 @@ export class GameControl
 
 	createGamingRoom(roomId: number, player: IPlayer): boolean
 	{
-		const room = this.waitingRoom.get(roomId);
-		if (room === undefined) {
+		const waitingRoom: Room | undefined = this.waitingRoom.get(roomId);
+		if (waitingRoom === undefined) {
 			console.log("GAME-CONTROL: failed to create a new gaming room n'", roomId);
 			return false;
 		}
@@ -133,14 +133,19 @@ export class GameControl
 		console.log("GAME-CONTROL: new gaming room created n'", roomId);
 		// console.log("ROOOM ", this.gamingRooms.get(roomId)?.players);
 		
-		this.gamingRooms.set(roomId, room);
+		this.gamingRooms.set(roomId, waitingRoom);
+		const current: Room | undefined = this.gamingRooms.get(roomId);
+		if (current === undefined) {
+			console.log("GAME-CONTROL: failed to create a new gaming room n'", roomId);
+			return false;
+		}
+		current.createGameLoop();
 
 		const welcomeMessage: JSONRoomAccess = {
 			roomId: roomId,
 			message: `Player ${player.username} has been added to gaming room n'${roomId}`,
-			players: room.getPlayersArray()
+			players: waitingRoom.getPlayersArray()
 		};
-		console.log(welcomeMessage);
 		notifyPlayersInRoom(this.gamingRooms.get(roomId), welcomeMessage);
 
 		this.waitingRoom.delete(roomId);

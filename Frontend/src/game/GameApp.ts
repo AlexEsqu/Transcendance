@@ -95,10 +95,12 @@ export class GameApp
 				}
 	
 				console.log(`GAME-FRONT: joining the gaming room(${this.roomId})`);
-				// this.pong.scene.state = PlayerState.waiting;
+
+				//	On socket creation send a message to the game-server to obtain the game info
+				this.sendUpdateToGameServer(this.pong.mainPlayerUsername, 'none', this.isPlayerReady);
+				//	Start to display (not playing) the game scene
 				this.pong.scene.state = this.pong.scene.options.matchLocation === 'local' ? PlayerState.opening : PlayerState.waiting;
 				this.pong.runGame();
-				console.log(this.pong.scene.players);
 			};
 	
 			this.gamingSocket.onmessage = (event) => {
@@ -129,7 +131,7 @@ export class GameApp
 
 			this.gamingSocket.onclose = () => {
 				console.log("GAME-FRONT: You left the game, websocket (for route 'game') is closed");
-				this.pong.scene.state = PlayerState.stop;
+				this.pong.scene.state = PlayerState.end;
 			};
 		}, 1000);
 	}
@@ -142,7 +144,7 @@ export class GameApp
 			if (keys[" "]) {
 				this.isPlayerReady = true;
 				if (this.pong.scene.options.matchLocation === 'remote')
-					setNotification(true, "Wait for the other player(s) to be ready");
+					setNotification(true, "Wait for the other player to be ready");
 				
 				//	Notify the server that player(s) is ready to play
 				if (this.pong.scene.options.matchLocation === 'local')

@@ -26,22 +26,23 @@ function handleMessage(socket: WSWebSocket, message: Buffer,
 			throw new Error("GAME-HANDLER: message received doesn't match with 'validateSchema' on '/room/game' route") ;
 		}
 
-		console.log("GAME-HANDLER: handle received message from '/room/game' route : ", data);
+		// console.log("GAME-HANDLER: handle received message from '/room/game' route : ", data);
 
 		const player: IPlayer | undefined = gameControl.getPlayer(data.roomId, data.username);
 		const gamingRoom: Room | undefined = gameControl.getGamingRoom(data.roomId);
 
-		console.log(`DEBUG `, data.username);
+		// console.log(`DEBUG `, data.username);
 		if (player === undefined || gamingRoom === undefined)
 			throw new Error("GAME-HANDLER: player or gaming room not found, can't handle user message on 'room/game' route");
 
-		// player.socket = socket;
+		if (player.username === data.username)
+			player.socket = socket;
 
-		// if (!gamingRoom.gameLoop)
-		// 	gamingRoom.createGameLoop();
-
-		// if (gamingRoom.gameLoop)
-		// 	notifyPlayersInRoom(gamingRoom, gamingRoom.gameLoop.composeGameState());
+		if (gamingRoom.gameLoop && gamingRoom.gameLoopStarted === false)
+		{
+			console.log("SHOULD SEND PLAYERS ", gamingRoom.gameLoop.leftPadd.player?.username);
+			notifyPlayersInRoom(gamingRoom, gamingRoom.gameLoop.composeGameState());
+		}
 
 		//	Check if player informs that its ready
 		if (data.ready === true) {

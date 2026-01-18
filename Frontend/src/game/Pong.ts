@@ -43,7 +43,6 @@ export class Pong
 		this.scene.players = players;
 		this.mainPlayerUsername = players[0].username;
 		this.scene.state = options.matchLocation === 'local' ? PlayerState.opening : PlayerState.waiting;
-		console.log("SCENE STATE CONSTRUCTOR ", this.scene.state);
 		console.log("MAIN PLAYER ", this.mainPlayerUsername);
 	}
 
@@ -65,7 +64,7 @@ export class Pong
 
 		//	Rendering loop
 		this.engine.runRenderLoop(() => {
-			if (!this.scene.id || this.scene.state === PlayerState.stop || !this.gameApp.gamingSocket)
+			if (!this.scene.id || this.scene.state === PlayerState.stop)
 			{
 				if (this.engine)
 					this.engine.stopRenderLoop();
@@ -160,6 +159,7 @@ export class Pong
 
 		if (this.round !== gameState.round || !this.scene.leftPadd.player || !this.scene.rightPadd.player)
 		{
+			console.log("ASSIGNED PLAYERS");
 			this.round = gameState.round;
 			this.scene.leftPadd.player = assignPlayer(gameState, this.scene.players, 'left');
 			this.scene.rightPadd.player = assignPlayer(gameState, this.scene.players, 'right');
@@ -191,6 +191,8 @@ export class Pong
 		if (this.scene.leftPadd.player && this.scene.rightPadd.player)
 			drawScore(this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
 		
+		this.scene.state = PlayerState.stop;
+
 		if (this.results === undefined) {
 			console.error("results of matches are lost");
 			return ;
@@ -202,7 +204,6 @@ export class Pong
 			winnerSpot.textContent = `${this.results.winner} wins!`;
 			winnerSpot.classList.remove('invisible');
 		}
-		this.scene.state = PlayerState.stop;
 	}
 
 	/**

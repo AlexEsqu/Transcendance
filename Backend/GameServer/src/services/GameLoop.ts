@@ -39,7 +39,7 @@ export class GameLoop
 		this.requestNewRound();
 		this.state = State.waiting;
 		this.isGameRunning = false;
-		this.timestamp = Date.now();
+		this.timestamp = -1;
 	}
 
 	runGameLoop(gameControl: GameControl): void
@@ -91,7 +91,7 @@ export class GameLoop
 	updateGameData(): void
 	{
 		//	Move the ball position according to its direction and velocity
-		const deltaTime: number = (Date.now() - this.timestamp) / 1000;
+		const deltaTime: number = this.timestamp !== -1 ? ((Date.now() - this.timestamp) / 1000) : Date.now();
 		const velocity = scaleVelocity(this.ball, deltaTime);
 		this.ball.posistion.x += velocity.x;
 		this.ball.posistion.z += velocity.z;

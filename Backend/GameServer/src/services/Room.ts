@@ -59,15 +59,12 @@ export class Room
 
 	startGame(gameControl: GameControl): void
 	{
-		console.log("IN ROOM ", this.players);
-		if (!this.gameLoopStarted)
+		console.log("GAME-ROOM: start game with : ", this.players);
+		if (!this.gameLoopStarted && this.gameLoop)
 		{
-			this.createGameLoop();
-			if (this.gameLoop)
-			{
-				this.gameLoop.runGameLoop(gameControl);
-				notifyPlayersInRoom(this, this.gameLoop.composeGameState())
-			}
+			this.gameLoop.runGameLoop(gameControl);
+			this.gameLoopStarted = true;
+			notifyPlayersInRoom(this, this.gameLoop.composeGameState())
 		}
 	}
 
@@ -83,7 +80,6 @@ export class Room
 		{
 			console.log("GAME-LOOP: game loop created");
 			this.gameLoop = new GameLoop(this.id, this.type, this.players);
-			this.gameLoopStarted = true;
 		}
 	}
 
