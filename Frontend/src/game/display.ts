@@ -39,7 +39,8 @@ function initGamePageListeners(): void
 
 			case '/game':
 			{
-				const options = loadOptions()
+				const options = loadOptions();
+				console.log("OPTIONS ", options);
 				if (options)
 					onGameLoaded();
 				else
@@ -55,6 +56,7 @@ function initGamePageListeners(): void
 
 			default:
 			{
+				console.error("TO DEBUG!!! CAN'T ACCESS GAME DON'T KNOW WHY");
 				return;
 			}
 
