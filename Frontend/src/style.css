@@ -353,6 +353,29 @@
     box-shadow: none;
   }
 
+  /* Conditional display of the security panel */
+  /* Make user-setting-container span full height by default */
+  #user-setting-container {
+      grid-row: span 4;
+  }
+
+/* When security panel is visible (not hidden), make user panel span only 2 rows */
+  #security-setting-content:not(.hidden) ~ #user-setting-container,
+  #settings-container:has(#security-setting-content:not(.hidden)) #user-setting-container {
+      grid-row: span 2;
+  }
+
+  /* For small screens and above */
+  @media (min-width: 640px) {
+      #user-setting-container {
+          grid-row: span 4;
+      }
+
+      #settings-container:has(#security-setting-content:not(.hidden)) #user-setting-container {
+          grid-row: span 2;
+      }
+  }
+
 }
 
 
