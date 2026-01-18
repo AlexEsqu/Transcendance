@@ -1,46 +1,109 @@
-<div id="game-option-main" class="flex flex-col items-center justify-center">
-	<div class="glow-anim">
-		<form id="game-option-form" class="glow-form">
-			<!-- Choose game mode/type : 1vsAI, 1vs1 or tournaments -->
-			 <section>
-				<label for="mode" class="">Match type</label>
-				<select id="mode" class="gentle-select">
-					<option class='' value="1">One player and a robot</option>
-					<option class='' value="2">Two players</option>
-					<option class='' value="4">Tournament with 4 friends</option>
-					<!-- <option value="8">Tournament with 8 friends</option> -->
-				</select>
-			</section>
-			<!-- Choose participants -->
-			<section>
-				<label for="mode" class="">Who fights ?</label>
-				<div id="players-container" class="w-full flex flex-col gap-2">
-					<!-- inputs are handled dynamically -->
-				</div>
-			</section>
-			<!-- Choose game level : the higher the level, the more challenging it is -->
-			<section>
-				<label for="level" class="">How intense ?</label>
-				<select id="level" class="gentle-select">
-					<option value="0">easy</option>
-					<option value="1">medium</option>
-					<option value="2">hard</option>
-				</select>
-			</section>
-			<!-- Choose rendering customization -->
-			<section>
-				<p class="">Customize the rendering</p>
-				<div class="flex items-center justify-center gap-2 mt-2">
-					<label for="ball-color-input" class="p-1">Ball</label>
-					<input type="color" class="w-12 h-6 border bg-transparent cursor-pointer p-0" id="ball-color-input" value="#a2c2e8" title="Choose your color">
-					<label for="back-color-input" class="p-1">Map</label>
-					<input type="color" class="w-12 h-6 border bg-transparent cursor-pointer p-0" id="back-color-input" value="#01011a" title="Choose your color">
-					<!-- <label for="hs-color-input" class="p-1">Paddle</label>
-					<input type="color" class="p-1 h-5 w-14 block bg-white border border-gray-200 cursor-pointer disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700" id="padd-color-input" value="#a2c2e8" title="Choose your color"> -->
-				</div>
-			</section>
-			<!-- When every settings are good, submit the form -->
-			<button class="" type="submit" id="btn-submit">Submit Options</button>
-		</form>
+<main id="main" class="flex flex-1 justify-center items-center min-h-0">
+	<div 
+		id="game-option-main"
+		class="max-h-full">
+
+		<div 
+			class="glow-anim">
+
+			<form 
+				id="game-option-form"
+				class="glow-form">
+
+				<!-- Choose match-location : remote or local -->
+				<section
+					class="flex flex-col gap-0.5">
+
+					<label 
+						for="match-location"
+						class="text-center text-sm">
+						Match location
+					</label>
+					<select 
+						id="match-location" 
+						name="match-location"
+						class="gentle-select-compact">
+						<option class='' value="local">Local</option>
+						<option class='' value="remote">Remote</option>
+					</select>
+				</section>
+
+				<!-- Choose game-type : classic (1vsAI or 1vs1) or tournament -->
+				<section
+					class="flex flex-col gap-0.5">
+
+					<label 
+						for="match-type-container"
+						class="text-center text-sm ">
+						Match type
+					</label>
+					<div
+						id="match-type-container">
+						<!-- inputs are handled dynamically -->
+					</div>
+				</section>
+		
+				<!-- Choose participants -->
+				<section
+					class="flex flex-col gap-0.5">
+
+					<label 
+						for="players-container" 
+						class="text-center text-sm ">
+						Who fights ?
+					</label>
+					<div 
+						id="players-container" 
+						class="w-full flex flex-col gap-1"
+						title="Choose participants">
+						<!-- inputs are handled dynamically -->
+					</div>
+				</section>
+
+				<!-- Choose paddle colors for each player -->
+				<section
+					class="flex flex-col gap-0.5">
+
+					<label
+						for="paddle-colors-container"
+						class="text-center text-sm ">
+						Customize paddle's color
+					</label>
+					<div
+						id="paddle-colors-container"
+						class="w-full flex flex-col gap-1">
+						<!-- inputs are handled dynamically -->
+					</div>
+				</section>
+
+				<!-- Choose game level : the higher the level, the more challenging it is -->
+				<section
+					class="flex flex-col gap-0.5">
+
+					<label 
+						for="level" 
+						class="text-center text-sm ">
+						How intense ?
+					</label>
+					<select 
+						id="level" 
+						name="level" 
+						class="gentle-select-compact" 
+						title="The higher the level, the more challenging it is">
+				
+						<option value="0">easy</option>
+						<option value="1">medium</option>
+						<option value="2">hard</option>
+					</select>
+				</section>
+
+				<!-- When every settings are good, submit the form -->
+				<button 
+					class="p-3.5 mt-3 glow-select border border-slate-500" 
+					type="submit" 
+					id="btn-submit">Submit Options
+				</button>
+			</form>
+		</div>
 	</div>
-</div>
+</main>

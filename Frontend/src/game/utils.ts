@@ -1,0 +1,130 @@
+import { IPlayer, PlayerState, ServerState } from './pongData';
+import { JSONRoomDemand, JSONGameState } from './submit.json';
+import { userState, } from "../app";
+
+/************************************************************************************************************/
+
+export { getCanvasConfig, getPlayers, fillRoomDemand, processNewPlayerState, assignPlayer, getIPlayerFromStr }
+
+/************************************************************************************************************/
+
+function getCanvasConfig(canvasId: string): HTMLCanvasElement
+{
+	const canvas = document.getElementById(canvasId) as HTMLCanvasElement;
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
+	return canvas;
+}
+
+function getPlayers(inputs: string[], colors: string[], nbOfPlayers: number, matchLocation: string): Array<IPlayer> | null
+{
+	let players: Array<IPlayer> = [];
+	for (let i = 0; i < inputs.length; i++)
+	{
+		if (inputs[i] && colors[i]) {
+			let id;
+			// console.log(`i = ${i} / loc = ${matchLocation} / name = ${inputs[i]} / storage = ${userState.getUser()?.getName()}`)
+			if (matchLocation === 'local' && inputs[i] !== userState.getUser()?.getName())
+				id = -1;
+			else
+				id = userState.getUser()?.getId() ?? -1;
+			players.push({ id: id, username: inputs[i], score: 0, color: colors[i] } );
+		}
+	}
+
+	// if (players.length != nbOfPlayers) {
+	// 	console.error("players initialization failed, some players are missing");
+	// 	return null;
+	// }
+
+	// special case: opponent is a robot
+	if (nbOfPlayers === 1) { 
+		players.push({ id: 0, username: "Robot", score: 0, color: "#8dbcff" });
+		// players.reverse();
+	}
+	return players;
+}
+
+function getIPlayerFromStr(players: string[]): IPlayer[]
+{
+	let newPlayerObject: IPlayer[] = [];
+	for (let i = 0; i < players.length; i++)
+	{
+		const playerId: IPlayer = {
+			id: -1,
+			username: players[i],
+			score: 0,
+			color: "#8dbcff"
+		}
+		newPlayerObject.push(playerId);
+	}
+	return newPlayerObject;
+}
+
+function fillRoomDemand(
+	matchLocation: string | undefined, nbOfPlayers: number | undefined, player: IPlayer): JSONRoomDemand
+{
+	let match: string;
+	switch(nbOfPlayers)
+	{
+		case 1:
+			match = 'solo'
+			break ;
+		case 2:
+			match = 'duo';
+			break ;
+		case 4: 
+			match = 'tournament';
+			break ;
+		default:
+			match = 'solo';
+			break ;
+	}
+
+	let location: string = matchLocation ?? 'local';
+	const request: JSONRoomDemand = {
+		id: player.id,
+		username: player.username,
+		match: match,
+		location: location
+	}
+	return request;
+}
+
+function processNewPlayerState(serverInput: number): PlayerState
+{
+	const serverState  = serverInput as ServerState;
+
+	switch (serverState)
+	{
+		case ServerState.play:
+			return PlayerState.play;
+
+		case ServerState.waiting:
+			return PlayerState.waiting;
+
+		case ServerState.end:
+			return PlayerState.end;
+
+		default:
+			return PlayerState.play;
+	}
+}
+
+function findPlayer(players: IPlayer[], username: string): IPlayer | null
+{
+	for (const player of players)
+	{
+		if (player.username === username)
+			return player;
+	}
+	return null;
+}
+
+function assignPlayer(gameState: JSONGameState, players: IPlayer[], side: string): IPlayer | null
+{
+	if (side === 'left')
+		return findPlayer(players, gameState.leftPaddUsername);
+	else
+		return findPlayer(players, gameState.rightPaddUsername);
+}

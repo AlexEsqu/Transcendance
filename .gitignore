@@ -9,3 +9,4 @@ dist/
 .prettierrc
 *.key
 *.crt
+Pong_old.ts

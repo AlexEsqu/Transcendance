@@ -21,6 +21,13 @@
     border-radius: 0;
   }
 
+  .gentle-select-compact {
+    background: rgb(23, 26, 37);
+    text-align: center;
+    padding: 5px;
+    border-radius: 0;
+  }
+
 
   /* FORMS */
 
