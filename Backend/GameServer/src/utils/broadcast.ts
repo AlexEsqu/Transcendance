@@ -13,7 +13,8 @@ function notifyPlayersInRoom(room: Room | undefined, message: string | JSONGameS
 	
 	for (const [key, value] of room.players)
 	{
-		if (value.socket && value.socket.readyState === WebSocket.OPEN) {
+		if (value.socket && value.socket.readyState === WebSocket.OPEN)
+		{
 			try {
 				const data = JSON.stringify(message);
 				value.socket.send(data);

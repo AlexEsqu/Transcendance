@@ -1,5 +1,3 @@
-import { IPlayer } from './pongData'
-
 /************************************************************************************************************/
 
 export { waitingSchema, gameSchema, 
@@ -51,6 +49,7 @@ interface JSONGameState {
 	leftPaddUsername: string;
 	rightPaddUsername: string;
 	ball: { x: number, z: number };
+	results?: { winner: string, loser: string };
 };
 
 interface JSONInputsUpdate {

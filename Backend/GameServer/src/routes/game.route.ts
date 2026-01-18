@@ -39,8 +39,7 @@ export async function registerGameRoutes(gameServer: FastifyInstance, gameContro
 	
 			//	Handle: errors!!
 			socket.on('error', (error: Error) => {
-				console.error("WS-ERROR: ", error);
-				throw new Error(error.toString());
+				throw error;
 			});
 		});
 	});

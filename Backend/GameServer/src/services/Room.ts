@@ -1,4 +1,5 @@
-import { MatchType, IPlayer, GameLocation } from '../config/pongData.js';
+import { MatchType, IPlayer, GameLocation } from '../config/pongData';
+import { notifyPlayersInRoom } from '../utils/broadcast';
 import { GameLoop } from './GameLoop';
 import { GameControl } from './GameControl';
 
@@ -58,9 +59,12 @@ export class Room
 
 	startGame(gameControl: GameControl): void
 	{
-		if (!this.gameLoopStarted && this.gameLoop) {
-			this.gameLoopStarted = true;
+		console.log("GAME-ROOM: start game with : ", this.players);
+		if (!this.gameLoopStarted && this.gameLoop)
+		{
 			this.gameLoop.runGameLoop(gameControl);
+			this.gameLoopStarted = true;
+			notifyPlayersInRoom(this, this.gameLoop.composeGameState())
 		}
 	}
 
@@ -72,7 +76,8 @@ export class Room
 
 	createGameLoop(): void
 	{
-		if (!this.gameLoop) {
+		if (!this.gameLoop)
+		{
 			console.log("GAME-LOOP: game loop created");
 			this.gameLoop = new GameLoop(this.id, this.type, this.players);
 		}
@@ -86,5 +91,15 @@ export class Room
 			playersArray.push(value.username);
 		}
 		return playersArray;
+	}
+
+	closeRoom(): void
+	{
+		for (const [key, value] of this.players)
+		{
+			if (value.socket)
+				value.socket.close();
+		}
+		this.gameLoop = null;
 	}
 }
