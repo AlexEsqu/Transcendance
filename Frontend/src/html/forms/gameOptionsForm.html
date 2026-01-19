@@ -1,22 +1,22 @@
-<form 
+<form
 	id="game-option-form"
 	class="glow-form glow-anim">
 
-	<h1 class="md-title">
+	<h1 class="big-title">
 		Game Options
 	</h1>
 
 	<!-- Choose match-location : remote or local -->
 	<section
-		class="flex flex-col gap-1">
+		class="flex flex-col my-3 gap-1">
 
-		<label 
+		<label
 			for="match-location"
 			class="text-center sm-title">
 			Match location
 		</label>
-		<select 
-			id="match-location" 
+		<select
+			id="match-location"
 			name="match-location"
 			class="gentle-select-compact">
 			<option class='' value="local">Local</option>
@@ -26,9 +26,9 @@
 
 	<!-- Choose game-type : classic (1vsAI or 1vs1) or tournament -->
 	<section
-		class="flex flex-col gap-0.5">
+		class="flex flex-col my-3 gap-1">
 
-		<label 
+		<label
 			for="match-type-container"
 			class="text-center sm-title ">
 			Match type
@@ -41,15 +41,15 @@
 
 	<!-- Choose participants -->
 	<section
-		class="flex flex-col gap-0.5">
+		class="flex flex-col my-3 gap-1">
 
-		<label 
-			for="players-container" 
+		<label
+			for="players-container"
 			class="text-center sm-title ">
 			Who fights ?
 		</label>
-		<div 
-			id="players-container" 
+		<div
+			id="players-container"
 			class="w-full flex flex-col gap-1"
 			title="Choose participants">
 			<!-- inputs are handled dynamically -->
@@ -58,7 +58,7 @@
 
 	<!-- Choose paddle colors for each player -->
 	<section
-		class="flex flex-col gap-0.5">
+		class="flex flex-col my-3 gap-1">
 
 		<label
 			for="paddle-colors-container"
@@ -67,26 +67,26 @@
 		</label>
 		<div
 			id="paddle-colors-container"
-			class="w-full flex flex-col gap-1">
+			class="w-full flex flex-col flex-wrap gap-1">
 			<!-- inputs are handled dynamically -->
 		</div>
 	</section>
 
 	<!-- Choose game level : the higher the level, the more challenging it is -->
 	<section
-		class="flex flex-col gap-0.5">
+		class="flex flex-col my-3 gap-1">
 
-		<label 
-			for="level" 
+		<label
+			for="level"
 			class="text-center sm-title ">
 			How intense ?
 		</label>
-		<select 
-			id="level" 
-			name="level" 
-			class="gentle-select-compact" 
+		<select
+			id="level"
+			name="level"
+			class="gentle-select-compact"
 			title="The higher the level, the more challenging it is">
-	
+
 			<option value="0">easy</option>
 			<option value="1">medium</option>
 			<option value="2">hard</option>
@@ -94,9 +94,9 @@
 	</section>
 
 	<!-- When every settings are good, submit the form -->
-	<button 
-		class="p-3.5 mt-3 glow-select border border-slate-500" 
-		type="submit" 
+	<button
+		class="glow-button mt-5"
+		type="submit"
 		id="btn-submit">Submit Options
 	</button>
 </form>
