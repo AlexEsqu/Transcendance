@@ -5,7 +5,7 @@ import { clearOptions, loadOptions, saveOptions } from "./options";
 import { IOptions } from "./pongData";
 
 import gameHtml from '../html/game.html?raw'
-import optionsHtml from '../html/options.html?raw'
+import optionsHtml from '../html/forms/gameOptionsForm.html?raw'
 
 /************************************************************************************************************/
 
@@ -26,7 +26,8 @@ function getGameOptionHtml(): string
 function initGamePageListeners(): void
 {
 	document.addEventListener('pageLoaded', (event: Event) => {
-		const { detail: path } = event as CustomEvent<string>;
+		const customEvent = event as CustomEvent<{ path: string; search: string }>;
+		const { path, search } = customEvent.detail;
 
 		switch (path)
 		{

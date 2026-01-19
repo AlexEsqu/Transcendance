@@ -105,7 +105,7 @@ class Router
 		this.rootElement.innerHTML = route.getPage();
 
 		this.renderNavbar(user);
-
+		console.log(`target path: ${targetPath}`);
 		const event = new CustomEvent('pageLoaded', { detail: { path: targetPath, search: currentSearch } });
 		console.log("dispatching event:");
 		console.log(event);
