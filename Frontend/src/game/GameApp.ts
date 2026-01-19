@@ -44,7 +44,7 @@ export class GameApp
 				{
 					if (player.id !== 0)
 					{
-						const demand: JSONRoomDemand = fillRoomDemand(options.matchLocation, options.nbOfPlayers, player);
+						const demand: JSONRoomDemand = fillRoomDemand(options, player);
 						this.waitingSocket.send(JSON.stringify(demand));
 					}
 				}

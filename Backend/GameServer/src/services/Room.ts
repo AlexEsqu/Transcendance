@@ -10,15 +10,18 @@ export class Room
 	id: number;
 	type: MatchType;
 	location: GameLocation;
+	level: number;
 	gameLoop: GameLoop | null;
 	gameLoopStarted: boolean = false;
 	players: Map<string, IPlayer> = new Map<string, IPlayer>();
 
-	constructor(roomId: number, players: Map<string, IPlayer> | IPlayer, matchType: MatchType, matchLocation: GameLocation)
+	constructor(roomId: number, players: Map<string, IPlayer> | IPlayer, 
+		matchType: MatchType, matchLocation: GameLocation, matchLevel: number)
 	{
 		this.id = roomId;
 		this.type = matchType;
 		this.location = matchLocation;
+		this.level = matchLevel;
 		this.gameLoop = null;
 
 		if (players instanceof Map) {
@@ -59,7 +62,7 @@ export class Room
 
 	startGame(gameControl: GameControl): void
 	{
-		console.log("GAME-ROOM: start game with : ", this.players);
+		console.log(`GAME-ROOM: start game in roomID:${this.id} | matchType:${this.type} | location:${this.location} | level:${this.level} | players: `, this.players);
 		if (!this.gameLoopStarted && this.gameLoop)
 		{
 			this.gameLoop.runGameLoop(gameControl);
@@ -79,7 +82,7 @@ export class Room
 		if (!this.gameLoop)
 		{
 			console.log("GAME-LOOP: game loop created");
-			this.gameLoop = new GameLoop(this.id, this.type, this.players);
+			this.gameLoop = new GameLoop(this.id, this.type, this.players, this.level);
 		}
 	}
 

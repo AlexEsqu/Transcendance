@@ -1,4 +1,4 @@
-import { IPlayer, PlayerState, ServerState } from './pongData';
+import { IOptions, IPlayer, PlayerState, ServerState } from './pongData';
 import { JSONRoomDemand, JSONGameState } from './submit.json';
 import { userState, } from "../app";
 
@@ -61,32 +61,32 @@ function getIPlayerFromStr(players: string[]): IPlayer[]
 	return newPlayerObject;
 }
 
-function fillRoomDemand(
-	matchLocation: string | undefined, nbOfPlayers: number | undefined, player: IPlayer): JSONRoomDemand
+function fillRoomDemand(options: IOptions, player: IPlayer): JSONRoomDemand
 {
-	let match: string;
-	switch(nbOfPlayers)
+	let matchType: string;
+	switch(options.nbOfPlayers)
 	{
 		case 1:
-			match = 'solo'
+			matchType = 'solo'
 			break ;
 		case 2:
-			match = 'duo';
+			matchType = 'duo';
 			break ;
 		case 4: 
-			match = 'tournament';
+			matchType = 'tournament';
 			break ;
 		default:
-			match = 'solo';
+			matchType = 'duo';
 			break ;
 	}
 
-	let location: string = matchLocation ?? 'local';
 	const request: JSONRoomDemand = {
 		id: player.id,
 		username: player.username,
-		match: match,
-		location: location
+		color: player.color,
+		matchType: matchType,
+		location: options.matchLocation ?? 'local',
+		level: options.level
 	}
 	return request;
 }
@@ -124,7 +124,7 @@ function findPlayer(players: IPlayer[], username: string): IPlayer | null
 function assignPlayer(gameState: JSONGameState, players: IPlayer[], side: string): IPlayer | null
 {
 	if (side === 'left')
-		return findPlayer(players, gameState.leftPaddUsername);
+		return findPlayer(players, gameState.leftPadd.username);
 	else
-		return findPlayer(players, gameState.rightPaddUsername);
+		return findPlayer(players, gameState.rightPadd.username);
 }

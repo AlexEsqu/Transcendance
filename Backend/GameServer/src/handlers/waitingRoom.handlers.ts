@@ -17,7 +17,6 @@ export { handleMessage, handleDisconnection}
 function handleMessage(socket: WSWebSocket, message: Buffer, 
 	validateSchema: ValidateFunction, gameControl: GameControl): { username: string, roomId: number}
 {
-	console.log("WAIT_HANDLER: handle received message from '/room/waiting' route");
 	try {
 		//	Must parse and validate received message
 		const data: JSONRoomDemand = JSON.parse(message.toString());
@@ -25,10 +24,11 @@ function handleMessage(socket: WSWebSocket, message: Buffer,
 			socket.send(JSON.stringify(getJSONError("Bad request", 400)));
 			return ({ username: 'NaN', roomId: -1});
 		}
+		console.log("WAIT_HANDLER: handle received message from '/room/waiting' route ");
 
 		//	Add in game controller (manage waiting rooms and gaming rooms)
 		const player = gameControl.generatePlayerId(socket, data);
-		const roomId = gameControl.addPlayerInWaitingRoom(player) ?? -1;
+		const roomId = gameControl.addPlayerInWaitingRoom(player, data.level) ?? -1;
 
 		return ({ username: player.username, roomId: roomId});
 

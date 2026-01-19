@@ -2,24 +2,17 @@ import { WebSocket as WSWebSocket } from 'ws';
 
 /************************************************************************************************************/
 
-export { GAME, MatchType, GameLocation, State, Level, GAMING_ROOM_URL, WAITING_ROOM_URL, PlayerState }
-export type { IBall, IPaddle, IPlayer, IRound, IResult }
+export { GAME_SIZE, MatchType, GameLocation, State, Level, GAMING_ROOM_URL, WAITING_ROOM_URL, PlayerState }
+export type { IBall, IPaddle, IPlayer, IRound, IResult, Info }
 
 /************************************************************************************************************
  * 		Declare CONSTANT variables								 											*
  ***********************************************************************************************************/
 
-const GAME = {
-	MAX_SCORE: 3,
-	MAX_ROUNDS: 1,
-
-	BALL_START_SPEED: 4,
-	BALL_MAX_SPEED: 10,
+const GAME_SIZE = {
+	
 	BALL_RADIUS: 0.15,
 
-	BOT_PROBABILITY: 5,
-	PADD_RESPONSIVENESS: -25.0,
-	PADD_SPEED: 15.0,
 	PADD_WIDTH: 1.25,
 	PADD_HEIGHT: 0.25,
 	PADD_DEPTH: 0.25,
@@ -95,4 +88,13 @@ interface IRound {
 	results: Array<IResult> | null;
 	waitingPlayers: Array<IPlayer>;
 	nbOfRounds: number;
-}
+};
+
+interface Info {
+	MAX_SCORE: number;
+	MAX_ROUNDS: number;
+	BALL_START_SPEED: number;
+	BALL_MAX_SPEED: number;
+	PADD_SPEED: number;
+	BOT_PROBABILITY: number;
+};

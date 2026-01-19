@@ -4,16 +4,17 @@ import { GAME_SIZE, IOptions, IScene, PlayerState } from './pongData';
 
 /************************************************************************************************************/
 
-export { loadGame, openingAnimation, drawScore, drawName }
+export { loadGame, openingAnimation, createMaterial, drawScore, drawName }
 
 /************************************************************************************************************
  * 		SETTING 3D OBJECTS																					*
  ***********************************************************************************************************/
 
-function createMaterial(scene: Scene, color: Color3): StandardMaterial | null
+function createMaterial(scene: Scene, colorHex: string): StandardMaterial | null
 {
 	if (!scene || scene === undefined) return null;
-	if (color === undefined) color = new Color3(0.031, 0.031, 0.141);
+	
+	const color: Color3 = new Color3().fromHexString(colorHex);
 
 	const meshMaterial: StandardMaterial = new StandardMaterial("Material", scene);
 	//	Color/texture of the material as if it were illuminated from within
@@ -33,8 +34,7 @@ function createBallMesh(scene: Scene, radius: number, colorHex: string): Mesh
 		{ diameter: radius * 2 },
 		scene
 	);
-	const color : Color3 = new Color3().fromHexString(colorHex);
-	mesh.material = createMaterial(scene, color);
+	mesh.material = createMaterial(scene, colorHex);
 
 	return mesh;
 }
@@ -50,7 +50,7 @@ function creatPaddleMesh(scene: Scene, colorHex: string): Mesh
 		},
 		scene
 	);
-	mesh.material = createMaterial(scene, new Color3().fromHexString(colorHex));
+	mesh.material = createMaterial(scene, colorHex);
 
 	return mesh;
 }

@@ -1,4 +1,4 @@
-import { GameLocation, MatchType, IPlayer, State } from '../config/pongData';
+import { GameLocation, MatchType, IPlayer } from '../config/pongData';
 import { WebSocket as WSWebSocket } from 'ws';
 import { notifyPlayersInRoom } from '../utils/broadcast'
 import { Room } from './Room';
@@ -17,8 +17,8 @@ export class GameControl
 
 	generatePlayerId(socket: WSWebSocket, data: JSONRoomDemand)
 	{
-		const matchType: MatchType = data.match === 'tournament' ? MatchType.tournament: 
-								data.match === 'duo' ? MatchType.duo: MatchType.solo;
+		const matchType: MatchType = data.matchType === 'tournament' ? MatchType.tournament: 
+								data.matchType === 'duo' ? MatchType.duo: MatchType.solo;
 
 		const gameLocation: GameLocation = data.location === 'local' ? GameLocation.local: GameLocation.remote;
 
@@ -28,7 +28,8 @@ export class GameControl
 			socket: socket,
 			matchType: matchType,
 			gameLocation: gameLocation,
-			isReady: false
+			isReady: false,
+			color: data.color
 		};
 		return player;
 	}
@@ -49,16 +50,16 @@ export class GameControl
 			return this.gamingRooms.get(roomId);
 	}
 
-	addPlayerInWaitingRoom(player: IPlayer): number | undefined
+	addPlayerInWaitingRoom(player: IPlayer, matchLevel: number): number | undefined
 	{
 		console.log("GAME-CONTROL : add a new player in a waiting room");
 		
 		//	Add to an existing room that match with the matchType and gameLocation ?
-		let roomId: number | undefined = this.findWaitingRoomMatch(player.matchType, player.gameLocation);
+		let roomId: number | undefined = this.findWaitingRoomMatch(player.matchType, player.gameLocation, matchLevel);
 		if (roomId !== undefined)
 			this.waitingRoom.get(roomId)?.addPlayerInRoom(player.username, player);
 		else //	Or create a new waiting room and add the player in
-			roomId = this.createWaitingRoom(player);
+			roomId = this.createWaitingRoom(player, matchLevel);
 
 		//	Notify everyone in the waiting room
 		if (roomId !== undefined)
@@ -74,27 +75,32 @@ export class GameControl
 		return roomId;
 	}
 
-	findWaitingRoomMatch(matchType: MatchType, gameLocation: GameLocation): number | undefined
+	findWaitingRoomMatch(matchType: MatchType, gameLocation: GameLocation, matchLevel: number): number | undefined
 	{
 		if (this.waitingRoom.size <= 0) return undefined;
 
-		for (const [key, value] of this.waitingRoom) {
-			if (value.type === matchType && value.players.size + 1 <= value.type && gameLocation === value.location)
-				return key;
+		for (const [key, value] of this.waitingRoom)
+		{
+			if (value.type === matchType && value.level === matchLevel && gameLocation === value.location)
+			{
+				if (value.players.size + 1 <= value.type)
+					return key;
+			}
 		}
 
 		console.log("GAME-CONTROL: no match with an existing free waiting room");
 		return undefined;
 	}
 
-	createWaitingRoom(player: IPlayer): number | undefined
+	createWaitingRoom(player: IPlayer, matchLevel: number): number | undefined
 	{
 		const roomId = Date.now();
 		if (!roomId) return undefined;
 
-		const room = new Room(roomId, player, player.matchType, player.gameLocation);
+		const room = new Room(roomId, player, player.matchType, player.gameLocation, matchLevel);
 		if (!room) return undefined;
-		if (player.matchType === MatchType.solo) {
+		if (player.matchType === MatchType.solo)
+		{
 			const playerRobot: IPlayer = {
 				id: 0,
 				username: 'Robot',

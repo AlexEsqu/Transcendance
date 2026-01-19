@@ -1,5 +1,5 @@
 import { IOptions, IPaddle, IScene, IPlayer, PlayerState } from "./pongData";
-import { openingAnimation, loadGame, drawScore, drawName } from './Graphics';
+import { openingAnimation, loadGame, drawScore, drawName, createMaterial } from './Graphics';
 import { getCanvasConfig, getPlayers, processNewPlayerState, assignPlayer } from './utils';
 import { JSONGameState } from './submit.json';
 import { setNotification } from './display';
@@ -31,7 +31,6 @@ export class Pong
 			throw new Error("'engine' creation failed");
 
 		const players: IPlayer[] | null = getPlayers(options.players, options.paddColors, options.nbOfPlayers, options.matchLocation);
-		console.log(players);
 		if (!players)
 			throw new Error("players are not found");
 
@@ -164,10 +163,15 @@ export class Pong
 			this.round = gameState.round;
 			this.scene.leftPadd.player = assignPlayer(gameState, this.scene.players, 'left');
 			this.scene.rightPadd.player = assignPlayer(gameState, this.scene.players, 'right');
+			if (this.scene.leftPadd.mesh && this.scene.rightPadd.mesh && this.scene.id)
+			{
+				this.scene.leftPadd.mesh.material = createMaterial(this.scene.id, gameState.leftPadd.color ?? '#a2c2e8');
+				this.scene.rightPadd.mesh.material = createMaterial(this.scene.id, gameState.rightPadd.color ?? '#a2c2e8');
+			}
 			return false;
 		}
-		this.updatePaddleInfo(this.scene.leftPadd, gameState.leftPaddPos, gameState.leftPaddScore);
-		this.updatePaddleInfo(this.scene.rightPadd, gameState.rightPaddPos, gameState.rightPaddScore);
+		this.updatePaddleInfo(this.scene.leftPadd, gameState.leftPadd.pos, gameState.leftPadd.score);
+		this.updatePaddleInfo(this.scene.rightPadd, gameState.rightPadd.pos, gameState.rightPadd.score);
 
 		if (gameState.results !== undefined)
 			this.results = gameState.results;

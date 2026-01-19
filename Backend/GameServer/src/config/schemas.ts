@@ -10,12 +10,14 @@ export { waitingSchema, gameSchema,
 
 const waitingSchema = {
 	type: 'object',
-	required: ['id', 'match', 'location'],
+	required: ['id', 'username', 'matchType', 'location'],
 	properties: {
 		id: {type: 'number'},
 		username: {type: 'string'},
-		match: {type: 'string'},
-		location: {type: 'string'}
+		color: {type: 'string'},
+		matchType: {type: 'string'},
+		location: {type: 'string'},
+		level: {type: 'number'}
 	},
 	additionalProperties: false
 };
@@ -34,7 +36,7 @@ const gameSchema = {
 };
 
 /************************************************************************************************************
- * 		Declare submit JSON forms to communicate with clients or server									*
+ * 		Declare submit JSON forms to communicate with clients or server										*
  ***********************************************************************************************************/
 
 interface JSONGameState {
@@ -42,12 +44,8 @@ interface JSONGameState {
 	state: number;
 	timestamp: number;
 	round: number;
-	leftPaddPos: number;
-	rightPaddPos: number;
-	leftPaddScore: number;
-	rightPaddScore: number;
-	leftPaddUsername: string;
-	rightPaddUsername: string;
+	leftPadd: { username: string, pos: number, score: number, color?: string };
+	rightPadd: { username: string, pos: number, score: number, color?: string };
 	ball: { x: number, z: number };
 	results?: { winner: string, loser: string };
 };
@@ -69,8 +67,10 @@ interface JSONRoomAccess {
 interface JSONRoomDemand {
 	id: number;
 	username: string;
-	match: string;
+	color: string;
+	matchType: string;
 	location: string;
+	level: number;
 };
 
 interface JSONMatchesResults {
