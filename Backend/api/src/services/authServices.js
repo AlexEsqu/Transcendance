@@ -4,7 +4,7 @@ import crypto from "crypto";
 export function createAccessToken(server, id, username) {
 	// Use the injected server instance instead of server
 	const accessTokenLifetime = process.env.ACCESS_TOKEN_LIFETIME_IN_MINUTES;
-	const token = server.jwt.sign({ id, username }, { expiresIn: `${accessTokenLifetime}m` }, { type: "user" });
+	const token = server.jwt.sign({ id, username }, { expiresIn: `${accessTokenLifetime || 3}m` }, { type: "user" });
 
 	// Update last_activity in DB
 	const date = new Date();
@@ -17,9 +17,9 @@ export function createAccessToken(server, id, username) {
 /**
  * Creates a refresh token using the provided server instance
  */
-export function createRefreshToken(server, id, username) {
+export function createRefreshToken(server, id, username, version) {
 	return server.jwt.sign(
-		{ id, username },
+		{ id, username, version },
 		{ expiresIn: "7d" } // TODO: adjust
 	);
 }
@@ -34,13 +34,13 @@ export async function hashRefreshToken(token) {
 
 export async function generateTokens(server, user, reply) {
 	const accessToken = createAccessToken(server, user.id, user.username);
-	const refreshToken = createRefreshToken(server, user.id, user.username);
+	const refreshToken = createRefreshToken(server, user.id, user.username, user.refresh_token_version);
 
 	const refreshTokenHash = await hashRefreshToken(refreshToken);
 	const addRefreshToken = server.db.prepare(`UPDATE users SET refresh_token_hash = ? WHERE id = ?`);
 	addRefreshToken.run(refreshTokenHash, user.id);
 	// set cookie
-	reply.setCookie("refreshToken", refreshToken, {
+	reply.setCookie("refresh_token", refreshToken, {
 		httpOnly: true,
 		secure: true, // REQUIRED (HTTPS)
 		sameSite: "lax",

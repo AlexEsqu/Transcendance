@@ -28,6 +28,8 @@ export async function confirmEmailChange(server) {
 				pending_email = NULL, 
 				email_verified = 0 
 				WHERE id = ?`).run(user.id);
+			incrementRefreshTokenVersion(server.db, id);
+			reply.clearCookie("refresh_token");
 			return reply.redirect(`${process.env.FRONTEND_DOMAIN_NAME}/settings?email_change=true`);
 		} catch (error) {
 			console.log(error);

@@ -15,6 +15,7 @@ export async function initDB(db) {
 		pending_email TEXT DEFAULT NULL,
 		avatar TEXT,
         refresh_token_hash TEXT,
+		refresh_token_version INTEGER DEFAULT 0,
 		email_verified INTEGER DEFAULT 0,
 		email_verify_token TEXT,
 		email_verify_expires INTEGER,

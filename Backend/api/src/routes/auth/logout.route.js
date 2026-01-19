@@ -13,7 +13,7 @@ export default function logout(server) {
 			server.db.prepare(`UPDATE users SET refresh_token_hash = null WHERE id = ?`).run(id);
 
 			//Clear the refresh token from cookies
-			reply.clearCookie("refreshToken", {
+			reply.clearCookie("refresh_token", {
 				httpOnly: true,
 				secure: false,
 				sameSite: "lax",

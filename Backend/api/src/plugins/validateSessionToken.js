@@ -4,7 +4,7 @@ import fp from "fastify-plugin";
 export default fp(async (server) => {
 	server.decorate("authenticateRefreshToken", async (request, reply) => {
 		try {
-			const { refreshToken } = request.cookies;
+			const refreshToken = request.cookies.refresh_token;
 			if (!refreshToken) {
 				return reply.status(401).send({ error: "Missing refreshToken cookie" });
 			}

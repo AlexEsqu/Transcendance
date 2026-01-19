@@ -19,7 +19,7 @@ function refresh(server) {
 			// Save new refresh token hash in DB
 			server.db.prepare(`UPDATE users SET refresh_token_hash = ? WHERE id = ?`).run(newRefreshTokenHash, id);
 			// Send new refresh token to user
-			reply.clearCookie("refreshToken", {
+			reply.clearCookie("refresh_token", {
 				httpOnly: true,
 				secure: true, // REQUIRED (HTTPS)
 				sameSite: "lax",
@@ -27,7 +27,7 @@ function refresh(server) {
 				maxAge: 60 * 60 * 24 * 7, // 7 days
 			});
 			// Send new refresh token to user
-			reply.setCookie("refreshToken", newRefreshToken, {
+			reply.setCookie("refresh_token", newRefreshToken, {
 				httpOnly: true,
 				secure: true, // REQUIRED (HTTPS)
 				sameSite: "lax",

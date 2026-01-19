@@ -19,3 +19,7 @@ export function computeActive(last_active_at) {
 	const diff = (Date.now() - last.getTime()) / 60000; // in minutes
 	return diff < process.env.ACCESS_TOKEN_LIFETIME_IN_MINUTES;
 }
+
+export function incrementRefreshTokenVersion(db, id) {
+	db.prepare(`UPDATE users SET refresh_token_version = refresh_token_version + 1 WHERE id = ?`).run(id);
+}

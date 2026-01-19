@@ -18,7 +18,7 @@ function deleteUser(server) {
 			}
 			server.db.prepare(`DELETE FROM users WHERE id = ?`).run(id);
 			//Clear the refresh token from cookies
-			reply.clearCookie("refreshToken", {
+			reply.clearCookie("refresh_token", {
 				httpOnly: true,
 				secure: true,
 				sameSite: "strict",
