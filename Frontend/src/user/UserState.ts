@@ -264,7 +264,7 @@ class UserState
 			throw new Error("User id is missing");
 
 		const response = await this.fetchWithTokenRefresh(
-			`${apiDomainName}/users/${this.user.id}`,
+			`${apiDomainName}/users/me`,
 			{
 				method: 'GET',
 				headers:
@@ -283,6 +283,7 @@ class UserState
 
 		this.user.username = data.username ?? this.user.username;
 		this.user.avatar = data.avatar ?? this.user.avatar;
+		this.user.email = data.email ?? this.user.email;
 
 		await this.refreshFriendList(this.user);
 		await this.refreshHas2fa(this.user);

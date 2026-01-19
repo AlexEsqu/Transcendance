@@ -97,6 +97,7 @@ export class CustomizeService
 					headers: {
 						'Content-Type': 'application/json',
 						'Authorization': `Bearer ${user.accessToken}`,
+						'X-App-Secret': `${apiKey}`
 					},
 					body: JSON.stringify({
 						oldPassword, newPassword
@@ -116,7 +117,33 @@ export class CustomizeService
 
 	async changeEmail(newEmail: string): Promise<void>
 	{
-		// AWAITING API ROUTE
+		const user = this.userState.getUser();
+
+		if (!(user instanceof RegisteredUser))
+			throw new Error("Not authenticated");
+
+		const response = await this.userState.fetchWithTokenRefresh(
+			`${apiDomainName}/users/me/change-email`,
+			{
+				method: 'PUT',
+				headers:
+				{
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${user.accessToken}`,
+					'X-App-Secret': `${apiKey}`
+				},
+				body: JSON.stringify({
+					email: newEmail
+				})
+			}
+		);
+
+		const data = await response.json();
+
+		if (!response.ok)
+			throw new Error(data.message || data.error || 'Failed to fetch match history');
+
+		return data;
 	}
 
 	async fetchMatchHistory(): Promise<BackendMatch[]>

@@ -214,6 +214,8 @@ function setupPasswordForm(): void
 					form.classList.add('hidden');
 					form.reset();
 					alert('Password updated!');
+					userState.resetUser();
+					router.navigateTo('/connection');
 				} catch (err) {
 					alert('Failed to update password.');
 					console.error(err);
@@ -234,7 +236,7 @@ function updateCurrentSettings(): void
 	// Update email
 	const emailElem = document.getElementById('current-email');
 	if (emailElem && userState.getUser()) {
-		emailElem.textContent = userState.getUser()?.username || 'Not set';
+		emailElem.textContent = userState.getUser()?.email || 'Not set';
 	}
 
 	// Update avatar
