@@ -84,7 +84,7 @@ function createCamera(scene: Scene, matchLocation: string): ArcRotateCamera | nu
 			'arCamera',
 			0, // alpha
 			Math.PI / 3, // beta
-			9, // radius
+			13, // radius
 			new Vector3((GAME_SIZE.MAP_WIDTH / 2) - 3, 0.5, 0.0), // target
 			scene
 		);
@@ -96,7 +96,7 @@ function createCamera(scene: Scene, matchLocation: string): ArcRotateCamera | nu
 			'arCamera',
 			-(Math.PI / 2), // alpha
 			0, // beta
-			8, // radius
+			12, // radius
 			new Vector3(0.0, -1, 0.0), // target
 			scene
 		);
