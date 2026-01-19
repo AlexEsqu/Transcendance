@@ -67,6 +67,15 @@ function createMap(scene: Scene, height: number, width: number, colorHex: string
 	const mapMaterial: StandardMaterial = new StandardMaterial("Material", scene);
 	mapMaterial.emissiveColor = new Color3().fromHexString(colorHex);
 	map.material = mapMaterial;
+	
+	const border: GroundMesh = MeshBuilder.CreateGround(
+		'border',
+		{
+			width: 0.1, height: height
+		},
+		scene
+	);
+
 	return map;
 }
 

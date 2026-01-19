@@ -59,7 +59,7 @@ export class Room
 		}
 		return true;
 	}
-
+	
 	startGame(gameControl: GameControl): void
 	{
 		console.log(`GAME-ROOM: start game in roomID:${this.id} | matchType:${this.type} | location:${this.location} | level:${this.level} | players: `, this.players);

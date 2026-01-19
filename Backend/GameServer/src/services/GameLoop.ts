@@ -128,7 +128,7 @@ export class GameLoop
 			this.ball.direction = normalizeVector(this.ball.direction);
 
 			//	Increase gradually the speed
-			this.ball.speed = Math.min(GameLoop.INFO.BALL_MAX_SPEED, this.ball.speed * 1.1);
+			this.ball.speed = Math.min(GameLoop.INFO.BALL_MAX_SPEED, this.ball.speed * 1.2);
 
 			return false;
 		}

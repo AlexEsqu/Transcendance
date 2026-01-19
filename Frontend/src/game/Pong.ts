@@ -221,11 +221,6 @@ export class Pong
 		window.addEventListener('resize', () => {
 			if (this.engine)
 				this.engine.resize();
-			// if (this.scene.leftPadd && this.scene.leftPadd.player && this.scene.rightPadd && this.scene.rightPadd.player)
-			// {
-			// 	drawName(this.scene.leftPadd.player.username, this.scene.rightPadd.player.username, this.scene.options.nbOfPlayers);
-			// 	drawScore(this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
-			// }
 		});
 
 		//	Shift+Ctrl+Alt+I == Hide/show the Inspector
@@ -241,7 +236,7 @@ export class Pong
 
 		//	Detect when a user presses or releases a key to play the game
 		window.addEventListener("keydown", (evt) => {
-			if (evt.key === "ArrowDown" || evt.key === "ArrowUp")
+			if (evt.key === "ArrowDown" || evt.key === "ArrowUp" || evt.key === "ArrowLeft" || evt.key === "ArrowRight")
 				evt.preventDefault();
 			keys[evt.key] = true;
 		});
