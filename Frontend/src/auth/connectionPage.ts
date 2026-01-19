@@ -1,16 +1,17 @@
 import { userState, router } from "../app";
 import { isValidInputs, checkInputValidityOnUnfocus } from "../utils/inputValidation";
+import { EmailCheckModal } from "../utils/Modal";
+import { openErrorModal } from "../error/error";
 
 import connectionHtml from "../html/connection.html?raw";
 import guestFormHtml from "../html/forms/guestForm.html?raw"
 import loginFormHtml from "../html/forms/loginForm.html?raw"
 import registerFormHtml from "../html/forms/registerForm.html?raw"
-import checkEmailHtml from "../html/info/checkEmail.html?raw"
+
 
 export {
 	getConnectionLandingHtml,
 	getConnectionForm,
-	getEmailCheck,
 	initConnectionPageListeners }
 
 
@@ -24,11 +25,6 @@ function getConnectionLandingHtml(): string
 function getConnectionForm(): string {
 
 	return "";
-}
-
-function getEmailCheck(): string
-{
-	return checkEmailHtml;
 }
 
 // FUNCTION TO ACTIVATE THE EVENT LISTENERS AND POSSIBLE BUTTON INTERACTIONS
@@ -115,27 +111,20 @@ function onRegisterLoaded(): void
 				const login = formData.get('input-login') as string | null;
 				const email = formData.get('input-email') as string | null;
 				const password = formData.get('input-password') as string | null;
-				const check = formData.get('input-password-check') as string | null;
 
 				if (!login || !password || !email)
 					return;
 
-				if (password !== check)
-				{
-					alert("The passwords don't match...");
-					return;
-				}
-
 				try
 				{
 					await userState.emailAuth.register(login, password, email);
-					router.navigateTo("/connection/emailcheck");
+					const checkEmailModal = new EmailCheckModal(email);
+					checkEmailModal.show();
 				}
 				catch (error)
 				{
-					const msg = error instanceof Error ? error.message : "Unknown error";
-					window.sessionStorage.setItem("errorMessage", msg);
-					router.navigateTo("/error");
+					if (error instanceof Error)
+						openErrorModal(error);
 				}
 			}
 		}
@@ -151,9 +140,8 @@ function onRegisterLoaded(): void
 			}
 			catch (error)
 			{
-				const msg = error instanceof Error ? error.message : "OAuth failed";
-				window.sessionStorage.setItem("errorMessage", msg);
-				router.navigateTo("/error");
+				if (error instanceof Error)
+					openErrorModal(error);
 			}
 		}
 	);
@@ -188,10 +176,8 @@ function onLoginLoaded(): void
 					}
 					catch (error)
 					{
-						const msg = error instanceof Error ? error.message : "Unknown error";
-						console.log(`error message is ${msg}`);
-						window.sessionStorage.setItem("errorMessage", msg);
-						router.navigateTo("/error");
+						if (error instanceof Error)
+							openErrorModal(error);
 					}
 				}
 			}
@@ -208,9 +194,8 @@ function onLoginLoaded(): void
 			}
 			catch (error)
 			{
-				const msg = error instanceof Error ? error.message : "OAuth failed";
-				window.sessionStorage.setItem("errorMessage", msg);
-				router.navigateTo("/error");
+				if (error instanceof Error)
+					openErrorModal(error);
 			}
 		}
 	);

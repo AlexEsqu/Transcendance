@@ -39,7 +39,7 @@ export class GameLoop
 		this.requestNewRound();
 		this.state = State.waiting;
 		this.isGameRunning = false;
-		this.timestamp = Date.now();
+		this.timestamp = -1;
 	}
 
 	runGameLoop(gameControl: GameControl): void
@@ -55,13 +55,26 @@ export class GameLoop
 		console.log("GAME-LOOP: game loop started");
 		const interval = setInterval(() => {
 			// console.log(this.state);
-			if (this.state === State.play) {
+
+			if (this.state === State.end)
+			{
+				clearInterval(interval);
+				if (this.rounds.results)
+					sendMatchesToDataBase(this.rounds.results[this.rounds.results.length - 1], Date.now());
+				room.closeRoom();
+				return ;
+			}
+
+			if (this.state === State.play)
+			{
 				//	update data & check collisions
 				this.updateGameData();
 				//	monitor score/rounds
 				isNewRound = this.isPlayerHittingMaxScore();
 			}
-			if (isNewRound) {
+
+			if (isNewRound)
+			{
 				this.requestNewRound();
 				isNewRound = false;
 			}
@@ -69,13 +82,6 @@ export class GameLoop
 			//	broadcast to players = send game state/data to all players
 			gameStateInfo = this.composeGameState();
 			notifyPlayersInRoom(room, gameStateInfo);
-
-			if (this.state === State.end) {
-				clearInterval(interval);
-				if (this.rounds.results)
-					sendMatchesToDataBase(this.rounds.results[this.rounds.results.length - 1], Date.now());
-				return ;
-			}
 
 			this.timestamp = Date.now();
 		}, 1000 / 60); // 60fps
@@ -85,7 +91,7 @@ export class GameLoop
 	updateGameData(): void
 	{
 		//	Move the ball position according to its direction and velocity
-		const deltaTime: number = (Date.now() - this.timestamp) / 1000;
+		const deltaTime: number = this.timestamp !== -1 ? ((Date.now() - this.timestamp) / 1000) : Date.now();
 		const velocity = scaleVelocity(this.ball, deltaTime);
 		this.ball.posistion.x += velocity.x;
 		this.ball.posistion.z += velocity.z;
@@ -228,6 +234,12 @@ export class GameLoop
 		//	Reset game's data
 		this.resetBall();
 		this.resetPaddles();
+
+		//	If registred player is disconnected, opponent wins
+		if (!this.leftPadd.player?.socket)
+			this.rightPadd.score = GAME.MAX_SCORE;
+		if (!this.rightPadd.player?.socket)
+			this.leftPadd.score = GAME.MAX_SCORE;
 	}
 
 	/**
@@ -269,7 +281,8 @@ export class GameLoop
 	{
 		this.leftPadd.pos.z = 0.0;
 		this.rightPadd.pos.z = 0.0;
-		if (this.state !== State.end) {
+		if (this.state !== State.end)
+		{
 			this.leftPadd.score = 0;
 			this.rightPadd.score = 0;
 		}

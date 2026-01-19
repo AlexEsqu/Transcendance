@@ -5,7 +5,7 @@ import { clearOptions, loadOptions, saveOptions } from "./options";
 import { IOptions } from "./pongData";
 
 import gameHtml from '../html/game.html?raw'
-import optionsHtml from '../html/options.html?raw'
+import optionsHtml from '../html/forms/gameOptionsForm.html?raw'
 
 /************************************************************************************************************/
 
@@ -26,7 +26,8 @@ function getGameOptionHtml(): string
 function initGamePageListeners(): void
 {
 	document.addEventListener('pageLoaded', (event: Event) => {
-		const { detail: path } = event as CustomEvent<string>;
+		const customEvent = event as CustomEvent<{ path: string; search: string }>;
+		const { path, search } = customEvent.detail;
 
 		switch (path)
 		{
@@ -39,7 +40,8 @@ function initGamePageListeners(): void
 
 			case '/game':
 			{
-				const options = loadOptions()
+				const options = loadOptions();
+				console.log("OPTIONS ", options);
 				if (options)
 					onGameLoaded();
 				else
@@ -255,7 +257,6 @@ function setNotification(show: boolean, message: string | undefined): void
 	notification.textContent = message ?? '';
 	notification.className = 'text-2xl text-center';
 	notification.style.display = 'flex';
-	// notification.style.display = 'flex flex-col items-center gap-4 font-bold p-6';
 }
 
 function onGameOptionLoaded(): void

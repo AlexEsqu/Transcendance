@@ -38,6 +38,30 @@ export class EmailAuthService
 			throw new Error(data.message || data.error || 'Register Failed');
 	}
 
+	async resendVerifEmail(email : string): Promise<void>
+	{
+		const response = await fetch(
+			`${this.apiDomainName}/users/auth/send-mail-verification`,
+			{
+				method: 'POST',
+				headers:
+				{
+					'accept': 'application/json',
+					"Content-Type": 'application/json'
+				},
+				body: JSON.stringify(
+					{
+						email: email,
+					}
+				),
+			}
+		);
+
+		const data = await response.json();
+		if (!response.ok)
+			throw new Error(data.message || data.error || 'Email Verification Failed');
+	}
+
 	async login(login: string, password: string): Promise<any> {
 		const response = await fetch(
 			`${this.apiDomainName}/users/auth/login`,

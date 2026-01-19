@@ -70,10 +70,3 @@ interface IPlayer {
 	score: number;
 	color: string;
 };
-
-// interface IResult {
-// 	winner: IPlayer | null;
-// 	maxScore: number;
-// 	loser: IPlayer | null;
-// 	minScore: number;
-// };

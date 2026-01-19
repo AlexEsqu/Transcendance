@@ -264,9 +264,9 @@ function activateTfaButton(user : RegisteredUser)
 
 	if (user.hasTwoFactorAuth)
 	{
-		new2FATitle.textContent = "Disable Two Factor Setting";
-		new2FAInfo.textContent = "Remove secure email verified login"
-		new2FAButton.textContent = 'Disable 2FA';
+		new2FATitle.textContent = "Remove email verification on login";
+		new2FAInfo.textContent = "Two Factor Authentication is currently enabled"
+		new2FAButton.textContent = 'Disable Two Factor Authentication';
 		new2FAButton.addEventListener('click', async () => {
 			await userState.twoFactor.toggle2fa(false);
 		});
@@ -278,9 +278,9 @@ function activateTfaButton(user : RegisteredUser)
 	}
 	else
 	{
-		new2FATitle.textContent = "Enable Two Factor Setting";
-		new2FAInfo.textContent = "Add an email verification on login"
-		new2FAButton.textContent = 'Enable 2FA';
+		new2FATitle.textContent = "Add email verification on login";
+		new2FAInfo.textContent = "Two Factor Authentication is currently disabled"
+		new2FAButton.textContent = 'Enable Two Factor Authentication';
 		new2FAButton.addEventListener('click', async () => {
 			await userState.twoFactor.toggle2fa(true);
 		});

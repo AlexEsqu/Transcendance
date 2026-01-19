@@ -124,8 +124,8 @@ export class GameControl
 
 	createGamingRoom(roomId: number, player: IPlayer): boolean
 	{
-		const room = this.waitingRoom.get(roomId);
-		if (room === undefined) {
+		const waitingRoom: Room | undefined = this.waitingRoom.get(roomId);
+		if (waitingRoom === undefined) {
 			console.log("GAME-CONTROL: failed to create a new gaming room n'", roomId);
 			return false;
 		}
@@ -133,14 +133,19 @@ export class GameControl
 		console.log("GAME-CONTROL: new gaming room created n'", roomId);
 		// console.log("ROOOM ", this.gamingRooms.get(roomId)?.players);
 		
-		this.gamingRooms.set(roomId, room);
+		this.gamingRooms.set(roomId, waitingRoom);
+		const current: Room | undefined = this.gamingRooms.get(roomId);
+		if (current === undefined) {
+			console.log("GAME-CONTROL: failed to create a new gaming room n'", roomId);
+			return false;
+		}
+		current.createGameLoop();
 
 		const welcomeMessage: JSONRoomAccess = {
 			roomId: roomId,
 			message: `Player ${player.username} has been added to gaming room n'${roomId}`,
-			players: room.getPlayersArray()
+			players: waitingRoom.getPlayersArray()
 		};
-		console.log(welcomeMessage);
 		notifyPlayersInRoom(this.gamingRooms.get(roomId), welcomeMessage);
 
 		this.waitingRoom.delete(roomId);
@@ -148,32 +153,48 @@ export class GameControl
 		return true;
 	}
 
-	deletePlayerFromRoom(player: string, roomId: number, roomType: string): void
+	deletePlayerFromRoom(username: string, roomId: number, roomType: string): void
 	{
 		let room: Room | undefined = undefined;
 
 		switch (roomType)
 		{
 			case 'waiting':
-				if (this.waitingRoom.has(roomId)) {
+				if (this.waitingRoom.has(roomId))
+				{
 					room = this.waitingRoom.get(roomId);
-					console.log("GAME-SERVER: a player has left the waiting room");
-					notifyPlayersInRoom(room, "A player has left the waiting room");
+					console.log(`GAME-SERVER: a ${username} has left the waiting room`);
+					notifyPlayersInRoom(room, `${username} has left the waiting room`);
 				}
 				break ;
 			
 			case 'game':
-				if (this.gamingRooms.has(roomId)) {
+				if (this.gamingRooms.has(roomId))
+				{
 					room = this.gamingRooms.get(roomId);
-					console.log("GAME-SERVER: a player has left the gaming room");
-					notifyPlayersInRoom(room, "A player has left the gaming room");
+					console.log(`GAME-SERVER: a ${username} has left the gaming room`);
+					notifyPlayersInRoom(room, `${username} has left the gaming room`);
 				}
 				break ;
 		}
-		if (room !== undefined && room.players.has(player)) {
-			room.players.delete(player);
-			if (room.gameLoop)
-				room.gameLoop.state = State.end;
+
+		if (room !== undefined && room.players.has(username))
+		{
+			const player = room.players.get(username);
+			if (player !== undefined && player.socket)
+			{
+				player.socket.close();
+				player.socket = null;
+			}
+			room.players.delete(username);
 		}
+	}
+
+	deleteRoom(roomId: number): void
+	{
+		if (this.waitingRoom.has(roomId))
+			this.waitingRoom.delete(roomId);
+		else if (this.gamingRooms.has(roomId))
+			this.gamingRooms.delete(roomId);
 	}
 }

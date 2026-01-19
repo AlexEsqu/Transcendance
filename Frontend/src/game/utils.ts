@@ -4,7 +4,7 @@ import { userState, } from "../app";
 
 /************************************************************************************************************/
 
-export { getCanvasConfig, getPlayers, fillRoomDemand, processNewPlayerState, assignPlayers, getIPlayerFromStr }
+export { getCanvasConfig, getPlayers, fillRoomDemand, processNewPlayerState, assignPlayer, getIPlayerFromStr }
 
 /************************************************************************************************************/
 
@@ -121,7 +121,7 @@ function findPlayer(players: IPlayer[], username: string): IPlayer | null
 	return null;
 }
 
-function assignPlayers(gameState: JSONGameState, players: IPlayer[], side: string): IPlayer | null
+function assignPlayer(gameState: JSONGameState, players: IPlayer[], side: string): IPlayer | null
 {
 	if (side === 'left')
 		return findPlayer(players, gameState.leftPaddUsername);

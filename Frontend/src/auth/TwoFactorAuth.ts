@@ -4,7 +4,7 @@ import { apiDomainName, apiKey } from '../user/UserState';
 import { FormModal, ErrorModal } from '../utils/Modal';
 import { openErrorModal } from '../error/error';
 
-import modalHtml from '../html/info/twoFactorModal.html?raw';
+import tfaModalHtml from '../html/info/twoFactorModal.html?raw';
 
 interface TwoFactorResult {
 	id: number;
@@ -51,24 +51,6 @@ export class TwoFactorAuthService
 		this.userState.notifySubscribers();
 	}
 
-	async prompt2faCode(): Promise<string>
-	{
-		console.log('Creating 2FA modal...');
-		return new Promise((resolve, reject) => {
-			const modal = new FormModal(
-				modalHtml,
-				async (formData) =>
-					{
-						const code = formData.get('input-2fa') as string;
-						console.log(code);
-						resolve(code)
-					}, // if user click submit 2fa
-				() => reject(new Error('2FA cancelled')) // if user click cancel
-			);
-			modal.show();
-		});
-	}
-
 	async check2faCode(code: string): Promise<TwoFactorResult>
 	{
 		console.log(`sending code : ${code}`);
@@ -90,8 +72,6 @@ export class TwoFactorAuthService
 		if (!response.ok)
 			throw new Error(data.message || data.error || '2FA verification failed');
 
-		console.log(`data received is ${data}`);
-
 		return data;
 	}
 
@@ -99,13 +79,36 @@ export class TwoFactorAuthService
 	{
 		try
 		{
-			console.log('Enter 2FA login');
-			const code = await this.userState.twoFactor.prompt2faCode();
-			const verifiedData = await this.userState.twoFactor.check2faCode(code);
-			const user = new RegisteredUser(verifiedData.id, verifiedData.accessToken);
-			await this.userState.setUser(user);
+			let verifiedData: TwoFactorResult | null = null;
+
+			const modal = new FormModal(
+				tfaModalHtml,
+				// if user clicks confirm, reextract the code and try it
+				async (formData) => {
+					const code = formData.get('input-2fa') as string;
+					try
+					{
+						verifiedData = await this.userState.twoFactor.check2faCode(code);
+						// if data checked without exception being thrown, can close modal
+						modal.close();
+						const user = new RegisteredUser(verifiedData.id, verifiedData.accessToken);
+						await this.userState.setUser(user);
+					}
+					catch (codeErr) {
+						console.log('Error while using 2 Factor Authentication');
+						if (codeErr instanceof Error)
+							openErrorModal(codeErr);
+					}
+				},
+				// If user cancels, close the modal
+				() => {
+					modal.close();
+				}
+			);
+
+			modal.show();
 		}
-		catch (err )
+		catch (err)
 		{
 			console.log('2FA failed:', err);
 			if (err instanceof Error)
