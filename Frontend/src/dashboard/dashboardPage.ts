@@ -14,7 +14,6 @@ export { getDashboardPage, initDashboardPageListeners, showRegisteredUserOptions
 
 let currentFriendsListener: Subscriber | null = null;
 let currentUsersListener: Subscriber | null = null;
-//
 
 // Getting base html for the pages
 
@@ -97,5 +96,5 @@ function cleanupDashboardListeners()
 		userState.unsubscribe(currentUsersListener);
 		currentUsersListener = null;
 	}
-	
+
 }

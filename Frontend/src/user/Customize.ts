@@ -2,7 +2,7 @@ import { RegisteredUser, GuestUser, User, BaseUser } from "./User";
 import { router } from "../app";
 import { apiDomainName, apiKey } from "./UserState";
 import type { UserState } from "./UserState";
-import type { MatchHistory } from "../dashboard/graphSection";
+import type { BackendMatch } from "../dashboard/graphSection";
 
 export class CustomizeService
 {
@@ -119,7 +119,7 @@ export class CustomizeService
 		// AWAITING API ROUTE
 	}
 
-	async fetchMatchHistory(): Promise<MatchHistory[]>
+	async fetchMatchHistory(): Promise<BackendMatch[]>
 	{
 		const user = this.userState.getUser();
 

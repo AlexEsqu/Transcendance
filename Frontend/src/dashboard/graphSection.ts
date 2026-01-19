@@ -1,7 +1,9 @@
 import { userState } from "../app";
+import { Chart, ChartConfiguration, registerables } from 'chart.js';
 
 export { displayMatchHistory }
-export type { MatchHistory }
+export type { MatchHistory, BackendMatch }
+
 
 interface MatchHistory {
 	id: number;
@@ -12,19 +14,48 @@ interface MatchHistory {
 	result: 'win' | 'loss';
 }
 
+interface BackendMatch {
+	id: number;
+	winner_id: number;
+	loser_id: number;
+	winner_score: number;
+	loser_score: number;
+	date: string;
+}
+
+Chart.register(
+	...registerables
+);
+
+function transformMatchData(backendMatches: BackendMatch[], userId: number): MatchHistory[] {
+	return backendMatches.map(match => {
+		const isWinner = match.winner_id === userId;
+		return {
+			id: match.id,
+			date: match.date,
+			opponent: isWinner ? `User ${match.loser_id}` : `User ${match.winner_id}`,
+			playerScore: isWinner ? match.winner_score : match.loser_score,
+			opponentScore: isWinner ? match.loser_score : match.winner_score,
+			result: isWinner ? 'win' : 'loss'
+		};
+	});
+}
+
 async function displayMatchHistory(): Promise<void>
 {
 	let matches: MatchHistory[] = [];
 
 	try
 	{
-		matches = await userState.customize.fetchMatchHistory();
+		const backendMatches = await userState.customize.fetchMatchHistory();
+		matches = transformMatchData(backendMatches, userState.getUser()?.getId() || -1);
+		console.log(`found history: ${matches}`);
 		if (matches.length < 1)
 			throw new Error("No history yet...")
 	}
 	catch (err)
 	{
-		displayError(err instanceof Error ? err.message : "Failed to load match history");
+		displayInfo(err instanceof Error ? err.message : "Failed to load match history");
 		return;
 	}
 
@@ -52,48 +83,135 @@ function displayStatistics(matches: MatchHistory[])
 		winrateEl.textContent = `${winRate}%`;
 }
 
-function displayError(message: string): void
+function displayInfo(message: string): void
 {
-	const graphCanvas = document.getElementById('dashboard-graph-canvas') as HTMLCanvasElement;
-	const graphContainer = document.getElementById('dashboard-graph-container');
-	const errorText = document.getElementById('match-history-error');
-
-	if (graphCanvas)
-		graphCanvas.style.display = 'hidden';
-
-	if (!graphContainer || !errorText)
+	const infoText = document.getElementById('match-history-info');
+	if (!infoText)
 		return;
 
-	errorText.textContent = message;
+	infoText.textContent = message;
+	infoText.classList.remove('hidden');
+	infoText.classList.add('flex');
+}
+
+function hideInfo(): void
+{
+	const infoText = document.getElementById('match-history-info');
+	if (!infoText)
+		return;
+
+	infoText.classList.remove('flex');
+	infoText.classList.add('hidden')
 }
 
 function displayHistoryGraph(matches: MatchHistory[])
 {
-	const canvas = document.getElementById('dashboard-graph-canvas') as HTMLCanvasElement;
-	const errorDiv = document.getElementById('match-history-error');
-	if (!canvas)
-		return;
-
-	drawLineChart(canvas, matches);
-
-	canvas.style.display = 'block';
-	if (errorDiv)
-		errorDiv.style.display = 'hidden';
+	if (matches.length > 0)
+	{
+		const canvas = document.getElementById('dashboard-graph-canvas') as HTMLCanvasElement;
+		if (!canvas)
+			return;
+		drawLineChart(canvas, matches);
+		canvas.style.display = 'flex';
+		hideInfo();
+	}
+	else
+	{
+		displayInfo('No match history to display...');
+	}
 }
 
 function drawLineChart(canvas: HTMLCanvasElement, matches: MatchHistory[]): void
 {
-	const ctx = canvas.getContext('2d');
-	if (!ctx)
-		return;
+	const existingChart = Chart.getChart(canvas);
+	if (existingChart)
+		existingChart.destroy();
 
-	const padding = 50;
-	const width = canvas.width;
-	const height = canvas.height;
+	const sortedMatches = [...matches].sort((a, b) =>
+		new Date(a.date).getTime() - new Date(b.date).getTime()
+	);
 
-	// reinitialize canvas
-	ctx.fillRect(0, 0, width, height);
+	let cumulativeScore = 0;
+	const labels: string[] = ['Start'];
+	const scoreData: number[] = [0];
+	const pointColors: string[] = ['#9ca3af'];
 
+	sortedMatches.forEach((match, index) =>
+		{
+			cumulativeScore += match.result === 'win' ? 1 : -1;
 
-	// TO DO
+			const date = new Date(match.date);
+			labels.push(`${date.getMonth() + 1}/${date.getDate()}`);
+			scoreData.push(cumulativeScore);
+			pointColors.push(match.result === 'win' ? '#aee2e9ff' : '#e28812ff');
+		}
+	);
+
+	// auto expand to at leasst -3 to 3, and else +1 to the score
+	const maxScore = Math.max(...scoreData);
+	const minScore = Math.min(...scoreData);
+	const yMax = Math.max(3, maxScore + 1);
+	const yMin = Math.min(-3, minScore - 1);
+
+	const config: ChartConfiguration = {
+		type: 'line',
+		data: {
+			labels: labels,
+			datasets: [
+				{
+					label: 'Match Results',
+					data: scoreData,
+					borderColor: '#d1d4daff',
+					backgroundColor: 'rgba(59, 130, 246, 0.1)',
+					borderWidth: 2,
+					pointBackgroundColor: pointColors,
+					pointBorderColor: pointColors,
+					pointRadius: 6,
+					pointHoverRadius: 8,
+					stepped: 'after',
+					tension: 0,
+					fill: true
+				}
+			]
+		},
+		options: {
+			responsive: true,
+			maintainAspectRatio: false,
+			plugins: {
+				legend: {
+					display: false,
+					labels: {
+						color: '#9ca3af'
+					}
+				},
+				title: {
+					display: false,
+				}
+			},
+			scales: {
+				y: {
+					beginAtZero: true,
+					min: yMin,
+					max: yMax,
+					ticks: {
+						color: '#9ca3af',
+						stepSize: 1,
+					},
+					grid: {
+						color: '#2d3748'
+					}
+				},
+				x: {
+					ticks: {
+						color: '#9ca3af'
+					},
+					grid: {
+						color: '#2d3748'
+					}
+				}
+			}
+		}
+	};
+
+	new Chart(canvas, config);
 }
