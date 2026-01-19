@@ -151,19 +151,24 @@ function setupEmailForm(): void
 			const newEmail = formData.get('input-email') as string | null;
 			const newEmailCheck = formData.get('input-email-check') as string | null;
 
-			if (newEmail !== newEmailCheck) {
+			if (newEmail !== newEmailCheck)
+			{
 				alert('The emails must match...');
 				return;
 			}
-
-			if (newEmail) {
-				try {
+			if (newEmail)
+			{
+				try
+				{
 					await userState.customize.changeEmail(newEmail);
 					form.classList.add('hidden');
 					form.reset();
 					updateCurrentSettings();
 					alert('Email updated!');
-				} catch (err) {
+					userState.resetUser();
+				}
+				catch (err)
+				{
 					alert('Failed to update email.');
 					console.error(err);
 				}
