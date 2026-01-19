@@ -41,7 +41,6 @@ function initGamePageListeners(): void
 			case '/game':
 			{
 				const options = loadOptions();
-				console.log("OPTIONS ", options);
 				if (options)
 					onGameLoaded();
 				else
@@ -250,13 +249,16 @@ function setNotification(show: boolean, message: string | undefined): void
 
 	if (!show)
 	{
-		notification.style.display = 'none';
+		notification.classList.add('invisible');
+		notification.classList.remove('flex')
+		// notification.style.display = 'invisible';
 		return ;
 	}
 
 	notification.textContent = message ?? '';
 	notification.className = 'text-2xl text-center';
-	notification.style.display = 'flex';
+	notification.classList.remove('invisible');
+	notification.classList.add('flex')
 }
 
 function onGameOptionLoaded(): void
@@ -285,7 +287,7 @@ function onGameOptionLoaded(): void
 				paddColors: getPaddColors() || '#a2c2e8',
 				players: getPlayerNames(),
 				ballColor: '#a2c2e8',
-				mapColor: "#01011a"
+				mapColor: "#210446ff"
 			}
 			saveOptions(options);
 			router.navigateTo('/game');

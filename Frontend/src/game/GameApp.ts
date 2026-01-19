@@ -44,7 +44,7 @@ export class GameApp
 				{
 					if (player.id !== 0)
 					{
-						const demand: JSONRoomDemand = fillRoomDemand(options.matchLocation, options.nbOfPlayers, player);
+						const demand: JSONRoomDemand = fillRoomDemand(options, player);
 						this.waitingSocket.send(JSON.stringify(demand));
 					}
 				}
@@ -190,7 +190,6 @@ export async function launchPongGame(options: IOptions): Promise<void>
 		element.style.display = 'none';
 
 	try {
-		console.log("HELLO LAUNCH GAME");
 		const app = new GameApp(options);
 		await app.goToWaitingRoom();
 		app.goToGamingRoom();

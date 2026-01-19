@@ -4,16 +4,17 @@ import { GAME_SIZE, IOptions, IScene, PlayerState } from './pongData';
 
 /************************************************************************************************************/
 
-export { loadGame, openingAnimation, drawScore, drawName }
+export { loadGame, openingAnimation, createMaterial, drawScore, drawName }
 
 /************************************************************************************************************
  * 		SETTING 3D OBJECTS																					*
  ***********************************************************************************************************/
 
-function createMaterial(scene: Scene, color: Color3): StandardMaterial | null
+function createMaterial(scene: Scene, colorHex: string): StandardMaterial | null
 {
 	if (!scene || scene === undefined) return null;
-	if (color === undefined) color = new Color3(0.031, 0.031, 0.141);
+	
+	const color: Color3 = new Color3().fromHexString(colorHex);
 
 	const meshMaterial: StandardMaterial = new StandardMaterial("Material", scene);
 	//	Color/texture of the material as if it were illuminated from within
@@ -33,8 +34,7 @@ function createBallMesh(scene: Scene, radius: number, colorHex: string): Mesh
 		{ diameter: radius * 2 },
 		scene
 	);
-	const color : Color3 = new Color3().fromHexString(colorHex);
-	mesh.material = createMaterial(scene, color);
+	mesh.material = createMaterial(scene, colorHex);
 
 	return mesh;
 }
@@ -50,7 +50,7 @@ function creatPaddleMesh(scene: Scene, colorHex: string): Mesh
 		},
 		scene
 	);
-	mesh.material = createMaterial(scene, new Color3().fromHexString(colorHex));
+	mesh.material = createMaterial(scene, colorHex);
 
 	return mesh;
 }
@@ -67,6 +67,15 @@ function createMap(scene: Scene, height: number, width: number, colorHex: string
 	const mapMaterial: StandardMaterial = new StandardMaterial("Material", scene);
 	mapMaterial.emissiveColor = new Color3().fromHexString(colorHex);
 	map.material = mapMaterial;
+	
+	const border: GroundMesh = MeshBuilder.CreateGround(
+		'border',
+		{
+			width: 0.1, height: height
+		},
+		scene
+	);
+
 	return map;
 }
 
@@ -84,7 +93,7 @@ function createCamera(scene: Scene, matchLocation: string): ArcRotateCamera | nu
 			'arCamera',
 			0, // alpha
 			Math.PI / 3, // beta
-			9, // radius
+			13, // radius
 			new Vector3((GAME_SIZE.MAP_WIDTH / 2) - 3, 0.5, 0.0), // target
 			scene
 		);
@@ -96,7 +105,7 @@ function createCamera(scene: Scene, matchLocation: string): ArcRotateCamera | nu
 			'arCamera',
 			-(Math.PI / 2), // alpha
 			0, // beta
-			8, // radius
+			12, // radius
 			new Vector3(0.0, -1, 0.0), // target
 			scene
 		);
