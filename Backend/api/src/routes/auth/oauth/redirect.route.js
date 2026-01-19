@@ -21,7 +21,7 @@ export default function oauthRoute(server) {
 			oAuthURL.searchParams.append("state", state);
 			oAuthURL.searchParams.append("scope", "public");
 			oAuthURL.searchParams.append("response_type", "code");
-			console.log(oAuthURL.href);
+			// console.log(oAuthURL.href);
 			return reply.status(302).redirect(oAuthURL.href);
 		} catch (err) {
 			console.log(err);
