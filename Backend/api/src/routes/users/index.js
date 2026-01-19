@@ -6,6 +6,8 @@ import { postUserPassword, putUserPassword } from "./password.route.js";
 import { getTwoFactorStatusRoute, updateTwoFactorStatusRoute } from "./two-factor.route.js";
 import updateUsername from "./username.route.js";
 import { getMe } from "./me.route.js";
+import { changeEmail } from "./change-email.route.js";
+import { confirmEmailChange } from "./confirm-email-change.route.js";
 
 export default async function userRoutes(server) {
 	server.register(getMe, { prefix: "api/users" });
@@ -22,4 +24,6 @@ export default async function userRoutes(server) {
 	server.register(getFriends, { prefix: "api/users" });
 	server.register(updateTwoFactorStatusRoute, { prefix: "api/users" });
 	server.register(getTwoFactorStatusRoute, { prefix: "api/users" });
+	server.register(changeEmail, { prefix: "api/users" });
+	server.register(confirmEmailChange, { prefix: "api/users" });
 }
