@@ -7,7 +7,7 @@ services:
       - ./Backend/api/src:/app/src
       - ./Backend/api/scripts:/app/scripts
       - ./Backend/api/tests:/app/tests
-      - sqlite:/app/data
+      - ./Backend/api/data:/app/data
       - user_avatars:/app/uploads/avatars
     environment:
       - JWT_SECRET=${JWT_SECRET}
@@ -48,7 +48,7 @@ services:
       - game_server
     networks:
       - app-network
-    
+
   game_server:
     build: ./Backend/GameServer
     container_name: game_server

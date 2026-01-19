@@ -5,7 +5,7 @@ import { clearOptions, loadOptions, saveOptions } from "./options";
 import { IOptions } from "./pongData";
 
 import gameHtml from '../html/game.html?raw'
-import optionsHtml from '../html/options.html?raw'
+import optionsHtml from '../html/forms/gameOptionsForm.html?raw'
 
 /************************************************************************************************************/
 
@@ -26,7 +26,8 @@ function getGameOptionHtml(): string
 function initGamePageListeners(): void
 {
 	document.addEventListener('pageLoaded', (event: Event) => {
-		const { detail: path } = event as CustomEvent<string>;
+		const customEvent = event as CustomEvent<{ path: string; search: string }>;
+		const { path, search } = customEvent.detail;
 
 		switch (path)
 		{
@@ -130,7 +131,7 @@ function generateMatchType(match: HTMLElement, location: HTMLSelectElement)
 	const selection = document.createElement('select');
 	selection.className = 'gentle-select';
 	selection.title = 'Choose which type of match you want to play';
-	
+
 	if (location.value === 'local') {
 		const robotOpponent = document.createElement('option');
 		robotOpponent.value = '1';
@@ -141,7 +142,7 @@ function generateMatchType(match: HTMLElement, location: HTMLSelectElement)
 	const twoPlayers = document.createElement('option');
 	twoPlayers.value = '2';
 	twoPlayers.textContent = 'Two players';
-	
+
 	const tournament = document.createElement('option');
 	tournament.value = '4';
 	tournament.textContent = 'Tournament with 4 players';
@@ -204,8 +205,6 @@ function getPlayerNames(): string[]
 	if (!playersContainer)
 		throw new Error("No players found");
 
-	userState.refreshUser();
-
 	const inputs = playersContainer.querySelectorAll('input');
 	const result = Array.from(inputs).map(input => (input as HTMLInputElement).value || `Player ${input.id.replace('player', '')}`);
 	if ( result[0] && result[0] === 'Player 1')
@@ -224,7 +223,7 @@ function getPaddColors(): string[]
 
 	const inputs = paddColorsContainer.querySelectorAll('input[type="color"]');
 	const result = Array.from(inputs).map(input => (input as HTMLInputElement).value || '#a2c2e8');
-	
+
 	return result;
 }
 
@@ -265,20 +264,20 @@ function onGameOptionLoaded(): void
 {
 	try {
 		initializePlayerInputs();
-	
+
 		const optionsForm = document.getElementById("game-option-form") as HTMLFormElement | null;
 		optionsForm?.addEventListener('submit', (event) =>
 		{
 			// prevent HTML form default actions such as add query strings to url, resetting...
 			event.preventDefault();
-	
+
 			// dump all form results in a variable
 			const formData = new FormData(optionsForm) as FormData;
-	
+
 			// identify form values
 			const level = formData.get('level') as string | null;
 			const matchLoc = formData.get('match-location') as string | null;
-	
+
 			// extracting data but putting default just in case some is missing
 			const options: IOptions = {
 				matchLocation: matchLoc ? matchLoc : 'local',

@@ -14,7 +14,7 @@ export { getDashboardPage, initDashboardPageListeners, showRegisteredUserOptions
 
 let currentFriendsListener: Subscriber | null = null;
 let currentUsersListener: Subscriber | null = null;
-// let currentOptionsListener: Subscriber | null = null;
+//
 
 // Getting base html for the pages
 
@@ -69,14 +69,6 @@ async function onDashboardLoaded()
 	if (isRegistered)
 	{
 		showRegisteredUserOptions(user);
-
-		// currentOptionsListener = (updatedUser: User | null) => {
-		// 	if (updatedUser instanceof RegisteredUser) {
-		// 		activateTfaButton(updatedUser);
-		// 	}
-		// };
-
-		// userState.subscribe(currentOptionsListener);
 		userState.subscribe(currentFriendsListener);
 		displayMatchHistory();
 	}
@@ -105,9 +97,5 @@ function cleanupDashboardListeners()
 		userState.unsubscribe(currentUsersListener);
 		currentUsersListener = null;
 	}
-	// if (currentOptionsListener)
-	// {
-	// 	userState.unsubscribe(currentOptionsListener);
-	// 	currentOptionsListener = null;
-	// }
+	
 }

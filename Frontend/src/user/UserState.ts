@@ -30,7 +30,7 @@ class UserState
 	private user: User | null = null;
 
 	// list of elements which need to be notified if user state changes
-	private subscriberVector: Subscriber[] = [];
+	subscriberVector: Subscriber[] = [];
 
 	// singleton of the class object, to only ever get one user active
 	private static instance: UserState;
@@ -112,7 +112,7 @@ class UserState
 
 	//--------------------------- STORAGE ----------------------------------//
 
-	private saveToLocalStorage(): void
+	saveToLocalStorage(): void
 	{
 		// clearing out any possible remaining User object from local
 		localStorage.removeItem(localStorageKeyForGuestUser);
@@ -128,7 +128,6 @@ class UserState
 					username: this.user.username,
 					id: this.user.id,
 					accessToken: this.user.accessToken,
-					hasTwoFactorAuth: this.user.hasTwoFactorAuth,
 					avatar: this.user.avatar,
 					friends: this.user.friends
 				}
@@ -145,7 +144,7 @@ class UserState
 		}
 	}
 
-	private loadFromLocalStorage(): void
+	async loadFromLocalStorage(): Promise<void>
 	{
 		const registeredData = localStorage.getItem(localStorageKeyForRegisteredUser);
 		const guestData = localStorage.getItem(localStorageKeyForGuestUser);
@@ -161,7 +160,8 @@ class UserState
 				this.user.avatar = data.avatar;
 				this.user.friends = data.friends ?? [];
 				this.notifySubscribers();
-				this.refreshUser();
+				await this.refreshUser();
+				this.notifySubscribers();
 			}
 			catch (error)
 			{

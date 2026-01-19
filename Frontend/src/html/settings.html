@@ -1,65 +1,65 @@
 <div id="settings-container"
-	class="flex flex-1 flex-wrap gap-2 justify-between mx-6 min-h-60">
+	class="grid grid-cols-1 sm:grid-cols-8 sm:grid-rows-auto gap-2 w-full box-border m-3">
 
-	<article id="avatar-setting-container" class="flex flex-col border-box w-full sm:flex-2 sm:w-1/4 input-field p-4">
-		<section id="user-avatar-container w-full flex gap-4">
-
-			<h2 class="text-xl mb-4">
-				User Avatar
+	<article id="avatar-setting-container" class="flex flex-col w-full sm:col-span-2 sm:row-span-4 input-field p-4 gap-4">
+			<h2 class="md-title sm:mb-4">
+				Avatar
 			</h2>
 
-			<div class="flex flex-col flex-1 items-center gap-2">
-				<div class="w-32 h-32 border-slate-500">
-					<img id="current-avatar" src="" alt="Current Avatar" class="w-full h-full object-cover">
+			<section id="user-avatar-container" class="flex flex-col px-2">
+
+				<div class="flex flex-col flex-1 items-center gap-5">
+					<div class="size-44 border-slate-500">
+						<img id="current-avatar" src="" alt="Current Avatar" class="w-full h-full object-cover">
+					</div>
+					<button id="btn-toggle-avatar" class="need-registered-user hidden w-full glow-button">
+						Change Avatar
+					</button>
 				</div>
-				<button id="btn-toggle-avatar" class="glow-select need-registered-user hidden flex-1 text-center border px-4 py-2 border-slate-600 text-sm">
-					Modify Avatar
-				</button>
-			</div>
 
-			<form id="avatar-form" name="avatar-form" class="hidden flex-col justify-around gap-2 pt-3 pb-3">
-				<div class="flex flex-col gap-1">
-					<label for="input-avatar-file" class="text-sm mt-2">
-						Pick a new image
-					</label>
-					<input
-						id="input-avatar-file"
-						name="avatar"
-						type="file"
-						accept="image/*"
-						class="glow-select text-xs p-2 mt-0 border border-slate-600 max-w-full"
-						required/>
-					<span aria-live="polite" class="error-hint hidden text-center text-red-500 text-xs mt-1"></span>
-				</div>
-				<button type="submit" class="glow-select border px-4 py-2 border-slate-600 text-sm flex-1">
-					Submit Avatar
-				</button>
-			</form>
+				<form id="avatar-form" name="avatar-form" class="hidden flex-col justify-around gap-2 pt-3 pb-3">
+					<div class="flex flex-col gap-1">
+						<label for="input-avatar-file" class="text-fluid-base mt-2">
+							Pick a new image
+						</label>
+						<input
+							id="input-avatar-file"
+							name="avatar"
+							type="file"
+							accept="image/*"
+							class="text-xs p-2 mt-0 border border-slate-600 max-w-full"
+							required/>
+						<span aria-live="polite" class="error-hint hidden text-center text-red-500 text-xs mt-1"></span>
+					</div>
+					<button type="submit" class="glow-button flex-1 w-full">
+						Submit Avatar
+					</button>
+				</form>
 
-		</section>
-	</article>
+			</section>
+		</article>
 
-	<article id="user-setting-container" class="flex flex-col gap-4 flex-1 input-field p-4">
-		<h2 class="text-xl">
+	<article id="user-setting-container" class="flex flex-col w-full sm:col-span-6 sm:row-span-4 gap-8 input-field p-4 pb-8">
+		<h2 class="md-title">
 			User Information
 		</h2>
 
-		<section id="user-name-container" class="flex flex-col px-2 mb-4">
+		<section id="user-name-container" class="flex flex-col px-2 gap-4">
 
-			<div class="flex items-center justify-between mb-2">
-				<div>
-					<h2 class="text-sm text-slate-400 p-0 m-0">Username</h2>
-					<p id="current-username" class="font-semibold text-xl">Loading...</p>
+			<div class="flex items-center justify-between flex-wrap gap-2">
+				<div class="">
+					<h2 class="text-fluid-base text-slate-400 p-0 m-0">Username</h2>
+					<p id="current-username" class="sm-title">Loading...</p>
 				</div>
 
-				<button id="btn-toggle-username" class="glow-select border px-4 py-2 border-slate-600 text-sm">
-					Change
+				<button id="btn-toggle-username" class="glow-button w-full sm:w-1/2">
+					Change Username
 				</button>
 			</div>
 
 			<form id="rename-form" name="rename-form" autocomplete="off" novalidate class="hidden w-full border-slate-700">
 				<div class="flex flex-col w-full gap-1">
-					<label for="input-rename-user" class="text-sm">
+					<label for="input-rename-user" class="text-fluid-base">
 						New username:
 					</label>
 					<input
@@ -72,15 +72,15 @@
 						pattern="[a-zA-Z0-9_]+"
 						autocomplete="off"
 						placeholder="Alice"
-						class="p-2 bg-slate-800 text-sm"
+						class="p-2 bg-slate-800 text-fluid-base"
 						data-error-msg="Cannot contain special characters"/>
 					<span aria-live="polite" class="error-hint text-center text-red-500 text-xs mt-1 hidden"></span>
 
 					<div class="flex gap-2 mt-2">
-						<button type="submit" class="glow-select border px-4 py-2 border-slate-600 text-sm flex-1">
+						<button type="submit" class="glow-button flex-1">
 							Submit new username
 						</button>
-						<button type="button" id="btn-cancel-username" class="border px-4 py-2 border-slate-600 text-sm flex-1">
+						<button type="button" id="btn-cancel-username" class="glow-button flex-1">
 							Cancel
 						</button>
 					</div>
@@ -88,21 +88,21 @@
 			</form>
 		</section>
 
-		<section id="user-email-container" class="flex flex-col px-2 mb-4">
-			<div class="flex items-center justify-between mb-2">
+		<section id="user-email-container" class="hidden need-registered-user flex-col px-2 gap-4">
+			<div class="flex items-center justify-between flex-wrap gap-2">
 				<div class="">
-					<h2 class="text-sm text-slate-400">Email</h2>
-					<p id="current-email" class="font-semibold text-xl">Loading...</p>
+					<h2 class="text-fluid-base text-slate-400">Email</h2>
+					<p id="current-email" class="sm-title">Loading...</p>
 				</div>
-				<button id="btn-toggle-email" class="glow-select need-registered-user hidden border px-4 py-2 border-slate-600 text-sm">
-					Change
+				<button id="btn-toggle-email" class="glow-button w-full sm:w-1/2">
+					Change Email
 				</button>
 			</div>
 
 			<form id="user-email-form" name="user-email-form" novalidate autocomplete="off" class="hidden w-full">
 				<div class="flex flex-col gap-3 w-full">
 					<div>
-						<label for="input-email" class="text-sm">
+						<label for="input-email" class="text-fluid-base">
 							New Email:
 						</label>
 						<input
@@ -111,20 +111,20 @@
 							type="email"
 							required
 							placeholder="login@student.42.fr"
-							class="w-full p-2 bg-slate-800 text-sm mt-1"
+							class="w-full p-2 bg-slate-800 text-fluid-base mt-1"
 							data-error-msg="Must be a valid email address"/>
 						<span aria-live="polite" class="error-hint text-center text-red-500 text-xs mt-1 hidden"></span>
 					</div>
 
 					<div>
-						<label for="input-email-check" class="text-sm">
+						<label for="input-email-check" class="text-fluid-base">
 							New Email verification:
 						</label>
 						<input
 							id="input-email-check"
 							name="input-email-check"
 							type="email"
-							class="confirmation-input w-full p-2 bg-slate-800 text-sm mt-1"
+							class="confirmation-input w-full p-2 bg-slate-800 text-fluid-base mt-1"
 							required
 							placeholder="login@student.42.fr"
 							data-error-msg="Must be identical to the email address"
@@ -133,10 +133,10 @@
 					</div>
 
 					<div class="flex gap-2 mt-2">
-						<button type="submit" class="glow-select border px-4 py-2 border-slate-600 text-sm flex-1">
+						<button type="submit" class="glow-button flex-1">
 							Submit new Email
 						</button>
-						<button type="button" id="btn-cancel-email" class="border px-4 py-2 border-slate-600 text-sm flex-1">
+						<button type="button" id="btn-cancel-email" class="glow-button flex-1">
 							Cancel
 						</button>
 					</div>
@@ -144,21 +144,21 @@
 			</form>
 		</section>
 
-		<section id="user-pass-container" class="flex flex-col px-2 gap-2 mb-4">
-			<div class="flex items-center justify-between">
-				<div>
-					<h2 class="text-sm text-slate-400 ">Password</h2>
-					<p class="font-semibold text-xl">••••••••</p>
+		<section id="user-pass-container" class="hidden need-registered-user flex-col px-2 gap-2">
+			<div class="hidden need-registered-user items-center justify-between flex-wrap gap-2">
+				<div class="">
+					<h2 class="text-fluid-base text-slate-400 ">Password</h2>
+					<p class="sm-title">*********</p>
 				</div>
-				<button id="btn-toggle-password" class="glow-select need-registered-user hidden border px-4 py-2 border-slate-600 text-sm">
-					Change
+				<button id="btn-toggle-password" class="glow-button w-full sm:w-1/2">
+					Change Password
 				</button>
 			</div>
 
 			<form id="password-form" name="password-form" autocomplete="off" novalidate class="hidden w-full">
 				<div class="flex flex-col gap-3 w-full">
 					<div>
-						<label for="input-old-password" class="text-sm">
+						<label for="input-old-password" class="text-fluid-base">
 							Current Password:
 						</label>
 						<input
@@ -168,13 +168,13 @@
 							required
 							minlength="8"
 							placeholder="Current password"
-							class="w-full p-2 bg-slate-800 text-sm mt-1"
+							class="w-full p-2 bg-slate-800 text-fluid-base mt-1"
 							data-error-msg="Password must be at least 8 characters"/>
 						<span aria-live="polite" class="error-hint text-center text-red-500 text-xs mt-1 hidden"></span>
 					</div>
 
 					<div>
-						<label for="input-password" class="text-sm">
+						<label for="input-password" class="text-fluid-base">
 							New Password:
 						</label>
 						<input
@@ -184,20 +184,20 @@
 							required
 							minlength="8"
 							placeholder="New password"
-							class="w-full p-2 bg-slate-800 text-sm mt-1"
+							class="w-full p-2 bg-slate-800 text-fluid-base mt-1"
 							data-error-msg="Password must be at least 8 characters"/>
 						<span aria-live="polite" class="error-hint text-center text-red-500 text-xs mt-1 hidden"></span>
 					</div>
 
 					<div>
-						<label for="input-password-check" class="text-sm">
+						<label for="input-password-check" class="text-fluid-base">
 							Confirm New Password:
 						</label>
 						<input
 							id="input-password-check"
 							name="input-password-check"
 							type="password"
-							class="confirmation-input w-full p-2 bg-slate-800 text-sm mt-1"
+							class="confirmation-input w-full p-2 bg-slate-800 text-fluid-base mt-1"
 							required
 							placeholder="Confirm new password"
 							data-error-msg="Must match the new password"
@@ -206,10 +206,10 @@
 					</div>
 
 					<div class="flex gap-2 mt-2">
-						<button type="submit" class="glow-select border px-4 py-2 border-slate-600 text-sm flex-1">
+						<button type="submit" class="glow-button flex-1">
 							Submit
 						</button>
-						<button type="button" id="btn-cancel-password" class="border px-4 py-2 border-slate-600 text-sm flex-1">
+						<button type="button" id="btn-cancel-password" class="glow-button flex-1">
 							Cancel
 						</button>
 					</div>
@@ -217,37 +217,33 @@
 			</form>
 		</section>
 
-	</article>
+		</article>
 
-	<article id="account-setting-content" class="flex flex-col w-full border-box p-4 input-field">
-		<h2 class="text-xl">
+	<article id="security-setting-content" class="hidden need-registered-user flex-col gap-8 w-full sm:col-span-8 sm:row-span-2 box-border p-4 input-field">
+		<h2 class="md-title">
 			Security Settings
 		</h2>
 
-		<section id="toggle-tfa-container" class="p-4 ">
-			<div class="flex items-center justify-between">
-				<div>
-					<h2 class="font-semibold text-lg">Two Factor Authentication</h2>
-					<p class="text-sm text-slate-400">Add an extra layer of security</p>
-				</div>
-				<button id="btn-enable-tfa" class="glow-select need-registered-user hidden border px-4 py-2 border-slate-600 text-sm">
-					Enable 2FA
-				</button>
+		<section id="toggle-tfa-container" class="flex items-center justify-between flex-wrap gap-2 px-2">
+			<div class="">
+				<h2 id="tfa-title" class="sm-title">Two Factor Authentication</h2>
+				<p  id="tfa-info" class="text-fluid-base text-slate-400">Add an extra layer of security</p>
 			</div>
+			<button id="tfa-toggle-btn" class="glow-button w-full sm:w-1/2">
+				Enable 2FA
+			</button>
 		</section>
 
-		<section id="delete-account-container" class="p-4 border border-red-600 mt-8">
-			<div class="flex items-center justify-between">
-				<div>
-					<h2 class="font-semibold text-lg text-red-400">Delete Account</h2>
-					<p class="text-sm text-slate-400">Permanently delete your account and all data</p>
-				</div>
-				<button id="btn-delete-account" class="glow-select need-registered-user hidden border px-4 py-2 border-red-600 text-red-400 text-sm">
-					Delete Account
-				</button>
+		<section id="delete-account-container" class="flex items-center justify-between flex-wrap gap-2 px-2">
+			<div class="">
+				<h2 class="text-red-400 sm-title">Delete Account</h2>
+				<p class="text-fluid-base text-red-300">Permanently delete your account</p>
 			</div>
+			<button id="delete-account-btn" class="red-glow-button w-full sm:w-1/2">
+				Delete Account
+			</button>
 		</section>
 
-	</article>
+		</article>
 
 </div>

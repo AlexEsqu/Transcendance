@@ -3,8 +3,11 @@ import { User, RegisteredUser } from '../user/User';
 import { checkInputValidityOnUnfocus, isValidInputs } from "../utils/inputValidation"
 import { showRegisteredUserOptions } from '../dashboard/dashboardPage'
 import settingPageHtml from "../html/settings.html?raw"
+import { Subscriber } from "../user/UserState";
 
 export { getSettingPage, onSettingsLoaded }
+
+let currentOptionsListener: Subscriber | null = null;
 
 function getSettingPage(): string
 {
@@ -16,17 +19,28 @@ function onSettingsLoaded(): void
 	const user = userState.getUser();
 	const isRegistered = user instanceof RegisteredUser;
 
+	cleanupSettingListeners();
+
 	if (isRegistered)
 	{
 		showRegisteredUserOptions(user);
+		setupAvatarForm();
+		setupEmailForm();
+		setupPasswordForm();
+		activateTfaButton(user);
+		activateDeleteButton();
+
+		currentOptionsListener = (updatedUser: User | null) => {
+			if (updatedUser instanceof RegisteredUser) {
+				activateTfaButton(updatedUser);
+			}
+		};
+
+		userState.subscribe(currentOptionsListener);
 	}
 
-	updateCurrentSettings();
-
-	setupAvatarForm();
 	setupUsernameForm();
-	setupEmailForm();
-	setupPasswordForm();
+	updateCurrentSettings();
 }
 
 
@@ -232,26 +246,49 @@ function updateCurrentSettings(): void
 
 function activateTfaButton(user : RegisteredUser)
 {
-	const twoFactorAuthBtn = document.getElementById('enable-tfa-btn');
-	if (!twoFactorAuthBtn)
+	const twoFactorAuthSection = document.getElementById('toggle-tfa-container');
+	if (!twoFactorAuthSection)
 		return;
 
-	const newBtn = twoFactorAuthBtn.cloneNode(true) as HTMLElement;
-	twoFactorAuthBtn.parentNode?.replaceChild(newBtn, twoFactorAuthBtn);
+	const new2FASection = twoFactorAuthSection.cloneNode(true) as HTMLElement;
+	const new2FATitle = new2FASection.querySelector('#tfa-title');
+	const new2FAInfo = new2FASection.querySelector('#tfa-info');
+	const new2FAButton = new2FASection.querySelector('#tfa-toggle-btn');
+	if (!new2FASection || !new2FATitle || !new2FAInfo || !new2FAButton)
+		return;
+
+	twoFactorAuthSection.parentNode?.replaceChild(new2FASection, twoFactorAuthSection);
+
+	console.log('user in tfa toggle is')
+	console.log(user);
 
 	if (user.hasTwoFactorAuth)
 	{
-		newBtn.textContent = 'Disable Two Factor Authentication';
-		newBtn.addEventListener('click', () => {
-			userState.twoFactor.toggle2fa(false);
+		new2FATitle.textContent = "Remove email verification on login";
+		new2FAInfo.textContent = "Two Factor Authentication is currently enabled"
+		new2FAButton.textContent = 'Disable Two Factor Authentication';
+		new2FAButton.addEventListener('click', async () => {
+			await userState.twoFactor.toggle2fa(false);
 		});
+		new2FAButton.classList.remove('glow-button');
+		new2FAButton.classList.add('red-glow-button');
+		new2FATitle.classList.add('text-red-400');
+		new2FAInfo.classList.remove('text-slate-400');
+		new2FAInfo.classList.add('text-red-300');
 	}
 	else
 	{
-		newBtn.textContent = 'Enable Two Factor Authentication';
-		newBtn.addEventListener('click', () => {
-			userState.twoFactor.toggle2fa(true);
+		new2FATitle.textContent = "Add email verification on login";
+		new2FAInfo.textContent = "Two Factor Authentication is currently disabled"
+		new2FAButton.textContent = 'Enable Two Factor Authentication';
+		new2FAButton.addEventListener('click', async () => {
+			await userState.twoFactor.toggle2fa(true);
 		});
+		new2FAButton.classList.add('glow-button');
+		new2FAButton.classList.remove('red-glow-button');
+		new2FATitle.classList.remove('text-red-400');
+		new2FAInfo.classList.add('text-slate-400');
+		new2FAInfo.classList.remove('text-red-300');
 	}
 }
 
@@ -261,8 +298,24 @@ function activateDeleteButton()
 	if (!deleteAccBtn)
 		return;
 
-	deleteAccBtn.addEventListener('click', () => {
-		userState.emailAuth.deleteAccount();
-		router.navigateTo('/connection')
-	});
+	const newBtn = deleteAccBtn.cloneNode(true) as HTMLElement;
+	deleteAccBtn.parentNode?.replaceChild(newBtn, deleteAccBtn);
+
+	newBtn.addEventListener('click', () => {
+		if (confirm('Are you sure you want to delete your account? This cannot be undone.'))
+			{
+				userState.emailAuth.deleteAccount();
+				router.navigateTo('/connection');
+			}
+		}
+	);
+}
+
+function cleanupSettingListeners()
+{
+	if (currentOptionsListener)
+	{
+		userState.unsubscribe(currentOptionsListener);
+		currentOptionsListener = null;
+	}
 }
