@@ -30,12 +30,12 @@ export class Pong
 		if (!this.engine)
 			throw new Error("'engine' creation failed");
 
-		const players = getPlayers(options.players, options.paddColors, options.nbOfPlayers, options.matchLocation);
+		const players: IPlayer[] | null = getPlayers(options.players, options.paddColors, options.nbOfPlayers, options.matchLocation);
 		console.log(players);
 		if (!players)
 			throw new Error("players are not found");
 
-		const scene = loadGame(this.engine, this.canvas, options);
+		const scene: IScene | null = loadGame(this.engine, this.canvas, options);
 		if (!scene)
 			throw new Error("'scene' creation failed");
 
@@ -43,6 +43,7 @@ export class Pong
 		this.scene.players = players;
 		this.mainPlayerUsername = players[0].username;
 		this.scene.state = options.matchLocation === 'local' ? PlayerState.opening : PlayerState.waiting;
+		// this.scene.state = PlayerState.opening;
 		console.log("MAIN PLAYER ", this.mainPlayerUsername);
 	}
 
@@ -68,6 +69,7 @@ export class Pong
 			{
 				if (this.engine)
 					this.engine.stopRenderLoop();
+				this.engine = null;
 				return ;
 			}
 			this.scene.id.render();
@@ -138,9 +140,9 @@ export class Pong
 		else
 			mainPlayerPadd = leftPadd;
 		//	Update paddle's position (remote case)
-		if (keys["ArrowDown"])
+		if (keys["ArrowLeft"])
 			this.gameApp.sendUpdateToGameServer(mainPlayerPadd.player?.username ?? 'NaN', 'down', true);
-		if (keys["ArrowUp"])
+		if (keys["ArrowRight"])
 			this.gameApp.sendUpdateToGameServer(mainPlayerPadd.player?.username ?? 'NaN', 'up', true);
 	}
 

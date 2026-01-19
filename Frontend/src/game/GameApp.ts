@@ -99,7 +99,7 @@ export class GameApp
 				//	On socket creation send a message to the game-server to obtain the game info
 				this.sendUpdateToGameServer(this.pong.mainPlayerUsername, 'none', this.isPlayerReady);
 				//	Start to display (not playing) the game scene
-				this.pong.scene.state = this.pong.scene.options.matchLocation === 'local' ? PlayerState.opening : PlayerState.waiting;
+				// this.pong.scene.state = this.pong.scene.options.matchLocation === 'local' ? PlayerState.opening : PlayerState.waiting;
 				this.pong.runGame();
 			};
 	
