@@ -57,7 +57,6 @@ function initGamePageListeners(): void
 
 			default:
 			{
-				console.error("TO DEBUG!!! CAN'T ACCESS GAME DON'T KNOW WHY");
 				return;
 			}
 
