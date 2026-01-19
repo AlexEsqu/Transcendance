@@ -82,6 +82,14 @@ function showRegisteredUserOptions(user : RegisteredUser)
 			(el as HTMLElement).style.display = 'flex';
 		}
 	);
+
+	document.querySelectorAll('.need-registered-user-btn').forEach(el =>
+		{
+			const btn = el as HTMLButtonElement;
+			btn.disabled = false;
+			btn.removeAttribute('title');
+		}
+	);
 }
 
 function cleanupDashboardListeners()

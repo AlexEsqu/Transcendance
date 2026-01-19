@@ -12,7 +12,7 @@
 					<div class="size-44 border-slate-500">
 						<img id="current-avatar" src="" alt="Current Avatar" class="w-full h-full object-cover">
 					</div>
-					<button id="btn-toggle-avatar" class="need-registered-user hidden w-full glow-button">
+					<button id="btn-toggle-avatar" disabled class="need-registered-user-btn w-full glow-button">
 						Change Avatar
 					</button>
 				</div>
@@ -88,13 +88,13 @@
 			</form>
 		</section>
 
-		<section id="user-email-container" class="hidden need-registered-user flex-col px-2 gap-4">
+		<section id="user-email-container" class="flex flex-col px-2 gap-4">
 			<div class="flex items-center justify-between flex-wrap gap-2">
 				<div class="">
 					<h2 class="text-fluid-base text-slate-400">Email</h2>
 					<p id="current-email" class="sm-title">Loading...</p>
 				</div>
-				<button id="btn-toggle-email" class="glow-button w-full sm:w-1/2">
+				<button id="btn-toggle-email" disabled class="need-registered-user-btn glow-button w-full sm:w-1/2">
 					Change Email
 				</button>
 			</div>
@@ -144,13 +144,13 @@
 			</form>
 		</section>
 
-		<section id="user-pass-container" class="hidden need-registered-user flex-col px-2 gap-2">
-			<div class="hidden need-registered-user items-center justify-between flex-wrap gap-2">
+		<section id="user-pass-container" class="flex flex-col px-2 gap-2">
+			<div class="flex items-center justify-between flex-wrap gap-2">
 				<div class="">
 					<h2 class="text-fluid-base text-slate-400 ">Password</h2>
 					<p class="sm-title">*********</p>
 				</div>
-				<button id="btn-toggle-password" class="glow-button w-full sm:w-1/2">
+				<button id="btn-toggle-password" disabled class="need-registered-user-btn glow-button w-full sm:w-1/2">
 					Change Password
 				</button>
 			</div>
@@ -219,7 +219,7 @@
 
 		</article>
 
-	<article id="security-setting-content" class="hidden need-registered-user flex-col gap-8 w-full sm:col-span-8 sm:row-span-2 box-border p-4 input-field">
+	<article id="security-setting-content" class="flex flex-col gap-8 w-full sm:col-span-8 sm:row-span-2 box-border p-4 input-field">
 		<h2 class="md-title">
 			Security Settings
 		</h2>
@@ -229,7 +229,7 @@
 				<h2 id="tfa-title" class="sm-title">Two Factor Authentication</h2>
 				<p  id="tfa-info" class="text-fluid-base text-slate-400">Add an extra layer of security</p>
 			</div>
-			<button id="tfa-toggle-btn" class="glow-button w-full sm:w-1/2">
+			<button id="tfa-toggle-btn" disabled class="need-registered-user-btn glow-button w-full sm:w-1/2">
 				Enable 2FA
 			</button>
 		</section>
@@ -239,7 +239,7 @@
 				<h2 class="text-red-400 sm-title">Delete Account</h2>
 				<p class="text-fluid-base text-red-300">Permanently delete your account</p>
 			</div>
-			<button id="delete-account-btn" class="red-glow-button w-full sm:w-1/2">
+			<button id="delete-account-btn" disabled class="need-registered-user-btn red-glow-button w-full sm:w-1/2">
 				Delete Account
 			</button>
 		</section>
