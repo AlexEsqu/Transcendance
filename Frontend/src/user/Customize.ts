@@ -16,34 +16,42 @@ export class CustomizeService
 	async rename(newName: string): Promise<void>
 	{
 		const user = this.userState.getUser();
-		if (!(user instanceof RegisteredUser))
-			throw new Error("Not authenticated");
+		if (!user)
+			return;
 
-		const response = await this.userState.fetchWithTokenRefresh(
-			`${apiDomainName}/users/me/username`,
-			{
-				method: 'PUT',
-				headers:
+		if (user instanceof RegisteredUser)
+		{
+			const response = await this.userState.fetchWithTokenRefresh(
+				`${apiDomainName}/users/me/username`,
 				{
-					'accept': 'application/json',
-					'Content-Type': 'application/json',
-					'Authorization': `Bearer ${user.accessToken}`,
-					'X-App-Secret': `${apiKey}`
-				},
-				body: JSON.stringify({
-					new_username: newName
-				})
-			}
-		);
+					method: 'PUT',
+					headers:
+					{
+						'accept': 'application/json',
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${user.accessToken}`,
+						'X-App-Secret': `${apiKey}`
+					},
+					body: JSON.stringify({
+						new_username: newName
+					})
+				}
+			);
 
-		const data = await response.json();
-		if (!response.ok)
-			throw new Error(data.message || 'Renaming failed');
+			const data = await response.json();
+			if (!response.ok)
+				throw new Error(data.message || 'Renaming failed');
 
-		user.username = newName;
-		router.render();
+			user.username = newName;
+		}
+
+		if (user instanceof GuestUser)
+		{
+			user.username = newName;
+		}
 
 		this.userState.setUser(user);
+		router.render();
 	}
 
 	async updateAvatar(formData: FormData): Promise<void>
