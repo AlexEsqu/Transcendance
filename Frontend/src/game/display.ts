@@ -41,7 +41,6 @@ function initGamePageListeners(): void
 			case '/game':
 			{
 				const options = loadOptions();
-				console.log("OPTIONS ", options);
 				if (options)
 					onGameLoaded();
 				else

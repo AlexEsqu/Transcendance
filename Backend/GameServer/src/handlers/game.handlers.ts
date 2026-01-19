@@ -39,15 +39,11 @@ function handleMessage(socket: WSWebSocket, message: Buffer,
 			player.socket = socket;
 
 		if (gamingRoom.gameLoop && gamingRoom.gameLoopStarted === false)
-		{
-			console.log("SHOULD SEND PLAYERS ", gamingRoom.gameLoop.leftPadd.player?.username);
 			notifyPlayersInRoom(gamingRoom, gamingRoom.gameLoop.composeGameState());
-		}
 
 		//	Check if player informs that its ready
-		if (data.ready === true) {
+		if (data.ready === true)
 			player.isReady = true;
-		}
 		else
 			player.isReady = false;
 		

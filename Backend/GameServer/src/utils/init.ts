@@ -11,7 +11,7 @@ function initBall(): IBall
 	const ball: IBall = {
 		speed: GAME.BALL_START_SPEED,
 		posistion: { x: 0.0, z: 0.0 },
-		direction: { x: 0.5, z: 0.0 }
+		direction: { x: 0.0, z: 0.0 }
 	}
 	return ball;
 }
@@ -27,7 +27,7 @@ function initPadd(matchType: MatchType, side: string): IPaddle
 	const paddle: IPaddle = {
 		pos: { x: posX, z: 0.0 },
 		side: side,
-		robot: matchType === MatchType.solo ? true : false,
+		robot: isRobot,
 		score: 0,
 		player: undefined
 	}

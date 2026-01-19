@@ -64,7 +64,7 @@ export class Room
 		{
 			this.gameLoop.runGameLoop(gameControl);
 			this.gameLoopStarted = true;
-			notifyPlayersInRoom(this, this.gameLoop.composeGameState())
+			notifyPlayersInRoom(this, this.gameLoop.composeGameState());
 		}
 	}
 

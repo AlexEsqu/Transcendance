@@ -190,7 +190,6 @@ export async function launchPongGame(options: IOptions): Promise<void>
 		element.style.display = 'none';
 
 	try {
-		console.log("HELLO LAUNCH GAME");
 		const app = new GameApp(options);
 		await app.goToWaitingRoom();
 		app.goToGamingRoom();

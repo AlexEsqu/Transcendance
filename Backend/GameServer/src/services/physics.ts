@@ -26,8 +26,7 @@ function isBallHittingPaddle(ball: IBall, paddle: IPaddle): boolean
 		return false;
 
 	//	Check if the ball fits in the paddle's coordinates range (Z-axis)
-	// if (ballTopEdge <= paddTopEdge + (GAME.BALL_RADIUS * 2) && ballDownEdge >= paddDownEdge - (GAME.BALL_RADIUS * 2))
-	if (ballTopEdge <= paddTopEdge + (GAME.BALL_RADIUS) && ballDownEdge >= paddDownEdge - (GAME.BALL_RADIUS))
+	if (ballTopEdge <= paddTopEdge + (GAME.BALL_RADIUS * 2) && ballDownEdge >= paddDownEdge - (GAME.BALL_RADIUS * 2))
 		return true;
 
 	return false;
@@ -52,7 +51,7 @@ function isBallOutOfBounds(ball: IBall): boolean
 
 	// if (mapLimit - ballRightEdge < 0.50)
 	// 	console.log(`left edge : ${ballLeftEdge} // right edge : ${ballRightEdge} // map limit : ${mapLimit}`);
-	if (ballLeftEdge <= -(mapLimit) || ballRightEdge >= mapLimit)
+	if (ballLeftEdge < -(mapLimit) || ballRightEdge > mapLimit)
 		return true;
 	return false;
 }

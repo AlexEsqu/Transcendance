@@ -161,7 +161,6 @@ export class Pong
 
 		if (this.round !== gameState.round || !this.scene.leftPadd.player || !this.scene.rightPadd.player)
 		{
-			console.log("ASSIGNED PLAYERS");
 			this.round = gameState.round;
 			this.scene.leftPadd.player = assignPlayer(gameState, this.scene.players, 'left');
 			this.scene.rightPadd.player = assignPlayer(gameState, this.scene.players, 'right');

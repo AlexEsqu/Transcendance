@@ -9,6 +9,7 @@ import { JSONGameState } from '../config/schemas';
 import { GameControl } from './GameControl';
 import { Room } from './Room';
 import { sendMatchesToDataBase } from '../utils/sendMatchResult';
+import { time } from 'node:console';
 
 /************************************************************************************************************/
 
@@ -47,58 +48,58 @@ export class GameLoop
 		const room: Room | undefined = gameControl.getGamingRoom(this.roomId);
 		if (room === undefined) return ; // TO DO: HANDLE ERROR LATER
 
-		this.state = State.play;
-
 		let isNewRound: boolean = false;
 		let gameStateInfo: JSONGameState;
 
 		console.log("GAME-LOOP: game loop started");
-		const interval = setInterval(() => {
-			// console.log(this.state);
-
-			if (this.state === State.end)
-			{
-				clearInterval(interval);
-				if (this.rounds.results)
-					sendMatchesToDataBase(this.rounds.results[this.rounds.results.length - 1], Date.now());
-				room.closeRoom();
-				return ;
-			}
-
-			if (this.state === State.play)
-			{
-				//	update data & check collisions
-				this.updateGameData();
-				//	monitor score/rounds
-				isNewRound = this.isPlayerHittingMaxScore();
-			}
-
-			if (isNewRound)
-			{
-				this.requestNewRound();
-				isNewRound = false;
-			}
-
-			//	broadcast to players = send game state/data to all players
-			gameStateInfo = this.composeGameState();
-			notifyPlayersInRoom(room, gameStateInfo);
-
-			this.timestamp = Date.now();
-		}, 1000 / 60); // 60fps
-
+		//	Take 1 sec to be sure every players are ready
+		setTimeout(() => {
+			const interval = setInterval(() => {
+				// console.log(this.state);
+	
+				if (this.state === State.end)
+				{
+					clearInterval(interval);
+					if (this.rounds.results)
+						sendMatchesToDataBase(this.rounds.results[this.rounds.results.length - 1], Date.now());
+					room.closeRoom();
+					return ;
+				}
+	
+				if (this.state === State.play)
+				{
+					//	update data & check collisions
+					this.updateGameData();
+					//	monitor score/rounds
+					isNewRound = this.isPlayerHittingMaxScore();
+				}
+	
+				if (isNewRound)
+				{
+					this.requestNewRound();
+					isNewRound = false;
+				}
+	
+				//	broadcast to players = send game state/data to all players
+				gameStateInfo = this.composeGameState();
+				notifyPlayersInRoom(room, gameStateInfo);
+	
+				this.timestamp = Date.now();
+			}, 1000 / 60); // 60fps
+		}, 100);
 	}
 
 	updateGameData(): void
 	{
 		//	Move the ball position according to its direction and velocity
-		const deltaTime: number = this.timestamp !== -1 ? ((Date.now() - this.timestamp) / 1000) : Date.now();
+		const deltaTime: number = this.timestamp !== -1 ? ((Date.now() - this.timestamp) / 1000) : 0;
 		const velocity = scaleVelocity(this.ball, deltaTime);
 		this.ball.posistion.x += velocity.x;
 		this.ball.posistion.z += velocity.z;
 
 		//	Check if the ball hits the edge of map/paddles or is out of bounds -> update its direction accordingly
 		//	Depending on what/where the ball hits an object or a limit, its direction is reversed and gains speed
-		const isBallOutOfBounds: boolean = this.bouncingBallProcess();
+		this.bouncingBallProcess();
 
 		if (this.leftPadd.robot)
 			this.processPlayerInput('Robot', this.state, processRobotOpponent(this.leftPadd, this.ball));
@@ -137,12 +138,11 @@ export class GameLoop
 		{
 			this.ball.direction.z = -(this.ball.direction.z);
 			this.ball.posistion.z = adjustBallVerticalPos(this.ball);
-			
 		}
 
 		if (isBallOutOfBounds(this.ball))
 		{
-			console.log("GAME-LOOP: ball is out of bounds");
+			console.log(`GAME-LOOP: ball is out of bounds ${this.ball.posistion.x} at ${this.timestamp}`);
 			if (this.ball.posistion.x > 0)
 				this.leftPadd.score += 1;
 			else
@@ -164,15 +164,15 @@ export class GameLoop
 		else if (this.rightPadd.player?.username === player)
 			paddle = this.rightPadd;
 		else {
-			console.error("(GAME-SERVER(processPlayerInput): no match with the given username");
+			console.error("(GAME-LOOP(processPlayerInput): no match with the given username");
 			return ;
 		}
 
-		const deltaTime: number = (Date.now() - this.timestamp) / 1000;
+		const deltaTime: number = this.timestamp === -1 ? Date.now() : (Date.now() - this.timestamp) / 1000;
 		//	Frame-rate independent smoothing
-        const alpha: number = 1 - Math.exp(GAME.PADD_RESPONSIVENESS * deltaTime);
+        // const alpha: number = 1 - Math.exp(GAME.PADD_RESPONSIVENESS * deltaTime);
 		//	Calculate the velocity of the paddle's movement
-		const velocityStep: number = GAME.PADD_SPEED * deltaTime * alpha;
+		const velocityStep: number = GAME.PADD_SPEED * deltaTime;
 
 		if (input === 'up' && !isNewPaddPosHittingMapLimit(paddle.pos.z, velocityStep, input))
 			paddle.pos.z += velocityStep;
@@ -202,8 +202,14 @@ export class GameLoop
 		if (this.state !== State.end)
 			this.state = State.waiting;
 
+		//	If registred player is disconnected, opponent wins
+		if (!this.leftPadd.player?.socket)
+			this.rightPadd.score = GAME.MAX_SCORE;
+		if (!this.rightPadd.player?.socket)
+			this.leftPadd.score = GAME.MAX_SCORE;
+
 		//	Save the results of the previous match, if there was one
-		if (this.rounds)
+		if (this.rounds && this.rounds.nbOfRounds !== 0)
 			this.saveResults();
 
 		if (this.state === State.end)
@@ -234,12 +240,6 @@ export class GameLoop
 		//	Reset game's data
 		this.resetBall();
 		this.resetPaddles();
-
-		//	If registred player is disconnected, opponent wins
-		if (!this.leftPadd.player?.socket)
-			this.rightPadd.score = GAME.MAX_SCORE;
-		if (!this.rightPadd.player?.socket)
-			this.leftPadd.score = GAME.MAX_SCORE;
 	}
 
 	/**
@@ -270,7 +270,8 @@ export class GameLoop
 	{
 		this.ball.speed = GAME.BALL_START_SPEED;
 		this.ball.posistion.x = 0.0;
-		this.ball.posistion.z = 0.0
+		this.ball.posistion.z = 0.0;
+		this.ball.direction.z = 0.0;
 		if (Math.floor(Math.random() * 2) === 1)
 			this.ball.direction.x = 1;
 		else
@@ -304,7 +305,7 @@ export class GameLoop
 			ball: { x: this.ball.posistion.x, z: this.ball.posistion.z },
 		};
 
-		if (this.state === State.end, this.rounds.results)
+		if (this.state === State.end && this.rounds.results)
 		{
 			const finalMatch: IResult = this.rounds.results[this.rounds.results.length - 1];
 			gameStateInfo.results = { 
