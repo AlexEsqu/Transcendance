@@ -131,16 +131,29 @@ function drawLineChart(canvas: HTMLCanvasElement, matches: MatchHistory[]): void
 		new Date(a.date).getTime() - new Date(b.date).getTime()
 	);
 
-	let cumulativeScore = 0;
-	const labels: string[] = ['Start'];
-	const scoreData: number[] = [0];
-	const pointColors: string[] = ['#9ca3af'];
+    let cumulativeScore = 0;
+    const labels: string[] = [];
+    const scoreData: number[] = [];
+    const pointColors: string[] = [];
+
+	// add 2 days before first match at score 0 for padding
+    if (sortedMatches.length > 0) {
+        const firstDate = new Date(sortedMatches[0].date);
+        for (let i = 2; i > 0; i--) {
+            const date = new Date(firstDate);
+            date.setDate(date.getDate() - i);
+            labels.push(`${date.getMonth() + 1}/${date.getDate()}`);
+            scoreData.push(0);
+            pointColors.push('transparent');
+        }
+    }
 
 	sortedMatches.forEach((match, index) =>
 		{
 			cumulativeScore += match.result === 'win' ? 1 : -1;
 
 			const date = new Date(match.date);
+            const time = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 			labels.push(`${date.getMonth() + 1}/${date.getDate()}`);
 			scoreData.push(cumulativeScore);
 			pointColors.push(match.result === 'win' ? '#aee2e9ff' : '#e28812ff');
@@ -203,11 +216,16 @@ function drawLineChart(canvas: HTMLCanvasElement, matches: MatchHistory[]): void
 				},
 				x: {
 					ticks: {
-						color: '#9ca3af'
+						color: '#9ca3af',
+						maxRotation: 45,
+                        minRotation: 45,
 					},
+					min: 0,
 					grid: {
 						color: '#2d3748'
-					}
+					},
+					// offset: true,
+					// grace: '15%',
 				}
 			}
 		}
