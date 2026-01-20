@@ -1,13 +1,19 @@
-import { deleteUserAvatar, putUserAvatar } from "./avatar.route.js";
-import deleteUser from "./delete-me.route.js";
-import { addFriend, deleteFriend, getFriends } from "./friends/friends.route.js";
-import { getUser, getUsers } from "./users.route.js";
-import { postUserPassword, putUserPassword } from "./password.route.js";
-import { getTwoFactorStatusRoute, updateTwoFactorStatusRoute } from "./two-factor.route.js";
-import updateUsername from "./username.route.js";
-import { getMe } from "./me.route.js";
-import { changeEmail } from "./change-email.route.js";
-import { confirmEmailChange } from "./confirm-email-change.route.js";
+import { deleteUserAvatar } from "./delete.avatar.route.js";
+import { putUserAvatar } from "./put.avatar.route.js";
+import deleteUser from "./delete.me.route.js";
+import { addFriend } from "./friends/post.friends.route.js";
+import { deleteFriend } from "./friends/delete.friends.route.js";
+import { getFriends } from "./friends/get.friends.route.js";
+import { getUser } from "./get.user.route.js";
+import { getUsers } from "./get.users.route.js";
+import { postUserPassword } from "./post.password.route.js";
+import { putUserPassword } from "./put.password.route.js";
+import { getTwoFactorStatusRoute } from "./get.two-factor.route.js";
+import { updateTwoFactorStatusRoute } from "./put.two-factor.route.js";
+import updateUsername from "./put.username.route.js";
+import { getMe } from "./get.me.route.js";
+import { changeEmail } from "./put.change-email.route.js";
+import { confirmEmailChange } from "./get.confirm-email-change.route.js";
 
 export default async function userRoutes(server) {
 	server.register(getMe, { prefix: "api/users" });
