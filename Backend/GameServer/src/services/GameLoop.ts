@@ -1,8 +1,8 @@
 import { isBallHittingWall, isBallHittingPaddle, isBallOutOfBounds, isNewPaddPosHittingMapLimit, 
 	adjustBallHorizontalPos, adjustBallVerticalPos, scaleVelocity, normalizeVector, processRobotOpponent 
-} from './physics';
+} from '../utils/physics';
 
-import { GAME_SIZE, IBall, IPaddle, IPlayer, State, Level, MatchType, IRound, IResult, Info } from '../config/pongData'
+import { GAME_SIZE, IBall, IPaddle, IPlayer, State, MatchType, IRound, IResult, Info, GameSatus } from '../config/pongData'
 import { initBall, initPadd, initPlayers, initInfoByLevel } from '../utils/init'
 import { notifyPlayersInRoom } from '../utils/broadcast';
 import { JSONGameState } from '../config/schemas';
@@ -14,7 +14,7 @@ import { sendMatchesToDataBase } from '../utils/sendMatchResult';
 
 export class GameLoop
 {
-	static INFO: Info;
+	INFO: Info;
 
 	roomId: number;
 	matchType: MatchType;
@@ -28,10 +28,10 @@ export class GameLoop
 
 	constructor(roomId: number, matchType: MatchType, players: Map<string, IPlayer>, level: number)
 	{
-		GameLoop.INFO = initInfoByLevel(level, matchType);
+		this.INFO = initInfoByLevel(level, matchType);
 		this.roomId = roomId;
 		this.matchType = matchType;
-		this.ball = initBall(GameLoop.INFO.BALL_START_SPEED);
+		this.ball = initBall(this.INFO.BALL_START_SPEED);
 		this.leftPadd = initPadd(matchType, 'left');
 		this.rightPadd = initPadd(matchType, 'right');
 		this.players = initPlayers(players);
@@ -39,7 +39,7 @@ export class GameLoop
 		this.requestNewRound();
 		this.state = State.waiting;
 		this.timestamp = -1;
-		console.log(GameLoop.INFO);
+		console.log(this.INFO);
 	}
 
 	runGameLoop(gameControl: GameControl): void
@@ -101,7 +101,7 @@ export class GameLoop
 		this.bouncingBallProcess();
 
 		if (this.leftPadd.robot)
-			this.processPlayerInput('Robot', this.state, processRobotOpponent(this.leftPadd, this.ball, GameLoop.INFO.BOT_PROBABILITY));
+			this.processPlayerInput('Robot', this.state, processRobotOpponent(this.leftPadd, this.ball, this.INFO.BOT_PROBABILITY));
 	}
 
 	bouncingBallProcess(): boolean
@@ -128,7 +128,7 @@ export class GameLoop
 			this.ball.direction = normalizeVector(this.ball.direction);
 
 			//	Increase gradually the speed
-			this.ball.speed = Math.min(GameLoop.INFO.BALL_MAX_SPEED, this.ball.speed * 1.2);
+			this.ball.speed = Math.min(this.INFO.BALL_MAX_SPEED, this.ball.speed * 1.2);
 
 			return false;
 		}
@@ -169,9 +169,9 @@ export class GameLoop
 
 		const deltaTime: number = this.timestamp === -1 ? Date.now() : (Date.now() - this.timestamp) / 1000;
 		//	Frame-rate independent smoothing
-        // const alpha: number = 1 - Math.exp(GameLoop.INFO.PADD_RESPONSIVENESS * deltaTime);
+        // const alpha: number = 1 - Math.exp(this.INFO.PADD_RESPONSIVENESS * deltaTime);
 		//	Calculate the velocity of the paddle's movement
-		const velocityStep: number = GameLoop.INFO.PADD_SPEED * deltaTime;
+		const velocityStep: number = this.INFO.PADD_SPEED * deltaTime;
 
 		if (input === 'up' && !isNewPaddPosHittingMapLimit(paddle.pos.z, velocityStep, input))
 			paddle.pos.z += velocityStep;
@@ -184,9 +184,9 @@ export class GameLoop
 		if (this.leftPadd.player === undefined || this.rightPadd.player === undefined)
 			return false;
 
-		if (this.leftPadd.score === GameLoop.INFO.MAX_SCORE || this.rightPadd.score === GameLoop.INFO.MAX_SCORE) {
+		if (this.leftPadd.score === this.INFO.MAX_SCORE || this.rightPadd.score === this.INFO.MAX_SCORE) {
 			this.state = State.waiting;
-			if (this.rounds.nbOfRounds >= GameLoop.INFO.MAX_ROUNDS)
+			if (this.rounds.nbOfRounds >= this.INFO.MAX_ROUNDS)
 				this.state = State.end;
 			return true;
 		}
@@ -194,36 +194,31 @@ export class GameLoop
 	}
 
 	/**
-	 * 	Assign new players to their paddle for the next match and reset game's data
+	 * 	Save the match's result & prepare the next match
 	 */
-	requestNewRound(): void
+	requestNewRound(): GameSatus
 	{
+		//	If it's not the game's end players must wait that everyone is ready for the new round
 		if (this.state !== State.end)
 			this.state = State.waiting;
-
-		//	If registred player is disconnected, opponent wins
-		if (!this.leftPadd.player?.socket)
-			this.rightPadd.score = GameLoop.INFO.MAX_SCORE;
-		if (!this.rightPadd.player?.socket)
-			this.leftPadd.score = GameLoop.INFO.MAX_SCORE;
 
 		//	Save the results of the previous match, if there was one
 		if (this.rounds && this.rounds.nbOfRounds !== 0)
 			this.saveResults();
 
 		if (this.state === State.end)
-			return ;
+			return GameSatus.SUCCESS;
 
 		//	Who should play now ?
 		let match = this.matchType;
 		if (match === MatchType.tournament && this.rounds.nbOfRounds >= 0 && this.rounds.nbOfRounds < 2)
 			match = MatchType.duo;
 		//	If the match type is a tournament and it's the final round, the last two players must be the two winners of the previous rounds
-		if (match === MatchType.tournament && this.rounds.nbOfRounds === GameLoop.INFO.MAX_ROUNDS - 1)
+		if (match === MatchType.tournament && this.rounds.nbOfRounds === this.INFO.MAX_ROUNDS - 1)
 		{
 			if (!this.rounds.results || !this.rounds.results[0] || !this.rounds.results[1]) {
 				console.error("GAME-LOOP: failed to assign players to new round, previous match's results not found");
-				return ;
+				return GameSatus.ERROR;
 			}
 			this.leftPadd.player = this.rounds.results[0].winner;
 			this.rightPadd.player = this.rounds.results[1].winner;
@@ -239,6 +234,17 @@ export class GameLoop
 		//	Reset game's data
 		this.resetBall();
 		this.resetPaddles();
+
+		if (this.leftPadd.player === undefined || this.rightPadd.player === undefined)
+			return GameSatus.ERROR;
+
+		//	If a player is disconnected, opponent wins
+		if (this.leftPadd.player?.socket === null)
+			this.rightPadd.score = this.INFO.MAX_SCORE;
+		else if (this.rightPadd.player?.socket === null)
+			this.leftPadd.score = this.INFO.MAX_SCORE;
+
+		return GameSatus.SUCCESS;
 	}
 
 	/**
@@ -246,8 +252,8 @@ export class GameLoop
 	*/
 	saveResults(): void
 	{
-		const winner: IPaddle = this.leftPadd.score === GameLoop.INFO.MAX_SCORE ? this.leftPadd : this.rightPadd;
-		const loser: IPaddle = this.leftPadd.score === GameLoop.INFO.MAX_SCORE ? this.rightPadd : this.leftPadd;
+		const winner: IPaddle = this.leftPadd.score === this.INFO.MAX_SCORE ? this.leftPadd : this.rightPadd;
+		const loser: IPaddle = this.leftPadd.score === this.INFO.MAX_SCORE ? this.rightPadd : this.leftPadd;
 		
 		if (winner.player === undefined || loser.player === undefined)
 			return ;
@@ -267,7 +273,7 @@ export class GameLoop
 
 	resetBall(): void
 	{
-		this.ball.speed = GameLoop.INFO.BALL_START_SPEED;
+		this.ball.speed = this.INFO.BALL_START_SPEED;
 		this.ball.posistion.x = 0.0;
 		this.ball.posistion.z = 0.0;
 		this.ball.direction.z = 0.0;

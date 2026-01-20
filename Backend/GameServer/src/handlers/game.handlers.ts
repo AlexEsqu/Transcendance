@@ -3,9 +3,10 @@ import { WebSocket as WSWebSocket } from 'ws';
 import { getJSONError } from '../errors/input.error';
 import { GameControl } from '../services/GameControl';
 import { Room } from '../services/Room';
-import { IPlayer, State, GAME, MatchType } from '../config/pongData';
+import { IPlayer, State, GAME_SIZE, MatchType } from '../config/pongData';
 import { JSONInputsUpdate } from '../config/schemas';
 import { notifyPlayersInRoom } from '../utils/broadcast';
+import { GameLoop } from '../services/GameLoop';
 
 /***********************************************************************************************************/
 
@@ -65,49 +66,49 @@ function handleMessage(socket: WSWebSocket, message: Buffer,
 	}
 }
 
-function handleDisconnection(player: IPlayer | undefined, gameControl: GameControl): void
+function handleDisconnection(socket: WSWebSocket, gameControl: GameControl): void
 {
+	const player: IPlayer | null = gameControl.findPlayerBySocket(socket);
+	if (player === null) {
+		console.log("GAME-HANDLER: on route '/room/game' disconnection of client");
+		socket.close();
+		return ;
+	}
+
 	console.log("GAME-HANDLER: on route '/room/game' disconnection of player ", player?.username);
-	if (player)
+	const gamingRoom: Room | undefined = gameControl.getGamingRoom(player.roomId ?? -1);
+	if (gamingRoom === undefined)
+		return ;
+
+	//	In case the game didn't even started
+	if (!gamingRoom.gameLoop)
 	{
-		const gamingRoom: Room | undefined = gameControl.getGamingRoom(player.roomId ?? -1);
-		if (gamingRoom === undefined)
-			return ;
+		gamingRoom.closeRoom();
+		gameControl.deleteRoom(gamingRoom.id);
+		return ;
+	}
 
-		//	In case the game didn't even started
-		if (!gamingRoom.gameLoop)
+	//	If game started && the match is a tournament = TO DO --> test the situation
+	if (gamingRoom.gameLoop.leftPadd.player && gamingRoom.gameLoop.rightPadd.player)
+	{
+		//	If game started, the opponent that didn't disconnected wins
+		if (gamingRoom.gameLoop.leftPadd.player.username === player.username)
+			gamingRoom.gameLoop.rightPadd.score = gamingRoom.gameLoop.INFO.MAX_SCORE;
+		else if (gamingRoom.gameLoop.rightPadd.player.username === player.username)
+			gamingRoom.gameLoop.leftPadd.score = gamingRoom.gameLoop.INFO.MAX_SCORE;
+		else if (gamingRoom.players.has(player.username))
 		{
-			gamingRoom.closeRoom();
-			gameControl.deleteRoom(gamingRoom.id);
-			return ;
-		}
-
-		//	If game started && the match is a tournament = TO DO --> handle tricky situation
-			if (gamingRoom.gameLoop.leftPadd.player && gamingRoom.gameLoop.rightPadd.player)
+			//	Only if the match is a tournament && player is disconnected but not currently playing
+			const disconnected = gamingRoom.players.get(player.username);
+			if (disconnected !== undefined)
 			{
-				//	If game started, the opponent that didn't disconnected wins
-				if (gamingRoom.gameLoop.leftPadd.player.username === player.username)
-					gamingRoom.gameLoop.rightPadd.score = GAME.MAX_SCORE;
-				else if (gamingRoom.gameLoop.rightPadd.player.username === player.username)
-					gamingRoom.gameLoop.leftPadd.score = GAME.MAX_SCORE;
-				else if (gamingRoom.players.has(player.username))
-				{
-					//	If the match is a tournament && player disconnected but not currently playing
-					const disconnected = gamingRoom.players.get(player.username);
-					if (disconnected !== undefined)
-					{
-						disconnected.socket?.close();
-						disconnected.socket = null;
-					}
-				}
+				disconnected.socket?.close();
+				disconnected.socket = null;
 			}
-
-		if (gamingRoom.gameLoop.leftPadd.player && gamingRoom.gameLoop.rightPadd.player)
-		{
-			if (gamingRoom.gameLoop.leftPadd.player.username === player.username)
-				gamingRoom.gameLoop.rightPadd.score = GAME.MAX_SCORE;
-			else
-				gamingRoom.gameLoop.leftPadd.score = GAME.MAX_SCORE;
+		}
+		else {
+			gamingRoom.gameLoop.state = State.end;
+			console.log("GAME-HANDLER: disconnection of a player but player not found in the gaming room");
 		}
 	}
 }

@@ -2,7 +2,7 @@ import { WebSocket as WSWebSocket } from 'ws';
 
 /************************************************************************************************************/
 
-export { GAME_SIZE, MatchType, GameLocation, State, Level, GAMING_ROOM_URL, WAITING_ROOM_URL, PlayerState }
+export { GAME_SIZE, MatchType, GameLocation, State, GameSatus, GAMING_ROOM_URL, WAITING_ROOM_URL }
 export type { IBall, IPaddle, IPlayer, IRound, IResult, Info }
 
 /************************************************************************************************************
@@ -36,16 +36,12 @@ enum GameLocation {
 	local, remote
 };
 
-enum PlayerState {
-	waiting, play, end, opening, stop
-};
-
-enum State {
+enum State { // TO DO -- rename by LoopState
 	waiting, play, end
 };
 
-enum Level {
-	easy, medium, hard
+enum GameSatus {
+	ERROR = 0, SUCCESS
 };
 
 /************************************************************************************************************
@@ -71,7 +67,7 @@ interface IPlayer {
 	username: string;
 	socket: WSWebSocket | null;
 	matchType: MatchType;
-	gameLocation: GameLocation;
+	gameLocation: GameLocation; // TO DO -- check if unused
 	isReady: boolean;
 	roomId?: number;
 	color?: string;

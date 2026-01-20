@@ -1,4 +1,5 @@
 import { GameLocation, MatchType, IPlayer } from '../config/pongData';
+import websocket from '@fastify/websocket';
 import { WebSocket as WSWebSocket } from 'ws';
 import { notifyPlayersInRoom } from '../utils/broadcast'
 import { Room } from './Room';
@@ -6,13 +7,42 @@ import { JSONRoomAccess, JSONRoomDemand } from '../config/schemas';
 
 export class GameControl
 {
+	clientSockets: WSWebSocket[] | null;
 	waitingRoom: Map<number, Room>;
 	gamingRooms: Map<number, Room>;
 
 	constructor()
 	{
+		this.clientSockets = null;
 		this.waitingRoom = new Map();
 		this.gamingRooms = new Map();
+	}
+
+	saveClientSocket(socket: WSWebSocket): void
+	{
+		if (this.clientSockets === null)
+			this.clientSockets = [ socket ];
+		else if (!this.clientSockets.includes(socket))
+			this.clientSockets.push(socket);
+	}
+
+	findPlayerBySocket(socket: WSWebSocket): IPlayer | null
+	{
+		if (this.clientSockets === null)
+			return null;
+
+		for (const [key, value] of this.gamingRooms)
+		{
+			const room = value;
+			for (const [key, value] of room.players)
+			{
+				if (value.socket && value.socket === socket) {
+					console.log("GAME-CONTROL: match found between socket and saved players");
+					return value;
+				}
+			}
+		}
+		return null;
 	}
 
 	generatePlayerId(socket: WSWebSocket, data: JSONRoomDemand)
