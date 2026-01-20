@@ -1,12 +1,12 @@
 import { generateTokens, sendVerificationCodeEmail } from "../../../services/authServices.js";
-import { oauthCallbackRouteSchema } from "../../../schemas/get.callback.schema.js";
+import { getOauthCallbackSchema } from "../../../schemas/get.callback.schema.js";
 import fs from "fs";
 
 const redirectUrl = encodeURI(`${process.env.FRONTEND_DOMAIN_NAME}/oauth/callback`);
 
-export default function oauthCallbackRoute(server) {
+export default function getOauthCallback(server) {
 	const opts = {
-		schema: oauthCallbackRouteSchema,
+		schema: getOauthCallbackSchema,
 	};
 	server.get("/oauth/42/callback", opts, async (req, reply) => {
 		try {

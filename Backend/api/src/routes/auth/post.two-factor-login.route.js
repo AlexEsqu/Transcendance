@@ -1,11 +1,11 @@
 import crypto from "crypto";
 import { generateTokens } from "../../services/authServices.js";
-import { twoFactorLoginSchema } from "../../schemas/post.two-factor-login.schema.js";
+import { postTwoFactorLoginSchema } from "../../schemas/post.two-factor-login.schema.js";
 import { getUserbyId } from "../../utils/utils.js";
 
-export default function twoFactorLoginRoute(server) {
+export default function postTwoFactorLogin(server) {
 	const opts = {
-		schema: twoFactorLoginSchema,
+		schema: postTwoFactorLoginSchema,
 	};
 	server.post("/login/2fa", opts, async (req, reply) => {
 		const { code } = req.body;

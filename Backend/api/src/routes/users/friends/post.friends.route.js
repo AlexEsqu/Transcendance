@@ -1,9 +1,9 @@
 import { getUserbyId } from "../../../utils/utils.js";
-import { addFriendSchema } from "../../../schemas/post.friends.schema.js";
+import { postFriendSchema } from "../../../schemas/post.friends.schema.js";
 
-export function addFriend(server) {
+export function postFriend(server) {
 	const opts = {
-		schema: addFriendSchema,
+		schema: postFriendSchema,
 		onRequest: [server.authenticateUser, server.authenticateClient],
 		preHandler: async (req, reply) => {
 			// Verify the id passed as parameter

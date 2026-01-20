@@ -1,4 +1,4 @@
-export const verifyEmailSchema = {
+export const getVerifyEmailSchema = {
 	tags: ["auth"],
 	description:
 		"Verifies a user's email address using a `one-time token` sent by email.\

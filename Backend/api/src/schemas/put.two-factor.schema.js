@@ -1,6 +1,6 @@
 import { Security } from "../utils/openApiSecurity.js";
 
-export const updateTwoFactorStatusSchema = {
+export const putTwoFactorSchema = {
 	tags: ["user"],
 	security: Security.UserAuth,
 	description: "Enable or disable 2FA for the authenticated user.",

@@ -1,8 +1,8 @@
-import { updateTwoFactorStatusSchema } from "../../schemas/put.two-factor.schema.js";
+import { putTwoFactorSchema } from "../../schemas/put.two-factor.schema.js";
 
-export function updateTwoFactorStatusRoute(server) {
+export function putTwoFactor(server) {
 	const opts = {
-		schema: updateTwoFactorStatusSchema,
+		schema: putTwoFactorSchema,
 		onRequest: [server.authenticateUser, server.authenticateClient],
 	};
 	server.put("/me/2fa", opts, async (req, reply) => {

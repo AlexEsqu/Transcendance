@@ -1,6 +1,6 @@
 import { postResetPasswordSchema } from "../../schemas/post.reset-password.schema.js";
 
-export function postResetPassword(server) {
+export default function postResetPassword(server) {
 	const opts = {
 		schema: postResetPasswordSchema,
 		onRequest: [server.authenticateClient],

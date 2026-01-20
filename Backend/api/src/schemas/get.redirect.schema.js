@@ -1,4 +1,4 @@
-export const oauthSchema = {
+export const getOauthRedirectSchema = {
 	tags: ["OAuth"],
 	description: "Redirects the user to the 42 authorize page",
 	responses: {

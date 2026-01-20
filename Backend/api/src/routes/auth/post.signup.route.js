@@ -1,10 +1,10 @@
 import bcrypt from "bcrypt";
 import { handleSQLiteError } from "../../errors/sqliteErrors.js";
 import crypto from "crypto";
-import { signupSchema } from "../../schemas/post.signup.schema.js";
-export default function signup(server) {
+import { postSignupSchema } from "../../schemas/post.signup.schema.js";
+export default function postSignup(server) {
 	const opts = {
-		schema: signupSchema,
+		schema: postSignupSchema,
 	};
 	server.post("/signup", opts, async (request, reply) => {
 		const { username, password, email } = request.body;

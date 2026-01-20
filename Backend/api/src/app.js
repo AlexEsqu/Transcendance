@@ -9,9 +9,9 @@ import fastifyRateLimit from "@fastify/rate-limit";
 import fastifyStatic from "@fastify/static";
 import Schemas from "./schemas/index.js";
 import db from "./database.js";
-import clientAuthPlugin from "./plugins/validateApiKey.js";
-import sessionAuthPlugin from "./plugins/validateSessionToken.js";
-import authPlugin from "./plugins/jwt.js";
+import clientAuthPlugin from "./plugins/client-auth.js";
+import sessionAuthPlugin from "./plugins/refresh-auth.js";
+import authPlugin from "./plugins/user-auth.js";
 import swaggerPlugin from "./plugins/swagger.js";
 import mailerPlugin from "./plugins/mailer.js";
 

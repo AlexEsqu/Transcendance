@@ -1,8 +1,8 @@
-import { updateUsernameSchema } from "../../schemas/put.username.schema.js";
+import { putUsernameSchema } from "../../schemas/put.username.schema.js";
 
-export default function updateUsername(server) {
+export default function putUsername(server) {
 	const opts = {
-		schema: updateUsernameSchema,
+		schema: putUsernameSchema,
 		onRequest: [server.authenticateUser, server.authenticateClient],
 	};
 	server.put("/me/username", opts, async (req, reply) => {

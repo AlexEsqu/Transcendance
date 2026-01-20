@@ -1,8 +1,8 @@
-import { confirmEmailChangeSchema } from "../../schemas/get.confirm-email-change.schema.js";
+import { getConfirmEmailChangeSchema } from "../../schemas/get.confirm-email-change.schema.js";
 
-export async function confirmEmailChange(server) {
+export async function getConfirmEmailChange(server) {
 	const opts = {
-		schema: confirmEmailChangeSchema,
+		schema: getConfirmEmailChangeSchema,
 	};
 	server.get("/confirm-email-change", opts, async (req, reply) => {
 		const { token } = req.query;

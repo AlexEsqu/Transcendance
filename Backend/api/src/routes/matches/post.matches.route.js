@@ -1,8 +1,8 @@
-import { postMatchSchema } from "../../schemas/post.matches.schema.js";
+import { postMatchesSchema } from "../../schemas/post.matches.schema.js";
 
 export function postMatches(server) {
 	const opts = {
-		schema: postMatchSchema,
+		schema: postMatchesSchema,
 		onRequest: [server.authenticateClient],
 		preHandler: async (req, reply) => {
 			//Verifies the users ids

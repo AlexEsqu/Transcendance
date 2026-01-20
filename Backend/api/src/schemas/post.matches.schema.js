@@ -1,6 +1,6 @@
 import { Security } from "../utils/openApiSecurity.js";
 
-export const postMatchSchema = {
+export const postMatchesSchema = {
 	tags: ["matches"],
 	description: "Records a completed match between two users, including winner, loser, scores, and match date. `This endpoint requires client authentication.`",
 	security: Security.AppAuth,

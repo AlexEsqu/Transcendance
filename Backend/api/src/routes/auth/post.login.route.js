@@ -1,10 +1,10 @@
 import { generateTokens, sendVerificationCodeEmail } from "../../services/authServices.js";
 import bcrypt from "bcrypt";
-import { loginSchema } from "../../schemas/post.login.schema.js";
+import { postLoginSchema } from "../../schemas/post.login.schema.js";
 
-export default function login(server) {
+export default function postLogin(server) {
 	const opts = {
-		schema: loginSchema,
+		schema: postLoginSchema,
 	};
 	server.post("/login", opts, async (req, reply) => {
 		try {

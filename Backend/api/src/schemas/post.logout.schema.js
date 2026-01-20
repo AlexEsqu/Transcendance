@@ -1,6 +1,6 @@
 import { Security } from "../utils/openApiSecurity.js";
 
-export const logoutSchema = {
+export const postLogoutSchema = {
 	tags: ["auth"],
 	description:
 		"Logs the user out by invalidating the refresh token stored in the \

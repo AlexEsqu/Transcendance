@@ -1,5 +1,5 @@
 
-export const confirmEmailChangeSchema = {
+export const getConfirmEmailChangeSchema = {
 	tags: ["user"],
 	description:
 		"Changes a user's email address using a `one-time token` sent by email.\
