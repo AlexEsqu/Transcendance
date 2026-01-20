@@ -6,94 +6,96 @@
 		Game Options
 	</h1>
 
-	<!-- Choose match-location : remote or local -->
-	<section
-		class="flex flex-col my-3 gap-1">
+	<div id="game-option-container" class="flex flex-col sm:flex-row gap-6">
 
-		<label
-			for="match-location"
-			class="text-center sm-title">
-			Match location
-		</label>
-		<select
-			id="match-location"
-			name="match-location"
-			class="gentle-select-compact">
-			<option class='' value="local">Local</option>
-			<option class='' value="remote">Remote</option>
-		</select>
-	</section>
+		<div id="game-setting-container" class="flex flex-col gap-4 flex-1 min-w-60">
+			<!-- Choose match-location : remote or local -->
+			<section id="match-location-section" class="flex flex-col gap-1">
 
-	<!-- Choose game-type : classic (1vsAI or 1vs1) or tournament -->
-	<section
-		class="flex flex-col my-3 gap-1">
+				<label
+					for="match-location"
+					class="text-center sm-title">
+					Match location
+				</label>
+				<select
+					id="match-location"
+					name="match-location"
+					class="gentle-select-compact">
+					<option class='' value="local">Local</option>
+					<option class='' value="remote">Remote</option>
+				</select>
+			</section>
 
-		<label
-			for="match-type-container"
-			class="text-center sm-title ">
-			Match type
-		</label>
-		<div
-			id="match-type-container">
-			<!-- inputs are handled dynamically -->
+			<!-- Choose game-type : classic (1vsAI or 1vs1) or tournament -->
+			<section id="match-type-section" class="flex flex-col gap-1">
+
+				<label
+					for="match-type-container"
+					class="text-center sm-title ">
+					Match type
+				</label>
+				<div
+					id="match-type-container">
+					<!-- inputs are handled dynamically -->
+				</div>
+			</section>
+
+			<!-- Choose game level : the higher the level, the more challenging it is -->
+			<section id="match-level-container" class="flex flex-col gap-1">
+
+				<label
+					for="level"
+					class="text-center sm-title ">
+					How intense ?
+				</label>
+				<select
+					id="level"
+					name="level"
+					class="gentle-select-compact"
+					title="The higher the level, the more challenging it is">
+
+					<option value="0">easy</option>
+					<option value="1">medium</option>
+					<option value="2">hard</option>
+				</select>
+			</section>
 		</div>
-	</section>
 
-	<!-- Choose participants -->
-	<section
-		class="flex flex-col my-3 gap-1">
+		<div id="game-customization-container" class="flex flex-col sm:flex-row gap-6">
+			<!-- Choose participants -->
+			<section id="customize-name-container" class="flex flex-col gap-1 min-w-36">
 
-		<label
-			for="players-container"
-			class="text-center sm-title ">
-			Who fights ?
-		</label>
-		<div
-			id="players-container"
-			class="w-full flex flex-col gap-1"
-			title="Choose participants">
-			<!-- inputs are handled dynamically -->
+				<label
+					for="players-container"
+					class="text-center sm-title ">
+					Who fights ?
+				</label>
+				<div
+					id="players-container"
+					class="w-full flex flex-col gap-1"
+					title="Choose participants">
+					<!-- inputs are handled dynamically -->
+				</div>
+			</section>
+
+			<!-- Choose paddle colors for each player -->
+			<section id="customize-paddle-container" class="flex flex-col gap-1 min-w-36">
+
+				<label
+					for="paddle-colors-container"
+					class="text-center sm-title ">
+					Paddle color
+				</label>
+				<div
+					id="paddle-colors-container"
+					class="w-full flex flex-col flex-wrap gap-1">
+					<!-- inputs are handled dynamically -->
+				</div>
+			</section>
 		</div>
-	</section>
 
-	<!-- Choose paddle colors for each player -->
-	<section
-		class="flex flex-col my-3 gap-1">
+	</div>
 
-		<label
-			for="paddle-colors-container"
-			class="text-center sm-title ">
-			Customize paddle's color
-		</label>
-		<div
-			id="paddle-colors-container"
-			class="w-full flex flex-col flex-wrap gap-1">
-			<!-- inputs are handled dynamically -->
-		</div>
-	</section>
-
-	<!-- Choose game level : the higher the level, the more challenging it is -->
-	<section
-		class="flex flex-col my-3 gap-1">
-
-		<label
-			for="level"
-			class="text-center sm-title ">
-			How intense ?
-		</label>
-		<select
-			id="level"
-			name="level"
-			class="gentle-select-compact"
-			title="The higher the level, the more challenging it is">
-
-			<option value="0">easy</option>
-			<option value="1">medium</option>
-			<option value="2">hard</option>
-		</select>
-	</section>
-
-	<!-- When every settings are good, submit the form -->
 	<button
 		class="glow-button mt-5"
 		type="submit"

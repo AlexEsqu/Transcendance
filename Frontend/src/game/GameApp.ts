@@ -37,7 +37,7 @@ export class GameApp
 				}
 
 				console.log("GAME-FRONT: connection with game-server");
-				
+
 				//	On socket creation send a demand to the server to add (each) player(s) in a waiting room
 				const players = this.pong.scene.players;
 				for (const player of players)
@@ -88,12 +88,12 @@ export class GameApp
 			this.gamingSocket = new WebSocket(`wss://${window.location.host}${Pong.GAMING_ROOM_URL}`);
 			if (!this.gamingSocket)
 				throw new Error("'gamingSocket' not found");
-	
+
 			this.gamingSocket.onopen = (event) => {
 				if (this.roomId === undefined || !this.gamingSocket) {
 					throw new Error("GAME-FRONT: can't identify client, impossible to enter the gaming room");
 				}
-	
+
 				console.log(`GAME-FRONT: joining the gaming room(${this.roomId})`);
 
 				//	On socket creation send a message to the game-server to obtain the game info
@@ -102,7 +102,7 @@ export class GameApp
 				// this.pong.scene.state = this.pong.scene.options.matchLocation === 'local' ? PlayerState.opening : PlayerState.waiting;
 				this.pong.runGame();
 			};
-	
+
 			this.gamingSocket.onmessage = (event) => {
 				try
 				{
@@ -113,7 +113,7 @@ export class GameApp
 						// console.log(`GAME-FRONT: game state from room(${this.roomId}) =`, gameState);
 						if (!this.pong.processServerGameState(gameState))
 							this.isPlayerReady = false;
-	
+
 				}
 				catch (error)
 				{
@@ -121,7 +121,7 @@ export class GameApp
 					return ;
 				}
 			};
-	
+
 			this.gamingSocket.onerror = (error) => {
 				// console.error(error);
 				this.gamingSocket?.close();
@@ -145,7 +145,7 @@ export class GameApp
 				this.isPlayerReady = true;
 				if (this.pong.scene.options.matchLocation === 'remote')
 					setNotification(true, "Wait for the other player to be ready");
-				
+
 				//	Notify the server that player(s) is ready to play
 				if (this.pong.scene.options.matchLocation === 'local')
 				{
