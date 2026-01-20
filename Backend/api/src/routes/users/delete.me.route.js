@@ -1,9 +1,9 @@
 import fs from "fs";
-import { deleteUserSchema } from "../../schemas/delete.me.schema.js";
+import { deleteMeSchema } from "../../schemas/delete.me.schema.js";
 //TODO: GDPR => DONT FORGET TO ANONIMIZE THE USER EVERYWHERE IN DB
-function deleteUser(server) {
+function deleteMe(server) {
 	const opts = {
-		schema: deleteUserSchema,
+		schema: deleteMeSchema,
 		onRequest: [server.authenticateUser, server.authenticateClient],
 	};
 	server.delete("/me", opts, (req, reply) => {
@@ -32,4 +32,4 @@ function deleteUser(server) {
 	});
 }
 
-export default deleteUser;
+export default deleteMe;

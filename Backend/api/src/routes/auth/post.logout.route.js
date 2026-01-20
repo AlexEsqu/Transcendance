@@ -1,8 +1,8 @@
-import { logoutSchema } from "../../schemas/post.logout.schema.js";
+import { postLogoutSchema } from "../../schemas/post.logout.schema.js";
 
-export default function logout(server) {
+export default function postLogout(server) {
 	const opts = {
-		schema: logoutSchema,
+		schema: postLogoutSchema,
 		onRequest: [server.authenticateClient, server.authenticateRefreshToken],
 	};
 	server.post("/logout", opts, async (req, reply) => {

@@ -1,6 +1,6 @@
 import { Security } from "../utils/openApiSecurity.js";
 
-export const deleteUserSchema = {
+export const deleteMeSchema = {
 	tags: ["user"],
 	description: "Deletes the user account and all its data. `This endpoint requires client AND user authentication.`",
 	security: Security.UserAuth,

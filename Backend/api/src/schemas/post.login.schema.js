@@ -1,4 +1,4 @@
-export const loginSchema = {
+export const postLoginSchema = {
 	description:
 		"Authenticates the user using their login (email or username) and password. \
    If authentication succeeds and two-factor authentication (2FA) is disabled, \

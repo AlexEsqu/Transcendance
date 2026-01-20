@@ -1,6 +1,6 @@
 import { Security } from "../utils/openApiSecurity.js";
 
-export const twoFactorLoginSchema = {
+export const postTwoFactorLoginSchema = {
 	description: "Verify a user's 2FA code sent during login",
 	tags: ["auth"],
 	cookies: {

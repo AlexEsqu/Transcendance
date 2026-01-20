@@ -1,9 +1,9 @@
 /* eslint-disable no-undef */
-import { verifyEmailSchema } from "../../schemas/get.verify-email.schema.js";
+import { getVerifyEmailSchema } from "../../schemas/get.verify-email.schema.js";
 
-export default function verifyEmail(server) {
+export default function getVerifyEmail(server) {
 	const opts = {
-		schema: verifyEmailSchema,
+		schema: getVerifyEmailSchema,
 	};
 	server.get("/verify-email", opts, async (request, reply) => {
 		try {

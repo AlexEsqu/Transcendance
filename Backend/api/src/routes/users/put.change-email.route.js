@@ -1,8 +1,8 @@
-import { changeEmailSchema } from "../../schemas/put.change-email.schema.js";
+import { putChangeEmailSchema } from "../../schemas/put.change-email.schema.js";
 import crypto from "crypto";
-export async function changeEmail(server) {
+export async function putChangeEmail(server) {
 	const opts = {
-		schema: changeEmailSchema,
+		schema: putChangeEmailSchema,
 		onRequest: [server.authenticateUser],
 	};
 	server.put("/me/change-email", opts, async (req, reply) => {

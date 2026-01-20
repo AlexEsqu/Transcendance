@@ -1,9 +1,9 @@
 import { createRefreshToken, createAccessToken, hashRefreshToken } from "../../services/authServices.js";
-import { refreshSchema } from "../../schemas/post.refresh.schema.js";
+import { postRefreshSchema } from "../../schemas/post.refresh.schema.js";
 
-function refresh(server) {
+function postRefresh(server) {
 	const opts = {
-		schema: refreshSchema,
+		schema: postRefreshSchema,
 		onRequest: [server.authenticateClient, server.authenticateRefreshToken],
 	};
 	server.post("/refresh", opts, async (req, reply) => {
@@ -44,4 +44,4 @@ function refresh(server) {
 	});
 }
 
-export default refresh;
+export default postRefresh;

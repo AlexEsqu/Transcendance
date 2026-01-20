@@ -1,4 +1,4 @@
-export const oauthCallbackRouteSchema = {
+export const getOauthCallbackSchema = {
 	tags: ["OAuth"],
 	description:
 		"Handles the OAuth2 callback from 42. Verifies the authorization code and state,\

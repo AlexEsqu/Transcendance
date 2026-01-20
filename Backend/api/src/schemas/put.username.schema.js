@@ -1,6 +1,6 @@
 import { Security } from "../utils/openApiSecurity.js";
 
-export const updateUsernameSchema = {
+export const putUsernameSchema = {
 	tags: ["user"],
 	security: Security.UserAuth,
 	description: "Modifies the username of the user. `This endpoint requires client AND user authentication.`",

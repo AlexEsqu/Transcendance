@@ -1,4 +1,4 @@
-export const sendEmailVerificationSchema = {
+export const postSendVerifyEmailSchema = {
 	tags: ["auth"],
 	description: "Sends an email verification email to the user's email address",
 	body: {

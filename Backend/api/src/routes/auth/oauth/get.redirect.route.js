@@ -1,8 +1,8 @@
-import { oauthSchema } from "../../../schemas/get.redirect.schema.js";
+import { getOauthRedirectSchema } from "../../../schemas/get.redirect.schema.js";
 
-export default function oauthRoute(server) {
+export default function getOauthRedirect(server) {
 	const opts = {
-		schema: oauthSchema,
+		schema: getOauthRedirectSchema,
 	};
 	server.get("/oauth/42", opts, (req, reply) => {
 		try {

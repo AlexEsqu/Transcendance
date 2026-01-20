@@ -1,9 +1,6 @@
-import { Security } from "../utils/openApiSecurity.js";
-
-export const putChangeEmailSchema = {
-	tags: ["user"],
-	security: Security.UserAuth,	
-	description: "Changes the email of the user",
+export const postResetPasswordSchema = {
+	tags: ["auth"],
+	description: "Reset user password",
 	body: {
 		type: "object",
 		required: ["email"],
@@ -13,15 +10,11 @@ export const putChangeEmailSchema = {
 	},
 	response: {
 		200: {
-			description: "Success: Email changed successfully",
+			description: "Success: Password reset email sent",
 			$ref: "SuccessMessageResponse#",
 		},
 		400: {
 			description: "Bad Request: Invalid input or missing fields",
-			$ref: "errorResponse#",
-		},
-		401: {
-			description: "Unauthorized: Invalid credentials",
 			$ref: "errorResponse#",
 		},
 		500: {
@@ -33,4 +26,5 @@ export const putChangeEmailSchema = {
 			$ref: "errorResponse#",
 		},
 	},
-}
+	
+};
