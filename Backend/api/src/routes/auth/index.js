@@ -7,6 +7,7 @@ import verifyEmail from "./get.verify-email.route.js";
 import twoFactorLoginRoute from "./post.two-factor-login.route.js";
 import oauthCallbackRoute from "./oauth/get.callback.route.js";
 import oauthRoute from "./oauth/get.redirect.route.js";
+import { postResetPassword } from "./post.reset-password.route.js";
 
 export default async function authRoutes(server) {
 	server.register(signup, { prefix: "api/users" });
@@ -18,4 +19,5 @@ export default async function authRoutes(server) {
 	server.register(twoFactorLoginRoute, { prefix: "api/users/auth" });
 	server.register(oauthRoute, { prefix: "api/users/auth" });
 	server.register(oauthCallbackRoute, { prefix: "api/users/auth" });
+	server.register(postResetPassword, { prefix: "api/users/auth" });
 }
