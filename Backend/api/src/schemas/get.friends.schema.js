@@ -4,8 +4,8 @@ export const getFriendsSchema = {
 	tags: ["user"],
 	security: Security.UserAuth,
 	description:
-		"Returns the complete list of friends of the authenticated user.
-		Returns basic profile information for each friend.
+		"Returns the complete list of friends of the authenticated user.\
+		Returns basic profile information for each friend.\
 		`This endpoint requires client authentication AND user authentication.`",
 	response: {
 		200: {
