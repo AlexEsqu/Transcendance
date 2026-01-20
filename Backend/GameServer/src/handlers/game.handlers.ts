@@ -33,12 +33,15 @@ function handleMessage(socket: WSWebSocket, message: Buffer,
 		const gamingRoom: Room | undefined = gameControl.getGamingRoom(data.roomId);
 
 		// console.log(`DEBUG `, data.username);
-		if (player === undefined || gamingRoom === undefined)
+		if (player === undefined || gamingRoom === undefined) {
+			socket.send(JSON.stringify(getJSONError("Bad request", 400)));
 			throw new Error("GAME-HANDLER: player or gaming room not found, can't handle user message on 'room/game' route");
+		}
 
 		if (player.username === data.username)
 			player.socket = socket;
 
+		//	Send game first data to players so they can start to display something
 		if (gamingRoom.gameLoop && gamingRoom.gameLoopStarted === false)
 			notifyPlayersInRoom(gamingRoom, gamingRoom.gameLoop.composeGameState());
 
@@ -50,9 +53,7 @@ function handleMessage(socket: WSWebSocket, message: Buffer,
 		
 		//	If all players are ready launch the game
 		if (gamingRoom.isEveryoneReady() === true && gamingRoom.gameLoopStarted === false)
-		{
 			gamingRoom.startGame(gameControl);
-		}
 
 		//	If player is ready & wants to move, update its paddle pos
 		if (gamingRoom.isEveryoneReady() === true && data.move)
@@ -96,7 +97,7 @@ function handleDisconnection(socket: WSWebSocket, gameControl: GameControl): voi
 			gamingRoom.gameLoop.rightPadd.score = gamingRoom.gameLoop.INFO.MAX_SCORE;
 		else if (gamingRoom.gameLoop.rightPadd.player.username === player.username)
 			gamingRoom.gameLoop.leftPadd.score = gamingRoom.gameLoop.INFO.MAX_SCORE;
-		else if (gamingRoom.players.has(player.username))
+		if (gamingRoom.players.has(player.username))
 		{
 			//	Only if the match is a tournament && player is disconnected but not currently playing
 			const disconnected = gamingRoom.players.get(player.username);
@@ -105,10 +106,12 @@ function handleDisconnection(socket: WSWebSocket, gameControl: GameControl): voi
 				disconnected.socket?.close();
 				disconnected.socket = null;
 			}
+			gamingRoom.gameLoop.state = State.play;
 		}
 		else {
 			gamingRoom.gameLoop.state = State.end;
 			console.log("GAME-HANDLER: disconnection of a player but player not found in the gaming room");
 		}
 	}
+	notifyPlayersInRoom(gamingRoom, `${player.username} has left room ${gamingRoom.id}`);
 }

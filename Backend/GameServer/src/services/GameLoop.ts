@@ -188,6 +188,7 @@ export class GameLoop
 			this.state = State.waiting;
 			if (this.rounds.nbOfRounds >= this.INFO.MAX_ROUNDS)
 				this.state = State.end;
+			console.log(`STATE IS ${this.state}`);
 			return true;
 		}
 		return false;
@@ -203,7 +204,7 @@ export class GameLoop
 			this.state = State.waiting;
 
 		//	Save the results of the previous match, if there was one
-		if (this.rounds && this.rounds.nbOfRounds !== 0)
+		if (this.rounds.nbOfRounds !== 0)
 			this.saveResults();
 
 		if (this.state === State.end)
@@ -265,10 +266,12 @@ export class GameLoop
 			minScore: loser.score
 		};
 
-		if (this.rounds && !this.rounds.results)
+		if (!this.rounds.results)
 			this.rounds.results = [ results ];
-		else if (this.rounds)
+		else
 			this.rounds.results?.push(results);
+
+		console.log(`GAME-LOOP: for round ${this.rounds.nbOfRounds} the winner is ${winner.player}`);
 	}
 
 	resetBall(): void
