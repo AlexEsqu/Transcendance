@@ -3,7 +3,7 @@ import { Security } from "../utils/openApiSecurity.js";
 export const deleteFriendSchema = {
 	tags: ["user"],
 	description:
-		"Deletes a friend from the authenticated user's friend list using the id passed in the body.
+		"Deletes a friend from the authenticated user's friend list using the id passed in the body.\
 			`This endpoint requires client authentication AND user authentication.`",
 	security: Security.UserAuth,
 	body: { $ref: "userIdObject#" },

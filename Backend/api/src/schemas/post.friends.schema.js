@@ -3,9 +3,9 @@ import { Security } from "../utils/openApiSecurity.js";
 export const addFriendSchema = {
 	tags: ["user"],
 	description:
-		"Adds a new friend to the authenticated user's friend list.
-						The new friend's `id` provided in the request body is validated before the friendship record is created.
-						`This endpoint requires client authentication AND user authentication.`",
+		"Adds a new friend to the authenticated user's friend list.\
+		The new friend's `id` provided in the request body is validated before the friendship record is created.\
+		`This endpoint requires client authentication AND user authentication.`",
 
 	security: Security.UserAuth,
 	body: { $ref: "userIdObject#" },
