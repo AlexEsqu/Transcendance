@@ -84,56 +84,66 @@ export class GameApp
 
 	goToGamingRoom(): void
 	{
-		setTimeout(() => {
-			this.gamingSocket = new WebSocket(`wss://${window.location.host}${Pong.GAMING_ROOM_URL}`);
-			if (!this.gamingSocket)
-				throw new Error("'gamingSocket' not found");
-	
-			this.gamingSocket.onopen = (event) => {
-				if (this.roomId === undefined || !this.gamingSocket) {
-					throw new Error("GAME-FRONT: can't identify client, impossible to enter the gaming room");
-				}
-	
-				console.log(`GAME-FRONT: joining the gaming room(${this.roomId})`);
+		this.gamingSocket = new WebSocket(`wss://${window.location.host}${Pong.GAMING_ROOM_URL}`);
+		if (!this.gamingSocket)
+			throw new Error("'gamingSocket' not found");
 
-				//	On socket creation send a message to the game-server to obtain the game info
-				this.sendUpdateToGameServer(this.pong.mainPlayerUsername, 'none', this.isPlayerReady);
-				//	Start to display (not playing) the game scene
-				// this.pong.scene.state = this.pong.scene.options.matchLocation === 'local' ? PlayerState.opening : PlayerState.waiting;
-				this.pong.runGame();
-			};
-	
-			this.gamingSocket.onmessage = (event) => {
-				try
+		this.gamingSocket.onopen = (event) => {
+			if (this.roomId === undefined || !this.gamingSocket)
+				throw new Error("GAME-FRONT: can't identify client, impossible to enter the gaming room");
+
+			console.log(`GAME-FRONT: joining the gaming room(${this.roomId})`);
+
+			//	On socket creation send a message to the game-server to obtain the game info
+			this.sendUpdateToGameServer(this.pong.mainPlayerUsername, 'none', this.isPlayerReady);
+			//	Start to display (not playing) the game scene
+			this.pong.runGame();
+		};
+
+		this.gamingSocket.onmessage = (event) => {
+			try
+			{
+				if (this.roomId === undefined || !this.gamingSocket)
+					throw new Error("GAME-FRONT: can't identify client, impossible to process the message received from server");
+
+				if (event.data.includes("left room"))
 				{
-					if (this.roomId === undefined || !this.gamingSocket)
-						throw new Error("GAME-FRONT: can't identify client, impossible to process the message received from server");
-
-						const gameState: JSONGameState = JSON.parse(event.data);
-						// console.log(`GAME-FRONT: game state from room(${this.roomId}) =`, gameState);
-						if (!this.pong.processServerGameState(gameState))
-							this.isPlayerReady = false;
-	
+					console.log(`GAME-FRONT: ${event.data}`);
+					setNotification(true, "Opponent has left the game, you win");
 				}
-				catch (error)
+				else if (event.data.includes("Bad request"))
 				{
-					console.error(error);
-					return ;
+					console.log(`GAME-FRONT: ${event.data}`);
+					setNotification(true, "Something went wrong while loading the game\nPlease try again");
+					this.pong.scene.state = PlayerState.stop;
+					this.closeSockets();
 				}
-			};
-	
-			this.gamingSocket.onerror = (error) => {
-				// console.error(error);
-				this.gamingSocket?.close();
-				this.gamingSocket = null;
-				throw new Error(error.toString());
-			};
+				else
+				{
+					const gameState: JSONGameState = JSON.parse(event.data);
+					// console.log(`GAME-FRONT: game state from room(${this.roomId}) =`, gameState);
+					if (!this.pong.processServerGameState(gameState))
+						this.isPlayerReady = false;
+				}
+			}
+			catch (error)
+			{
+				console.error(error);
+				return ;
+			}
+		};
 
-			this.gamingSocket.onclose = () => {
-				console.log("GAME-FRONT: You left the game, websocket (for route 'game') is closed");
-				this.pong.scene.state = PlayerState.end;
-			};
-		}, 1000);
+		this.gamingSocket.onerror = (error) => {
+			// console.error(error);
+			this.gamingSocket?.close();
+			this.gamingSocket = null;
+			throw new Error(error.toString());
+		};
+
+		this.gamingSocket.onclose = () => {
+			console.log("GAME-FRONT: You left the game, websocket (for route 'game') is closed");
+			this.pong.scene.state = PlayerState.end;
+		};
 	}
 
 	getReadyToPlay(keys: Record<string, boolean>): void
@@ -181,19 +191,34 @@ export class GameApp
 
 		this.gamingSocket.send(JSON.stringify(gameUpdateMsg));
 	}
+
+	closeSockets(): void
+	{
+		if (this.waitingSocket !== null)
+		{
+			this.waitingSocket.close();
+			this.waitingSocket = null;
+		}
+		if (this.gamingSocket !== null)
+		{
+			this.gamingSocket.close();
+			this.gamingSocket = null;
+		}
+	}
 }
 
 export async function launchPongGame(options: IOptions): Promise<void>
 {
-	const element = document.getElementById('player-ready-input') as HTMLElement;
-	if (element)
-		element.style.display = 'none';
-
+	let clean: (() => void) | null = null;
 	try {
 		const app = new GameApp(options);
+		clean = app.closeSockets;
 		await app.goToWaitingRoom();
-		app.goToGamingRoom();
+		setTimeout(() => { app.goToGamingRoom(); }, 1000);
 	} catch (error) {
-		console.error(error); // TO DO: better error handling
+		console.error(error);
+		setNotification(true, "Something went wrong while loading the game\nPlease try again");
+		if (clean)
+			clean();
 	}
 }

@@ -19,13 +19,16 @@ const launchGameServer = async () => {
 		//	When a signal is catched clean data, close sockets and quit the server
 		process.on(signal, async () => {
 			gameServer.log.info(`GAME-SERVER received ${signal}, closing server`);
+			console.log(`GAME-SERVER received ${signal}, closing server`);
 
 			try {
 				await gameServer.close();
 				gameServer.log.info(`GAME-SERVER closed successfully`);
+				console.log(`GAME-SERVER closed successfully`);
 				process.exit(0);
 			} catch (err) {
 				gameServer.log.error(`GAME-SERVER catched an error during shutdown`);
+				console.error(`GAME-SERVER catched an error during shutdown`);
 				process.exit(1);
 			}
 		});

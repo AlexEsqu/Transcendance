@@ -68,13 +68,13 @@ function createMap(scene: Scene, height: number, width: number, colorHex: string
 	mapMaterial.emissiveColor = new Color3().fromHexString(colorHex);
 	map.material = mapMaterial;
 	
-	const border: GroundMesh = MeshBuilder.CreateGround(
-		'border',
-		{
-			width: 0.1, height: height
-		},
-		scene
-	);
+	// const border: GroundMesh = MeshBuilder.CreateGround(
+	// 	'border',
+	// 	{
+	// 		width: 0.1, height: height
+	// 	},
+	// 	scene
+	// );
 
 	return map;
 }
@@ -87,30 +87,30 @@ function createCamera(scene: Scene, matchLocation: string): ArcRotateCamera | nu
 {
 	if (!scene || scene === undefined) return null;
 
-	if (matchLocation === 'remote')
-	{
-		const camera: ArcRotateCamera = new ArcRotateCamera(
-			'arCamera',
-			0, // alpha
-			Math.PI / 3, // beta
-			13, // radius
-			new Vector3((GAME_SIZE.MAP_WIDTH / 2) - 3, 0.5, 0.0), // target
-			scene
-		);
-		return camera;
-	}
-	else
-	{
-		const camera: ArcRotateCamera = new ArcRotateCamera(
-			'arCamera',
-			-(Math.PI / 2), // alpha
-			0, // beta
-			12, // radius
-			new Vector3(0.0, -1, 0.0), // target
-			scene
-		);
-		return camera;
-	}
+	// if (matchLocation === 'remote')
+	// {
+	// 	const camera: ArcRotateCamera = new ArcRotateCamera(
+	// 		'arCamera',
+	// 		0, // alpha
+	// 		Math.PI / 3, // beta
+	// 		13, // radius
+	// 		new Vector3((GAME_SIZE.MAP_WIDTH / 2) - 3, 0.5, 0.0), // target
+	// 		scene
+	// 	);
+	// 	return camera;
+	// }
+	// else
+	// {
+	const camera: ArcRotateCamera = new ArcRotateCamera(
+		'arCamera',
+		-(Math.PI / 2), // alpha
+		0, // beta
+		12, // radius
+		new Vector3(0.0, -1, 0.0), // target
+		scene
+	);
+	return camera;
+	// }
 	//	Allow to move the camera with the mouse -> uncomment for debug
 	// camera.attachControl(canvas, true);
 }
