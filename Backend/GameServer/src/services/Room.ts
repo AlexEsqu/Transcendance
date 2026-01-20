@@ -100,8 +100,10 @@ export class Room
 	{
 		for (const [key, value] of this.players)
 		{
-			if (value.socket)
+			if (value.socket) {
 				value.socket.close();
+				value.socket = null;
+			}
 		}
 		this.gameLoop = null;
 	}
