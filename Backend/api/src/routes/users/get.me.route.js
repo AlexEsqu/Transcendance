@@ -14,17 +14,11 @@ export async function getMe(server) {
 			if (!user) {
 				return reply.status(404).send({ error: "Not Found", message: "User not found" });
 			}
-			delete user.password_hash;
-			delete user.refresh_token_hash;
-			delete user.code_hash_2fa;
-			delete user.code_expires_2fa;
-			delete user.code_attempts_2fa;
-			delete user.email_verify_token;
-			delete user.email_verify_expires;
-
 			const stmnt = server.db.prepare(`SELECT * FROM matches WHERE winner_id = ? OR loser_id = ?`);
 			const matches = stmnt.all(id, id);
 			user.matches = matches;
+			user.is_password_set = user.password_hash ? "true" : "false";
+			console.log(user.is_password_set)
 			formatUserObject(user);
 			console.log(user);
 			return reply.status(200).send(user);

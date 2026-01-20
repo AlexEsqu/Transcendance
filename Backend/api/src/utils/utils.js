@@ -4,7 +4,6 @@ export function formatUserObject(user) {
 	}
 	user.is_active = computeActive(user.last_activity);
 	user.oauth = user.oauth_provider ? "true" : "false";
-	delete user.last_activity;
 }
 
 export async function getUserbyId(id, db) {
