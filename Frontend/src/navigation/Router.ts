@@ -4,25 +4,35 @@ import { User, RegisteredUser } from "../user/User";
 import { getNavBarHtml } from './navSection';
 import { apiDomainName } from "../user/UserState";
 import { initOAuthCallback } from "../auth/OAuth";
-import { getConnectionLandingHtml, getConnectionForm, initConnectionPageListeners} from '../auth/connectionPage'
-import { getDashboardPage, initDashboardPageListeners } from "../dashboard/dashboardPage";
-import { getGameHtml, getGameOptionHtml, initGamePageListeners } from "../game/display";
-import { getSettingPage } from "../settings/settingPage";
-import { getErrorPage } from "../error/error";
+import { getConnectionPage, getGuestForm, getLoginForm, getRegisterForm, onAliasLoaded, onLoginLoaded, onRegisterLoaded } from '../auth/connectionPage'
+import { getDashboardPage, onDashboardLoaded, cleanupDashboardPage } from "../dashboard/dashboardPage";
+import { getGamePage, onGameLoaded, cleanGamePage } from "../game/display";
+import { getSettingPage, onSettingsLoaded, cleanupSettingPage } from "../settings/settingPage";
+import { getErrorPage, openErrorModal } from "../error/error";
 
 export { Router }
 export type { Route, getPageHtmlFunction }
 
-// all page must provide a function to get their HTML content as string
+// all routes must provide a function to get their HTML content as string
 type getPageHtmlFunction = () => string;
+
+// routes may provide a function to get the JS to activate the HTML content
+type initPageJSFunction = (() => void) | (() => Promise<void>);
+
+// routes may provide a function to execute when the user leaves the page
+type cleanPageFunction = (() => void) | (() => Promise<void>);
 
 // all routes must fit this pattern
 interface Route
 {
+	// mandatory
 	path: string;
 	getPage: getPageHtmlFunction;
+
+	// optional
+	initPage: initPageJSFunction;
+	cleanPage: cleanPageFunction;
 	needUser: boolean;
-	needRegisteredUser: boolean;
 }
 
 class Router
@@ -42,6 +52,9 @@ class Router
 	// track if navbar is currently initialized
 	navbarInitialized: boolean = false;
 
+	// function stored to be executed before next render
+	cleanUp: cleanPageFunction | null = null;
+
 	//--------------------------- CONSTRUCTORS ------------------------------//
 
 	constructor (userState: UserState, rootSelector: string)
@@ -59,7 +72,7 @@ class Router
 		// plug into back / forward browser buttons to render the last state
 		window.addEventListener('popstate', () => this.render());
 
-		// prevent page refresh to stay on single page app
+		// prevent page refresh when changing page to stay on single page app
 		document.body.removeEventListener('click', this.handleClickInSinglePage);
 		document.body.addEventListener('click', this.handleClickInSinglePage);
 
@@ -85,16 +98,21 @@ class Router
 	//-------------------------- NAVIGATION ---------------------------------//
 
 
-	addRoute(path: string,
-			getPage: getPageHtmlFunction,
-			needUser = false,
-			needRegisteredUser = false)
+	addRoute(
+		path: string,
+		getPage: getPageHtmlFunction,
+		initPage: initPageJSFunction = () => {},
+		cleanPage: cleanPageFunction = () => {},
+		needUser:boolean = false
+	)
 	{
-		this.routes.push({ path, getPage, needUser, needRegisteredUser });
+		this.routes.push({ path, getPage, initPage, cleanPage, needUser });
 	}
 
-	render()
+	async render()
 	{
+		await this.executeLastPageCleanup();
+
 		const currentPath = window.location.pathname;
 		const currentSearch = window.location.search;
 		const user = this.userState.getUser();
@@ -102,28 +120,35 @@ class Router
 		const route = this.validateRoute(currentPath);
 		const targetPath = route.path;
 
-		this.rootElement.innerHTML = route.getPage();
-
 		this.renderNavbar(user);
-		console.log(`target path: ${targetPath}`);
-		const event = new CustomEvent('pageLoaded', { detail: { path: targetPath, search: currentSearch } });
-		console.log("dispatching event:");
-		console.log(event);
-		document.dispatchEvent(event);
+
+		this.rootElement.innerHTML = route.getPage();
+		await route.initPage();
+
+		this.storeCleanupForNextRender(route);
+
+		// warn all subscribed that a new page has loaded
+		this.notifyThatPageHasLoaded(targetPath, currentSearch);
 	}
 
 	// uses window.history.pushState, for app navigation (allow back and forth)
 	// and path validation to make sure no innaccessible page is accessed
 	navigateTo(path: string)
 	{
-		if (this.isValidPath(path))
+		try
 		{
-			window.history.pushState(null, '', path);
-			this.render();
+			if (this.isValidPath(path))
+			{
+				window.history.pushState(null, '', path);
+				this.render();
+			}
+			else
+				throw new Error(`Inaccessible page: ${path}`);
 		}
-		else
+		catch (err)
 		{
-			console.log(`Inaccessible page: ${path}`);
+			if (err instanceof Error)
+				openErrorModal(err);
 		}
 	}
 
@@ -205,9 +230,7 @@ class Router
 	{
 		if (!user && route.needUser)
 			return false;
-		if (user && !route.needUser)
-			return false;
-		if (!(user instanceof RegisteredUser) && route.needRegisteredUser)
+		if (user && !route.needUser && route.path !== '/error')
 			return false;
 		return true;
 	}
@@ -232,23 +255,42 @@ class Router
 
 	registerRoutes()
 	{
-		this.addRoute('/connection', getConnectionLandingHtml);
-		this.addRoute('/connection/login', getConnectionForm);
-		this.addRoute('/connection/register', getConnectionForm);
-		this.addRoute('/connection/alias', getConnectionForm);
+		// AUTHENTICATION, requires no user to be registered
+		this.addRoute('/connection', getConnectionPage);
+		this.addRoute('/connection/login', getLoginForm, onLoginLoaded);
+		this.addRoute('/connection/register', getRegisterForm, onRegisterLoaded);
+		this.addRoute('/connection/alias', getGuestForm, onAliasLoaded);
 
-		this.addRoute('/dashboard', getDashboardPage, true);
-		this.addRoute('/settings', getSettingPage, true);
-
-		this.addRoute('/game/options', getGameOptionHtml, true);
-		this.addRoute('/game', getGameHtml, true);
-
+		// CONTENT, requires user to be registered or guests
+		this.addRoute('/dashboard', getDashboardPage, onDashboardLoaded, cleanupDashboardPage, true);
+		this.addRoute('/settings', getSettingPage, onSettingsLoaded, cleanupSettingPage, true);
+		this.addRoute('/game', getGamePage, onGameLoaded, cleanGamePage, true);
 		this.addRoute('/error', getErrorPage);
 
+		// SPECIAL CASE for oauth callback
 		this.addRoute('/oauth/callback', () => {
 			initOAuthCallback();
 			return '<div id="oauth-callback"></div>';
-		}, false, false);
+		}, ()=>{}, ()=>{}, false);
 	}
 
+	async executeLastPageCleanup(): Promise<void>
+	{
+		if (this.cleanUp)
+		{
+			await this.cleanUp();
+			this.cleanUp = null;
+		}
+	}
+
+	storeCleanupForNextRender(route: Route): void
+	{
+		this.cleanUp = route.cleanPage;
+	}
+
+	notifyThatPageHasLoaded(targetPath: string, currentSearch: string): void
+	{
+		const event = new CustomEvent('pageLoaded', { detail: { path: targetPath, search: currentSearch } });
+		document.dispatchEvent(event);
+	}
 }

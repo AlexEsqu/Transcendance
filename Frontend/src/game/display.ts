@@ -9,11 +9,11 @@ import optionsHtml from '../html/forms/gameOptionsForm.html?raw'
 
 /************************************************************************************************************/
 
-export { getGameHtml, getGameOptionHtml, initGamePageListeners, setNotification };
+export { getGamePage, onGameLoaded, getGameOptionHtml, cleanGamePage, setNotification };
 
 /************************************************************************************************************/
 
-function getGameHtml(): string
+function getGamePage(): string
 {
 	return gameHtml;
 }
@@ -21,46 +21,6 @@ function getGameHtml(): string
 function getGameOptionHtml(): string
 {
 	return optionsHtml;
-}
-
-function initGamePageListeners(): void
-{
-	document.addEventListener('pageLoaded', (event: Event) => {
-		const customEvent = event as CustomEvent<{ path: string; search: string }>;
-		const { path, search } = customEvent.detail;
-
-		switch (path)
-		{
-
-			case '/game/options':
-			{
-				onGameOptionLoaded();
-				return;
-			}
-
-			case '/game':
-			{
-				const options = loadOptions();
-				if (options)
-					onGameLoaded();
-				else
-					router.navigateTo('/game/options')
-				return;
-			}
-
-			case '/game/error':
-			{
-				// TO DO
-				return;
-			}
-
-			default:
-			{
-				return;
-			}
-
-		}
-	});
 }
 
 function generatePlayersInputs(nbOfPlayers: number): void
@@ -307,4 +267,9 @@ function onGameLoaded(): void
 	}
 	else
 		router.navigateTo('/game/error')
+}
+
+function cleanGamePage(): void
+{
+	// TO BE FILLED
 }
