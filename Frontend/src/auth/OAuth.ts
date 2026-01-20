@@ -72,7 +72,7 @@ export class OAuthService {
 			} else {
 				throw new Error("Unrecognized api response");
 			}
-			router.render();
+			await router.render();
 		} catch (error) {
 			console.error("OAuth login error:", error);
 			throw error;
@@ -104,7 +104,7 @@ export class OAuthService {
 				const user = new RegisteredUser(userId, data.accessToken, data.username);
 				await this.userState.setUser(user);
 			}
-			router.render();
+			await router.render();
 		} catch (error) {
 			console.error("OAuth login error:", error);
 			throw error;

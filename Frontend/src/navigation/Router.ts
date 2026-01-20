@@ -133,14 +133,14 @@ class Router
 
 	// uses window.history.pushState, for app navigation (allow back and forth)
 	// and path validation to make sure no innaccessible page is accessed
-	navigateTo(path: string)
+	async navigateTo(path: string)
 	{
 		try
 		{
 			if (this.isValidPath(path))
 			{
 				window.history.pushState(null, '', path);
-				this.render();
+				await this.render();
 			}
 			else
 				throw new Error(`Inaccessible page: ${path}`);
@@ -181,15 +181,11 @@ class Router
 	{
 		const navbar = document.getElementById('nav');
 		if (!navbar)
-		{
-			console.log('Navbar element not found');
-			return;
-		}
+			throw new Error('Navbar element is not found');
 
 		if (user)
 		{
 			navbar.classList.remove('hidden');
-
 			navbar.innerHTML = getNavBarHtml();
 			this.navbarInitialized = true;
 
