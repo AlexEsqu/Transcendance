@@ -9,8 +9,10 @@ export type { JSONInputsUpdate, JSONGameState, JSONRoomAccess, JSONRoomDemand }
 interface JSONRoomDemand {
 	id: number;
 	username: string;
-	match: string;
+	color: string;
+	matchType: string;
 	location: string;
+	level: number;
 };
 
 interface JSONRoomAccess {
@@ -24,12 +26,8 @@ interface JSONGameState {
 	state: number;
 	timestamp: number;
 	round: number;
-	leftPaddPos: number;
-	rightPaddPos: number;
-	leftPaddScore: number;
-	rightPaddScore: number;
-	leftPaddUsername: string;
-	rightPaddUsername: string;
+	leftPadd: { username: string, pos: number, score: number, color?: string };
+	rightPadd: { username: string, pos: number, score: number, color?: string };
 	ball: { x: number, z: number };
 	results?: { winner: string, loser: string };
 };

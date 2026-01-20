@@ -14,7 +14,6 @@ export { getDashboardPage, initDashboardPageListeners, showRegisteredUserOptions
 
 let currentFriendsListener: Subscriber | null = null;
 let currentUsersListener: Subscriber | null = null;
-//
 
 // Getting base html for the pages
 
@@ -83,6 +82,14 @@ function showRegisteredUserOptions(user : RegisteredUser)
 			(el as HTMLElement).style.display = 'flex';
 		}
 	);
+
+	document.querySelectorAll('.need-registered-user-btn').forEach(el =>
+		{
+			const btn = el as HTMLButtonElement;
+			btn.disabled = false;
+			btn.removeAttribute('title');
+		}
+	);
 }
 
 function cleanupDashboardListeners()
@@ -97,5 +104,5 @@ function cleanupDashboardListeners()
 		userState.unsubscribe(currentUsersListener);
 		currentUsersListener = null;
 	}
-	
+
 }

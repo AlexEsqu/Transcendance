@@ -17,18 +17,19 @@ export { handleMessage, handleDisconnection}
 function handleMessage(socket: WSWebSocket, message: Buffer, 
 	validateSchema: ValidateFunction, gameControl: GameControl): { username: string, roomId: number}
 {
-	console.log("WAIT_HANDLER: handle received message from '/room/waiting' route");
 	try {
 		//	Must parse and validate received message
 		const data: JSONRoomDemand = JSON.parse(message.toString());
 		if (!validateSchema(data)) {
 			socket.send(JSON.stringify(getJSONError("Bad request", 400)));
+			console.log("GAME-WAIT-HANDLER: received a bad request from a client");
 			return ({ username: 'NaN', roomId: -1});
 		}
+		console.log("GAME-WAIT-HANDLER: handle received message");
 
 		//	Add in game controller (manage waiting rooms and gaming rooms)
 		const player = gameControl.generatePlayerId(socket, data);
-		const roomId = gameControl.addPlayerInWaitingRoom(player) ?? -1;
+		const roomId = gameControl.addPlayerInWaitingRoom(player, data.level) ?? -1;
 
 		return ({ username: player.username, roomId: roomId});
 
@@ -40,6 +41,6 @@ function handleMessage(socket: WSWebSocket, message: Buffer,
 
 function handleDisconnection(client: { username: string, roomId: number }, gameControl: GameControl)
 {
-	console.log("GAME-HANDLER: on route '/room/waiting' disconnection of client ", client.username);
+	console.log("GAME-WAIT-HANDLER: disconnection of client ", client.username);
 	gameControl.deletePlayerFromRoom(client.username, client.roomId, 'waiting');
 }

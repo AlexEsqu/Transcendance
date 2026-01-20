@@ -129,7 +129,8 @@ class UserState
 					id: this.user.id,
 					accessToken: this.user.accessToken,
 					avatar: this.user.avatar,
-					friends: this.user.friends
+					friends: this.user.friends,
+					email: this.user.email
 				}
 			));
 		}
@@ -159,6 +160,7 @@ class UserState
 				this.user = new RegisteredUser(data.id, data.accessToken, data.username);
 				this.user.avatar = data.avatar;
 				this.user.friends = data.friends ?? [];
+				this.user.email = data.email ?? 'not set';
 				this.notifySubscribers();
 				await this.refreshUser();
 				this.notifySubscribers();
@@ -264,7 +266,7 @@ class UserState
 			throw new Error("User id is missing");
 
 		const response = await this.fetchWithTokenRefresh(
-			`${apiDomainName}/users/${this.user.id}`,
+			`${apiDomainName}/users/me`,
 			{
 				method: 'GET',
 				headers:
@@ -283,6 +285,7 @@ class UserState
 
 		this.user.username = data.username ?? this.user.username;
 		this.user.avatar = data.avatar ?? this.user.avatar;
+		this.user.email = data.email ?? this.user.email;
 
 		await this.refreshFriendList(this.user);
 		await this.refreshHas2fa(this.user);
@@ -310,8 +313,6 @@ class UserState
 		);
 
 		const data = await response.json();
-		console.log(`received friends as:`);
-		console.log(data);
 		if (!response.ok)
 			throw new Error(data.message || data.error || `Failed to fetch user friends (${response.status})`);
 
@@ -334,8 +335,6 @@ class UserState
 		);
 
 		const data = await response.json();
-		console.log(`has 2fa active:`);
-		console.log(data);
 		if (!response.ok)
 			throw new Error(data.message || data.error || `Failed to fetch tfa status (${response.status})`);
 

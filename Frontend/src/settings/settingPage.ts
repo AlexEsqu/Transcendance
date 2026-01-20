@@ -151,19 +151,24 @@ function setupEmailForm(): void
 			const newEmail = formData.get('input-email') as string | null;
 			const newEmailCheck = formData.get('input-email-check') as string | null;
 
-			if (newEmail !== newEmailCheck) {
+			if (newEmail !== newEmailCheck)
+			{
 				alert('The emails must match...');
 				return;
 			}
-
-			if (newEmail) {
-				try {
+			if (newEmail)
+			{
+				try
+				{
 					await userState.customize.changeEmail(newEmail);
 					form.classList.add('hidden');
 					form.reset();
 					updateCurrentSettings();
 					alert('Email updated!');
-				} catch (err) {
+					userState.resetUser();
+				}
+				catch (err)
+				{
 					alert('Failed to update email.');
 					console.error(err);
 				}
@@ -214,6 +219,8 @@ function setupPasswordForm(): void
 					form.classList.add('hidden');
 					form.reset();
 					alert('Password updated!');
+					userState.resetUser();
+					router.navigateTo('/connection');
 				} catch (err) {
 					alert('Failed to update password.');
 					console.error(err);
@@ -234,7 +241,7 @@ function updateCurrentSettings(): void
 	// Update email
 	const emailElem = document.getElementById('current-email');
 	if (emailElem && userState.getUser()) {
-		emailElem.textContent = userState.getUser()?.username || 'Not set';
+		emailElem.textContent = userState.getUser()?.email || 'Not set';
 	}
 
 	// Update avatar
