@@ -1,6 +1,6 @@
 export const postResetPasswordSchema = {
 	tags: ["auth"],
-	description: "Reset user password",
+	description: "Sends a password reset email to the user's email address. If the email is not found a 200 is still returned",
 	body: {
 		type: "object",
 		required: ["email"],
