@@ -1,6 +1,6 @@
 import { Security } from "../utils/openApiSecurity.js";
 
-export const changeEmailSchema = {
+export const putChangeEmailSchema = {
 	tags: ["user"],
 	security: Security.UserAuth,	
 	description: "Changes the email of the user",

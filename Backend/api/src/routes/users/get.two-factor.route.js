@@ -1,8 +1,8 @@
-import { getTwoFactorStatusSchema } from "../../schemas/get.two-factor.schema.js";
+import { getTwoFactorSchema } from "../../schemas/get.two-factor.schema.js";
 
-export function getTwoFactorStatusRoute(server) {
+export function getTwoFactor(server) {
 	const opts = {
-		schema: getTwoFactorStatusSchema,
+		schema: getTwoFactorSchema,
 		onRequest: [server.authenticateUser, server.authenticateClient],
 	};
 	server.get("/me/2fa", opts, async (req, reply) => {

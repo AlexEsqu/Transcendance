@@ -1,6 +1,6 @@
 import { Security } from "../utils/openApiSecurity.js";
 
-export const addFriendSchema = {
+export const postFriendSchema = {
 	tags: ["user"],
 	description:
 		"Adds a new friend to the authenticated user's friend list.\

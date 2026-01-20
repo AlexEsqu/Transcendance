@@ -1,6 +1,6 @@
 import { Security } from "../utils/openApiSecurity.js";
 
-export const getTwoFactorStatusSchema = {
+export const getTwoFactorSchema = {
 	description: "Returns 2fa activation status",
 	security: Security.UserAuth,
 	tags: ["user"],

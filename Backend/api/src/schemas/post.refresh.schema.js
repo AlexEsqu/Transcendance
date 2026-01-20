@@ -1,6 +1,6 @@
 import { Security } from "../utils/openApiSecurity.js";
 
-export const refreshSchema = {
+export const postRefreshSchema = {
 	tags: ["auth"],
 	description:
 		"Uses the refresh token to issue a new access token. The endpoint verifies the refresh token, checks that it is not expired or revoked. This endpoint requires `client authentification` AND `user authentification` AND the refresh cookie stored in the `HttpOnly refreshToken cookie`",

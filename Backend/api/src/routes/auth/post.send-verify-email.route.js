@@ -1,9 +1,9 @@
 import crypto from "crypto";
-import { sendEmailVerificationSchema } from "../../schemas/post.send-verify-email.schema.js";
+import { postSendVerifyEmailSchema } from "../../schemas/post.send-verify-email.schema.js";
 
-export default function sendEmailVerificationRoute(server) {
+export default function postSendVerifyEmail(server) {
 	const opts = {
-		schema: sendEmailVerificationSchema,
+		schema: postSendVerifyEmailSchema,
 	};
 	server.post("/send-mail-verification", opts, async (request, reply) => {
 		const token = crypto.randomBytes(32).toString("hex");

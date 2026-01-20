@@ -1,4 +1,4 @@
-export const signupSchema = {
+export const postSignupSchema = {
 	tags: ["auth"],
 	description:
 		"Creates a new user account using a username an email and password. Sends a verification email to the user.\
