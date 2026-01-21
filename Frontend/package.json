@@ -30,6 +30,9 @@
   "dependencies": {
     "@tailwindcss/cli": "^4.1.17",
     "babylonjs-gltf2interface": "^8.37.0",
+    "chart.js": "^4.4.1",
+    "chartjs-adapter-date-fns": "^3.0.0",
+    "date-fns": "^3.0.0",
     "csstype": "^3.2.3"
   },
   "description": "",

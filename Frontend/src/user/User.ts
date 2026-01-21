@@ -14,6 +14,7 @@ abstract class User implements BaseUser {
 	id: number;
 	username: string;
 	avatar: string;
+	email: string;
 	friends: BaseUser[];
 	is_active: boolean;
 
@@ -21,6 +22,7 @@ abstract class User implements BaseUser {
 	{
 		this.id = -1;
 		this.username = username;
+		this.email = "";
 		this.avatar = placeholderAvatar;
 		this.friends = [];
 		this.is_active = true;

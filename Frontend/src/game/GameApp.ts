@@ -37,7 +37,7 @@ export class GameApp
 				}
 
 				console.log("GAME-FRONT: connection with game-server");
-				
+
 				//	On socket creation send a demand to the server to add (each) player(s) in a waiting room
 				const players = this.pong.scene.players;
 				for (const player of players)
@@ -164,7 +164,7 @@ export class GameApp
 				this.isPlayerReady = true;
 				if (this.pong.scene.options.matchLocation === 'remote')
 					setNotification(true, "Wait for the other player to be ready");
-				
+
 				//	Notify the server that player(s) is ready to play
 				if (this.pong.scene.options.matchLocation === 'local')
 				{

@@ -4,7 +4,6 @@ export function formatUserObject(user) {
 	}
 	user.is_active = computeActive(user.last_activity);
 	user.oauth = user.oauth_provider ? "true" : "false";
-	delete user.last_activity;
 }
 
 export async function getUserbyId(id, db) {
@@ -18,4 +17,8 @@ export function computeActive(last_active_at) {
 	const last = new Date(last_active_at);
 	const diff = (Date.now() - last.getTime()) / 60000; // in minutes
 	return diff < process.env.ACCESS_TOKEN_LIFETIME_IN_MINUTES;
+}
+
+export function incrementRefreshTokenVersion(db, id) {
+	db.prepare(`UPDATE users SET refresh_token_version = refresh_token_version + 1 WHERE id = ?`).run(id);
 }

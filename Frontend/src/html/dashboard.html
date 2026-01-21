@@ -47,13 +47,16 @@
 			</h2>
 
 			<div id="dashboard-graph-container"
-				class="w-full flex flex-1 justify-center align-middle border border-slate-600 mt-2 mb-2">
-				<div id="match-history-error"
-					class="flex flex-1 justify-center align-middle sm-title">
+				class="w-full flex flex-1 relative mt-2 mb-2">
+				<div id="match-history-info"
+					class="sm-title absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
 					Loading history...
 				</div>
 				<canvas id="dashboard-graph-canvas"
-					class="hidden">
+					class="hidden w-full h-1/2">
+				</canvas>
+				<canvas id="dashboard-pie-canvas"
+					class="hidden w-full h-1/2">
 				</canvas>
 			</div>
 

@@ -353,28 +353,31 @@
     box-shadow: none;
   }
 
-  /* Conditional display of the security panel */
-  /* Make user-setting-container span full height by default */
-  #user-setting-container {
-      grid-row: span 4;
-  }
+  .need-registered-user-btn[disabled] {
+  position: relative;
+  cursor: not-allowed;
+}
 
-/* When security panel is visible (not hidden), make user panel span only 2 rows */
-  #security-setting-content:not(.hidden) ~ #user-setting-container,
-  #settings-container:has(#security-setting-content:not(.hidden)) #user-setting-container {
-      grid-row: span 2;
-  }
+.need-registered-user-btn[disabled]::after {
+  content: "Requires user account";
+  position: absolute;
+  left: 0%;
+  top: 100%;
+  transform: translateX(-0%);
+  background: #222;
+  color: #fff;
+  padding: 4px 8px;
+  white-space: wrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  z-index: 10;
+}
 
-  /* For small screens and above */
-  @media (min-width: 640px) {
-      #user-setting-container {
-          grid-row: span 4;
-      }
-
-      #settings-container:has(#security-setting-content:not(.hidden)) #user-setting-container {
-          grid-row: span 2;
-      }
-  }
+.need-registered-user-btn[disabled]:hover::after,
+.need-registered-user-btn[disabled]:focus::after {
+  opacity: 1;
+}
 
 }
 
