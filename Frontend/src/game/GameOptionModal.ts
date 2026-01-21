@@ -7,6 +7,8 @@ import { launchPongGame } from "./GameApp";
 export class GameOptionsModal extends Modal
 {
 	formElement: HTMLFormElement | null = null;
+	nbOfPlayers: number = 1;
+	matchLocation: string = "local";
 
 	constructor() {
 		super(optionsHtml);
@@ -15,35 +17,52 @@ export class GameOptionsModal extends Modal
 
 	setupModal(): void {
 		this.formElement = this.modalElem.querySelector('form');
-			if (!this.formElement) throw new Error('missing form element');
+		if (!this.formElement)
+			throw new Error('missing form element');
 
-			const typeContainer = this.modalElem.querySelector('#match-type-container') as HTMLElement;
+		const update = () => {
+			const locationSelect = this.modalElem.querySelector('#match-location') as HTMLSelectElement;
 			const playerContainer = this.modalElem.querySelector('#players-container') as HTMLElement;
 			const paddleColorsContainer = this.modalElem.querySelector('#paddle-colors-container') as HTMLElement;
 
-			const update = () => {
-				const locationSelect = this.formElement!.querySelector('#match-location') as HTMLSelectElement;
+			this.matchLocation = locationSelect.value;
+			const matchTypeSelect = this.modalElem.querySelector('#match-type') as HTMLSelectElement;
+			this.nbOfPlayers = matchTypeSelect ? parseInt(matchTypeSelect.value) : 1;
 
-				this.generateMatchType(typeContainer, locationSelect);
-				const matchTypeSelect = typeContainer.querySelector('select[name="match-type"]') as HTMLSelectElement;
-				const nb = matchTypeSelect ? parseInt(matchTypeSelect.value) : 1;
-				const finalNb = locationSelect.value === 'remote' ? 1 : nb;
+			this.generateMatchType()
+			this.generatePlayersInputs(playerContainer);
+			this.generatePaddleColorsInputs(paddleColorsContainer);
+		};
 
-				this.generatePlayersInputs(finalNb, playerContainer);
-				this.generatePaddleColorsInputs(finalNb, paddleColorsContainer);
-			};
+		update();
 
+		this.formElement.addEventListener('change', (e) => {
 			update();
+		});
 
-			this.formElement.addEventListener('change', (e) => {
-				update();
-			});
+		this.formElement.addEventListener('submit', (e) => {
+			e.preventDefault();
+			launchPongGame(this.extractOptions());
+			this.close();
+		});
+	}
 
-			this.formElement.addEventListener('submit', (e) => {
-				e.preventDefault();
-				launchPongGame(this.extractOptions());
-				this.close();
-			});
+	generateMatchType()
+	{
+
+		if (this.matchLocation == "remote")
+		{
+			this.formElement?.querySelector("#match-type-ai")?.classList.add("hidden")
+			const matchTypeSelect = this.formElement?.querySelector('#match-type') as HTMLSelectElement;
+			if (matchTypeSelect && matchTypeSelect.value === "1") {
+				matchTypeSelect.value = "2";
+			}
+		}
+		else
+		{
+			this.formElement?.querySelector("#match-type-ai")?.classList.remove("hidden")
+		}
+
 	}
 
 	extractOptions(): IOptions {
@@ -51,11 +70,11 @@ export class GameOptionsModal extends Modal
 
 		const location = formData.get('match-location') as string;
 		const level = parseInt(formData.get('level') as string);
-		const nbOfPlayers = parseInt(formData.get('match-type') as string);
+		this.nbOfPlayers = parseInt(formData.get('match-type') as string);
 		const players: string[] = [];
 		const colors: string[] = [];
 
-		for (let i = 1; i <= nbOfPlayers; i++) {
+		for (let i = 1; i <= this.nbOfPlayers; i++) {
 			const name = formData.get(`player-${i}`) as string;
 			const color = formData.get(`paddle-color-${i}`) as string;
 
@@ -67,7 +86,7 @@ export class GameOptionsModal extends Modal
 		return {
 			matchLocation: location,
 			level: level,
-			nbOfPlayers: nbOfPlayers,
+			nbOfPlayers: this.nbOfPlayers,
 			players: players,
 			paddColors: colors,
 			ballColor: '#a2c2e8',
@@ -75,88 +94,49 @@ export class GameOptionsModal extends Modal
 		};
 	}
 
-	generatePlayersInputs(nbOfPlayers: number, playersContainer: HTMLElement): void
+	generatePlayersInputs(playersContainer: HTMLElement): void
 	{
-		playersContainer.innerHTML = '';
-
-		for (let i = 1; i <= nbOfPlayers; i++)
-		{
-			const input = document.createElement('input');
-			input.type = 'text';
-			input.id = `player${i}`;
-			if (nbOfPlayers === 1 || i === 1)
-				input.placeholder = userState.getUser()?.getName() ?? 'Player 1';
-			else
-				input.placeholder = `Player ${i}`;
-			input.className = 'input-field p-2 placeholder:text-center';
-			input.name = `player-${i}`;
-			if (i === 1)
+		const inputs = playersContainer.querySelectorAll('input[name^="player-"]') as NodeListOf<HTMLInputElement>;
+		inputs.forEach((input, idx) => {
+			if (idx < this.nbOfPlayers)
 			{
-				input.value = userState.getUser()?.getName() ?? '';
-				input.readOnly = true;
+				input.classList.remove('invisible');
+				if (idx === 0)
+				{
+					input.value = userState.getUser()?.getName() ?? '';
+					input.readOnly = true;
+				}
+				else
+				{
+					input.readOnly = false;
+				}
 			}
-			playersContainer.appendChild(input);
-		}
+			else
+			{
+				input.classList.add('invisible');
+				input.value = '';
+				input.readOnly = false;
+			}
+		});
 	}
 
-	generateMatchType(match: HTMLElement, location: HTMLSelectElement)
+
+	generatePaddleColorsInputs(paddleColorsContainer: HTMLElement): void
 	{
-		match.innerHTML = '';
+		const colorInputs = paddleColorsContainer.querySelectorAll('input[type="color"]');
+		const labels = paddleColorsContainer.querySelectorAll('label');
 
-		const container = document.createElement('div');
-		container.className = 'flex flex-col flex-center gap-1 m-1 text-center';
-
-		const selection = document.createElement('select');
-		selection.className = 'gentle-select';
-		selection.title = 'Choose which type of match you want to play';
-		selection.name = 'match-type';
-
-		if (location.value === 'local') {
-			const robotOpponent = document.createElement('option');
-			robotOpponent.value = '1';
-			robotOpponent.textContent = 'One player and a robot';
-			selection.appendChild(robotOpponent);
-		}
-
-		const twoPlayers = document.createElement('option');
-		twoPlayers.value = '2';
-		twoPlayers.textContent = 'Two players';
-
-		const tournament = document.createElement('option');
-		tournament.value = '4';
-		tournament.textContent = 'Tournament with 4 players';
-
-		selection.appendChild(twoPlayers);
-		selection.appendChild(tournament);
-		container.appendChild(selection);
-		match.appendChild(container);
-	}
-
-	generatePaddleColorsInputs(nbOfPlayers: number, paddleColorsContainer: HTMLElement): void
-	{
-		paddleColorsContainer.innerHTML = '';
-
-		for (let i = 1; i <= nbOfPlayers; i++)
-		{
-			const container = document.createElement('div');
-			container.className = 'flex items-center justify-center gap-2';
-
-			const label = document.createElement('label');
-			label.htmlFor = `paddle-color-${i}`;
-			label.className = 'p-1';
-			label.textContent = nbOfPlayers === 1 ? (userState.getUser()?.getName() ?? 'Your color') : `Player ${i}`;
-
-			const input = document.createElement('input');
-			input.type = 'color';
-			input.id = `paddle-color-${i}`;
-			input.name = `paddle-color-${i}`;
-			input.className = "w-12 h-10 border bg-transparent cursor-pointer";
-			input.value = '#a2c2e8';
-			input.title = 'Choose paddle color';
-
-			container.appendChild(label);
-			container.appendChild(input);
-			paddleColorsContainer.appendChild(container);
-		}
+		colorInputs.forEach((input, idx) => {
+			if (idx < this.nbOfPlayers)
+			{
+				input.classList.remove('invisible');
+				if (labels[idx]) labels[idx].classList.remove('invisible');
+			}
+			else
+			{
+				input.classList.add('invisible');
+				if (labels[idx]) labels[idx].classList.add('invisible');
+			}
+		});
 	}
 }
