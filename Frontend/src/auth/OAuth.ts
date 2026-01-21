@@ -1,16 +1,16 @@
 import type { UserState } from "../user/UserState";
 import { RegisteredUser } from "../user/User";
 import { router } from "../app";
-import { TwoFactorAuthService } from "./TwoFactorAuth";
 
-export { initOAuthCallback };
-export class OAuthService {
+export class OAuthService
+{
 	apiDomainName: string;
 	apiKey: string;
 	userState: UserState;
 	oauthWindow: Window | null = null;
 
-	constructor(apiDomainName: string, apiKey: string, userState: UserState) {
+	constructor(apiDomainName: string, apiKey: string, userState: UserState)
+	{
 		this.apiDomainName = apiDomainName;
 		this.apiKey = apiKey;
 		this.userState = userState;
@@ -18,11 +18,13 @@ export class OAuthService {
 		window.addEventListener("message", this.handleOAuthMessage.bind(this));
 	}
 
-	async register(): Promise<void> {
+	async register(): Promise<void>
+	{
 		this.openOAuthPopup();
 	}
 
-	openOAuthPopup(): void {
+	openOAuthPopup(): void
+	{
 		const width = 600;
 		const height = 700;
 		const left = (window.screen.width - width) / 2;
@@ -40,8 +42,11 @@ export class OAuthService {
 		}, 500);
 	}
 
-	async handleOAuthMessage(event: MessageEvent): Promise<void> {
-		if (event.source !== this.oauthWindow) return;
+	async handleOAuthMessage(event: MessageEvent): Promise<void>
+	{
+		if (event.source !== this.oauthWindow)
+			return;
+
 		const locationHref = event.source?.window?.location?.href;
 		const url = new URL(locationHref ?? "");
 		const twoFactorRequired = url.searchParams.get("twoFactorRequired") === "true";
@@ -55,31 +60,36 @@ export class OAuthService {
 			this.oauthWindow = null;
 		}
 
-		if (error) {
+		if (error)
+		{
 			console.error("OAuth error:", error);
 			throw new Error(error);
 		}
 
-		try {
-			// If we have a twoFactorRequired, prompt for 2FA
+		try
+		{
 			if (twoFactorRequired)
 			{
 				console.log('2FA required, prompting for code...');
 				await this.userState.twoFactor.login();
 			}
-			if (userId) {
+
+			if (userId)
 				this.login(userId);
-			} else {
+			else
 				throw new Error("Unrecognized api response");
-			}
+
 			await router.render();
-		} catch (error) {
+		}
+		catch (error)
+		{
 			console.error("OAuth login error:", error);
 			throw error;
 		}
 	}
 
-	async login(userId: number): Promise<void> {
+	async login(userId: number): Promise<void>
+	{
 		try {
 			console.log("Fetching refresh token...");
 			const response = await fetch(`${this.apiDomainName}/users/auth/refresh`, {
@@ -111,7 +121,35 @@ export class OAuthService {
 		}
 	}
 
-	static sendCallbackToParent(): void {
+	// technically not a method but an arrow function for use in router
+	handleRedirectCallback = async (): Promise<void> =>
+	{
+		const urlParams = new URLSearchParams(window.location.search);
+		const userId: string | null = urlParams.get("id");
+		const error: string | null = urlParams.get("error");
+		const twoFactorRequired: boolean = urlParams.get("twoFactorRequired") === "true";
+
+		// if in popup
+		if (window.opener)
+		{
+			console.log("Popup detected, sending message to parent...");
+			OAuthService.sendCallbackToParent();
+			setTimeout(() => window.close(), 500);
+			return;
+		}
+		if (error)
+			throw new Error(error);
+
+		// if in main window
+		if (twoFactorRequired)
+			await this.userState.twoFactor.login();
+
+		if (userId)
+			await this.login(Number(userId));
+	}
+
+	static sendCallbackToParent(): void
+	{
 		console.log("sendCallbackToParent called");
 		console.log("Current URL:", window.location.href);
 
@@ -123,32 +161,9 @@ export class OAuthService {
 
 		console.log("URL params - userId:", userId, "error:", error);
 
-		if (window.opener) {
+		if (window.opener)
+		{
 			window.opener.postMessage({ type: "oauth-callback", userId: userId ? Number(userId) : null, error }, targetOrigin);
 		}
-	}
-}
-
-function initOAuthCallback(): void {
-	console.log("initOAuthCallback() called");
-	console.log("Current URL:", window.location.href);
-
-	const isOAuthCallback =
-		window.location.pathname.includes("/oauth/callback") ||
-		window.location.search.includes("id=") ||
-		window.location.search.includes("error=") ||
-		window.location.search.includes("code=");
-
-	console.log("Is OAuth callback:", isOAuthCallback);
-
-	if (isOAuthCallback) {
-		console.log("Detected OAuth callback, sending to parent...");
-		OAuthService.sendCallbackToParent();
-
-		document.body.innerHTML = '<div style="text-align: center; padding: 2rem;">Authentication successful. This window will close automatically...</div>';
-		setTimeout(() => {
-			console.log("Closing popup window...");
-			window.close();
-		}, 500);
 	}
 }

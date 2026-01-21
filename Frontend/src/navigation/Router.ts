@@ -3,7 +3,6 @@ import { User, RegisteredUser } from "../user/User";
 
 import { getNavBarHtml } from './navSection';
 import { apiDomainName } from "../user/UserState";
-import { initOAuthCallback } from "../auth/OAuth";
 import { getConnectionPage, getGuestForm, getLoginForm, getRegisterForm, onAliasLoaded, onLoginLoaded, onRegisterLoaded } from '../auth/connectionPage'
 import { getDashboardPage, onDashboardLoaded, cleanupDashboardPage } from "../dashboard/dashboardPage";
 import { getGamePage, onGameLoaded, cleanGamePage } from "../game/display";
@@ -13,13 +12,8 @@ import { getErrorPage, openErrorModal } from "../error/error";
 export { Router }
 export type { Route, getPageHtmlFunction }
 
-// all routes must provide a function to get their HTML content as string
 type getPageHtmlFunction = () => string;
-
-// routes may provide a function to get the JS to activate the HTML content
 type initPageJSFunction = (() => void) | (() => Promise<void>);
-
-// routes may provide a function to execute when the user leaves the page
 type cleanPageFunction = (() => void) | (() => Promise<void>);
 
 // all routes must fit this pattern
@@ -27,12 +21,12 @@ interface Route
 {
 	// mandatory
 	path: string;
-	getPage: getPageHtmlFunction;
+	getPage: getPageHtmlFunction; // all routes must provide a function to get their HTML content as string
 
 	// optional
-	initPage: initPageJSFunction;
-	cleanPage: cleanPageFunction;
-	needUser: boolean;
+	initPage: initPageJSFunction; // routes may provide a function to get the JS to activate the HTML content
+	cleanPage: cleanPageFunction; // routes may provide a function to execute when the user leaves the page
+	needUser: boolean; // routes may set a needUser boolean to true if a page's access is restricted
 }
 
 class Router
@@ -62,11 +56,13 @@ class Router
 		this.userState = userState;
 		this.rootElement = document.querySelector(rootSelector) as HTMLElement;
 
+		this.registerRoutes();
+
 		if (window.location.pathname === '/oauth/callback') {
+			this.render();
 			return;
 		}
 
-		this.registerRoutes();
 		this.initializeFirstPage();
 
 		// plug into back / forward browser buttons to render the last state
@@ -78,12 +74,11 @@ class Router
 
 		// automatically kicks out user if log out, or display dashboard if log in
 		this.userState.subscribe((user) => {
-			if (!user &&
-				(window.location.pathname !== '/connection'
-					&& window.location.pathname !== `${apiDomainName}/users/auth/oauth/42`)
-				)
+			if (!user
+				&& (window.location.pathname !== '/connection'
+				&& window.location.pathname !== `${apiDomainName}/users/auth/oauth/42`))
 				this.navigateTo('/connection');
-			if (user && window.location.pathname.includes('/connection'))
+			if (user && window.location.pathname.includes('/connection') && window.location.pathname !== '/oauth/callback')
 				this.navigateTo('/dashboard');
 			if (this.navbarInitialized)
 				this.renderNavbar(user);
@@ -153,13 +148,13 @@ class Router
 	}
 
 	// uses window.history.replaceState, for app initialization (no back button)
-	initializeFirstPage()
+	async initializeFirstPage()
 	{
 		const initialPath = window.location.pathname;
 		const initialSearch = window.location.search;
 
 		window.history.replaceState({ detail: { path: initialPath, search: initialSearch }}, '', initialPath);
-		this.render();
+		await this.render();
 	}
 
 	handleClickInSinglePage = (event: MouseEvent) =>
@@ -265,9 +260,8 @@ class Router
 
 		// SPECIAL CASE for oauth callback
 		this.addRoute('/oauth/callback', () => {
-			initOAuthCallback();
 			return '<div id="oauth-callback"></div>';
-		}, ()=>{}, ()=>{}, false);
+		}, this.userState.oAuth.handleRedirectCallback, ()=>{}, false);
 	}
 
 	async executeLastPageCleanup(): Promise<void>
