@@ -107,7 +107,7 @@ export class GameLoop
 		//	Depending on what/where the ball hits an object or a limit, its direction is reversed and gains speed
 		this.bouncingBallProcess();
 
-		if (this.leftPadd.robot && Date.now() - this.timestamp === 1000)
+		if (this.leftPadd.robot)
 			this.processPlayerInput('Robot', this.state, processRobotOpponent(this.leftPadd, this.ball, this.INFO.BOT_PROBABILITY));
 	}
 
@@ -278,7 +278,7 @@ export class GameLoop
 		else
 			this.rounds.results?.push(results);
 
-		console.log(`GAME-LOOP: for round ${this.rounds.nbOfRounds} the winner is ${winner.player}`);
+		console.log(`GAME-LOOP: for round ${this.rounds.nbOfRounds} the winner is ${winner.player.username}`);
 	}
 
 	resetBall(): void

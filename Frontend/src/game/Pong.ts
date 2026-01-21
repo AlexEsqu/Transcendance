@@ -49,7 +49,7 @@ export class Pong
 	runGame(): void
 	{
 		if (!this.engine || !this.scene.id) {
-			console.error("GAME-FRONT: element is missing, can't run the game");
+			console.error("GAME-APP: element is missing, can't run the game");
 			return ;
 		}
 
@@ -58,7 +58,7 @@ export class Pong
 		//	Manage user input and update data before render
 		this.processInputs(keys);
 		this.scene.id.registerBeforeRender(() => {
-			// console.log(`GAME-FRONT-STATE: ${this.scene.state}`);
+			// console.log(`GAME-APP-STATE: ${this.scene.state}`);
 			this.stateBasedAction(this.scene.state, keys);
 		});
 
@@ -193,7 +193,7 @@ export class Pong
 
 	endGame(): void
 	{
-		console.log("GAME-FRONT: end");
+		console.log("GAME-APP: end");
 
 		if (this.scene.leftPadd.player && this.scene.rightPadd.player)
 			drawScore(this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
@@ -202,7 +202,7 @@ export class Pong
 
 		const winnerSpot = document.getElementById('match-results');
 		if (!winnerSpot) {
-			console.log("GAME-FRONT: 'match-results' element is not found");
+			console.log("GAME-APP: 'match-results' element is not found");
 			return ;
 		}
 

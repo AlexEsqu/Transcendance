@@ -133,7 +133,7 @@ function createAnimation(username: string, target: string, keys: IAnimationKey[]
  */
 function openingAnimation(scene: IScene): void
 {
-	console.log("GAME-FRONT: opening scene animation");
+	console.log("GAME-APP: opening scene animation");
 
 	const endCameraAngle: number = Math.PI / 4;
 
@@ -164,7 +164,7 @@ function loadGame(engine: Engine, canvas: HTMLCanvasElement, options: IOptions):
 
 	const id = new Scene(engine) as Scene;
 	if (!id) {
-		console.error("GAME-FRONT: 'scene' creation failed");
+		console.error("GAME-APP: 'scene' creation failed");
 		return null;
 	}
 
@@ -187,7 +187,7 @@ function loadGame(engine: Engine, canvas: HTMLCanvasElement, options: IOptions):
 	//	Create the ball
 	const ball: Mesh | null = setupBall(id, options.ballColor);
 	if (!ball) {
-		console.error("GAME-FRONT: failed to create 'Ball', can't load game");
+		console.error("GAME-APP: failed to create 'Ball', can't load game");
 		return null;
 	}
 
@@ -195,7 +195,7 @@ function loadGame(engine: Engine, canvas: HTMLCanvasElement, options: IOptions):
 	const leftPadd: Mesh | null = setupPaddle(id, options.paddColors[0], 'left');
 	const rightPadd: Mesh | null = setupPaddle(id, options.paddColors[Math.min(1, options.paddColors.length - 1)] ?? "#a2c2e8", 'right');
 	if (!leftPadd || !rightPadd) {
-		console.error("GAME-FRONT: failed to create 'Paddle', can't load game");
+		console.error("GAME-APP: failed to create 'Paddle', can't load game");
 		return null;
 	}
 	
@@ -210,7 +210,7 @@ function loadGame(engine: Engine, canvas: HTMLCanvasElement, options: IOptions):
 		state: 0
 	};
 
-	console.log("GAME-FRONT: game scene loaded");
+	console.log("GAME-APP: game scene loaded");
 	return scene;
 }
 
