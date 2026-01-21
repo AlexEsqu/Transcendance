@@ -22,11 +22,13 @@ export abstract class Modal
 
 	show(): void
 	{
+		console.log("showing modal")
 		document.body.appendChild(this.modalElem);
 	}
 
 	close(): void
 	{
+		console.log("closing modal");
 		this.modalElem.remove();
 	}
 }

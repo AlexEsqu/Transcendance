@@ -42,8 +42,13 @@ export class GameOptionsModal extends Modal
 
 		this.formElement.addEventListener('submit', (e) => {
 			e.preventDefault();
-			launchPongGame(this.extractOptions());
-			this.close();
+			try {
+				const options = this.extractOptions();
+				launchPongGame(options);
+				this.close();
+			} catch (error) {
+				console.error('Error during form submission:', error);
+			}
 		});
 	}
 
