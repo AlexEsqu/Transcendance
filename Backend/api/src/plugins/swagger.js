@@ -25,7 +25,7 @@ export default fp(async (server) => {
 					cookieAuth: {
 						type: "apiKey",
 						in: "cookie",
-						name: "refreshToken",
+						name: "refresh_token",
 					},
 					AppClientAuth: {
 						type: "apiKey",

@@ -15,6 +15,7 @@ export async function initDB(db) {
 		pending_email TEXT DEFAULT NULL,
 		avatar TEXT,
         refresh_token_hash TEXT,
+		refresh_token_version INTEGER DEFAULT 0,
 		email_verified INTEGER DEFAULT 0,
 		email_verify_token TEXT,
 		email_verify_expires INTEGER,
@@ -24,7 +25,9 @@ export async function initDB(db) {
 		code_hash_2fa TEXT,
 		code_expires_2fa INTEGER,
 		code_attempts_2fa INTEGER DEFAULT 0,
-		oauth_provider TEXT DEFAULT NULL);
+		oauth_provider TEXT DEFAULT NULL,
+		reset_password_token TEXT,
+		reset_password_token_expires INTEGER);
 `).run();
 
 	db.prepare(

@@ -89,7 +89,8 @@ export const privateUserObject = {
     "oauth_provider",
     "matches",
     "is_active",
-    "oauth"
+    "oauth",
+	"is_password_set"
   ],
   properties: {
     id: {
@@ -143,7 +144,17 @@ export const privateUserObject = {
       items: {
         $ref: "matchObject#"
       }
-    }
+    },
+	is_active: {
+		type: "boolean",
+		description: "Whether the user account is active",
+		example: true
+	},
+	is_password_set: {
+		type: "boolean",
+		description: "Whether the user has set a password",
+		example: true
+	}
   },
   additionalProperties: false
 };

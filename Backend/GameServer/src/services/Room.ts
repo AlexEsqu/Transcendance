@@ -54,7 +54,7 @@ export class Room
 	{
 		for (const [key, value] of this.players)
 		{
-			if (value.isReady === false)
+			if (value.isReady === false && value.socket !== null)
 				return false;
 		}
 		return true;

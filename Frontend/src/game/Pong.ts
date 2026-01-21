@@ -41,15 +41,15 @@ export class Pong
 		this.scene = scene;
 		this.scene.players = players;
 		this.mainPlayerUsername = players[0].username;
-		this.scene.state = options.matchLocation === 'local' ? PlayerState.opening : PlayerState.waiting;
-		// this.scene.state = PlayerState.opening;
+		// this.scene.state = options.matchLocation === 'local' ? PlayerState.opening : PlayerState.waiting;
+		this.scene.state = PlayerState.opening;
 		console.log("MAIN PLAYER ", this.mainPlayerUsername);
 	}
 
 	runGame(): void
 	{
 		if (!this.engine || !this.scene.id) {
-			console.error("error occured while loading 'Pong' game");
+			console.error("GAME-FRONT: element is missing, can't run the game");
 			return ;
 		}
 
@@ -102,8 +102,7 @@ export class Pong
 				break ;
 			
 			case PlayerState.stop:
-				this.gameApp.gamingSocket?.close();
-				this.gameApp.gamingSocket = null;
+				this.gameApp.closeSockets();
 				break ;
 
 			default:
@@ -113,8 +112,6 @@ export class Pong
 
 	updateGame(keys: Record<string, boolean>): void
 	{
-		setNotification(false, undefined);
-
 		const rightPadd: IPaddle = this.scene.rightPadd;
 		const leftPadd: IPaddle = this.scene.leftPadd;
 
@@ -139,15 +136,18 @@ export class Pong
 		else
 			mainPlayerPadd = leftPadd;
 		//	Update paddle's position (remote case)
-		if (keys["ArrowLeft"])
+		if (keys["ArrowDown"])
 			this.gameApp.sendUpdateToGameServer(mainPlayerPadd.player?.username ?? 'NaN', 'down', true);
-		if (keys["ArrowRight"])
+		if (keys["ArrowUp"])
 			this.gameApp.sendUpdateToGameServer(mainPlayerPadd.player?.username ?? 'NaN', 'up', true);
 	}
 
 	processServerGameState(gameState: JSONGameState): boolean
 	{
+		const prevState = this.scene.state;
 		this.scene.state = processNewPlayerState(gameState.state);
+		if (prevState === PlayerState.waiting && this.scene.state === PlayerState.play)
+			setNotification(false, undefined);
 
 		if (this.scene.ball)
 		{
@@ -158,6 +158,9 @@ export class Pong
 			// this.scene.ball.position.z = gameState.ball.z;
 		}
 
+		if (gameState.results !== undefined)
+			this.results = gameState.results;
+
 		if (this.round !== gameState.round || !this.scene.leftPadd.player || !this.scene.rightPadd.player)
 		{
 			this.round = gameState.round;
@@ -167,14 +170,13 @@ export class Pong
 			{
 				this.scene.leftPadd.mesh.material = createMaterial(this.scene.id, gameState.leftPadd.color ?? '#a2c2e8');
 				this.scene.rightPadd.mesh.material = createMaterial(this.scene.id, gameState.rightPadd.color ?? '#a2c2e8');
+				this.scene.leftPadd.mesh.position.z = 0.0;
+				this.scene.rightPadd.mesh.position.z = 0.0;
 			}
 			return false;
 		}
 		this.updatePaddleInfo(this.scene.leftPadd, gameState.leftPadd.pos, gameState.leftPadd.score);
 		this.updatePaddleInfo(this.scene.rightPadd, gameState.rightPadd.pos, gameState.rightPadd.score);
-
-		if (gameState.results !== undefined)
-			this.results = gameState.results;
 
 		return true;
 	}
@@ -198,17 +200,20 @@ export class Pong
 		
 		this.scene.state = PlayerState.stop;
 
-		if (this.results === undefined) {
-			console.error("results of matches are lost");
+		const winnerSpot = document.getElementById('match-results');
+		if (!winnerSpot) {
+			console.log("GAME-FRONT: 'match-results' element is not found");
 			return ;
 		}
 
-		const winnerSpot = document.getElementById('match-results');
-		if (winnerSpot && this.results.winner)
+		if (this.results !== undefined && this.results.winner)
 		{
 			winnerSpot.textContent = `${this.results.winner} wins!`;
 			winnerSpot.classList.remove('invisible');
+			setNotification(true, "Leave the page to start a new game");
 		}
+		else
+			setNotification(true, "The Game ended before the match was over\nLeave the page to start a new game");
 	}
 
 	/**

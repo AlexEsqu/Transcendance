@@ -1,4 +1,5 @@
-import { getMatches, getUserMatches, postMatches } from "./matches.route.js";
+import { getMatches, getUserMatches } from "./get.matches.route.js";
+import { postMatches } from "./post.matches.route.js";
 
 export default async function matchesRoutes(server) 
 {

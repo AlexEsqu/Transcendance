@@ -111,7 +111,7 @@ function generateMatchType(match: HTMLElement, location: HTMLSelectElement)
 	match.appendChild(container);
 }
 
-function initializePlayerInputs(): void
+function initializeGameOptionsForm(): void
 {
 	const macthTypeContainer = document.getElementById('match-type-container') as HTMLElement;
 	const locationSelect = document.getElementById('match-location') as HTMLSelectElement;
@@ -210,7 +210,7 @@ function setNotification(show: boolean, message: string | undefined): void
 	if (!show)
 	{
 		notification.classList.add('invisible');
-		notification.classList.remove('flex')
+		notification.classList.remove('flex');
 		// notification.style.display = 'invisible';
 		return ;
 	}
@@ -218,16 +218,19 @@ function setNotification(show: boolean, message: string | undefined): void
 	notification.textContent = message ?? '';
 	notification.className = 'text-2xl text-center';
 	notification.classList.remove('invisible');
-	notification.classList.add('flex')
+	notification.classList.add('flex');
 }
 
 function onGameOptionLoaded(): void
 {
 	try {
-		initializePlayerInputs();
+		initializeGameOptionsForm();
 
 		const optionsForm = document.getElementById("game-option-form") as HTMLFormElement | null;
-		optionsForm?.addEventListener('submit', (event) =>
+		if (!optionsForm)
+			throw new Error("'game-option-form' element not found");
+
+		optionsForm.addEventListener('submit', (event) =>
 		{
 			// prevent HTML form default actions such as add query strings to url, resetting...
 			event.preventDefault();
@@ -251,7 +254,7 @@ function onGameOptionLoaded(): void
 			}
 			saveOptions(options);
 			router.navigateTo('/game');
-		})
+		});
 	} catch (error) {
 		console.error(error);
 	}
