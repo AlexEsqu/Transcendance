@@ -9,6 +9,7 @@ import { JSONGameState } from '../config/schemas';
 import { GameControl } from './GameControl';
 import { Room } from './Room';
 import { sendMatchesToDataBase } from '../utils/sendMatchResult';
+import { time } from 'node:console';
 
 /************************************************************************************************************/
 
@@ -49,16 +50,18 @@ export class GameLoop
 
 		let isNewRound: boolean = false;
 		let gameStateInfo: JSONGameState;
+		let robotInterval: NodeJS.Timeout;
 
 		console.log("GAME-LOOP: game loop started");
 		//	Take 1 sec to be sure every players are ready
 		setTimeout(() => {
-			const interval = setInterval(() => {
+			const gameInterval = setInterval(() => {
 				// console.log(this.state);
 	
 				if (this.state === State.end)
 				{
-					clearInterval(interval);
+					clearInterval(gameInterval);
+					// clearInterval(robotInterval);
 					if (this.rounds.results)
 						sendMatchesToDataBase(this.rounds.results[this.rounds.results.length - 1], Date.now());
 					room.closeRoom();
@@ -69,6 +72,10 @@ export class GameLoop
 				{
 					//	update data & check collisions
 					this.updateGameData();
+					// robotInterval = setInterval(() => {
+					// 	if (this.leftPadd.robot && this.state === State.play)
+					// 		this.processPlayerInput('Robot', this.state, processRobotOpponent(this.leftPadd, this.ball, this.INFO.BOT_PROBABILITY));
+					// }, 1000);
 					//	monitor score/rounds
 					isNewRound = this.isPlayerHittingMaxScore();
 				}
@@ -100,7 +107,7 @@ export class GameLoop
 		//	Depending on what/where the ball hits an object or a limit, its direction is reversed and gains speed
 		this.bouncingBallProcess();
 
-		if (this.leftPadd.robot)
+		if (this.leftPadd.robot && Date.now() - this.timestamp === 1000)
 			this.processPlayerInput('Robot', this.state, processRobotOpponent(this.leftPadd, this.ball, this.INFO.BOT_PROBABILITY));
 	}
 

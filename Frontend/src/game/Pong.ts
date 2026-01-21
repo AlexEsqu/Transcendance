@@ -183,7 +183,7 @@ export class Pong
 
 	updatePaddleInfo(paddle: IPaddle, newPos: number, newScore: number): void
 	{
-		const alpha: number = 0.30;
+		const alpha: number = 0.8;
 		if (paddle.mesh)
 			paddle.mesh.position.z = paddle.mesh.position.z * (1 - alpha) + newPos * alpha;
 

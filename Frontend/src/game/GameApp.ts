@@ -48,6 +48,15 @@ export class GameApp
 						this.waitingSocket.send(JSON.stringify(demand));
 					}
 				}
+
+				//	Set a timeout to avoid waiting until eternity
+				setTimeout(() => {
+					if (this.roomId === undefined)
+					{
+						setNotification(true, "No players available to play with you");
+						resolve(-1);
+					}
+				}, 600000);
 			};
 
 			//	Wait for the server to manage waiting rooms and assign current user to a gaming room

@@ -51,9 +51,9 @@ function initInfoByLevel(level: number, matchType: MatchType): Info
 		MAX_ROUNDS: matchType === MatchType.tournament ? matchType - 1 : 1,
 		BALL_START_SPEED: 3 + level,
 		BALL_MAX_SPEED: 10 + level,
-		PADD_SPEED: 20,
+		PADD_SPEED: 15,
 		PADD_RESPONSIVENESS: -60,
-		BOT_PROBABILITY: 4 - level
+		BOT_PROBABILITY: 6 - level
 	};
 	return INFO;
 }
