@@ -15,7 +15,8 @@ export class GameOptionsModal extends Modal
 		this.setupModal();
 	}
 
-	setupModal(): void {
+	setupModal(): void
+	{
 		this.formElement = this.modalElem.querySelector('form');
 		if (!this.formElement)
 			throw new Error('missing form element');
@@ -72,12 +73,8 @@ export class GameOptionsModal extends Modal
 	extractOptions(): IOptions {
 		const formData = new FormData(this.formElement!);
 
-		const location = formData.get('match-location') as string;
-		const level = parseInt(formData.get('level') as string);
-		this.nbOfPlayers = parseInt(formData.get('match-type') as string);
 		const players: string[] = [];
 		const colors: string[] = [];
-
 		for (let i = 1; i <= this.nbOfPlayers; i++) {
 			const name = formData.get(`player-${i}`) as string;
 			const color = formData.get(`paddle-color-${i}`) as string;
@@ -88,9 +85,9 @@ export class GameOptionsModal extends Modal
 		}
 
 		return {
-			matchLocation: location,
-			level: level,
-			nbOfPlayers: this.nbOfPlayers,
+			matchLocation: formData.get('match-location') as string,
+			level: parseInt(formData.get('level') as string),
+			nbOfPlayers: parseInt(formData.get('match-type') as string),
 			players: players,
 			paddColors: colors,
 			ballColor: '#a2c2e8',
