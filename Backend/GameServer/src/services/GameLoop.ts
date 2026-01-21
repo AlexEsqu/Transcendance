@@ -167,7 +167,7 @@ export class GameLoop
 			return ;
 		}
 
-		const deltaTime: number = this.timestamp === -1 ? Date.now() : (Date.now() - this.timestamp) / 1000;
+		const deltaTime: number = this.timestamp === -1 ? 0 : (Date.now() - this.timestamp) / 1000;
 		//	Frame-rate independent smoothing
         // const alpha: number = 1 - Math.exp(this.INFO.PADD_RESPONSIVENESS * deltaTime);
 		//	Calculate the velocity of the paddle's movement

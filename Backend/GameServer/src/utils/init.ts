@@ -47,11 +47,12 @@ function initPlayers(players: Map<string, IPlayer>): Array<IPlayer>
 function initInfoByLevel(level: number, matchType: MatchType): Info
 {
 	const INFO: Info = {
-		MAX_SCORE: 3,
+		MAX_SCORE: 11,
 		MAX_ROUNDS: matchType === MatchType.tournament ? matchType - 1 : 1,
 		BALL_START_SPEED: 3 + level,
 		BALL_MAX_SPEED: 10 + level,
-		PADD_SPEED: 15,
+		PADD_SPEED: 20,
+		PADD_RESPONSIVENESS: -60,
 		BOT_PROBABILITY: 4 - level
 	};
 	return INFO;

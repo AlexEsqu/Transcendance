@@ -128,7 +128,7 @@ function processRobotOpponent(paddle: IPaddle, ball: IBall, probability: number)
 	//	Avoid the robot to always move perfectly : 1/BOT_PROBABILITY chance to miss the target
 	if (result !== 1) return 'none';
 	
-	//	Reduces noise & vibration (avoid robot constantly moving even when unmecessary)
+	//	Reduces noise & vibration (avoid robot constantly moving when it's uncessary)
 	if (ball.posistion.x >= 0) return 'none';
 	else if (ball.posistion.z === paddle.pos.z) return 'none';
 
