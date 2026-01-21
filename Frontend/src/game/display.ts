@@ -41,5 +41,5 @@ function onGameLoaded(): void
 
 function cleanGamePage(): void
 {
-	GameApp.close
+	//
 }
