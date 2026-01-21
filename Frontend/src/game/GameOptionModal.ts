@@ -29,9 +29,9 @@ export class GameOptionsModal extends Modal
 			const matchTypeSelect = this.modalElem.querySelector('#match-type') as HTMLSelectElement;
 			this.nbOfPlayers = matchTypeSelect ? parseInt(matchTypeSelect.value) : 1;
 
-			this.generateMatchType()
-			this.generatePlayersInputs(playerContainer);
-			this.generatePaddleColorsInputs(paddleColorsContainer);
+			this.removeIncompatibleOptions()
+			this.showPlayerUsernameInput(playerContainer);
+			this.showPaddleCustom(paddleColorsContainer);
 		};
 
 		update();
@@ -52,9 +52,8 @@ export class GameOptionsModal extends Modal
 		});
 	}
 
-	generateMatchType()
+	removeIncompatibleOptions()
 	{
-
 		if (this.matchLocation == "remote")
 		{
 			this.formElement?.querySelector("#match-type-ai")?.classList.add("hidden")
@@ -99,7 +98,7 @@ export class GameOptionsModal extends Modal
 		};
 	}
 
-	generatePlayersInputs(playersContainer: HTMLElement): void
+	showPlayerUsernameInput(playersContainer: HTMLElement): void
 	{
 		const inputs = playersContainer.querySelectorAll('input[name^="player-"]') as NodeListOf<HTMLInputElement>;
 		inputs.forEach((input, idx) => {
@@ -126,7 +125,7 @@ export class GameOptionsModal extends Modal
 	}
 
 
-	generatePaddleColorsInputs(paddleColorsContainer: HTMLElement): void
+	showPaddleCustom(paddleColorsContainer: HTMLElement): void
 	{
 		const colorInputs = paddleColorsContainer.querySelectorAll('input[type="color"]');
 		const labels = paddleColorsContainer.querySelectorAll('label');
