@@ -122,9 +122,9 @@ export class Pong
 				this.gameApp.sendUpdateToGameServer(rightPadd.player?.username ?? 'NaN', 'down', true);
 			if (keys["ArrowUp"])
 				this.gameApp.sendUpdateToGameServer(rightPadd.player?.username ?? 'NaN', 'up', true);
-			if (keys["s"])
+			if (keys["s"] && this.scene.options.nbOfPlayers > 1)
 				this.gameApp.sendUpdateToGameServer(leftPadd.player?.username ?? 'NaN', 'down', true);
-			if (keys["w"])
+			if (keys["w"] && this.scene.options.nbOfPlayers > 1)
 				this.gameApp.sendUpdateToGameServer(leftPadd.player?.username ?? 'NaN', 'up', true);
 			return ;
 		}

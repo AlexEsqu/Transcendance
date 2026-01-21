@@ -4,6 +4,9 @@ import websocket from '@fastify/websocket';
 import { registerWaitingRoomRoutes } from './routes/waitingRoom.route'
 import { registerGameRoutes } from './routes/game.route'
 import { GameControl } from './services/GameControl';
+// import authPlugin from "../../api/src/plugins/";
+// add this file in dockerfile 
+//	add the checkin in the optiosn with the schema
 
 /************************************************************************************************************
  * 		Run Game Server																						*
@@ -11,7 +14,7 @@ import { GameControl } from './services/GameControl';
 
 //	Create game server instance
 const gameServer: FastifyInstance = Fastify({ logger: {level: 'info'} });
-
+// gameServer.register(authPlugin);
 const launchGameServer = async () => {
 	const signals = ['SIGTERM', 'SIGINT'];
 
