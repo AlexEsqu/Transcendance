@@ -51,8 +51,8 @@ services:
   game_server:
     build: ./Backend/GameServer
     container_name: game_server
-    expose:
-      - "4001"
+    ports:
+      - "4001:4001"
     environment:
       - JWT_SECRET=${JWT_SECRET}
       - APP_SECRET_KEY=${APP_SECRET_KEY}

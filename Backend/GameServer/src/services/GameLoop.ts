@@ -195,7 +195,6 @@ export class GameLoop
 			this.state = State.waiting;
 			if (this.rounds.nbOfRounds >= this.INFO.MAX_ROUNDS)
 				this.state = State.end;
-			console.log(`STATE IS ${this.state}`);
 			return true;
 		}
 		return false;

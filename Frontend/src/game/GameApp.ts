@@ -3,15 +3,17 @@ import { fillRoomDemand, getIPlayerFromStr } from './utils';
 import { setNotification } from './display';
 import { IOptions, PlayerState } from '../game/pongData';
 import { Pong } from '../game/Pong';
+import { UserState } from '../user/UserState';
+import { RegisteredUser, User } from '../user/User';
 
 /************************************************************************************************************/
 
 export class GameApp
 {
-	pong: Pong;
-	roomId: number | undefined = undefined;
-	waitingSocket: WebSocket | null = null;
-	gamingSocket: WebSocket | null = null;
+	private pong: Pong;
+	private roomId: number | undefined = undefined;
+	private waitingSocket: WebSocket | null = null;
+	private gamingSocket: WebSocket | null = null;
 	isPlayerReady: boolean = false;
 
 	constructor(options: IOptions)
@@ -19,10 +21,36 @@ export class GameApp
 		this.pong = new Pong("game-canvas", options, this);
 	}
 
+	private getUserToken(): string | null
+	{
+		const userState: UserState = UserState.getInstance();
+
+		try {
+			userState.refreshUser();
+		} catch (error) {
+			console.error(error);
+			return null;
+		}
+
+		const user: User | null = userState.getUser();
+		if (user)
+		{
+			const token = user instanceof RegisteredUser ? user.accessToken : null;
+			return token;
+		}
+		return null;
+	}
+
 	goToWaitingRoom(): Promise<number>
 	{
 		return new Promise((resolve, reject) => {
-			this.waitingSocket = new WebSocket(`wss://${window.location.host}${Pong.WAITING_ROOM_URL}`);
+			const token: string | null = this.getUserToken();
+			if (!token) {
+				reject(new Error("Authentication token not found for the current user"));
+				return ;
+			}
+
+			this.waitingSocket = new WebSocket(`wss://${window.location.host}${Pong.WAITING_ROOM_URL}?token=${token}`);
 			if (!this.waitingSocket) {
 				reject(new Error("'waitingSocket' creation failed"));
 				return ;
@@ -79,13 +107,15 @@ export class GameApp
 				// console.error(error);
 				this.waitingSocket?.close();
 				this.waitingSocket = null;
-				reject(new Error(error.toString()));
+				reject(new Error("Authentication failed or websocket rejected from the game-server"));
 			};
 
-			this.waitingSocket.onclose = () => {
-				console.log("GAME-APP: You left the waiting room, websocket (for route 'waiting') is closed");
-				this.waitingSocket?.close();
+			this.waitingSocket.onclose = (event) => {
 				this.waitingSocket = null;
+				if (event.code === 1006)
+					reject(new Error("Authentication failed or websocket rejected from the game-server"));
+				else
+					console.log("GAME-APP: You left the waiting room, websocket (for route 'waiting') is closed");
 				resolve(this.roomId ?? -1);
 			};
 		});
@@ -93,7 +123,11 @@ export class GameApp
 
 	goToGamingRoom(): void
 	{
-		this.gamingSocket = new WebSocket(`wss://${window.location.host}${Pong.GAMING_ROOM_URL}`);
+		const token: string | null = this.getUserToken();
+		if (!token)
+			throw new Error("Authentication token not found for the current user");
+		
+		this.gamingSocket = new WebSocket(`wss://${window.location.host}${Pong.GAMING_ROOM_URL}?token=${token}`);
 		if (!this.gamingSocket)
 			throw new Error("'gamingSocket' not found");
 
@@ -144,14 +178,15 @@ export class GameApp
 
 		this.gamingSocket.onerror = (error) => {
 			// console.error(error);
-			this.gamingSocket?.close();
-			this.gamingSocket = null;
-			throw new Error(error.toString());
+			this.closeSockets();
+			console.error("Authentication failed or websocket rejected from the game-server");
 		};
 
 		this.gamingSocket.onclose = () => {
 			console.log("GAME-APP: You left the game, websocket (for route 'game') is closed");
 			this.pong.scene.state = PlayerState.end;
+			this.gamingSocket = null;
+			return ;
 		};
 	}
 
@@ -219,13 +254,13 @@ export class GameApp
 
 export async function launchPongGame(options: IOptions): Promise<void>
 {
-	let clean: (() => void) | null = null;
+	console.clear();
 	try {
 		const app = new GameApp(options);
-		clean = app.closeSockets;
 		const roomId: number = await app.goToWaitingRoom();
 		if (roomId === -1)
 		{
+			setNotification(true, "Something went wrong while entering the game. Please try again");
 			app.closeSockets();
 			return ;
 		}
@@ -234,15 +269,12 @@ export async function launchPongGame(options: IOptions): Promise<void>
 				app.goToGamingRoom(); 
 			} catch (error) {
 				console.error(error);
-				setNotification(true, "Something went wrong while loading the game. Please try again");
-				if (clean)
-					clean();
+				setNotification(true, "Something went wrong while entering the game. Please try again");
+				app.closeSockets();
 			}
 		}, 1000);
 	} catch (error) {
 		console.error(error);
 		setNotification(true, "Something went wrong while loading the game. Please try again");
-		if (clean)
-			clean();
 	}
 }

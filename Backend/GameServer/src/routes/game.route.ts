@@ -4,8 +4,6 @@ import { GameControl } from "../services/GameControl";
 import { gameSchema } from '../config/schemas';
 import { handleMessage, handleDisconnection } from '../handlers/game.handlers.js'
 import { IPlayer, GAMING_ROOM_URL } from "../config/pongData";
-import websocket from '@fastify/websocket';
-import { WebSocket as WSWebSocket } from 'ws';
 
 /************************************************************************************************************
  * 		Declare routes/endpoints								 											*
@@ -29,7 +27,7 @@ export async function registerGameRoutes(gameServer: FastifyInstance, gameContro
 			//	Handler: receiving message from a client
 			socket.on('message', (message: Buffer) => {
 				// console.log("GAME-SERVER: received a message from the client on route '/room/game'");
-				const player: IPlayer | undefined = handleMessage(socket, message, validateGameMessage, gameControl);
+				handleMessage(socket, message, validateGameMessage, gameControl);
 			});
 	
 			//	Handle: ending client connection properly for the server

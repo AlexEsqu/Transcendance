@@ -14,13 +14,13 @@ export class Pong
 	static WAITING_ROOM_URL = `/room/waiting`;
 	static GAMING_ROOM_URL = "/room/gaming";
 
-	gameApp: GameApp;
-	canvas: HTMLCanvasElement;
-	engine: Engine | null = null;
-	scene: IScene;
-	round: number = 0;
+	private gameApp: GameApp;
+	private canvas: HTMLCanvasElement;
+	private engine: Engine | null = null;
+	private round: number = 0;
+	private results: { winner: string, loser: string } | undefined = undefined;
 	mainPlayerUsername: string;
-	results: { winner: string, loser: string } | undefined = undefined;
+	scene: IScene;
 
 	constructor(canvasId: string, options: IOptions, app: GameApp)
 	{
