@@ -159,6 +159,7 @@ class UserState
 				this.user.avatar = data.avatar;
 				this.user.friends = data.friends ?? [];
 				this.user.email = data.email ?? 'not set';
+				this.notifySubscribers(); // prerender to avoid long load times
 				await this.refreshUser();
 				this.notifySubscribers();
 			}
