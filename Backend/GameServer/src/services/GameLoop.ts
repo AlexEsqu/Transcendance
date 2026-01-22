@@ -1,5 +1,5 @@
-import { isBallHittingWall, isBallHittingPaddle, isBallOutOfBounds, isNewPaddPosHittingMapLimit, 
-	adjustBallHorizontalPos, adjustBallVerticalPos, scaleVelocity, normalizeVector, processRobotOpponent 
+import { isBallHittingWall, isBallHittingPaddle, isBallOutOfBounds, isNewPaddPosHittingMapLimit,
+	adjustBallHorizontalPos, adjustBallVerticalPos, scaleVelocity, normalizeVector, processRobotOpponent
 } from '../utils/physics';
 
 import { GAME_SIZE, IBall, IPaddle, IPlayer, State, MatchType, IRound, IResult, Info, GameSatus } from '../config/pongData'
@@ -56,7 +56,7 @@ export class GameLoop
 		setTimeout(() => {
 			const gameInterval = setInterval(() => {
 				// console.log(this.state);
-	
+
 				if (this.state === State.end)
 				{
 					clearInterval(gameInterval);
@@ -66,7 +66,7 @@ export class GameLoop
 					room.closeRoom();
 					return ;
 				}
-	
+
 				if (this.state === State.play)
 				{
 					//	update data & check collisions
@@ -78,17 +78,17 @@ export class GameLoop
 					//	monitor score/rounds
 					isNewRound = this.isPlayerHittingMaxScore();
 				}
-	
+
 				if (isNewRound)
 				{
 					this.requestNewRound();
 					isNewRound = false;
 				}
-	
+
 				//	broadcast to players = send game state/data to all players
 				gameStateInfo = this.composeGameState();
 				notifyPlayersInRoom(room, gameStateInfo);
-	
+
 				this.timestamp = Date.now();
 			}, 1000 / 60); // 60fps
 		}, 100);
@@ -117,7 +117,7 @@ export class GameLoop
 			//	Invert X direction
 			this.ball.posistion.x = adjustBallHorizontalPos(this.ball);
 			this.ball.direction.x = -(this.ball.direction.x);
-			
+
 			const ballLeftEdge = this.ball.posistion.x - GAME_SIZE.BALL_RADIUS;
 			//	Avoid repeating trajectories, increase angle (Z-axis) if the ball hits top/down edge of the paddle
 			if (ballLeftEdge <= 0)
@@ -163,7 +163,7 @@ export class GameLoop
 		let paddle: IPaddle;
 
 		this.state = State.play;
-	
+
 		if (this.leftPadd.player?.username === player)
 			paddle = this.leftPadd;
 		else if (this.rightPadd.player?.username === player)
@@ -261,7 +261,7 @@ export class GameLoop
 	{
 		const winner: IPaddle = this.leftPadd.score === this.INFO.MAX_SCORE ? this.leftPadd : this.rightPadd;
 		const loser: IPaddle = this.leftPadd.score === this.INFO.MAX_SCORE ? this.rightPadd : this.leftPadd;
-		
+
 		if (winner.player === undefined || loser.player === undefined)
 			return ;
 
@@ -310,13 +310,13 @@ export class GameLoop
 			state: this.state as number,
 			timestamp: this.timestamp,
 			round: this.rounds.nbOfRounds,
-			leftPadd: { 
+			leftPadd: {
 				username: this.leftPadd.player?.username ?? 'NaN',
 				pos: this.leftPadd.pos.z,
 				score: this.leftPadd.score,
 				color: this.leftPadd.player?.color
 			},
-			rightPadd: { 
+			rightPadd: {
 				username: this.rightPadd.player?.username ?? 'NaN',
 				pos: this.rightPadd.pos.z,
 				score: this.rightPadd.score,
@@ -328,9 +328,9 @@ export class GameLoop
 		if (this.state === State.end && this.rounds.results)
 		{
 			const finalMatch: IResult = this.rounds.results[this.rounds.results.length - 1];
-			gameStateInfo.results = { 
-				winner: finalMatch.winner.username, 
-				loser: finalMatch.loser.username 
+			gameStateInfo.results = {
+				winner: finalMatch.winner.username,
+				loser: finalMatch.loser.username
 			};
 		}
 

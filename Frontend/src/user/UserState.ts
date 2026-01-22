@@ -9,8 +9,6 @@ import { SocialService } from "./Social";
 
 const apiKey : string = import.meta.env.VITE_APP_SECRET_KEY ?? "";
 const apiDomainName : string = import.meta.env.VITE_API_DOMAIN_NAME ?? "";
-console.log(apiKey);
-console.log(apiDomainName);
 
 export type { Subscriber }
 export { UserState, apiKey, apiDomainName }
@@ -161,7 +159,6 @@ class UserState
 				this.user.avatar = data.avatar;
 				this.user.friends = data.friends ?? [];
 				this.user.email = data.email ?? 'not set';
-				this.notifySubscribers();
 				await this.refreshUser();
 				this.notifySubscribers();
 			}
@@ -181,7 +178,6 @@ class UserState
 			user.avatar = data.avatar;
 			this.setUser(user);
 		}
-		console.log(this.user);
 	}
 
 	//------------------------ TOKEN REFRESHER -------------------------------//
@@ -279,7 +275,6 @@ class UserState
 		);
 
 		const data = await response.json();
-		console.log(data);
 		if (!response.ok)
 			throw new Error(data.message || data.error || `Failed to fetch user (${response.status})`);
 

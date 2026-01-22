@@ -1,68 +1,72 @@
-<form
-	id="game-option-form"
-	class="glow-form glow-anim">
+<div class="modal-overlay">
 
-	<h1 class="big-title">
-		Game Options
-	</h1>
+	<form
+		id="game-option-form"
+		class="glow-form glow-anim bg-[#0C0D11]">
 
-	<div id="game-option-container" class="flex flex-col sm:flex-row gap-6">
+		<h1 class="big-title">
+			Game Options
+		</h1>
 
-		<div id="game-setting-container" class="flex flex-col gap-4 flex-1 min-w-60">
-			<!-- Choose match-location : remote or local -->
-			<section id="match-location-section" class="flex flex-col gap-1">
+		<div id="game-option-container" class="flex flex-col sm:flex-row gap-6">
 
-				<label
-					for="match-location"
-					class="text-center sm-title">
-					Match location
-				</label>
-				<select
-					id="match-location"
-					name="match-location"
-					class="gentle-select-compact">
-					<option class='' value="local">Local</option>
-					<option class='' value="remote">Remote</option>
-				</select>
-			</section>
+			<div class="flex flex-col gap-6">
+				<!-- Choose match-location : remote or local -->
+				<section id="match-location-section" class="flex flex-col gap-1">
 
-			<!-- Choose game-type : classic (1vsAI or 1vs1) or tournament -->
-			<section id="match-type-section" class="flex flex-col gap-1">
+					<label
+						for="match-location"
+						class="text-center sm-title">
+						Match location
+					</label>
+					<select
+						id="match-location"
+						name="match-location"
+						class="gentle-select-compact">
+						<option id="match-location-local" class='' value="local">Local</option>
+						<option id="match-location-remote" class='' value="remote">Remote</option>
+					</select>
+				</section>
 
-				<label
-					for="match-type-container"
-					class="text-center sm-title ">
-					Match type
-				</label>
-				<div
-					id="match-type-container">
-					<!-- inputs are handled dynamically -->
-				</div>
-			</section>
+				<!-- Choose game-type : classic (1vsAI or 1vs1) or tournament -->
+				<section id="match-type-section" class="flex flex-col gap-1">
 
-			<!-- Choose game level : the higher the level, the more challenging it is -->
-			<section id="match-level-container" class="flex flex-col gap-1">
+					<label
+						for="match-type-container"
+						class="text-center sm-title ">
+						Match type
+					</label>
+					<select
+						id="match-type"
+						name="match-type"
+						class="gentle-select-compact">
+						<option id="match-type-ai" class='' value="1">1 Player and 1 IA</option>
+						<option id="match-type-vs" class='' value="2">2 Players</option>
+						<option id="match-type-tournament" class='' value="4">4 Players Tournament</option>
+					</select>
+				</section>
 
-				<label
-					for="level"
-					class="text-center sm-title ">
-					How intense ?
-				</label>
-				<select
-					id="level"
-					name="level"
-					class="gentle-select-compact"
-					title="The higher the level, the more challenging it is">
+				<!-- Choose game level : the higher the level, the more challenging it is -->
+				<section id="match-level-container" class="flex flex-col gap-1">
 
-					<option value="0">easy</option>
-					<option value="1">medium</option>
-					<option value="2">hard</option>
-				</select>
-			</section>
-		</div>
+					<label
+						for="level"
+						class="text-center sm-title ">
+						How intense ?
+					</label>
+					<select
+						id="level"
+						name="level"
+						class="gentle-select-compact"
+						title="The higher the level, the more challenging it is">
 
-		<div id="game-customization-container" class="flex flex-col sm:flex-row gap-6">
-			<!-- Choose participants -->
+						<option value="0">easy</option>
+						<option value="1">medium</option>
+						<option value="2">hard</option>
+					</select>
+				</section>
+			</div>
+
 			<section id="customize-name-container" class="flex flex-col gap-1 min-w-36">
 
 				<label
@@ -74,13 +78,16 @@
 					id="players-container"
 					class="w-full flex flex-col gap-1"
 					title="Choose participants">
-					<!-- inputs are handled dynamically -->
+
+					<input name="player-name-1" class="input-field p-2 placeholder:text-center" placeholder="Player 1">
+					<input name="player-name-2" class="invisible input-field p-2 placeholder:text-center" placeholder="Player 2">
+					<input name="player-name-3" class="invisible input-field p-2 placeholder:text-center" placeholder="Player 3">
+					<input name="player-name-4" class="invisible input-field p-2 placeholder:text-center" placeholder="Player 4">
 				</div>
 			</section>
 
 			<!-- Choose paddle colors for each player -->
 			<section id="customize-paddle-container" class="flex flex-col gap-1 min-w-36">
-
 				<label
 					for="paddle-colors-container"
 					class="text-center sm-title ">
@@ -89,16 +96,31 @@
 				<div
 					id="paddle-colors-container"
 					class="w-full flex flex-col flex-wrap gap-1">
-					<!-- inputs are handled dynamically -->
+					<div class="flex items-center justify-center gap-2">
+					<label for="paddle-color-1">Player 1 Color: </label>
+					<input name="paddle-color-1" type="color" value="#a2c2e8" title="Choose paddle color" class="w-12 h-10 border bg-transparent cursor-pointer" placeholder="Player 1">
+					</div>
+					<div class="flex items-center justify-center gap-2">
+					<label for="paddle-color-2">Player 2 Color: </label>
+					<input name="paddle-color-2" type="color" value="#a2c2e8" title="Choose paddle color" class="w-12 h-10 border bg-transparent cursor-pointer" placeholder="Player 1">
+					</div>
+					<div class="flex items-center justify-center gap-2">
+					<label for="paddle-color-3">Player 3 Color: </label>
+					<input name="paddle-color-3" type="color" value="#a2c2e8" title="Choose paddle color" class="w-12 h-10 border bg-transparent cursor-pointer" placeholder="Player 1">
+					</div>
+					<div class="flex items-center justify-center gap-2">
+					<label for="paddle-color-4">Player 4 Color: </label>
+					<input name="paddle-color-4" type="color" value="#a2c2e8" title="Choose paddle color" class="w-12 h-10 border bg-transparent cursor-pointer" placeholder="Player 1">
+					</div>
 				</div>
 			</section>
 		</div>
 
-	</div>
+		<button
+			class="modal-confirm modal-submit glow-button mt-5"
+			type="submit"
+			id="btn-submit">Submit Options
+		</button>
+	</form>
 
-	<button
-		class="glow-button mt-5"
-		type="submit"
-		id="btn-submit">Submit Options
-	</button>
-</form>
+</div>

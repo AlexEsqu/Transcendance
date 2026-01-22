@@ -16,7 +16,7 @@ export { handleMessage, handleDisconnection}
  * 		Declare handlers for the 'waiting room'								 								*
  ***********************************************************************************************************/
 
-function handleMessage(socket: WSWebSocket, message: Buffer, 
+function handleMessage(socket: WSWebSocket, message: Buffer,
 	validateSchema: ValidateFunction, gameControl: GameControl): IPlayer | undefined
 {
 	try {
@@ -50,7 +50,7 @@ function handleMessage(socket: WSWebSocket, message: Buffer,
 			player.isReady = true;
 		else
 			player.isReady = false;
-		
+
 		//	If all players are ready launch the game
 		if (gamingRoom.isEveryoneReady() === true && gamingRoom.gameLoopStarted === false)
 			gamingRoom.startGame(gameControl);

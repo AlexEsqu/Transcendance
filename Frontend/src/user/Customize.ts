@@ -51,7 +51,7 @@ export class CustomizeService
 		}
 
 		this.userState.setUser(user);
-		router.render();
+		await router.render();
 	}
 
 	async updateAvatar(formData: FormData): Promise<void>

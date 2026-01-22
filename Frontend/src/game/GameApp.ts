@@ -18,10 +18,12 @@ export class GameApp
 	private waitingSocket: WebSocket | null = null;
 	private gamingSocket: WebSocket | null = null;
 	isPlayerReady: boolean = false;
+	isOnGamePage: boolean = true;
 
 	constructor(options: IOptions)
 	{
 		this.pong = new Pong("game-canvas", options, this);
+		document.addEventListener('pageLoaded', () => {this.handlePageChange()});
 	}
 
 	private getUserToken(): string | null
@@ -252,6 +254,11 @@ export class GameApp
 			this.gamingSocket = null;
 		}
 		console.log("GAME-APP: sockets are closed");
+	}
+
+	handlePageChange(): void
+	{
+		this.isOnGamePage = false;
 	}
 }
 

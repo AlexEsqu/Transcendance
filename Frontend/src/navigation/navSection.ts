@@ -19,15 +19,12 @@ let hasAttachedNavListeners = false;
 
 function initNavBarListeners()
 {
-	if (!hasAttachedNavListeners)
-	{
-		document.addEventListener('navbarLoaded', () =>
-			{
-				attachNavListeners();
-			}
-		);
-		hasAttachedNavListeners = true;
-	}
+	document.addEventListener('navbarLoaded', () =>
+		{
+			attachNavListeners();
+		}
+	);
+	hasAttachedNavListeners = true;
 
 	UserState.getInstance().subscribe(() => updateNavFromUserData());
 }

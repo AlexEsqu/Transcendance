@@ -5,7 +5,7 @@ import { showRegisteredUserOptions } from '../dashboard/dashboardPage'
 import settingPageHtml from "../html/settings.html?raw"
 import { Subscriber } from "../user/UserState";
 
-export { getSettingPage, onSettingsLoaded }
+export { getSettingPage, onSettingsLoaded, cleanupSettingPage }
 
 let currentOptionsListener: Subscriber | null = null;
 
@@ -19,7 +19,7 @@ function onSettingsLoaded(): void
 	const user = userState.getUser();
 	const isRegistered = user instanceof RegisteredUser;
 
-	cleanupSettingListeners();
+	cleanupSettingPage();
 
 	if (isRegistered)
 	{
@@ -266,9 +266,6 @@ function activateTfaButton(user : RegisteredUser)
 
 	twoFactorAuthSection.parentNode?.replaceChild(new2FASection, twoFactorAuthSection);
 
-	console.log('user in tfa toggle is')
-	console.log(user);
-
 	if (user.hasTwoFactorAuth)
 	{
 		new2FATitle.textContent = "Remove email verification on login";
@@ -318,7 +315,7 @@ function activateDeleteButton()
 	);
 }
 
-function cleanupSettingListeners()
+function cleanupSettingPage()
 {
 	if (currentOptionsListener)
 	{
