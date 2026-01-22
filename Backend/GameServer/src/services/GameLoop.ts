@@ -9,6 +9,7 @@ import { JSONGameState } from '../config/schemas';
 import { GameControl } from './GameControl';
 import { Room } from './Room';
 import { sendMatchesToDataBase } from '../utils/sendMatchResult';
+import { time } from 'node:console';
 
 /************************************************************************************************************/
 
@@ -49,16 +50,18 @@ export class GameLoop
 
 		let isNewRound: boolean = false;
 		let gameStateInfo: JSONGameState;
+		let robotInterval: NodeJS.Timeout;
 
 		console.log("GAME-LOOP: game loop started");
 		//	Take 1 sec to be sure every players are ready
 		setTimeout(() => {
-			const interval = setInterval(() => {
+			const gameInterval = setInterval(() => {
 				// console.log(this.state);
 
 				if (this.state === State.end)
 				{
-					clearInterval(interval);
+					clearInterval(gameInterval);
+					// clearInterval(robotInterval);
 					if (this.rounds.results)
 						sendMatchesToDataBase(this.rounds.results[this.rounds.results.length - 1], Date.now());
 					room.closeRoom();
@@ -69,6 +72,10 @@ export class GameLoop
 				{
 					//	update data & check collisions
 					this.updateGameData();
+					// robotInterval = setInterval(() => {
+					// 	if (this.leftPadd.robot && this.state === State.play)
+					// 		this.processPlayerInput('Robot', this.state, processRobotOpponent(this.leftPadd, this.ball, this.INFO.BOT_PROBABILITY));
+					// }, 1000);
 					//	monitor score/rounds
 					isNewRound = this.isPlayerHittingMaxScore();
 				}
@@ -167,7 +174,7 @@ export class GameLoop
 			return ;
 		}
 
-		const deltaTime: number = this.timestamp === -1 ? Date.now() : (Date.now() - this.timestamp) / 1000;
+		const deltaTime: number = this.timestamp === -1 ? 0 : (Date.now() - this.timestamp) / 1000;
 		//	Frame-rate independent smoothing
         // const alpha: number = 1 - Math.exp(this.INFO.PADD_RESPONSIVENESS * deltaTime);
 		//	Calculate the velocity of the paddle's movement
@@ -184,11 +191,11 @@ export class GameLoop
 		if (this.leftPadd.player === undefined || this.rightPadd.player === undefined)
 			return false;
 
-		if (this.leftPadd.score === this.INFO.MAX_SCORE || this.rightPadd.score === this.INFO.MAX_SCORE) {
+		if (this.leftPadd.score === this.INFO.MAX_SCORE || this.rightPadd.score === this.INFO.MAX_SCORE)
+		{
 			this.state = State.waiting;
 			if (this.rounds.nbOfRounds >= this.INFO.MAX_ROUNDS)
 				this.state = State.end;
-			console.log(`STATE IS ${this.state}`);
 			return true;
 		}
 		return false;
@@ -271,7 +278,7 @@ export class GameLoop
 		else
 			this.rounds.results?.push(results);
 
-		console.log(`GAME-LOOP: for round ${this.rounds.nbOfRounds} the winner is ${winner.player}`);
+		console.log(`GAME-LOOP: for round ${this.rounds.nbOfRounds} the winner is ${winner.player.username}`);
 	}
 
 	resetBall(): void

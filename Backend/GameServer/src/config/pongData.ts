@@ -92,5 +92,6 @@ interface Info {
 	BALL_START_SPEED: number;
 	BALL_MAX_SPEED: number;
 	PADD_SPEED: number;
+	PADD_RESPONSIVENESS: number;
 	BOT_PROBABILITY: number;
 };

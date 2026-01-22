@@ -52,7 +52,8 @@ function initInfoByLevel(level: number, matchType: MatchType): Info
 		BALL_START_SPEED: 3 + level,
 		BALL_MAX_SPEED: 10 + level,
 		PADD_SPEED: 15,
-		BOT_PROBABILITY: 4 - level
+		PADD_RESPONSIVENESS: -60,
+		BOT_PROBABILITY: 6 - level
 	};
 	return INFO;
 }

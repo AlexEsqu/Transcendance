@@ -14,13 +14,13 @@ export class Pong
 	static WAITING_ROOM_URL = `/room/waiting`;
 	static GAMING_ROOM_URL = "/room/gaming";
 
-	gameApp: GameApp;
-	canvas: HTMLCanvasElement;
-	engine: Engine | null = null;
-	scene: IScene;
-	round: number = 0;
+	private gameApp: GameApp;
+	private canvas: HTMLCanvasElement;
+	private engine: Engine | null = null;
+	private round: number = 0;
+	private results: { winner: string, loser: string } | undefined = undefined;
 	mainPlayerUsername: string;
-	results: { winner: string, loser: string } | undefined = undefined;
+	scene: IScene;
 
 	constructor(canvasId: string, options: IOptions, app: GameApp)
 	{
@@ -49,7 +49,7 @@ export class Pong
 	runGame(): void
 	{
 		if (!this.engine || !this.scene.id) {
-			console.error("GAME-FRONT: element is missing, can't run the game");
+			console.error("GAME-APP: element is missing, can't run the game");
 			return ;
 		}
 
@@ -58,7 +58,7 @@ export class Pong
 		//	Manage user input and update data before render
 		this.processInputs(keys);
 		this.scene.id.registerBeforeRender(() => {
-			// console.log(`GAME-FRONT-STATE: ${this.scene.state}`);
+			// console.log(`GAME-APP-STATE: ${this.scene.state}`);
 			this.stateBasedAction(this.scene.state, keys);
 		});
 
@@ -122,9 +122,9 @@ export class Pong
 				this.gameApp.sendUpdateToGameServer(rightPadd.player?.username ?? 'NaN', 'down', true);
 			if (keys["ArrowUp"])
 				this.gameApp.sendUpdateToGameServer(rightPadd.player?.username ?? 'NaN', 'up', true);
-			if (keys["s"])
+			if (keys["s"] && this.scene.options.nbOfPlayers > 1)
 				this.gameApp.sendUpdateToGameServer(leftPadd.player?.username ?? 'NaN', 'down', true);
-			if (keys["w"])
+			if (keys["w"] && this.scene.options.nbOfPlayers > 1)
 				this.gameApp.sendUpdateToGameServer(leftPadd.player?.username ?? 'NaN', 'up', true);
 			return ;
 		}
@@ -183,7 +183,7 @@ export class Pong
 
 	updatePaddleInfo(paddle: IPaddle, newPos: number, newScore: number): void
 	{
-		const alpha: number = 0.9;
+		const alpha: number = 0.8;
 		if (paddle.mesh)
 			paddle.mesh.position.z = paddle.mesh.position.z * (1 - alpha) + newPos * alpha;
 
@@ -193,7 +193,7 @@ export class Pong
 
 	endGame(): void
 	{
-		console.log("GAME-FRONT: end");
+		console.log("GAME-APP: end");
 
 		if (this.scene.leftPadd.player && this.scene.rightPadd.player)
 			drawScore(this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
@@ -202,7 +202,7 @@ export class Pong
 
 		const winnerSpot = document.getElementById('match-results');
 		if (!winnerSpot) {
-			console.log("GAME-FRONT: 'match-results' element is not found");
+			console.log("GAME-APP: 'match-results' element is not found");
 			return ;
 		}
 
