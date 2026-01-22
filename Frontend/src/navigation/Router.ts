@@ -4,7 +4,7 @@ import { User, RegisteredUser } from "../user/User";
 import { getNavBarHtml } from './navSection';
 import { apiDomainName } from "../user/UserState";
 import { getConnectionPage, getGuestForm, getLoginForm, getRegisterForm, onAliasLoaded, onLoginLoaded, onRegisterLoaded } from '../auth/connectionPage'
-import { getDashboardPage, onDashboardLoaded, cleanupDashboardPage } from "../dashboard/dashboardPage";
+import { getDashboardPage, onDashboardLoaded, cleanupDashboardPage, getPolicyPage } from "../dashboard/dashboardPage";
 import { getGamePage, onGameLoaded, cleanGamePage } from "../game/display";
 import { getSettingPage, onSettingsLoaded, cleanupSettingPage } from "../settings/settingPage";
 import { getErrorPage, openErrorModal } from "../error/error";
@@ -221,7 +221,7 @@ class Router
 	{
 		if (!user && route.needUser)
 			return false;
-		if (user && !route.needUser && route.path !== '/error')
+		if (user && !route.needUser && route.path !== '/error' && route.path !== '/policy')
 			return false;
 		return true;
 	}
@@ -257,6 +257,7 @@ class Router
 		this.addRoute('/settings', getSettingPage, onSettingsLoaded, cleanupSettingPage, true);
 		this.addRoute('/game', getGamePage, onGameLoaded, cleanGamePage, true);
 		this.addRoute('/error', getErrorPage);
+		this.addRoute('/policy', getPolicyPage);
 
 		// SPECIAL CASE for oauth callback
 		this.addRoute('/oauth/callback', () => {

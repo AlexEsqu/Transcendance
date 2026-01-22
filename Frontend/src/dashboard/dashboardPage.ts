@@ -5,8 +5,9 @@ import type { Subscriber } from "../user/UserState";
 import { displayMatchHistory } from "./graphSection";
 
 import dashboardHtml from "../html/dashboard.html?raw";
+import policyHtml from "../html/policy.html?raw";
 
-export { getDashboardPage, onDashboardLoaded, showRegisteredUserOptions, cleanupDashboardPage }
+export { getDashboardPage, onDashboardLoaded, showRegisteredUserOptions, cleanupDashboardPage, getPolicyPage }
 
 // variable to hold current listener functions
 
@@ -18,6 +19,11 @@ let currentUsersListener: Subscriber | null = null;
 function getDashboardPage(): string
 {
 	return dashboardHtml;
+}
+
+function getPolicyPage(): string
+{
+	return policyHtml;
 }
 
 
