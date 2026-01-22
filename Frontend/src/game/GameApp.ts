@@ -8,6 +8,9 @@ import { RegisteredUser, User } from '../user/User';
 
 /************************************************************************************************************/
 
+const WAITING_ROOM_URL: string = `/room/waiting`;
+const GAMING_ROOM_URL: string = "/room/gaming";
+
 export class GameApp
 {
 	private pong: Pong;
@@ -50,7 +53,7 @@ export class GameApp
 				return ;
 			}
 
-			this.waitingSocket = new WebSocket(`wss://${window.location.host}${Pong.WAITING_ROOM_URL}?token=${token}`);
+			this.waitingSocket = new WebSocket(`wss://${window.location.host}${WAITING_ROOM_URL}?token=${token}`);
 			if (!this.waitingSocket) {
 				reject(new Error("'waitingSocket' creation failed"));
 				return ;
@@ -127,7 +130,7 @@ export class GameApp
 		if (!token)
 			throw new Error("Authentication token not found for the current user");
 		
-		this.gamingSocket = new WebSocket(`wss://${window.location.host}${Pong.GAMING_ROOM_URL}?token=${token}`);
+		this.gamingSocket = new WebSocket(`wss://${window.location.host}${GAMING_ROOM_URL}?token=${token}`);
 		if (!this.gamingSocket)
 			throw new Error("'gamingSocket' not found");
 
