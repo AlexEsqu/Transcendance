@@ -266,9 +266,6 @@ function activateTfaButton(user : RegisteredUser)
 
 	twoFactorAuthSection.parentNode?.replaceChild(new2FASection, twoFactorAuthSection);
 
-	console.log('user in tfa toggle is')
-	console.log(user);
-
 	if (user.hasTwoFactorAuth)
 	{
 		new2FATitle.textContent = "Remove email verification on login";

@@ -159,14 +159,11 @@ class Router
 
 	handleClickInSinglePage = (event: MouseEvent) =>
 	{
-		console.log('in handle click redirect')
 		const link = (event.target as Element | null)?.closest('[data-link]') as HTMLAnchorElement | null;
 		if (link)
 		{
 			event.preventDefault();
-			console.log('in custom routing')
 			const href = link.getAttribute('href');
-			console.log(href)
 			if (href)
 				this.navigateTo(href);
 		}
