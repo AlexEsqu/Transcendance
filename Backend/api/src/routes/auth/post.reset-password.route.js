@@ -1,5 +1,5 @@
 import { postResetPasswordSchema } from "../../schemas/post.reset-password.schema.js";
-
+import crypto from "crypto";
 export default function postResetPassword(server) {
 	const opts = {
 		schema: postResetPasswordSchema,
@@ -15,7 +15,7 @@ export default function postResetPassword(server) {
 			}
 			const token = crypto.randomBytes(32).toString("hex");
 			const expires = Date.now() + 1000 * 60 * 15; // 15 minutes
-			server.db.prepare(`UPDATE users SET password_reset_token = ?, password_reset_expires = ? WHERE email = ?`).run(token, expires, email);
+			server.db.prepare(`UPDATE users SET reset_password_token = ?, reset_password_token_expires = ? WHERE email = ?`).run(token, expires, email);
 			await server.mailer.sendMail({
 				from: `"Pong" <${process.env.GMAIL_USER}>`,
 				to: email,
