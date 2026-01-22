@@ -14,13 +14,20 @@ export const getOauthCallbackSchema = {
 				type: "string",
 				description: "The code you received as a response of `GET api/users/auth/oauth/42`",
 				example: "a3f9c8e2b4d74e0c9f...",
-			},
+			}
+
+		},
+	},
+	cookies : {
+		type: "object",
+		required: ["state"],
+		properties: {
 			state: {
 				type: "string",
-				description: "Unguessable string provided in the in by backend for verification `GET api/users/auth/oauth/42`",
+				description: "The state you received as a response of `GET api/users/auth/oauth/42`",
 				example: "a3f9c8e2b4d74e0c9f...",
-			},
-		},
+			}
+		}
 	},
 	response: {
 		302: {
