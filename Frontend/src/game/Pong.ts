@@ -10,10 +10,6 @@ import { Engine } from '@babylonjs/core';
 
 export class Pong
 {
-
-	static WAITING_ROOM_URL = `/room/waiting`;
-	static GAMING_ROOM_URL = "/room/gaming";
-
 	private gameApp: GameApp;
 	private canvas: HTMLCanvasElement;
 	private engine: Engine | null = null;
@@ -75,8 +71,8 @@ export class Pong
 
 			if (this.scene.leftPadd.player && this.scene.rightPadd.player)
 			{
-				drawName(this.scene.leftPadd.player.username, this.scene.rightPadd.player.username, this.round);
-				drawScore(this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
+				drawName(this.scene.leftPadd.player, this.scene.rightPadd.player);
+				drawScore(this.scene.leftPadd.player, this.scene.rightPadd.player);
 			}
 		});
 	}
@@ -173,6 +169,11 @@ export class Pong
 				this.scene.leftPadd.mesh.position.z = 0.0;
 				this.scene.rightPadd.mesh.position.z = 0.0;
 			}
+			if (this.scene.leftPadd.player && this.scene.rightPadd.player)
+			{
+				this.scene.leftPadd.player.color = gameState.leftPadd.color ?? '#a2c2e8';
+				this.scene.rightPadd.player.color = gameState.rightPadd.color ?? '#a2c2e8';
+			}
 			return false;
 		}
 		this.updatePaddleInfo(this.scene.leftPadd, gameState.leftPadd.pos, gameState.leftPadd.score);
@@ -196,7 +197,7 @@ export class Pong
 		console.log("GAME-APP: end");
 
 		if (this.scene.leftPadd.player && this.scene.rightPadd.player)
-			drawScore(this.scene.leftPadd.player.score, this.scene.rightPadd.player.score);
+			drawScore(this.scene.leftPadd.player, this.scene.rightPadd.player);
 		
 		this.scene.state = PlayerState.stop;
 

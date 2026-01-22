@@ -115,7 +115,7 @@ function onRegisterLoaded(): void
 
 function onLoginLoaded(): void
 {
-	const loginForm = document.getElementById('login-form') as HTMLFormElement | null;
+	const loginForm = document.getElementById('email-login-form') as HTMLFormElement | null;
 	if (!loginForm)
 		return;
 
@@ -158,6 +158,36 @@ function onLoginLoaded(): void
 			{
 				if (error instanceof Error)
 					openErrorModal(error);
+			}
+		}
+	);
+
+	const resetForm = document.getElementById('password-reset-form') as HTMLFormElement | null;
+	if (!resetForm)
+		return;
+
+	checkInputValidityOnUnfocus(resetForm);
+	resetForm.addEventListener('submit', async (e) =>
+		{
+			e.preventDefault();
+
+			if (isValidInputs(resetForm.querySelectorAll('input')))
+			{
+				const formData = new FormData(resetForm);
+				const email = formData.get('input-email-reset') as string | null;
+
+				if (email)
+				{
+					try
+					{
+						await userState.emailAuth.resetPass(email);
+					}
+					catch (error)
+					{
+						if (error instanceof Error)
+							openErrorModal(error);
+					}
+				}
 			}
 		}
 	);

@@ -50,7 +50,6 @@ async function displayMatchHistory(): Promise<void>
 	{
 		const backendMatches = await userState.customize.fetchMatchHistory();
 		matches = transformMatchData(backendMatches, userState.getUser()?.getId() || -1);
-		console.log(`found history: ${matches}`);
 		if (matches.length < 1)
 			throw new Error("No history yet...")
 	}

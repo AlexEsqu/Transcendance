@@ -96,10 +96,34 @@ export class EmailAuthService
 		}
 	}
 
+	async resetPass(email: string): Promise<void>
+	{
+		const response = await fetch(
+			`${this.apiDomainName}/users/auth/reset-password`,
+			{
+				method: 'POST',
+				headers:
+				{
+					'accept': 'application/json',
+					"Content-Type": 'application/json',
+					'X-App-Secret': `${this.apiKey}`
+				},
+				body: JSON.stringify(
+					{
+						email: email
+					}
+				),
+			}
+		);
+
+		const data = await response.json();
+		if (!response.ok)
+			throw new Error(data.message || data.error || 'Password Reset Failed');
+	}
+
 	async logout(): Promise<void>
 	{
 		const user = this.userState.getUser();
-
 		if (user instanceof RegisteredUser)
 		{
 			const response = await this.userState.fetchWithTokenRefresh(
@@ -125,7 +149,6 @@ export class EmailAuthService
 	async deleteAccount(): Promise<void>
 	{
 		const user = this.userState.getUser();
-
 		if (user instanceof RegisteredUser)
 		{
 			const response = await this.userState.fetchWithTokenRefresh(

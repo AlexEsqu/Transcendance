@@ -234,8 +234,5 @@ async function getAllUsers(): Promise<BaseUser[]>
 	const data = await response.json();
 	if (!response.ok)
 		throw new Error(data.message || data.error || 'Friend fetch Failed');
-
-	console.log('Fetched users:')
-	console.log(data);
 	return data;
 }
