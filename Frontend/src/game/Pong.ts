@@ -2,7 +2,7 @@ import { IOptions, IPaddle, IScene, IPlayer, PlayerState } from "./pongData";
 import { openingAnimation, loadGame, drawScore, drawName, createMaterial } from './Graphics';
 import { getCanvasConfig, getPlayers, processNewPlayerState, assignPlayer } from './utils';
 import { JSONGameState } from './submit.json';
-import { setNotification } from './display';
+import { setNotification, displayGameHelpMessage } from './display';
 import { GameApp } from './GameApp';
 import { Engine } from '@babylonjs/core';
 
@@ -37,9 +37,7 @@ export class Pong
 		this.scene = scene;
 		this.scene.players = players;
 		this.mainPlayerUsername = players[0].username;
-		// this.scene.state = options.matchLocation === 'local' ? PlayerState.opening : PlayerState.waiting;
 		this.scene.state = PlayerState.opening;
-		console.log("MAIN PLAYER ", this.mainPlayerUsername);
 	}
 
 	runGame(): void
@@ -62,7 +60,6 @@ export class Pong
 		this.engine.runRenderLoop(() => {
 			if (!this.scene.id || this.scene.state === PlayerState.stop || !this.gameApp.isOnGamePage)
 			{
-				console.log("IS ON GAME PAGE ? ", this.gameApp.isOnGamePage);
 				if (!this.gameApp.isOnGamePage)
 					this.gameApp.closeSockets();
 				if (this.engine)
@@ -248,6 +245,8 @@ export class Pong
 		window.addEventListener("keydown", (evt) => {
 			if (evt.key === "ArrowDown" || evt.key === "ArrowUp" || evt.key === "ArrowLeft" || evt.key === "ArrowRight")
 				evt.preventDefault();
+			if (evt.key === 'h')
+				displayGameHelpMessage(this.scene.options.matchLocation);
 			keys[evt.key] = true;
 		});
 		window.addEventListener("keyup", (evt) => {

@@ -177,7 +177,6 @@ function loadGame(engine: Engine, canvas: HTMLCanvasElement, options: IOptions):
 	const glowLayer: GlowLayer = new GlowLayer("glow", id, { mainTextureRatio: 0.6 });
 	glowLayer.intensity = 0.7;
 	glowLayer.blurKernelSize = 64;
-	console.log(options.mapColor);
 
 	const map: Mesh | null = createMap(id, GAME_SIZE.MAP_HEIGHT, GAME_SIZE.MAP_WIDTH, options.mapColor);
 
@@ -282,6 +281,5 @@ function drawName(player1: IPlayer | null, player2: IPlayer | null): void
 	{
 		player2Name.textContent = player2.username.substring(0, 10) || "Robot";
 		player2Name.style.color = player2.color;
-		console.log(player2.color);
 	}
 }

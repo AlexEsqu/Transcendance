@@ -110,7 +110,6 @@ export class GameApp
 			};
 
 			this.waitingSocket.onerror = (error) => {
-				// console.error(error);
 				this.waitingSocket?.close();
 				this.waitingSocket = null;
 				reject(new Error("Authentication failed or websocket rejected from the game-server"));

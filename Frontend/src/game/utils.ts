@@ -23,7 +23,6 @@ function getPlayers(inputs: string[], colors: string[], nbOfPlayers: number, mat
 	{
 		if (inputs[i] && colors[i]) {
 			let id;
-			// console.log(`i = ${i} / loc = ${matchLocation} / name = ${inputs[i]} / storage = ${userState.getUser()?.getName()}`)
 			if (matchLocation === 'local' && inputs[i] !== userState.getUser()?.getName())
 				id = -1;
 			else
@@ -32,16 +31,10 @@ function getPlayers(inputs: string[], colors: string[], nbOfPlayers: number, mat
 		}
 	}
 
-	// if (players.length != nbOfPlayers) {
-	// 	console.error("players initialization failed, some players are missing");
-	// 	return null;
-	// }
-
 	// special case: opponent is a robot
-	if (nbOfPlayers === 1) { 
+	if (nbOfPlayers === 1)
 		players.push({ id: 0, username: "Robot", score: 0, color: "#8dbcff" });
-		// players.reverse();
-	}
+
 	return players;
 }
 
