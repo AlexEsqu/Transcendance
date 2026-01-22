@@ -13,8 +13,6 @@ export class GameOptionsModal extends Modal
 	{
 		super(optionsHtml);
 
-		console.log('opening game options');
-
 		const form = this.modalElem.querySelector('form');
 		if (!form)
 			throw new Error('Game Options Form not found');
