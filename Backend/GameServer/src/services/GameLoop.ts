@@ -191,7 +191,8 @@ export class GameLoop
 		if (this.leftPadd.player === undefined || this.rightPadd.player === undefined)
 			return false;
 
-		if (this.leftPadd.score === this.INFO.MAX_SCORE || this.rightPadd.score === this.INFO.MAX_SCORE) {
+		if (this.leftPadd.score === this.INFO.MAX_SCORE || this.rightPadd.score === this.INFO.MAX_SCORE)
+		{
 			this.state = State.waiting;
 			if (this.rounds.nbOfRounds >= this.INFO.MAX_ROUNDS)
 				this.state = State.end;
