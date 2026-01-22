@@ -22,24 +22,28 @@ function setNotification(show: boolean, message: string | undefined): void
 	if (!show)
 	{
 		notification.classList.add('invisible');
-		notification.classList.remove('flex');
+		notification.classList.remove('absolute');
 		// notification.style.display = 'invisible';
 		return ;
 	}
 
 	notification.textContent = message ?? '';
-	notification.className = 'text-2xl text-center';
 	notification.classList.remove('invisible');
-	notification.classList.add('flex');
+	notification.classList.add('absolute');
 }
 
 function onGameLoaded(): void
 {
+	const existingModal = document.querySelector('.modal-overlay');
+	if (existingModal)
+		existingModal.remove();
 	const modal = new GameOptionsModal();
 	modal.show();
 }
 
 function cleanGamePage(): void
 {
-	//
+	const existingModal = document.querySelector('.modal-overlay');
+	if (existingModal)
+		existingModal.remove();
 }

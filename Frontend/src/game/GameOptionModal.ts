@@ -6,138 +6,128 @@ import { launchPongGame } from "./GameApp";
 
 export class GameOptionsModal extends Modal
 {
-	formElement: HTMLFormElement | null = null;
-	nbOfPlayers: number = 1;
-	matchLocation: string = "local";
+	form: HTMLFormElement;
+	isSubmitting: boolean = false;
 
-	constructor() {
+	constructor()
+	{
 		super(optionsHtml);
+
+		console.log('opening game options');
+
+		const form = this.modalElem.querySelector('form');
+		if (!form)
+			throw new Error('Game Options Form not found');
+		this.form = form;
+
 		this.setupModal();
+		this.updateUI();
 	}
 
 	setupModal(): void
 	{
-		this.formElement = this.modalElem.querySelector('form');
-		if (!this.formElement)
-			throw new Error('missing form element');
+		this.form.addEventListener('change', () => this.updateUI());
 
-		const update = () => {
-			const locationSelect = this.modalElem.querySelector('#match-location') as HTMLSelectElement;
-			const playerContainer = this.modalElem.querySelector('#players-container') as HTMLElement;
-			const paddleColorsContainer = this.modalElem.querySelector('#paddle-colors-container') as HTMLElement;
-
-			this.matchLocation = locationSelect.value;
-			const matchTypeSelect = this.modalElem.querySelector('#match-type') as HTMLSelectElement;
-			this.nbOfPlayers = matchTypeSelect ? parseInt(matchTypeSelect.value) : 1;
-
-			this.removeIncompatibleOptions()
-			this.showPlayerUsernameInput(playerContainer);
-			this.showPaddleCustom(paddleColorsContainer);
-		};
-
-		update();
-
-		this.formElement.addEventListener('change', (e) => {
-			update();
-		});
-
-		this.formElement.addEventListener('submit', (e) => {
+		this.form.addEventListener('submit', async (e) => {
 			e.preventDefault();
-			try {
+			if (this.isSubmitting)
+				return;
+
+			try
+			{
+				this.isSubmitting = true;
 				const options = this.extractOptions();
 				launchPongGame(options);
 				this.close();
-			} catch (error) {
-				console.error('Error during form submission:', error);
+			}
+			catch (error)
+			{
+				console.error('Submission error:', error);
+				this.isSubmitting = false;
 			}
 		});
 	}
 
-	removeIncompatibleOptions()
+	updateUI(): void
 	{
-		if (this.matchLocation == "remote")
+		const formData = new FormData(this.form);
+		const location = formData.get('match-location') as string;
+		const aiOption = this.form.querySelector('#match-type-ai') as HTMLElement;
+		const typeSelect = this.form.querySelector('#match-type') as HTMLSelectElement;
+
+		if (location === 'remote')
 		{
-			this.formElement?.querySelector("#match-type-ai")?.classList.add("hidden")
-			const matchTypeSelect = this.formElement?.querySelector('#match-type') as HTMLSelectElement;
-			if (matchTypeSelect && matchTypeSelect.value === "1") {
-				matchTypeSelect.value = "2";
-			}
+			aiOption.classList.add('hidden');
+			if (typeSelect.value === '1')
+				typeSelect.value = '2';
 		}
 		else
-		{
-			this.formElement?.querySelector("#match-type-ai")?.classList.remove("hidden")
-		}
+			aiOption.classList.remove('hidden');
 
+		const nbPlayers = parseInt(typeSelect.value) || 1;
+		this.syncVisibility('#players-container input', nbPlayers, (el, i) =>
+			{
+				const input = el as HTMLInputElement;
+				if (i === 0) {
+					input.value = userState.getUser()?.getName() ?? '';
+					input.readOnly = true;
+				} else {
+					input.readOnly = false;
+				}
+			}
+		);
+
+		this.syncVisibility('#paddle-colors-container > div', nbPlayers);
 	}
 
-	extractOptions(): IOptions {
-		const formData = new FormData(this.formElement!);
+	syncVisibility(selector: string, count: number, onShow?: (el: Element, index: number) => void)
+	{
+		const elements = this.form.querySelectorAll(selector);
+		elements.forEach((el, index) =>
+			{
+				const isVisible = index < count;
+				if (isVisible)
+				{
+					el.classList.remove('invisible');
+					if (onShow) onShow(el, index);
+				}
+				else
+				{
+					el.classList.add('invisible');
+					if (el instanceof HTMLInputElement) el.value = '';
+				}
+			}
+		);
+	}
 
-		const players: string[] = [];
-		const colors: string[] = [];
-		for (let i = 1; i <= this.nbOfPlayers; i++) {
-			const name = formData.get(`player-${i}`) as string;
-			const color = formData.get(`paddle-color-${i}`) as string;
+	extractOptions(): IOptions
+	{
+		const formData = new FormData(this.form);
+		const nbOfPlayers = parseInt(formData.get('match-type') as string);
 
-			const defaultName = i === 1 ? (userState.getUser()?.getName() ?? 'Player 1') : `Player ${i}`;
-			players.push(name || defaultName);
-			colors.push(color || '#a2c2e8');
-		}
+		const players = Array.from({ length: nbOfPlayers }, (_, i) =>
+			{
+				const val = formData.get(`player-name-${i + 1}`) as string;
+				if (i === 0) return userState.getUser()?.getName() ?? 'Player 1';
+				return val || `Player ${i + 1}`;
+			}
+		);
+
+		const colors = Array.from({ length: nbOfPlayers }, (_, i) =>
+			{
+				return (formData.get(`paddle-color-${i + 1}`) as string)
+					|| '#a2c2e8';
+			}
+		);
 
 		return {
 			matchLocation: formData.get('match-location') as string,
 			level: parseInt(formData.get('level') as string),
-			nbOfPlayers: parseInt(formData.get('match-type') as string),
-			players: players,
+			nbOfPlayers,
+			players,
 			paddColors: colors,
 			ballColor: '#a2c2e8',
 			mapColor: "#210446ff"
 		};
-	}
-
-	showPlayerUsernameInput(playersContainer: HTMLElement): void
-	{
-		const inputs = playersContainer.querySelectorAll('input[name^="player-"]') as NodeListOf<HTMLInputElement>;
-		inputs.forEach((input, idx) => {
-			if (idx < this.nbOfPlayers)
-			{
-				input.classList.remove('invisible');
-				if (idx === 0)
-				{
-					input.value = userState.getUser()?.getName() ?? '';
-					input.readOnly = true;
-				}
-				else
-				{
-					input.readOnly = false;
-				}
-			}
-			else
-			{
-				input.classList.add('invisible');
-				input.value = '';
-				input.readOnly = false;
-			}
-		});
-	}
-
-
-	showPaddleCustom(paddleColorsContainer: HTMLElement): void
-	{
-		const colorInputs = paddleColorsContainer.querySelectorAll('input[type="color"]');
-		const labels = paddleColorsContainer.querySelectorAll('label');
-
-		colorInputs.forEach((input, idx) => {
-			if (idx < this.nbOfPlayers)
-			{
-				input.classList.remove('invisible');
-				if (labels[idx]) labels[idx].classList.remove('invisible');
-			}
-			else
-			{
-				input.classList.add('invisible');
-				if (labels[idx]) labels[idx].classList.add('invisible');
-			}
-		});
 	}
 }
