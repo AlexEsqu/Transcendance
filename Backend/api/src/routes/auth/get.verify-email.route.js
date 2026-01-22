@@ -6,8 +6,8 @@ export default function getVerifyEmail(server) {
 		schema: getVerifyEmailSchema,
 	};
 	server.get("/verify-email", opts, async (request, reply) => {
+		const { token } = request.query;
 		try {
-			const { token } = request.query;
 			if (!token) {
 				throw new Error("Missing token", 400);
 			}
