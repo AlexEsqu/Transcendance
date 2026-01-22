@@ -161,4 +161,20 @@ function onLoginLoaded(): void
 			}
 		}
 	);
+
+	const resetPassBtn = document.getElementById('reset-pass-form') as HTMLButtonElement;
+	resetPassBtn.addEventListener('click', async (e) =>
+		{
+			e.preventDefault();
+			try
+			{
+				await userState.emailAuth.resetPass();
+			}
+			catch (error)
+			{
+				if (error instanceof Error)
+					openErrorModal(error);
+			}
+		}
+	);
 }
