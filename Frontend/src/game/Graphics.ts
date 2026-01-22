@@ -1,6 +1,6 @@
 import { Engine, Scene, Mesh, MeshBuilder, Vector3, Color3, GlowLayer, Color4, StandardMaterial,
 	 ArcRotateCamera, GroundMesh, Animation, IAnimationKey } from '@babylonjs/core';
-import { GAME_SIZE, IOptions, IScene, PlayerState } from './pongData';
+import { GAME_SIZE, IOptions, IScene, PlayerState, IPlayer } from './pongData';
 
 /************************************************************************************************************/
 
@@ -133,7 +133,7 @@ function createAnimation(username: string, target: string, keys: IAnimationKey[]
  */
 function openingAnimation(scene: IScene): void
 {
-	console.log("GAME-FRONT: opening scene animation");
+	console.log("GAME-APP: opening scene animation");
 
 	const endCameraAngle: number = Math.PI / 4;
 
@@ -164,7 +164,7 @@ function loadGame(engine: Engine, canvas: HTMLCanvasElement, options: IOptions):
 
 	const id = new Scene(engine) as Scene;
 	if (!id) {
-		console.error("GAME-FRONT: 'scene' creation failed");
+		console.error("GAME-APP: 'scene' creation failed");
 		return null;
 	}
 
@@ -187,7 +187,7 @@ function loadGame(engine: Engine, canvas: HTMLCanvasElement, options: IOptions):
 	//	Create the ball
 	const ball: Mesh | null = setupBall(id, options.ballColor);
 	if (!ball) {
-		console.error("GAME-FRONT: failed to create 'Ball', can't load game");
+		console.error("GAME-APP: failed to create 'Ball', can't load game");
 		return null;
 	}
 
@@ -195,7 +195,7 @@ function loadGame(engine: Engine, canvas: HTMLCanvasElement, options: IOptions):
 	const leftPadd: Mesh | null = setupPaddle(id, options.paddColors[0], 'left');
 	const rightPadd: Mesh | null = setupPaddle(id, options.paddColors[Math.min(1, options.paddColors.length - 1)] ?? "#a2c2e8", 'right');
 	if (!leftPadd || !rightPadd) {
-		console.error("GAME-FRONT: failed to create 'Paddle', can't load game");
+		console.error("GAME-APP: failed to create 'Paddle', can't load game");
 		return null;
 	}
 	
@@ -210,7 +210,7 @@ function loadGame(engine: Engine, canvas: HTMLCanvasElement, options: IOptions):
 		state: 0
 	};
 
-	console.log("GAME-FRONT: game scene loaded");
+	console.log("GAME-APP: game scene loaded");
 	return scene;
 }
 
@@ -244,25 +244,44 @@ function setupPaddle(scene: Scene, color: string, side: string): Mesh | null
  ***********************************************************************************************************/
 
 // FYI: score1 is the player2
-function drawScore(score1: number, score2: number): void
+function drawScore(player1: IPlayer | null, player2: IPlayer | null): void
 {
+	if (!player1 || !player2)
+		return ;
+
 	const player1Score = document.getElementById('player1-score');
 	const player2Score = document.getElementById('player2-score');
 
 	if (player1Score)
-		player1Score.textContent = score1.toString();
+	{
+		player1Score.textContent = player1.score.toString();
+		player1Score.style.color = player1.color;
+	}
 
 	if (player2Score)
-		player2Score.textContent = score2.toString();
+	{
+		player2Score.textContent = player2.score.toString();
+		player2Score.style.color = player2.color;
+	}
 }
 
-function drawName(player1: string, player2: string, nbRound: number): void
+function drawName(player1: IPlayer | null, player2: IPlayer | null): void
 {
+	if (!player1 || !player2)
+		return ;
+
 	const player1Name = document.getElementById('player1-name');
 	const player2Name = document.getElementById('player2-name');
 
 	if (player1Name)
-		player1Name.textContent = player1.substring(0, 10) || 'You';
+	{
+		player1Name.textContent = player1.username.substring(0, 10) || 'You';
+		player1Name.style.color = player1.color;
+	}
 	if (player2Name)
-		player2Name.textContent = player2.substring(0, 10) || "Robot";
+	{
+		player2Name.textContent = player2.username.substring(0, 10) || "Robot";
+		player2Name.style.color = player2.color;
+		console.log(player2.color);
+	}
 }

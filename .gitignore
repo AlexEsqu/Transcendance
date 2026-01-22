@@ -11,3 +11,4 @@ dist/
 *.crt
 Pong_old.ts
 Backend/data/*
+draft
