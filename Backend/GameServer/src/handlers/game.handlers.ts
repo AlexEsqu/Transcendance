@@ -3,7 +3,7 @@ import { WebSocket as WSWebSocket } from 'ws';
 import { getJSONError } from '../errors/input.error';
 import { GameControl } from '../services/GameControl';
 import { Room } from '../services/Room';
-import { IPlayer, State, GAME_SIZE, MatchType } from '../config/pongData';
+import { IPlayer, State, GAME_SIZE, MatchType, GameLocation } from '../config/pongData';
 import { JSONInputsUpdate } from '../config/schemas';
 import { notifyPlayersInRoom } from '../utils/broadcast';
 import { GameLoop } from '../services/GameLoop';
@@ -86,6 +86,12 @@ function handleDisconnection(socket: WSWebSocket, gameControl: GameControl): voi
 	{
 		gamingRoom.closeRoom();
 		gameControl.deleteRoom(gamingRoom.id);
+		return ;
+	}
+
+	if (gamingRoom.location === GameLocation.local)
+	{
+		gamingRoom.gameLoop.state = State.end;
 		return ;
 	}
 

@@ -60,13 +60,17 @@ export class Pong
 
 		//	Rendering loop
 		this.engine.runRenderLoop(() => {
-			if (!this.scene.id || this.scene.state === PlayerState.stop)
+			if (!this.scene.id || this.scene.state === PlayerState.stop || !this.gameApp.isOnGamePage)
 			{
+				console.log("IS ON GAME PAGE ? ", this.gameApp.isOnGamePage);
+				if (!this.gameApp.isOnGamePage)
+					this.gameApp.closeSockets();
 				if (this.engine)
 					this.engine.stopRenderLoop();
 				this.engine = null;
 				return ;
 			}
+
 			this.scene.id.render();
 
 			if (this.scene.leftPadd.player && this.scene.rightPadd.player)

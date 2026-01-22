@@ -49,7 +49,6 @@ export class GameLoop
 
 		let isNewRound: boolean = false;
 		let gameStateInfo: JSONGameState;
-		let robotInterval: NodeJS.Timeout;
 
 		console.log("GAME-LOOP: game loop started");
 		//	Take 1 sec to be sure every players are ready
@@ -60,10 +59,12 @@ export class GameLoop
 				if (this.state === State.end)
 				{
 					clearInterval(gameInterval);
-					// clearInterval(robotInterval);
 					if (this.rounds.results)
 						sendMatchesToDataBase(this.rounds.results[this.rounds.results.length - 1], Date.now());
+					else
+						console.log("GAME-LOOP: not results of match, player(s) disconnected before the end");
 					room.closeRoom();
+					gameControl.deleteRoom(this.roomId);
 					return ;
 				}
 
@@ -71,11 +72,6 @@ export class GameLoop
 				{
 					//	update data & check collisions
 					this.updateGameData();
-					// robotInterval = setInterval(() => {
-					// 	if (this.leftPadd.robot && this.state === State.play)
-					// 		this.processPlayerInput('Robot', this.state, processRobotOpponent(this.leftPadd, this.ball, this.INFO.BOT_PROBABILITY));
-					// }, 1000);
-					//	monitor score/rounds
 					isNewRound = this.isPlayerHittingMaxScore();
 				}
 

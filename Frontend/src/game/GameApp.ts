@@ -40,6 +40,7 @@ export class GameApp
 		const user: User | null = userState.getUser();
 		if (user)
 		{
+			userState.refreshToken();
 			const token = user instanceof RegisteredUser ? user.accessToken : null;
 			return token;
 		}
@@ -153,6 +154,8 @@ export class GameApp
 			{
 				if (this.roomId === undefined || !this.gamingSocket)
 					throw new Error("GAME-APP: can't identify client, impossible to process the message received from server");
+				if (!this.isOnGamePage)
+					this.closeSockets();
 
 				if (event.data.includes("left room"))
 				{
@@ -218,6 +221,8 @@ export class GameApp
 					this.sendUpdateToGameServer(this.pong.mainPlayerUsername, 'none', true);
 			}
 		}
+		if (!this.isOnGamePage)
+			this.closeSockets();
 	}
 
 	sendUpdateToGameServer(player: string, action: string, ready: boolean): void
