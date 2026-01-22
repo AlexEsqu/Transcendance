@@ -4,7 +4,7 @@ import { getFriendsSchema } from "../../../schemas/get.friends.schema.js";
 export function getFriends(server) {
 	const opts = {
 		schema: getFriendsSchema,
-		onRequest: [server.authenticateClient, server.authenticateUser],
+		onRequest: [server.authenticateUser],
 	};
 	server.get("/me/friends", opts, async (req, reply) => {
 		try {

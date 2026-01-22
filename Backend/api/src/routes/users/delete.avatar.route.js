@@ -4,7 +4,7 @@ import { deleteUserAvatarSchema } from "../../schemas/delete.avatar.schema.js";
 export function deleteUserAvatar(server) {
 	const opts = {
 		schema: deleteUserAvatarSchema,
-		onRequest: [server.authenticateUser, server.authenticateClient],
+		onRequest: [server.authenticateUser],
 	};
 	server.delete("/me/avatar", opts, async (req, reply) => {
 		try {

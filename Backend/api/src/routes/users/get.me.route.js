@@ -4,7 +4,7 @@ import { formatUserObject, getUserbyId } from "../../utils/utils.js";
 export async function getMe(server) {
 	const opts = {
 		schema: getMeSchema,
-		onRequest: [server.authenticateUser, server.authenticateClient],
+		onRequest: [server.authenticateUser],
 	};
 	server.get("/me", opts, async (req, reply) => {
 		try {

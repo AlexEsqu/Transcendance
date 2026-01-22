@@ -3,7 +3,6 @@ import { getUserMatchesSchema, getMatchesSchema } from "../../schemas/get.matche
 export function getUserMatches(server) {
 	const opts = {
 		schema: getUserMatchesSchema,
-		onRequest: [server.authenticateClient],
 	};
 	server.get("/:id/matches", opts, async (req, reply) => {
 		try {
@@ -29,7 +28,6 @@ export function getUserMatches(server) {
 export function getMatches(server) {
 	const opts = {
 		schema: getMatchesSchema,
-		onRequest: [server.authenticateClient],
 	};
 	server.get("/matches", opts, (req, reply) => {
 		try {

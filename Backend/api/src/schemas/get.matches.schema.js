@@ -3,7 +3,6 @@ import { Security } from "../utils/openApiSecurity.js";
 export const getUserMatchesSchema = {
 	tags: ["matches"],
 	description: "Returns a list of all the matches of a user using the user_id parameter. `This endpoint requires client authentication.`",
-	security: Security.AppAuth,
 	params: { $ref: "userIdObject#" },
 	response: {
 		200: {
@@ -32,7 +31,6 @@ export const getUserMatchesSchema = {
 export const getMatchesSchema = {
 	tags: ["matches"],
 	description: "Returns a list of all matches. `This endpoint requires client authentication.`",
-	security: Security.AppAuth,
 	response: {
 		200: {
 			type: "array",

@@ -4,7 +4,6 @@ import { getUserSchema } from "../../schemas/get.user.schema.js";
 export function getUser(server) {
 	const singleUserSchema = {
 		schema: getUserSchema,
-		onRequest: [server.authenticateClient],
 	};
 	server.get("/users/:id", singleUserSchema, async (req, reply) => {
 		try {

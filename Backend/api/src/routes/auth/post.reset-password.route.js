@@ -3,7 +3,6 @@ import crypto from "crypto";
 export default function postResetPassword(server) {
 	const opts = {
 		schema: postResetPasswordSchema,
-		onRequest: [server.authenticateClient],
 	};
 	server.post("/reset-password", opts, async (req, reply) => {
 		try {

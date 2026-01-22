@@ -3,7 +3,7 @@ import { putUsernameSchema } from "../../schemas/put.username.schema.js";
 export default function putUsername(server) {
 	const opts = {
 		schema: putUsernameSchema,
-		onRequest: [server.authenticateUser, server.authenticateClient],
+		onRequest: [server.authenticateUser],
 	};
 	server.put("/me/username", opts, async (req, reply) => {
 		try {

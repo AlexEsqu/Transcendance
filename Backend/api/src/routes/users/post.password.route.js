@@ -5,7 +5,7 @@ import { postUserPasswordSchema } from "../../schemas/post.password.schema.js";
 export function postUserPassword(server) {
 	const opts = {
 		schema: postUserPasswordSchema,
-		onRequest: [server.authenticateUser, server.authenticateClient],
+		onRequest: [server.authenticateUser],
 	};
 	server.post("/me/password", opts, async (req, reply) => {
 		try {

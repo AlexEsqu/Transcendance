@@ -3,7 +3,6 @@ import { Security } from "../utils/openApiSecurity.js";
 export const getUserSchema = {
 	tags: ["user"],
 	description: "Returns an object of an user using the id passed in parameters. `This endpoint requires client authentication.`",
-	security: Security.AppAuth,
 	params: { $ref: "userIdObject#" },
 	response: {
 		200: { $ref: "publicUserObject#" },

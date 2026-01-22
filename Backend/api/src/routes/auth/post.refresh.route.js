@@ -4,7 +4,7 @@ import { postRefreshSchema } from "../../schemas/post.refresh.schema.js";
 function postRefresh(server) {
 	const opts = {
 		schema: postRefreshSchema,
-		onRequest: [server.authenticateClient, server.authenticateRefreshToken],
+		onRequest: [server.authenticateRefreshToken],
 	};
 	server.post("/refresh", opts, async (req, reply) => {
 		try {

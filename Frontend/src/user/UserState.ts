@@ -196,7 +196,7 @@ class UserState
 				{
 					'accept': 'application/json',
 					'Authorization': `Bearer ${this.user.accessToken}`,
-					'X-App-Secret': `${apiKey}`
+					
 				},
 			}
 		);
@@ -269,7 +269,7 @@ class UserState
 				headers:
 				{
 					'accept': 'application/json',
-					'X-App-Secret': `${apiKey}`,
+					
 					'Authorization': `Bearer ${this.user.accessToken}`
 				}
 			}
@@ -302,7 +302,7 @@ class UserState
 				headers:
 				{
 					'accept': 'application/json',
-					'X-App-Secret': `${apiKey}`,
+					
 					'Authorization': `Bearer ${user.accessToken}`
 				}
 			}
@@ -324,7 +324,7 @@ class UserState
 				headers:
 				{
 					'accept': 'application/json',
-					'X-App-Secret': `${apiKey}`,
+					
 					'Authorization': `Bearer ${user.accessToken}`
 				}
 			}

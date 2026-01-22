@@ -3,7 +3,7 @@ import { getTwoFactorSchema } from "../../schemas/get.two-factor.schema.js";
 export function getTwoFactor(server) {
 	const opts = {
 		schema: getTwoFactorSchema,
-		onRequest: [server.authenticateUser, server.authenticateClient],
+		onRequest: [server.authenticateUser],
 	};
 	server.get("/me/2fa", opts, async (req, reply) => {
 		try {

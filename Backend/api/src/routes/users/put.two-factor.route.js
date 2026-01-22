@@ -3,7 +3,7 @@ import { putTwoFactorSchema } from "../../schemas/put.two-factor.schema.js";
 export function putTwoFactor(server) {
 	const opts = {
 		schema: putTwoFactorSchema,
-		onRequest: [server.authenticateUser, server.authenticateClient],
+		onRequest: [server.authenticateUser],
 	};
 	server.put("/me/2fa", opts, async (req, reply) => {
 		try {

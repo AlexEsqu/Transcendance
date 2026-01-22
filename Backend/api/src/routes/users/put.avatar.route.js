@@ -4,7 +4,7 @@ import { putUserAvatarSchema } from "../../schemas/put.avatar.schema.js";
 export function putUserAvatar(server) {
 	const opts = {
 		schema: putUserAvatarSchema,
-		onRequest: [server.authenticateUser, server.authenticateClient],
+		onRequest: [server.authenticateUser],
 	};
 	server.put("/me/avatar", opts, async (req, reply) => {
 		try {

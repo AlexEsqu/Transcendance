@@ -7,7 +7,7 @@ import { putUserPasswordSchema } from "../../schemas/put.password.schema.js";
 export function putUserPassword(server) {
 	const opts = {
 		schema: putUserPasswordSchema,
-		onRequest: [server.authenticateUser, server.authenticateClient],
+		onRequest: [server.authenticateUser],
 	};
 	server.put("/me/password", opts, async (req, reply) => {
 		try {

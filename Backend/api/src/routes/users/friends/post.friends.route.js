@@ -4,7 +4,7 @@ import { postFriendSchema } from "../../../schemas/post.friends.schema.js";
 export function postFriend(server) {
 	const opts = {
 		schema: postFriendSchema,
-		onRequest: [server.authenticateUser, server.authenticateClient],
+		onRequest: [server.authenticateUser],
 		preHandler: async (req, reply) => {
 			// Verify the id passed as parameter
 			const { id } = req.body;

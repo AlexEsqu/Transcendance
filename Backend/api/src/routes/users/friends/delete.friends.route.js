@@ -4,7 +4,7 @@ import { deleteFriendSchema } from "../../../schemas/delete.friends.schema.js";
 export  function deleteFriend(server) {
 	const opts = {
 		schema: deleteFriendSchema,
-		onRequest: [server.authenticateUser, server.authenticateClient],
+		onRequest: [server.authenticateUser],
 		preHandler: async (req, reply) => {
 			// Verify the id passed as parameter
 			const { id } = req.body;

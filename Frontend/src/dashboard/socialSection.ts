@@ -226,7 +226,7 @@ async function getAllUsers(): Promise<BaseUser[]>
 			method: 'GET',
 			headers: {
 				'accept': 'application/json',
-				'X-App-Secret': `${apiKey}`
+				
 			}
 		}
 	);

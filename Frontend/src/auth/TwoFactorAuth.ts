@@ -34,7 +34,7 @@ export class TwoFactorAuthService
 				headers: {
 					'accept': 'application/json',
 					'Authorization': `Bearer ${user.accessToken}`,
-					'X-App-Secret': `${apiKey}`,
+					
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({
@@ -61,7 +61,7 @@ export class TwoFactorAuthService
 				method: 'POST',
 				headers: {
 					'accept': 'application/json',
-					'X-App-Secret': `${apiKey}`,
+					
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({ code: code })

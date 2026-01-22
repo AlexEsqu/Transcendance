@@ -4,7 +4,7 @@ import { deleteMeSchema } from "../../schemas/delete.me.schema.js";
 function deleteMe(server) {
 	const opts = {
 		schema: deleteMeSchema,
-		onRequest: [server.authenticateUser, server.authenticateClient],
+		onRequest: [server.authenticateUser],
 	};
 	server.delete("/me", opts, (req, reply) => {
 		try {

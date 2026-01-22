@@ -11,7 +11,7 @@ components:
     cookieAuth:
       type: apiKey
       in: cookie
-      name: refreshToken
+      name: refresh_token
     AppClientAuth:
       type: apiKey
       in: header
@@ -150,24 +150,72 @@ components:
       description: Two-factor authentication required
       title: twoFactorRequiredObject
     def-9:
-      tags:
-        - user
-      description: Deletes the user account and all its data. `This endpoint requires
-        client AND user authentication.`
-      security:
-        - BearerAuth: []
-          AppClientAuth: []
-      response:
-        "204":
-          description: "Success: User deleted successfully"
-          type: "null"
-        "401":
-          $ref: "#/components/schemas/def-1"
-        "500":
-          $ref: "#/components/schemas/def-1"
-        default:
-          $ref: "#/components/schemas/def-1"
-      title: deleteUserSchema
+      type: object
+      description: Private authenticated user data
+      required:
+        - id
+        - username
+        - email
+        - avatar
+        - email_verified
+        - is_2fa_enabled
+        - oauth_provider
+        - matches
+        - is_active
+        - oauth
+        - is_password_set
+      properties:
+        id:
+          type: integer
+          example: 1
+        username:
+          type: string
+          minLength: 3
+          maxLength: 32
+          example: lasablon
+        email:
+          type: string
+          format: email
+          example: lasablon@student.42.fr
+        avatar:
+          type:
+            - "null"
+            - string
+          format: uri
+          example: https://localhost:8443/api/avatars/user_1.jpg
+        email_verified:
+          type: boolean
+          description: Whether the user's email is verified
+          example: true
+        is_2fa_enabled:
+          type: boolean
+          description: Whether two-factor authentication is enabled
+          example: false
+        oauth_provider:
+          type:
+            - "null"
+            - string
+          description: OAuth provider used for signup
+          example: "42"
+        oauth:
+          type: boolean
+          description: Whether the user authenticated via OAuth
+          example: true
+        is_active:
+          type: boolean
+          description: Whether the user account is active
+          example: true
+        matches:
+          type: array
+          description: List of matches played by the user
+          items:
+            $ref: "#/components/schemas/def-4"
+        is_password_set:
+          type: boolean
+          description: Whether the user has set a password
+          example: true
+      additionalProperties: false
+      title: privateUserObject
 paths:
   /api/matches:
     post:
@@ -181,7 +229,7 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/def-4"
-      security: &a1
+      security:
         - AppClientAuth: []
       responses:
         "200":
@@ -219,7 +267,6 @@ paths:
         - matches
       description: Returns a list of all matches. `This endpoint requires client
         authentication.`
-      security: *a1
       responses:
         "200":
           description: Default Response
@@ -259,7 +306,6 @@ paths:
           in: path
           name: id
           required: true
-      security: *a1
       responses:
         "200":
           description: Default Response
@@ -293,13 +339,78 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/def-1"
+  /api/users/me:
+    get:
+      tags:
+        - user
+      description: Returns an object of the current user data. `This endpoint requires
+        user authentication.`
+      security: &a1
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Private authenticated user data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-9"
+        "401":
+          description: "Unauthorized: Invalid credentials"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "404":
+          description: "Not Found: User not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+    delete:
+      tags:
+        - user
+      description: Deletes the user account and all its data. `This endpoint requires
+        client AND user authentication.`
+      security: *a1
+      responses:
+        "204":
+          description: "Success: User deleted successfully"
+        "401":
+          description: "Unauthorized: Invalid credentials"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
   /api/users:
     get:
       tags:
         - user
       description: Returns a list of all registered users. `This endpoint requires
         client authentication.`
-      security: *a1
       responses:
         "200":
           description: Default Response
@@ -321,7 +432,6 @@ paths:
           in: path
           name: id
           required: true
-      security: *a1
       responses:
         "200":
           description: Default Response
@@ -387,9 +497,7 @@ paths:
                   minLength: 8
               additionalProperties: false
         required: true
-      security: &a2
-        - BearerAuth: []
-          AppClientAuth: []
+      security: *a1
       responses:
         "200":
           description: Updated password successfully
@@ -439,7 +547,7 @@ paths:
                   minLength: 8
               additionalProperties: false
         required: true
-      security: *a2
+      security: *a1
       responses:
         "200":
           description: Uploaded password successfully
@@ -495,7 +603,7 @@ paths:
                   type: string
                   format: binary
         required: true
-      security: *a2
+      security: *a1
       responses:
         "200":
           description: Updated avatar successfully
@@ -538,7 +646,7 @@ paths:
         - user
       description: Deletes the avatar of the user. `This endpoint requires client AND
         user authentication.`
-      security: *a2
+      security: *a1
       responses:
         "204":
           description: "Success: Avatar deleted successfully"
@@ -580,7 +688,7 @@ paths:
                   maxLength: 20
               additionalProperties: false
         required: true
-      security: *a2
+      security: *a1
       responses:
         "200":
           description: Updated username successfully
@@ -622,16 +730,16 @@ paths:
     post:
       tags:
         - user
-      description: Adds a new friend to the authenticated user's friend list.						The
-        new friend's `id` provided in the request body is validated before the
-        friendship record is created.						`This endpoint requires client
+      description: Adds a new friend to the authenticated user's friend list.		The new
+        friend's `id` provided in the request body is validated before the
+        friendship record is created.		`This endpoint requires client
         authentication AND user authentication.`
       requestBody:
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/def-5"
-      security: *a2
+      security: *a1
       responses:
         "201":
           description: OK
@@ -679,14 +787,14 @@ paths:
       tags:
         - user
       description: Deletes a friend from the authenticated user's friend list using
-        the id passed in the body.						`This endpoint requires client
+        the id passed in the body.			`This endpoint requires client
         authentication AND user authentication.`
       requestBody:
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/def-5"
-      security: *a2
+      security: *a1
       responses:
         "204":
           description: "Success: Friend deleted successfully"
@@ -724,9 +832,9 @@ paths:
       tags:
         - user
       description: Returns the complete list of friends of the authenticated
-        user.				Returns basic profile information for each friend.				`This
+        user.		Returns basic profile information for each friend.		`This
         endpoint requires client authentication AND user authentication.`
-      security: *a2
+      security: *a1
       responses:
         "200":
           description: Default Response
@@ -760,11 +868,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/def-1"
-  /api/users/me:
-    delete:
-      responses:
-        "200":
-          description: Default Response
   /api/users/me/2fa:
     put:
       tags:
@@ -781,7 +884,7 @@ paths:
                 enabled:
                   type: boolean
         required: true
-      security: *a2
+      security: *a1
       responses:
         "200":
           description: " 2FA status updated successfully "
@@ -793,7 +896,7 @@ paths:
       tags:
         - user
       description: Returns 2fa activation status
-      security: *a2
+      security: *a1
       responses:
         "200":
           description: Returns 2fa activation status
@@ -813,38 +916,43 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/def-1"
-  /api/guests:
-    post:
+  /api/users/me/change-email:
+    put:
       tags:
-        - guests
-      description: Add a guest
+        - user
+      description: Changes the email of the user
       requestBody:
         content:
           application/json:
             schema:
               type: object
               required:
-                - alias
+                - email
               properties:
-                alias:
+                email:
                   type: string
-                  description: Alias chosen by user
+                  format: email
         required: true
       security: *a1
       responses:
-        "201":
-          description: Default Response
+        "200":
+          description: "Success: Email changed successfully"
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                  alias:
-                    type: string
-                  sessionToken:
-                    type: string
+                $ref: "#/components/schemas/def-3"
+        "400":
+          description: "Bad Request: Invalid input or missing fields"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "401":
+          description: "Unauthorized: Invalid credentials"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
         "500":
           description: Internal Server Error
           content:
@@ -853,6 +961,42 @@ paths:
                 $ref: "#/components/schemas/def-1"
         default:
           description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+  /api/users/confirm-email-change:
+    get:
+      tags:
+        - user
+      description: "Changes a user's email address using a `one-time token` sent by
+        email.\t\t\tThe user clicks a verification link received by
+        email.\t\t\tIf the token is valid and not expired, the email is marked
+        as verified\t\t\tand the user is redirected to the frontend
+        application.  \t\t\t"
+      parameters:
+        - schema:
+            type: string
+            example: a3f9c8e2b4d74e0c9f...
+          in: query
+          name: token
+          required: true
+          description: Email verification token sent to the user by email
+      responses:
+        "302":
+          description: Email successfully changed. User is redirected to the frontend.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-3"
+        "400":
+          description: "Bad Request: Invalid input or missing fields"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "500":
+          description: Internal Server Error
           content:
             application/json:
               schema:
@@ -911,11 +1055,10 @@ paths:
         refresh token in an HttpOnly `refreshToken` cookie.       If 2FA is
         enabled for the user, the endpoint does not issue tokens
         immediately.    Instead, a one-time 6-digit verification code is sent to
-        the user's email and    a temporary 2FA continuation token is generated,
-        which must be used to complete    authentication via the 2FA
-        verification endpoint through the api route `POST
-        /api/users/auth/login/2fa`.    `This endpoint requires the client to
-        have a verified email address.`
+        the user's email and    a boolean value is returned to indicate that the
+        authentication process continues    by calling the `two-factor login`
+        endpoint.    `This endpoint requires the client to have a verified email
+        address.`
       requestBody:
         content:
           application/json:
@@ -942,16 +1085,12 @@ paths:
                     type: object
                     required:
                       - twoFactorRequired
-                      - twoFactorToken
                     properties:
                       twoFactorRequired:
                         type: boolean
                         example: true
-                      twoFactorToken:
-                        type: string
-                        description: 2FA continuation token
               examples:
-                no2faExample:
+                noTwoFaExample:
                   summary: Successful response when no 2FA is required
                   value:
                     accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
@@ -960,7 +1099,6 @@ paths:
                   summary: Successful response when 2FA is required
                   value:
                     twoFactorRequired: true
-                    twoFactorToken: 2fa_continuation_token
         "302":
           description: "Redirect: Email not verified"
           content:
@@ -1000,9 +1138,8 @@ paths:
         This endpoint requires `client authentification` AND `user
         authentification` AND the refresh cookie stored in the `HttpOnly
         refreshToken cookie`
-      security: &a3
+      security: &a2
         - cookieAuth: []
-          AppClientAuth: []
       responses:
         "200":
           description: Returns new access token
@@ -1046,7 +1183,7 @@ paths:
         tokens. This endpoint requires client authentification 				 AND user
         authentification AND the refresh cookie stored in the HttpOnly
         refreshToken cookie
-      security: *a3
+      security: *a2
       responses:
         "200":
           description: "Success: User successfully logged out"
@@ -1172,12 +1309,11 @@ paths:
         description: 6-digit code sent to user email or app
       parameters:
         - schema:
-            type: string
-            example: a3f9c8e2b4d74e0c9f...
-          in: query
-          name: twoFactorToken
+            type: integer
+          in: cookie
+          name: pending_2fa_uid
           required: true
-          description: Token generated by the login endpoint
+          description: User ID for pending 2FA stored in cookie
       responses:
         "200":
           description: Login successful
@@ -1225,11 +1361,12 @@ paths:
       tags:
         - OAuth
       description: "Handles the OAuth2 callback from 42. Verifies the authorization
-        code and state, retrieves the user information from 42, and either logs
-        in an existing user or signs up a new user. \t\t\t\t`Stores refresh
+        code and state,\t\t retrieves the user information from 42, and either
+        logs in an existing user or signs up a new user. \t\t`Stores refresh
         token in cookies` if login/signup is successful and `put the user's id
-        in query`, or returns a two-factor authentication token if 2FA is
-        required. "
+        in query`, \t\tor returns a two-factor authentication boolean if the
+        user has enabled 2FA indicating \t\t that the authentication process
+        continues by calling the `two-factor login` endpoint. "
       parameters:
         - schema:
             type: string
@@ -1247,33 +1384,34 @@ paths:
           description: Unguessable string provided in the in by backend for verification
             `GET api/users/auth/oauth/42`
       responses:
-        "200":
-          description: Two-factor authentication required
-          content:
-            application/json:
-              schema:
-                description: Two-factor authentication required
-                type: object
-                required:
-                  - twoFactorRequired
-                  - token
-                properties:
-                  twoFactorRequired:
-                    type: boolean
-                  token:
-                    type: string
         "302":
-          description: "Sucess: Redirects to the frontend, stores the user's id in query
-            parameters"
+          description: Redirects to frontend after OAuth login. May include `id` query or
+            `twoFactorRequired` flag.
           headers:
-            location:
+            type:
               schema:
-                type: string
+                "0": o
+                "1": b
+                "2": j
+                "3": e
+                "4": c
+                "5": t
+            required:
+              schema:
+                "0": location
+            properties:
+              schema:
+                location:
+                  type: string
+                  description: Frontend URL with query parameters (user id or 2FA flag)
+                  example: https://frontend.example.com/?id=123
           content:
             application/json:
               schema:
-                description: "Sucess: Redirects to the frontend, stores the user's id in query
-                  parameters"
+                type: object
+                description: Redirects to frontend after OAuth login. May include `id` query or
+                  `twoFactorRequired` flag.
+                additionalProperties: true
         "500":
           description: Default Response
           content:
@@ -1282,6 +1420,84 @@ paths:
                 $ref: "#/components/schemas/def-1"
         default:
           description: Default Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+  /api/users/auth/reset-password:
+    post:
+      tags:
+        - auth
+      description: Sends a password reset email to the user's email address. If the
+        email is not found a 200 is still returned
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+        required: true
+      responses:
+        "200":
+          description: "Success: Password reset email sent"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-3"
+        "400":
+          description: "Bad Request: Invalid input or missing fields"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+    get:
+      tags:
+        - auth
+      description: "Verifies a user's password reset token and redirects to the reset
+        password page where they can reset their password "
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: token
+      responses:
+        "302":
+          description: Redirects to the reset password page
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-3"
+        "400":
+          description: "Bad Request: Invalid input or missing fields"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/def-1"
+        default:
+          description: Unexpected error
           content:
             application/json:
               schema:

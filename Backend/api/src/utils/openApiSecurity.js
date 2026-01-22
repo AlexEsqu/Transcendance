@@ -1,6 +1,6 @@
  export const  Security = {
-  UserAuth: [{ BearerAuth: [], AppClientAuth: [] }],
-  SessionAuth: [{ cookieAuth: [], AppClientAuth: [] }],
+  UserAuth: [{ BearerAuth: [] }],
+  SessionAuth: [{ cookieAuth: [] }],
   AppAuth: [{ AppClientAuth: [] }],
-  UserAndSession: [{ BearerAuth: [], cookieAuth: [], AppClientAuth: [] }],
+  UserAndSession: [{ BearerAuth: [], cookieAuth: [] }],
 };

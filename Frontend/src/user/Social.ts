@@ -29,7 +29,7 @@ export class SocialService
 				{
 					'accept': 'application/json',
 					'Content-Type': 'application/json',
-					'X-App-Secret': `${apiKey}`,
+					
 					'Authorization': `Bearer ${user.accessToken}`
 				},
 				body: JSON.stringify({ id: friendId }),
@@ -66,7 +66,7 @@ export class SocialService
 				{
 					'accept': 'application/json',
 					'Content-Type': 'application/json',
-					'X-App-Secret': `${apiKey}`,
+					
 					'Authorization': `Bearer ${user.accessToken}`
 				},
 				body: JSON.stringify({ id: friendId }),
