@@ -1,6 +1,6 @@
 <div class="flex-1 min-h-0 flex flex-col w-full box-border m-0 p-0">
 
-	<div id="match-scoreboard-container" class="flex flex-col justify-center">
+	<div id="match-scoreboard-container" class="flex flex-col justify-center items-center w-full">
 		<div id='match-scoreboard' class="flex items-center justify-center gap-8 shadow-lg w-auto max-w-full">
 			<div class="flex flex-col items-center gap-4 font-bold p-6">
 				<span id="player1-name" class="player1 text-xl">Player 1</span>
@@ -12,11 +12,11 @@
 				<span id="player2-score" class="player2 text-5xl ">0</span>
 			</div>
 		</div>
-		<div id="match-results" class="text-3xl text-center invisible">Match Ongoing</div>
+		<div id="match-results" class="w-full big-title text-center m-auto invisible mb-4">Match Ongoing</div>
 	</div>
 
 	<!-- <div id="notification-container" class="flex flex-col relative justify-center">
-		
+
 	</div> -->
 
 	<!-- <div id='game-window-container' class="flex-1 min-h-100 w-full h-full">
@@ -24,7 +24,7 @@
 	</div> -->
 	<!-- Fixed canvas -->
 	<div id='game-window-container' class="flex-1 min-h-0 w-full relative">
-		<span id="game-notification" class="text-2xl text-center absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/3 z-10"></span>
+		<span id="game-notification" class="md-title text-center absolute left-1/2 top-1/5 -translate-x-1/2 -translate-y-1/2 z-10"></span>
         <canvas id="game-canvas" class="absolute inset-0 w-full h-full"></canvas>
     </div>
 

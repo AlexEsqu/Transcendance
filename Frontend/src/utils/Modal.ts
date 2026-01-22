@@ -22,11 +22,13 @@ export abstract class Modal
 
 	show(): void
 	{
+		console.log("showing modal")
 		document.body.appendChild(this.modalElem);
 	}
 
 	close(): void
 	{
+		console.log("closing modal");
 		this.modalElem.remove();
 	}
 }
@@ -94,6 +96,7 @@ export class FormModal extends Modal
 	}
 }
 
+
 export class ErrorModal extends Modal
 {
 	/**
@@ -137,7 +140,6 @@ export class InfoModal extends Modal
 }
 
 import checkEmailHtml from "../html/info/checkEmailModal.html?raw";
-import { UserState } from "../user/UserState";
 import { userState } from "../app";
 
 export class EmailCheckModal extends Modal

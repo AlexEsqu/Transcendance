@@ -10,67 +10,37 @@ import registerFormHtml from "../html/forms/registerForm.html?raw"
 
 
 export {
-	getConnectionLandingHtml,
-	getConnectionForm,
-	initConnectionPageListeners }
+	getConnectionPage,
+	getRegisterForm, getGuestForm, getLoginForm,
+	onAliasLoaded, onLoginLoaded, onRegisterLoaded }
 
 
 // FUNCTION TO GET THE RELEVANT HTML BITS
 
-function getConnectionLandingHtml(): string
+function getConnectionPage(): string
 {
 	return connectionHtml;
 }
 
-function getConnectionForm(): string {
-
-	return "";
-}
-
-// FUNCTION TO ACTIVATE THE EVENT LISTENERS AND POSSIBLE BUTTON INTERACTIONS
-// ONCE THE PAGE IS LOADED
-
-function initConnectionPageListeners(): void
+function getLoginForm(): string
 {
-	document.addEventListener('pageLoaded', (event: Event) => {
-		const customEvent = event as CustomEvent<{ path: string; search: string }>;
-		const { path, search } = customEvent.detail;
-
-		switch (path)
-		{
-			case '/connection/alias':
-			{
-				onAliasLoaded();
-				return;
-			}
-
-			case '/connection/register':
-			{
-				onRegisterLoaded();
-				return;
-			}
-
-			case '/connection/login':
-			{
-				onLoginLoaded();
-				return;
-			}
-
-			default:
-			{
-				return;
-			}
-
-		}
-	});
+	return loginFormHtml;
 }
+
+function getGuestForm(): string
+{
+	return guestFormHtml;
+}
+
+function getRegisterForm(): string
+{
+	return registerFormHtml;
+}
+
+// FUNCTION TO PLUG JS ONTO THE HTML BIT
 
 function onAliasLoaded(): void
 {
-	const mainContainer = document.getElementById('main')
-	if (mainContainer)
-		mainContainer.insertAdjacentHTML('beforeend', guestFormHtml);
-
 	const guestForm = document.getElementById('guest-form') as HTMLFormElement | null;
 	if (!guestForm)
 		return
@@ -92,10 +62,6 @@ function onAliasLoaded(): void
 
 function onRegisterLoaded(): void
 {
-	const mainContainer = document.getElementById('main')
-	if (mainContainer)
-		mainContainer.insertAdjacentHTML('beforeend', registerFormHtml);
-
 	const registerForm = document.getElementById('register-form') as HTMLFormElement | null;
 	if (!registerForm)
 		return;
@@ -149,10 +115,6 @@ function onRegisterLoaded(): void
 
 function onLoginLoaded(): void
 {
-	const mainContainer = document.getElementById('main')
-	if (mainContainer)
-		mainContainer.insertAdjacentHTML('beforeend', loginFormHtml);
-
 	const loginForm = document.getElementById('login-form') as HTMLFormElement | null;
 	if (!loginForm)
 		return;

@@ -13,10 +13,12 @@ export class GameApp
 	waitingSocket: WebSocket | null = null;
 	gamingSocket: WebSocket | null = null;
 	isPlayerReady: boolean = false;
+	isOnGamePage: boolean = true;
 
 	constructor(options: IOptions)
 	{
 		this.pong = new Pong("game-canvas", options, this);
+		document.addEventListener('pageLoaded', () => {this.handlePageChange()});
 	}
 
 	goToWaitingRoom(): Promise<number>
@@ -204,6 +206,11 @@ export class GameApp
 			this.gamingSocket.close();
 			this.gamingSocket = null;
 		}
+	}
+
+	handlePageChange(): void
+	{
+		this.isOnGamePage = false;
 	}
 }
 

@@ -178,8 +178,8 @@ function drawLineChart(canvas: HTMLCanvasElement, matches: MatchHistory[]): void
 	// x-axis padding without extra points
 	const first : Date = sortedMatches.length ? new Date(sortedMatches[0].date) : new Date();
 	const last : Date = sortedMatches.length ? new Date(sortedMatches[sortedMatches.length - 1].date) : new Date();
-	const xMin : Date = new Date(first.getFullYear(), first.getMonth(), first.getDate() - 1, 0, 0, 0, 0);
-	const xMax : Date = new Date(last.getFullYear(),  last.getMonth(),  last.getDate() + 1, 23, 59, 59, 999);
+	const xMin: number = new Date(first.getFullYear(), first.getMonth(), first.getDate() - 1, 0, 0, 0, 0).getTime();
+	const xMax: number = new Date(last.getFullYear(),  last.getMonth(),  last.getDate() + 1, 23, 59, 59, 999).getTime();
 
 	const ys = dataPoints.map(p => p.y);
 	const yMax = ys.length ? Math.max(3, Math.max(...ys) + 1) : 1;
@@ -231,7 +231,6 @@ function drawLineChart(canvas: HTMLCanvasElement, matches: MatchHistory[]): void
 				x: {
 					type: 'time',
 					time: { unit: 'day', displayFormats: { day: 'MM/dd' } },
-					distribution: 'linear',
 					min: xMin,
 					max: xMax,
 					ticks: {

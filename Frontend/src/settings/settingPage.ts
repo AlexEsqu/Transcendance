@@ -5,7 +5,7 @@ import { showRegisteredUserOptions } from '../dashboard/dashboardPage'
 import settingPageHtml from "../html/settings.html?raw"
 import { Subscriber } from "../user/UserState";
 
-export { getSettingPage, onSettingsLoaded }
+export { getSettingPage, onSettingsLoaded, cleanupSettingPage }
 
 let currentOptionsListener: Subscriber | null = null;
 
@@ -19,7 +19,7 @@ function onSettingsLoaded(): void
 	const user = userState.getUser();
 	const isRegistered = user instanceof RegisteredUser;
 
-	cleanupSettingListeners();
+	cleanupSettingPage();
 
 	if (isRegistered)
 	{
@@ -318,7 +318,7 @@ function activateDeleteButton()
 	);
 }
 
-function cleanupSettingListeners()
+function cleanupSettingPage()
 {
 	if (currentOptionsListener)
 	{
