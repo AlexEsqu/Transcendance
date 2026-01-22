@@ -1,5 +1,5 @@
 import { getOauthRedirectSchema } from "../../../schemas/get.redirect.schema.js";
-
+import crypto from "crypto";
 export default function getOauthRedirect(server) {
 	const opts = {
 		schema: getOauthRedirectSchema,
