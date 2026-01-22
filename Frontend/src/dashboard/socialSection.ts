@@ -66,7 +66,7 @@ async function showUsers(): Promise<void>
 		const userFriendList = mainUser?.getFriends() ?? [];
 		const allUsers = await getAllUsers();
 
-		if (allUsers.length > 0)
+		if (allUsers.length > 1)
 		{
 			for (const user of allUsers)
 			{
@@ -79,7 +79,7 @@ async function showUsers(): Promise<void>
 		}
 		else
 		{
-			userFragment.appendChild(document.createTextNode('No registered users yet...'))
+			userFragment.appendChild(document.createTextNode(`No ${isRegistered? "other" : ""} users yet...`));
 		}
 
 		// empty out the list if existing data inside
@@ -210,45 +210,6 @@ function attachAddRemoveFriendButtonListener(): void
 		});
 	});
 }
-
-
-// function activateAddFriendForm(): void
-// {
-// 	// injectForm(newFriendFormHtml);
-// 	const newFriendForm = document.getElementById('new-friend-form') as HTMLFormElement | null;
-
-// 	newFriendForm?.addEventListener('submit', async (e) =>
-// 		{
-// 			e.preventDefault();
-// 			const formData = new FormData(newFriendForm);
-// 			const friendUsername = formData.get('new-friend-input') as string | null;
-
-// 			if (friendUsername)
-// 			{
-// 				const newFriend = await getUserFromUsername(friendUsername);
-
-// 				console.log(newFriend)
-
-// 				if (newFriend && newFriend.id)
-// 				{
-// 					try
-// 					{
-// 						userState.addToFriendList(newFriend.id);
-// 					}
-// 					catch (error)
-// 					{
-// 						const msg = error instanceof Error ? error.message : "Unknown error";
-// 						window.sessionStorage.setItem("errorMessage", msg);
-// 						router.navigateTo("/error");
-// 					}
-// 				}
-
-// 			}
-
-// 		}
-// 	);
-// }
-
 
 
 async function getUserFromUsername(username: string): Promise<BaseUser | null>

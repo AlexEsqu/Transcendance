@@ -54,8 +54,6 @@ function showRegisteredUserOptions(user : RegisteredUser)
 			btn.removeAttribute('title');
 		}
 	);
-
-
 }
 
 function cleanupDashboardPage()
