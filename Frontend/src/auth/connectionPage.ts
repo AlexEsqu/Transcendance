@@ -115,7 +115,7 @@ function onRegisterLoaded(): void
 
 function onLoginLoaded(): void
 {
-	const loginForm = document.getElementById('login-form') as HTMLFormElement | null;
+	const loginForm = document.getElementById('email-login-form') as HTMLFormElement | null;
 	if (!loginForm)
 		return;
 
@@ -162,18 +162,32 @@ function onLoginLoaded(): void
 		}
 	);
 
-	const resetPassBtn = document.getElementById('reset-pass-form') as HTMLButtonElement;
-	resetPassBtn.addEventListener('click', async (e) =>
+	const resetForm = document.getElementById('password-reset-form') as HTMLFormElement | null;
+	if (!resetForm)
+		return;
+
+	checkInputValidityOnUnfocus(resetForm);
+	resetForm.addEventListener('submit', async (e) =>
 		{
 			e.preventDefault();
-			try
+
+			if (isValidInputs(resetForm.querySelectorAll('input')))
 			{
-				await userState.emailAuth.resetPass();
-			}
-			catch (error)
-			{
-				if (error instanceof Error)
-					openErrorModal(error);
+				const formData = new FormData(resetForm);
+				const email = formData.get('input-email-reset') as string | null;
+
+				if (email)
+				{
+					try
+					{
+						await userState.emailAuth.resetPass(email);
+					}
+					catch (error)
+					{
+						if (error instanceof Error)
+							openErrorModal(error);
+					}
+				}
 			}
 		}
 	);

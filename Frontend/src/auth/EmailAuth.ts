@@ -105,7 +105,8 @@ export class EmailAuthService
 				headers:
 				{
 					'accept': 'application/json',
-					"Content-Type": 'application/json'
+					"Content-Type": 'application/json',
+					'X-App-Secret': `${this.apiKey}`
 				},
 				body: JSON.stringify(
 					{
