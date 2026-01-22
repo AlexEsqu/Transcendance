@@ -22,14 +22,13 @@ function setNotification(show: boolean, message: string | undefined): void
 	if (!show)
 	{
 		notification.classList.add('invisible');
-		notification.classList.remove('absolute');
-		// notification.style.display = 'invisible';
+		notification.classList.remove('flex');
 		return ;
 	}
 
 	notification.textContent = message ?? '';
 	notification.classList.remove('invisible');
-	notification.classList.add('absolute');
+	notification.classList.add('flex');
 }
 
 function onGameLoaded(): void
