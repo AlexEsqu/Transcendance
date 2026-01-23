@@ -7,7 +7,7 @@ export default function getOauthRedirect(server) {
 	server.get("/oauth/42", opts, (req, reply) => {
 		try {
 			const state = crypto.randomUUID();
-			const redirectUrl = encodeURI(`https://localhost:8443/api/users/auth/oauth/42/callback`);
+			const redirectUrl = encodeURI(`${process.env.API_DOMAIN_NAME}/users/auth/oauth/42/callback`);
 			reply.setCookie("state", state, {
 				httpOnly: true,
 				secure: true,
