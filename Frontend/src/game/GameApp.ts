@@ -20,6 +20,7 @@ export class GameApp
 	private gamingSocket: WebSocket | null = null;
 	isPlayerReady: boolean = false;
 	isOnGamePage: boolean = true;
+	hasForfeitingOpponent: boolean = false;
 
 	constructor(options: IOptions)
 	{
@@ -146,6 +147,7 @@ export class GameApp
 				if (event.data.includes("left room"))
 				{
 					console.log(`GAME-APP: ${event.data}`);
+					this.hasForfeitingOpponent = true;
 					setNotification(true, "Opponent has left the game, you win");
 				}
 				else if (event.data.includes("Bad request"))

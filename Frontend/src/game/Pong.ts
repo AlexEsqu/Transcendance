@@ -97,7 +97,7 @@ export class Pong
 			case PlayerState.end:
 				this.endGame();
 				break ;
-			
+
 			case PlayerState.stop:
 				this.gameApp.closeSockets();
 				break ;
@@ -202,7 +202,7 @@ export class Pong
 
 		if (this.scene.leftPadd.player && this.scene.rightPadd.player)
 			drawScore(this.scene.leftPadd.player, this.scene.rightPadd.player);
-		
+
 		this.scene.state = PlayerState.stop;
 
 		const winnerSpot = document.getElementById('match-results');
@@ -211,11 +211,21 @@ export class Pong
 			return ;
 		}
 
+
 		if (this.results !== undefined && this.results.winner)
 		{
-			winnerSpot.textContent = `${this.results.winner} wins!`;
-			winnerSpot.classList.remove('invisible');
-			setNotification(true, "Leave the page to start a new game");
+			if (this.gameApp.hasForfeitingOpponent)
+			{
+				winnerSpot.textContent = `${this.results.winner} wins by default!`;
+				winnerSpot.classList.remove('invisible');
+				setNotification(true, "Leave the page to start a new game");
+			}
+			else
+			{
+				winnerSpot.textContent = `${this.results.winner} wins!`;
+				winnerSpot.classList.remove('invisible');
+				setNotification(true, "Leave the page to start a new game");
+			}
 		}
 		else
 			setNotification(true, "The Game ended before the match was over\nLeave the page to start a new game");
