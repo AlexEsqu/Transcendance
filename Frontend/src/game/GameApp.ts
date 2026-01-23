@@ -58,7 +58,6 @@ export class GameApp
 					{
 						const demand: JSONRoomDemand = fillRoomDemand(options, player);
 						this.waitingSocket.send(JSON.stringify(demand));
-						waitingRoomModal.addPlayer(player);
 					}
 				}
 				if (!this.isOnGamePage)
@@ -85,6 +84,7 @@ export class GameApp
 				//	If game server sends a valid roomId and that no roomId was already settled save data and close websocket
 				if (serverMsg.roomId !== undefined && this.roomId === undefined) {
 					this.pong.scene.players = getIPlayerFromStr(serverMsg.players);
+
 					this.roomId = serverMsg.roomId;
 					this.waitingSocket?.close();
 					this.waitingSocket = null;

@@ -13,7 +13,7 @@ export { loadGame, openingAnimation, createMaterial, drawScore, drawName }
 function createMaterial(scene: Scene, colorHex: string): StandardMaterial | null
 {
 	if (!scene || scene === undefined) return null;
-	
+
 	const color: Color3 = new Color3().fromHexString(colorHex);
 
 	const meshMaterial: StandardMaterial = new StandardMaterial("Material", scene);
@@ -67,7 +67,7 @@ function createMap(scene: Scene, height: number, width: number, colorHex: string
 	const mapMaterial: StandardMaterial = new StandardMaterial("Material", scene);
 	mapMaterial.emissiveColor = new Color3().fromHexString(colorHex);
 	map.material = mapMaterial;
-	
+
 	// const border: GroundMesh = MeshBuilder.CreateGround(
 	// 	'border',
 	// 	{
@@ -171,6 +171,9 @@ function loadGame(engine: Engine, canvas: HTMLCanvasElement, options: IOptions):
 	//	Remove default background color
 	id.clearColor = new Color4(0, 0, 0, 0);
 
+	const scoreBoard = document.getElementById('match-scoreboard');
+	scoreBoard?.classList.add('invisible');
+
 	const camera = createCamera(id, options.matchLocation);
 
 	//	Create a glow layer to add a bloom effect around meshes
@@ -197,11 +200,11 @@ function loadGame(engine: Engine, canvas: HTMLCanvasElement, options: IOptions):
 		console.error("GAME-APP: failed to create 'Paddle', can't load game");
 		return null;
 	}
-	
-	const scene: IScene = { 
-		id: id, 
-		camera: camera, 
-		ball: ball, 
+
+	const scene: IScene = {
+		id: id,
+		camera: camera,
+		ball: ball,
 		leftPadd: { mesh: leftPadd, player: null },
 		rightPadd: { mesh: rightPadd, player: null },
 		options: options,
@@ -245,6 +248,9 @@ function setupPaddle(scene: Scene, color: string, side: string): Mesh | null
 // FYI: score1 is the player2
 function drawScore(player1: IPlayer | null, player2: IPlayer | null): void
 {
+	const scoreBoard = document.getElementById('match-scoreboard');
+	scoreBoard?.classList.remove('invisible');
+
 	if (!player1 || !player2)
 		return ;
 

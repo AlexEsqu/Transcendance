@@ -30,7 +30,7 @@ export class CustomizeService
 						'accept': 'application/json',
 						'Content-Type': 'application/json',
 						'Authorization': `Bearer ${user.accessToken}`,
-						
+
 					},
 					body: JSON.stringify({
 						new_username: newName
@@ -68,7 +68,7 @@ export class CustomizeService
 				{
 					'accept': 'application/json',
 					'Authorization': `Bearer ${user.accessToken}`,
-					
+
 				},
 				body: formData,
 			}
@@ -94,8 +94,8 @@ export class CustomizeService
 				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json',
+					'accept': 'application/json',
 					'Authorization': `Bearer ${user.accessToken}`,
-					
 				},
 				body: JSON.stringify({
 					oldPassword, newPassword
@@ -122,7 +122,7 @@ export class CustomizeService
 				{
 					'Content-Type': 'application/json',
 					'Authorization': `Bearer ${user.accessToken}`,
-					
+
 				},
 				body: JSON.stringify({
 					email: newEmail
@@ -152,7 +152,7 @@ export class CustomizeService
 				{
 					'accept': 'application/json',
 					'Authorization': `Bearer ${user.accessToken}`,
-					
+
 				}
 			}
 		);

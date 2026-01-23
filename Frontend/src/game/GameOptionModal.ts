@@ -3,6 +3,7 @@ import optionsHtml from '../html/forms/gameOptionsForm.html?raw';
 import { userState } from "../app";
 import { IOptions } from "./pongData";
 import { launchPongGame } from "./GameApp";
+import { RegisteredUser } from "../user/User";
 
 export class GameOptionsModal extends Modal
 {
@@ -55,11 +56,23 @@ formElement: HTMLFormElement | null = null;
 		const paddleColorsContainer = this.modalElem.querySelector('#paddle-colors-container') as HTMLElement;
 		const customizeNameContainer = this.modalElem.querySelector('#customize-name-container') as HTMLElement;
 
+		const user = userState.getUser();
+		if (!(user instanceof RegisteredUser))
+		{
+			this.formElement?.querySelector('#match-location-remote')?.classList.add('hidden');
+		}
+		else
+		{
+			this.formElement?.querySelector('#match-location-remote')?.classList.remove('hidden');
+		}
+
 		if (this.matchLocation == "remote")
 		{
 			this.formElement?.querySelector("#match-type-ai")?.classList.add("hidden")
+			this.formElement?.querySelector("#match-type-tournament")?.classList.add("hidden")
 			const matchTypeSelect = this.formElement?.querySelector('#match-type') as HTMLSelectElement;
-			if (matchTypeSelect && matchTypeSelect.value === "1") {
+			if (matchTypeSelect && matchTypeSelect.value === "1")
+			{
 				matchTypeSelect.value = "2";
 			}
 			this.hideCustomOptions(customizeNameContainer, customizePaddleContainer);
@@ -67,6 +80,7 @@ formElement: HTMLFormElement | null = null;
 		else
 		{
 			this.formElement?.querySelector("#match-type-ai")?.classList.remove("hidden")
+			this.formElement?.querySelector("#match-type-tournament")?.classList.remove("hidden")
 			this.showPlayerUsernameInput(customizeNameContainer, playerContainer);
 			this.showPaddleCustom(customizePaddleContainer, paddleColorsContainer);
 		}
