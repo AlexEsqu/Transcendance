@@ -9,8 +9,8 @@ import { WaitingRoomModal } from '../utils/Modal';
 
 /************************************************************************************************************/
 
-const WAITING_ROOM_URL: string = `/room/waiting`;
-const GAMING_ROOM_URL: string = "/room/gaming";
+const WAITING_ROOM_URL: string = `:8443/room/waiting`;
+const GAMING_ROOM_URL: string = ":8443/room/gaming";
 
 export class GameApp
 {
@@ -31,7 +31,6 @@ export class GameApp
 	{
 		return new Promise((resolve, reject) => {
 			const waitingRoomModal = new WaitingRoomModal();
-			console.log(window.location.host);
 			this.waitingSocket = new WebSocket(`wss://${import.meta.env.VITE_HOST}${WAITING_ROOM_URL}`);
 			if (!this.waitingSocket) {
 				reject(new Error("'waitingSocket' creation failed"));

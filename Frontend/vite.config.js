@@ -11,14 +11,14 @@ export default defineConfig({
       "localhost",
       "typescript",
       "nginx",
-      process.env.HOST
+      `${process.env.VITE_HOST}`
     ],
   },
   hmr: {
       // Configuration HMR pour fonctionner derrière Nginx
-      clientPort: 8443,
       protocol: 'wss',
-      host: 'localhost'
+      host: `${process.env.VITE_HOST}`,
+      port: 443
     },
     watch: {
       usePolling: true, // Nécessaire dans Docker

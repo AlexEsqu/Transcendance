@@ -47,15 +47,19 @@ const launchGameServer = async () => {
 
 		const gameControl = new GameControl() as GameControl | null;
 		if (!gameControl) throw new Error("failed to create 'gameControl'");
-		    await gameServer.register(cors, {
+		
+		//	Register plugins/external routes
+		await gameServer.register(websocket);
+
+		await gameServer.register(cors, {
             origin: (origin, cb) => {
                 if (!origin) {
                     cb(null, true);
                     return;
                 }
                 const hostname = new URL(origin).hostname;
-				console.log(hostname)
-                if(hostname === "localhost" || hostname === "127.0.0.1" || hostname.endsWith("clusters.42.fr")){
+				console.log(hostname);
+                if(hostname === "localhost" || hostname === "127.0.0.1" || hostname.endsWith("clusters.42paris.fr")) {
                     cb(null, true)
                     return
                 }
@@ -64,11 +68,10 @@ const launchGameServer = async () => {
             credentials: true,
             methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         });
-		//	Register plugins/external routes
-		await gameServer.register(websocket);
+		
 
 		// await gameServer.register(cors, {
-		// 	origin: [process.env.FRONTEND_DOMAIN_NAME, "https://localhost:8443"],
+		// 	origin: true,
 		// 	credentials: true,
 		// 	methods: ["GET"],
 		// 	logLevel: "trace",
