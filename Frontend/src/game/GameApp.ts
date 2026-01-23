@@ -41,6 +41,7 @@ export class GameApp
 		const user: User | null = userState.getUser();
 		if (user)
 		{
+			userState.refreshToken();
 			const token = user instanceof RegisteredUser ? user.accessToken : null;
 			return token;
 		}
@@ -51,13 +52,7 @@ export class GameApp
 	{
 		return new Promise((resolve, reject) => {
 			const waitingRoomModal = new WaitingRoomModal();
-			const token: string | null = this.getUserToken();
-			if (!token) {
-				reject(new Error("Authentication token not found for the current user"));
-				return ;
-			}
-
-			this.waitingSocket = new WebSocket(`wss://${window.location.host}${WAITING_ROOM_URL}?token=${token}`);
+			this.waitingSocket = new WebSocket(`wss://${window.location.host}${WAITING_ROOM_URL}`);
 			if (!this.waitingSocket) {
 				reject(new Error("'waitingSocket' creation failed"));
 				return ;
@@ -80,8 +75,7 @@ export class GameApp
 				const players = this.pong.scene.players;
 				for (const player of players)
 				{
-					waitingRoomModal.addPlayer(player);
-					if (player.id !== 0)
+					if (player.username !== 'Robot')
 					{
 						const demand: JSONRoomDemand = fillRoomDemand(options, player);
 						this.waitingSocket.send(JSON.stringify(demand));
@@ -116,7 +110,6 @@ export class GameApp
 			};
 
 			this.waitingSocket.onerror = (error) => {
-				// console.error(error);
 				this.waitingSocket?.close();
 				this.waitingSocket = null;
 				waitingRoomModal.close();
@@ -137,11 +130,7 @@ export class GameApp
 
 	goToGamingRoom(): void
 	{
-		const token: string | null = this.getUserToken();
-		if (!token)
-			throw new Error("Authentication token not found for the current user");
-
-		this.gamingSocket = new WebSocket(`wss://${window.location.host}${GAMING_ROOM_URL}?token=${token}`);
+		this.gamingSocket = new WebSocket(`wss://${window.location.host}${GAMING_ROOM_URL}`);
 		if (!this.gamingSocket)
 			throw new Error("'gamingSocket' not found");
 
@@ -162,6 +151,8 @@ export class GameApp
 			{
 				if (this.roomId === undefined || !this.gamingSocket)
 					throw new Error("GAME-APP: can't identify client, impossible to process the message received from server");
+				if (!this.isOnGamePage)
+					this.closeSockets();
 
 				if (event.data.includes("left room"))
 				{
@@ -227,6 +218,8 @@ export class GameApp
 					this.sendUpdateToGameServer(this.pong.mainPlayerUsername, 'none', true);
 			}
 		}
+		if (!this.isOnGamePage)
+			this.closeSockets();
 	}
 
 	sendUpdateToGameServer(player: string, action: string, ready: boolean): void
@@ -240,6 +233,7 @@ export class GameApp
 			return ;
 
 		const gameUpdateMsg: JSONInputsUpdate = {
+			secret: import.meta.env.VITE_APP_SECRET_KEY ?? "",
 			username: player,
 			roomId: this.roomId,
 			ready: ready,

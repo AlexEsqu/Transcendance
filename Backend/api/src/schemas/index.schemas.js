@@ -111,7 +111,7 @@ export const privateUserObject = {
     avatar: {
       type: ["string", "null"],
       format: "uri",
-      example: "https://localhost:8443/api/avatars/user_1.jpg"
+      example: `https://${process.env.API_DOMAIN_NAME}:8443/api/avatars/user_1.jpg`
     },
     email_verified: {
       type: "boolean",

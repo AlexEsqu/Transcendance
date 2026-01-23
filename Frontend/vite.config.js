@@ -10,7 +10,8 @@ export default defineConfig({
 	allowedHosts: [
       "localhost",
       "typescript",
-      "nginx"
+      "nginx",
+      process.env.VITE_HOST
     ],
   },
   hmr: {

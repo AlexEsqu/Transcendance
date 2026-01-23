@@ -2,13 +2,16 @@ import { isBallHittingWall, isBallHittingPaddle, isBallOutOfBounds, isNewPaddPos
 	adjustBallHorizontalPos, adjustBallVerticalPos, scaleVelocity, normalizeVector, processRobotOpponent
 } from '../utils/physics';
 
-import { GAME_SIZE, IBall, IPaddle, IPlayer, State, MatchType, IRound, IResult, Info, GameSatus } from '../config/pongData'
-import { initBall, initPadd, initPlayers, initInfoByLevel } from '../utils/init'
+import { GAME_SIZE, IBall, IPaddle, IPlayer, State, MatchType, IRound, IResult, Info, GameSatus, IRobot 
+} from '../config/pongData';
+
+import { initBall, initPadd, initPlayers, initInfoByLevel, initRobot } from '../utils/init';
 import { notifyPlayersInRoom } from '../utils/broadcast';
 import { JSONGameState } from '../config/schemas';
 import { GameControl } from './GameControl';
 import { Room } from './Room';
 import { sendMatchesToDataBase } from '../utils/sendMatchResult';
+import { time } from 'node:console';
 
 /************************************************************************************************************/
 
@@ -24,7 +27,8 @@ export class GameLoop
 	rounds: IRound;
 	players: Array<IPlayer>;
 	state: State;
-	timestamp: number;
+	private inputsBuffer: Map<string, string> = new Map();
+	private timestamp: number;
 
 	constructor(roomId: number, matchType: MatchType, players: Map<string, IPlayer>, level: number)
 	{
@@ -39,7 +43,7 @@ export class GameLoop
 		this.requestNewRound();
 		this.state = State.waiting;
 		this.timestamp = -1;
-		console.log(this.INFO);
+		console.log(`GAME-LOOP(${roomId}): `, this.INFO);
 	}
 
 	runGameLoop(gameControl: GameControl): void
@@ -47,9 +51,12 @@ export class GameLoop
 		const room: Room | undefined = gameControl.getGamingRoom(this.roomId);
 		if (room === undefined) return ; // TO DO: HANDLE ERROR LATER
 
+		this.state = State.play;
+		this.timestamp = Date.now();
+
+		let robotState: IRobot = initRobot(this.INFO.BOT_PROBABILITY);
 		let isNewRound: boolean = false;
 		let gameStateInfo: JSONGameState;
-		let robotInterval: NodeJS.Timeout;
 
 		console.log("GAME-LOOP: game loop started");
 		//	Take 1 sec to be sure every players are ready
@@ -59,23 +66,18 @@ export class GameLoop
 
 				if (this.state === State.end)
 				{
-					clearInterval(gameInterval);
-					// clearInterval(robotInterval);
-					if (this.rounds.results)
-						sendMatchesToDataBase(this.rounds.results[this.rounds.results.length - 1], Date.now());
-					room.closeRoom();
+					this.stopGameLoop(gameControl, room, gameInterval);
 					return ;
 				}
 
+				// const currentTime: number = Date.now();
+				// // const deltaTime = this.timestamp === -1 ? 0 :(currentTime - this.timestamp) / 1000;
+				// const deltaTime = (currentTime - this.timestamp) / 1000;
+
 				if (this.state === State.play)
 				{
-					//	update data & check collisions
-					this.updateGameData();
-					// robotInterval = setInterval(() => {
-					// 	if (this.leftPadd.robot && this.state === State.play)
-					// 		this.processPlayerInput('Robot', this.state, processRobotOpponent(this.leftPadd, this.ball, this.INFO.BOT_PROBABILITY));
-					// }, 1000);
-					//	monitor score/rounds
+					//	update data, physics & check collisions
+					this.updateGameData(robotState);
 					isNewRound = this.isPlayerHittingMaxScore();
 				}
 
@@ -90,14 +92,15 @@ export class GameLoop
 				notifyPlayersInRoom(room, gameStateInfo);
 
 				this.timestamp = Date.now();
+
 			}, 1000 / 60); // 60fps
 		}, 100);
 	}
 
-	updateGameData(): void
+	private updateGameData(robotState: IRobot): void
 	{
 		//	Move the ball position according to its direction and velocity
-		const deltaTime: number = this.timestamp !== -1 ? ((Date.now() - this.timestamp) / 1000) : 0;
+		const deltaTime = (Date.now() - this.timestamp) / 1000;
 		const velocity = scaleVelocity(this.ball, deltaTime);
 		this.ball.posistion.x += velocity.x;
 		this.ball.posistion.z += velocity.z;
@@ -106,8 +109,22 @@ export class GameLoop
 		//	Depending on what/where the ball hits an object or a limit, its direction is reversed and gains speed
 		this.bouncingBallProcess();
 
+		//	Perform anticipation and decision-making og the AI (named Robot) opponent
 		if (this.leftPadd.robot)
-			this.processPlayerInput('Robot', this.state, processRobotOpponent(this.leftPadd, this.ball, this.INFO.BOT_PROBABILITY));
+		{
+			if (robotState.lastViewRefresh - this.timestamp < 1000) {
+				robotState.currentMove = processRobotOpponent(this.leftPadd, this.ball, robotState);
+				robotState.lastViewRefresh = this.timestamp;
+			}
+			this.processPlayerInput('Robot', robotState.currentMove);
+		}
+
+		//	Process received inputs and update paddle position
+		// for (const [key, value] of this.inputsBuffer)
+		// {
+		// 	this.processPlayerInput(key, value);
+		// 	this.inputsBuffer.delete(key);
+		// }
 	}
 
 	bouncingBallProcess(): boolean
@@ -127,7 +144,7 @@ export class GameLoop
 			//	Increase again the angle (less predictable) --- is necessary ??
 			this.ball.direction.z *= 1.01;
 			//	Add random noise to trajectories (avoid perfect loop, less predictable, better gameplay)
-			const random = (Math.random() - 0.4) * 0.03;
+			const random = (Math.random() - 0.4) * 0.08;
 			this.ball.direction.z += random;
 
 			//	Normalize direction's vector (stabilizes physics, sightly rendering)
@@ -147,7 +164,6 @@ export class GameLoop
 
 		if (isBallOutOfBounds(this.ball))
 		{
-			console.log(`GAME-LOOP: ball is out of bounds ${this.ball.posistion.x} at ${this.timestamp}`);
 			if (this.ball.posistion.x > 0)
 				this.leftPadd.score += 1;
 			else
@@ -158,7 +174,7 @@ export class GameLoop
 		return false;
 	}
 
-	processPlayerInput(player: string, state: number, input: string): void
+	processPlayerInput(player: string, input: string): void
 	{
 		let paddle: IPaddle;
 
@@ -173,16 +189,20 @@ export class GameLoop
 			return ;
 		}
 
-		const deltaTime: number = this.timestamp === -1 ? 0 : (Date.now() - this.timestamp) / 1000;
-		//	Frame-rate independent smoothing
-        // const alpha: number = 1 - Math.exp(this.INFO.PADD_RESPONSIVENESS * deltaTime);
-		//	Calculate the velocity of the paddle's movement
+		//	Calculate the velocity of the paddle's movement (scale)
+		const deltaTime = (Date.now() - this.timestamp) / 1000;
+
 		const velocityStep: number = this.INFO.PADD_SPEED * deltaTime;
 
 		if (input === 'up' && !isNewPaddPosHittingMapLimit(paddle.pos.z, velocityStep, input))
 			paddle.pos.z += velocityStep;
 		else if (input === 'down' && !isNewPaddPosHittingMapLimit(paddle.pos.z, velocityStep, input))
 			paddle.pos.z -= velocityStep;
+	}
+
+	receivePlayerInput(player: string, input: string): void
+	{
+		this.inputsBuffer.set(player, input);
 	}
 
 	isPlayerHittingMaxScore(): boolean
@@ -278,6 +298,17 @@ export class GameLoop
 			this.rounds.results?.push(results);
 
 		console.log(`GAME-LOOP: for round ${this.rounds.nbOfRounds} the winner is ${winner.player.username}`);
+	}
+
+	stopGameLoop(gameControl: GameControl, room: Room, interval: NodeJS.Timeout): void
+	{
+		clearInterval(interval);
+		if (this.rounds.results)
+			sendMatchesToDataBase(this.rounds.results[this.rounds.results.length - 1], Date.now());
+		else
+			console.log("GAME-LOOP: not results of match, player(s) disconnected before the end");
+		room.closeRoom();
+		gameControl.deleteRoom(this.roomId);
 	}
 
 	resetBall(): void

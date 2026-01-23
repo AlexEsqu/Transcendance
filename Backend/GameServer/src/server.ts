@@ -47,7 +47,7 @@ const launchGameServer = async () => {
 
 		//	Register plugins/external routes
 		await gameServer.register(websocket);
-		await registerAuthPlugin(gameServer);
+		// await registerAuthPlugin(gameServer);
 		await registerWaitingRoomRoutes(gameServer, gameControl);
 		await registerGameRoutes(gameServer, gameControl);
 

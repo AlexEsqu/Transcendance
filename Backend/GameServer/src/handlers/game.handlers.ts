@@ -3,7 +3,7 @@ import { WebSocket as WSWebSocket } from 'ws';
 import { getJSONError } from '../errors/input.error';
 import { GameControl } from '../services/GameControl';
 import { Room } from '../services/Room';
-import { IPlayer, State, GAME_SIZE, MatchType } from '../config/pongData';
+import { IPlayer, State, GAME_SIZE, MatchType, GameLocation } from '../config/pongData';
 import { JSONInputsUpdate } from '../config/schemas';
 import { notifyPlayersInRoom } from '../utils/broadcast';
 import { GameLoop } from '../services/GameLoop';
@@ -25,6 +25,11 @@ function handleMessage(socket: WSWebSocket, message: Buffer,
 		if (!validateSchema(data) || data === undefined || !data) {
 			socket.send(JSON.stringify(getJSONError("Bad request", 400)));
 			throw new Error("GAME-HANDLER: message received doesn't match with 'validateSchema' on '/room/game' route") ;
+		}
+		if (data.secret !== process.env.APP_SECRET_KEY) {
+			socket.send(JSON.stringify(getJSONError("Unauthorized", 401)));
+			console.log("GAME-WAIT-HANDLER: client is not authenticated");
+			return (undefined);
 		}
 
 		// console.log("GAME-HANDLER: handle received message from '/room/game' route : ", data);
@@ -57,7 +62,7 @@ function handleMessage(socket: WSWebSocket, message: Buffer,
 
 		//	If player is ready & wants to move, update its paddle pos
 		if (gamingRoom.isEveryoneReady() === true && data.move)
-			gamingRoom.handlePlayerInput(player.username, data.state, data.move);
+			gamingRoom.handlePlayerInput(player.username, data.move);
 
 		return (player);
 
@@ -86,6 +91,12 @@ function handleDisconnection(socket: WSWebSocket, gameControl: GameControl): voi
 	{
 		gamingRoom.closeRoom();
 		gameControl.deleteRoom(gamingRoom.id);
+		return ;
+	}
+
+	if (gamingRoom.location === GameLocation.local)
+	{
+		gamingRoom.gameLoop.state = State.end;
 		return ;
 	}
 

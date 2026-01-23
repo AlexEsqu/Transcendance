@@ -10,8 +10,9 @@ export { waitingSchema, gameSchema,
 
 const waitingSchema = {
 	type: 'object',
-	required: ['id', 'username', 'matchType', 'location'],
+	required: ['secret', 'id', 'username', 'matchType', 'location'],
 	properties: {
+		secret: {type: 'string'},
 		id: {type: 'number'},
 		username: {type: 'string'},
 		color: {type: 'string'},
@@ -24,8 +25,9 @@ const waitingSchema = {
 
 const gameSchema = {
 	type: 'object',
-	required: ['username', 'roomId', 'ready'],
+	required: ['secret', 'username', 'roomId', 'ready'],
 	properties: {
+		secret: {type: 'string'},
 		username: {type: 'string'},
 		roomId: {type: 'number'},
 		ready: {type: 'boolean'},
@@ -51,6 +53,7 @@ interface JSONGameState {
 };
 
 interface JSONInputsUpdate {
+	secret: string;
 	username: string;
 	roomId: number;
 	ready: boolean;
@@ -65,6 +68,7 @@ interface JSONRoomAccess {
 };
 
 interface JSONRoomDemand {
+	secret: string;
 	id: number;
 	username: string;
 	color: string;

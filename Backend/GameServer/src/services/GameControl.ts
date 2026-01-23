@@ -223,6 +223,8 @@ export class GameControl
 				player.socket = null;
 			}
 			room.players.delete(username);
+			if (room.players.size <= 0)
+				this.deleteRoom(roomId);
 		}
 	}
 

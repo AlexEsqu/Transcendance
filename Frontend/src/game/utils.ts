@@ -23,25 +23,18 @@ function getPlayers(inputs: string[], colors: string[], nbOfPlayers: number, mat
 	{
 		if (inputs[i] && colors[i]) {
 			let id;
-			// console.log(`i = ${i} / loc = ${matchLocation} / name = ${inputs[i]} / storage = ${userState.getUser()?.getName()}`)
 			if (matchLocation === 'local' && inputs[i] !== userState.getUser()?.getName())
-				id = -1;
+				id = 0;
 			else
-				id = userState.getUser()?.getId() ?? -1;
+				id = userState.getUser()?.getId() ?? 0;
 			players.push({ id: id, username: inputs[i], score: 0, color: colors[i] } );
 		}
 	}
 
-	// if (players.length != nbOfPlayers) {
-	// 	console.error("players initialization failed, some players are missing");
-	// 	return null;
-	// }
-
 	// special case: opponent is a robot
-	if (nbOfPlayers === 1) { 
+	if (nbOfPlayers === 1)
 		players.push({ id: 0, username: "Robot", score: 0, color: "#8dbcff" });
-		// players.reverse();
-	}
+
 	return players;
 }
 
@@ -81,6 +74,7 @@ function fillRoomDemand(options: IOptions, player: IPlayer): JSONRoomDemand
 	}
 
 	const request: JSONRoomDemand = {
+		secret: import.meta.env.VITE_APP_SECRET_KEY ?? "",
 		id: player.id,
 		username: player.username,
 		color: player.color,
