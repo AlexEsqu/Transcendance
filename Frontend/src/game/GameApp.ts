@@ -61,6 +61,8 @@ export class GameApp
 						waitingRoomModal.addPlayer(player);
 					}
 				}
+				if (!this.isOnGamePage)
+					this.closeSockets();
 
 				//	Set a timeout to avoid waiting until eternity
 				setTimeout(() => {
@@ -76,6 +78,9 @@ export class GameApp
 			this.waitingSocket.onmessage = (event) => {
 				const serverMsg: JSONRoomAccess = JSON.parse(event.data);
 				console.log("GAME-APP: received message from game-server = ", serverMsg);
+
+				if (!this.isOnGamePage)
+					this.closeSockets();
 
 				//	If game server sends a valid roomId and that no roomId was already settled save data and close websocket
 				if (serverMsg.roomId !== undefined && this.roomId === undefined) {
@@ -105,6 +110,9 @@ export class GameApp
 					console.log("GAME-APP: You left the waiting room, websocket (for route 'waiting') is closed");
 				resolve(this.roomId ?? -1);
 			};
+
+			if (!this.isOnGamePage)
+				this.closeSockets();
 		});
 	}
 
@@ -131,6 +139,7 @@ export class GameApp
 			{
 				if (this.roomId === undefined || !this.gamingSocket)
 					throw new Error("GAME-APP: can't identify client, impossible to process the message received from server");
+
 				if (!this.isOnGamePage)
 					this.closeSockets();
 

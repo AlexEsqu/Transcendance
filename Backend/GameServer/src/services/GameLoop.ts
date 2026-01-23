@@ -83,7 +83,10 @@ export class GameLoop
 
 				if (isNewRound)
 				{
-					this.requestNewRound();
+					if (this.requestNewRound() === GameSatus.ERROR) {
+						this.stopGameLoop(gameControl, room, gameInterval);
+						return ;
+					}
 					isNewRound = false;
 				}
 
@@ -118,13 +121,6 @@ export class GameLoop
 			}
 			this.processPlayerInput('Robot', robotState.currentMove);
 		}
-
-		//	Process received inputs and update paddle position
-		// for (const [key, value] of this.inputsBuffer)
-		// {
-		// 	this.processPlayerInput(key, value);
-		// 	this.inputsBuffer.delete(key);
-		// }
 	}
 
 	bouncingBallProcess(): boolean
@@ -233,6 +229,12 @@ export class GameLoop
 		if (this.rounds.nbOfRounds !== 0)
 			this.saveResults();
 
+		if (this.leftPadd.player !== undefined && this.rightPadd.player !== undefined)
+		{
+			this.leftPadd.player.isCurrentlyPlaying = false;
+			this.rightPadd.player.isCurrentlyPlaying = false;
+		}
+
 		if (this.state === State.end)
 			return GameSatus.SUCCESS;
 
@@ -264,6 +266,9 @@ export class GameLoop
 
 		if (this.leftPadd.player === undefined || this.rightPadd.player === undefined)
 			return GameSatus.ERROR;
+
+		this.leftPadd.player.isCurrentlyPlaying = true;
+		this.rightPadd.player.isCurrentlyPlaying = true;
 
 		//	If a player is disconnected, opponent wins
 		if (this.leftPadd.player?.socket === null)

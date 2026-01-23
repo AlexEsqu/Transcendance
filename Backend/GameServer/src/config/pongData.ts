@@ -81,6 +81,7 @@ interface IPlayer {
 	isReady: boolean;
 	roomId?: number;
 	color?: string;
+	isCurrentlyPlaying: boolean;
 };
 
 interface IRobot {

@@ -59,7 +59,8 @@ export class GameControl
 			matchType: matchType,
 			gameLocation: gameLocation,
 			isReady: false,
-			color: data.color
+			color: data.color,
+			isCurrentlyPlaying: false
 		};
 		return player;
 	}
@@ -138,7 +139,8 @@ export class GameControl
 				matchType: player.matchType,
 				gameLocation: player.gameLocation,
 				isReady: true,
-				roomId: roomId
+				roomId: roomId,
+				isCurrentlyPlaying: false
 			};
 			room.addPlayerInRoom('Robot', playerRobot);
 		}
