@@ -77,7 +77,7 @@ export class GameApp
 				const players = this.pong.scene.players;
 				for (const player of players)
 				{
-					if (player.id !== 0)
+					if (player.username !== 'Robot')
 					{
 						const demand: JSONRoomDemand = fillRoomDemand(options, player);
 						this.waitingSocket.send(JSON.stringify(demand));
