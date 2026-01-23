@@ -112,7 +112,10 @@ export class GameLoop
 		//	Perform anticipation and decision-making og the AI (named Robot) opponent
 		if (this.leftPadd.robot)
 		{
-			processRobotOpponent(this.leftPadd, this.ball, robotState, this.timestamp);
+			if (robotState.lastViewRefresh - this.timestamp < 1000) {
+				robotState.currentMove = processRobotOpponent(this.leftPadd, this.ball, robotState);
+				robotState.lastViewRefresh = this.timestamp;
+			}
 			this.processPlayerInput('Robot', robotState.currentMove);
 		}
 

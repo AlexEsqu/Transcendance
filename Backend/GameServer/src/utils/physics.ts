@@ -121,45 +121,35 @@ function scaleVelocity(ball: IBall, deltaTime: number): { x: number, z: number }
 	return velocity;
 }
 
-function processRobotOpponent(
-	paddle: IPaddle, ball: IBall, robotState: IRobot, currentTime: number): void
+function processRobotOpponent(paddle: IPaddle, ball: IBall, robotState: IRobot): string
 {
-	//	The AI must only refresh its view & take decisions once per second otherwise continue the last move
-	if (currentTime - robotState.lastViewRefresh < 1000) {
-		return ;
-	}
-
-	console.log(robotState);
-	robotState.lastViewRefresh = currentTime;
-
-	//	Avoid the robot to always move perfectly : 1/PROBABILITY chance to miss the target
 	const result = Math.floor(Math.random() * robotState.successProba);
-	if (result === 0) {
-		robotState.currentMove = 'none';
-		return ;
-	}
+	//	Avoid the robot to always move perfectly : 1/BOT_PROBABILITY chance to miss the target
+	if (result !== 1) 
+		return 'none';
 	
-	robotState.targetPosition = predictBallPos(ball);
+	//	Reduces noise & vibration (avoid robot constantly moving when it's uncessary)
+	if (ball.posistion.x >= 0 || ball.posistion.z === paddle.pos.z) 
+		return 'none';
+	else if (ball.posistion.z === paddle.pos.z) return 'none';
 
-	const distanceToTarget: number = robotState.targetPosition - paddle.pos.z;
 	const halfPaddLength: number = GAME_SIZE.PADD_WIDTH / 2;
 
-	console.log(`target ${robotState.targetPosition} distance ${distanceToTarget} padd pos ${paddle.pos.z}`);
-	//	Reduce noise & vibration (avoid robot constantly moving when it's uncessary)
-	if (Math.abs(distanceToTarget) < halfPaddLength * 0.3) {
-		robotState.currentMove = 'none';
-		return ;
-	}
+	//	No move needed if the ball is already in the paddle's field
+	if (ball.posistion.z <= paddle.pos.z + halfPaddLength && ball.posistion.z >= paddle.pos.z - halfPaddLength)
+		return 'none';
+
+	robotState.targetPosition = predictBallPos(ball);
+	
+	const distanceToTarget: number = robotState.targetPosition - paddle.pos.z;
+	if (Math.abs(distanceToTarget) < halfPaddLength * 0.3)
+		return 'none';
 
 	//	Process automatic move
-	if (distanceToTarget > 0) {
-		robotState.currentMove = 'up';
-		return ;
-	}
-	else {
-		robotState.currentMove = 'down';
-		return ;
-	}
+	if (robotState.targetPosition > paddle.pos.z)
+		return 'up';
+	else
+		return 'down';
 }
 
 /**
@@ -167,15 +157,8 @@ function processRobotOpponent(
  */
 function predictBallPos(ball: IBall): number
 {
-	// console.log('=== PREDICT BALL ===');
-    // console.log('Ball position:', ball.posistion);
-    // console.log('Ball direction:', ball.direction);
-    // console.log('Ball speed:', ball.speed);
-	//	Come back to the center when the ball moves away
 	if (ball.direction.x >= 0)
 		return 0;
-
-	console.log('Ball moving TOWARDS paddle, predicting...');
 
 	const topMap: number = GAME_SIZE.MAP_HEIGHT / 2;
 	const bottomMap: number = -(GAME_SIZE.MAP_HEIGHT / 2);
@@ -206,15 +189,12 @@ function predictBallPos(ball: IBall): number
 		}
 		else if (ballExpected.posistion.z < bottomMap)
 		{
-			ballExpected.posistion.z = bottomMap + (ballExpected.posistion.z - bottomMap);
+			ballExpected.posistion.z = bottomMap + (bottomMap - ballExpected.posistion.z);
 			ballExpected.direction.z = -(ballExpected.direction.z);
 		}
 
 		elapsedTime += deltaTime;
 	}
-
-	console.log(`Predicted Z position: ${ballExpected.posistion.z} `);
-    console.log('===================');
 
 	return ballExpected.posistion.z;
 }
