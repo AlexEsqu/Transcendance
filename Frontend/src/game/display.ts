@@ -39,19 +39,10 @@ function displayGameHelpMessage(matchLocation: string): void
 
 	if (matchLocation === 'local')
 	{
-		helpMsg.innerHTML = `Left Controls : press W/S <br/> Right Controls: press ↑ / ↓`;
+		helpMsg.innerHTML = `Left Controls : press W/S                       Right Controls: press ↑ / ↓`;
 	}
 	else 
 		helpMsg.textContent = `Controls: press ↑ / ↓`;
-
-	helpMsg.classList.remove('invisible');
-	helpMsg.classList.add('flex');
-
-	//	Display only for 10 seconds
-	setTimeout(() => {
-		helpMsg.classList.remove('flex');
-		helpMsg.classList.add('invisible');
-	}, 10000);
 }
 
 

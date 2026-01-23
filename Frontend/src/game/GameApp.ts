@@ -47,8 +47,8 @@ export class GameApp
 
 				console.log("GAME-APP: connection with game-server");
 
-
-				waitingRoomModal.show();
+				if (this.pong.scene.options.matchLocation === 'remote')
+					waitingRoomModal.show();
 
 				//	On socket creation send a demand to the server to add (each) player(s) in a waiting room
 				const players = this.pong.scene.players;
@@ -58,7 +58,8 @@ export class GameApp
 					{
 						const demand: JSONRoomDemand = fillRoomDemand(options, player);
 						this.waitingSocket.send(JSON.stringify(demand));
-						waitingRoomModal.addPlayer(player);
+						if (this.pong.scene.options.matchLocation === 'remote')
+							waitingRoomModal.addPlayer(player);
 					}
 				}
 				if (!this.isOnGamePage)
@@ -89,7 +90,8 @@ export class GameApp
 					this.waitingSocket?.close();
 					this.waitingSocket = null;
 					//	We can leave waiting room
-					waitingRoomModal.close();
+					if (this.pong.scene.options.matchLocation === 'remote')
+						waitingRoomModal.close();
 					resolve(this.roomId);
 				}
 			};
@@ -97,13 +99,15 @@ export class GameApp
 			this.waitingSocket.onerror = (error) => {
 				this.waitingSocket?.close();
 				this.waitingSocket = null;
-				waitingRoomModal.close();
+				if (this.pong.scene.options.matchLocation === 'remote')
+					waitingRoomModal.close();
 				reject(new Error("Authentication failed or websocket rejected from the game-server"));
 			};
 
 			this.waitingSocket.onclose = (event) => {
 				this.waitingSocket = null;
-				waitingRoomModal.close();
+				if (this.pong.scene.options.matchLocation === 'remote')
+					waitingRoomModal.close();
 				if (event.code === 1006)
 					reject(new Error("Authentication failed or websocket rejected from the game-server"));
 				else
