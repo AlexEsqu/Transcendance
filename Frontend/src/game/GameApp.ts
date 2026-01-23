@@ -31,7 +31,8 @@ export class GameApp
 	{
 		return new Promise((resolve, reject) => {
 			const waitingRoomModal = new WaitingRoomModal();
-			this.waitingSocket = new WebSocket(`wss://${window.location.host}${WAITING_ROOM_URL}`);
+			console.log(window.location.host);
+			this.waitingSocket = new WebSocket(`wss://${import.meta.env.VITE_HOST}${WAITING_ROOM_URL}`);
 			if (!this.waitingSocket) {
 				reject(new Error("'waitingSocket' creation failed"));
 				return ;
@@ -109,7 +110,7 @@ export class GameApp
 
 	goToGamingRoom(): void
 	{
-		this.gamingSocket = new WebSocket(`wss://${window.location.host}${GAMING_ROOM_URL}`);
+		this.gamingSocket = new WebSocket(`wss://${import.meta.env.VITE_HOST}${GAMING_ROOM_URL}`);
 		if (!this.gamingSocket)
 			throw new Error("'gamingSocket' not found");
 

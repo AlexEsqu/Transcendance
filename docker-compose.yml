@@ -32,7 +32,7 @@ services:
       - VITE_JWT_SECRET=${JWT_SECRET}
       - VITE_APP_SECRET_KEY=${APP_SECRET_KEY}
       - VITE_API_DOMAIN_NAME=${API_DOMAIN_NAME}
-      - HOST=${HOST}
+      - VITE_HOST=${VITE_HOST}
     networks:
       - app-network
 
@@ -50,6 +50,9 @@ services:
       - game_server
     networks:
       - app-network
+    environment:
+      - HOST=${HOST}
+
   game_server:
     build: ./Backend/GameServer
     container_name: game_server

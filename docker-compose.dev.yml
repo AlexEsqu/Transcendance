@@ -21,6 +21,7 @@ services:
       - FRONTEND_DOMAIN_NAME=${FRONTEND_DOMAIN_NAME}
       - FT_CLIENT_ID=${FT_CLIENT_ID}
       - FT_CLIENT_SECRET=${FT_CLIENT_SECRET}
+      - HOST=${HOST}
     networks:
       - app-network
 
@@ -33,7 +34,7 @@ services:
       - VITE_JWT_SECRET=${JWT_SECRET}
       - VITE_APP_SECRET_KEY=${APP_SECRET_KEY}
       - VITE_API_DOMAIN_NAME=${API_DOMAIN_NAME}
-      - HOST=${HOST}
+      - VITE_HOST=${VITE_HOST}
 
     networks:
       - app-network
@@ -65,6 +66,7 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - APP_SECRET_KEY=${APP_SECRET_KEY}
       - API_DOMAIN_NAME=${API_DOMAIN_NAME}
+      - HOST=${HOST}
       - PORT=4001
     volumes:
       - ./Backend/GameServer/src:/app/src
