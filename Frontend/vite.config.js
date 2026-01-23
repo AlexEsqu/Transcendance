@@ -11,7 +11,7 @@ export default defineConfig({
       "localhost",
       "typescript",
       "nginx",
-      process.env.VITE_HOST
+      process.env.HOST
     ],
   },
   hmr: {

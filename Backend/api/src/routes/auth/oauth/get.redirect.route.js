@@ -11,9 +11,9 @@ export default function getOauthRedirect(server) {
 			reply.setCookie("state", state, {
 				httpOnly: true,
 				secure: true,
-				sameSite: "Lax",
-				path: "api/users/auth/oauth/42/callback",
-				maxAge: 60 * 5, // 1 minute
+				sameSite: "lax",
+				path: "/api/users/auth/oauth/42/callback",
+				maxAge: 60 * 5, // 5 minutes
 			});
 			const oAuthURL = new URL(process.env.FT_OAUTH_URL);
 			oAuthURL.searchParams.append("client_id", process.env.FT_CLIENT_ID);

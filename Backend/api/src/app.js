@@ -45,7 +45,7 @@ export function buildServer({ useHttps = null, dbOverride = null, apiKeyPluginOv
 	server.register(fastifyCookie);
 	server.register(swaggerPlugin);
 	server.register(cors, {
-		origin:`${process.env.API_DOMAIN_NAME}`,
+		origin: [process.env.FRONTEND_DOMAIN_NAME, "https://localhost:8443"],
 		credentials: true,
 		methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
 		logLevel: "trace",

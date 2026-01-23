@@ -76,24 +76,24 @@ export async function isUserInDB(server, user) {
 
 function prepareParamsFor42TokenExchange(req, reply) {
 	const cookieState = req.cookies.state;
+	// reply.clearCookie("state");
 	const ft_state = req.query.state;
 	const code = req.query.code;
-	const redirectUri = encodeURI(`${process.env.API_DOMAIN_NAME}/users/auth/oauth/42/callback`);
+	const redirectUri = `${process.env.API_DOMAIN_NAME}/users/auth/oauth/42/callback`;
+	console.log("FT STATE", ft_state);
+	console.log("COOKIE STATE", cookieState);
 	if (cookieState != ft_state) {
+		console.log("INVALID STATE");
 		return reply.redirect(`${redirectUrl}?error=invalid_state`);
 	}
 	const params = new URLSearchParams();
 	params.append("grant_type", "authorization_code");
 	params.append("client_id", process.env.FT_CLIENT_ID);
 	params.append("client_secret", process.env.FT_CLIENT_SECRET);
-	params.append("code", code); // from query
+	params.append("code", code); 
 	params.append("redirect_uri", redirectUri);
-	reply.clearCookie("state", {
-		httpOnly: true,
-		secure: true,
-		sameSite: "Lax",
-		maxAge: 60 * 5, // 1 minute
-	});
+	reply.clearCookie("state");
+	console.log("HERE", params.toString());
 	return params;
 }
 
@@ -109,6 +109,7 @@ export async function get42Token(params) {
 		});
 		if (!response.ok) {
 			const errJson = await response.json();
+			console.log(errJson);
 			throw new Error(errJson.error_description || "Unknown error");
 		}
 		const result = await response.json();
