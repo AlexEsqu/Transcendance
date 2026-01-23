@@ -64,6 +64,8 @@ export class GameApp
 			}
 
 			const options: IOptions = this.pong.scene.options;
+			console.log("received options:");
+			console.log(options);
 
 			this.waitingSocket.onopen = (e) => {
 				if (!this.waitingSocket || !this.pong.scene) {

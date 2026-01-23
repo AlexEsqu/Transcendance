@@ -23,16 +23,11 @@ formElement: HTMLFormElement | null = null;
 
 		const update = () => {
 			const locationSelect = this.modalElem.querySelector('#match-location') as HTMLSelectElement;
-			const playerContainer = this.modalElem.querySelector('#players-container') as HTMLElement;
-			const paddleColorsContainer = this.modalElem.querySelector('#paddle-colors-container') as HTMLElement;
-
 			this.matchLocation = locationSelect.value;
 			const matchTypeSelect = this.modalElem.querySelector('#match-type') as HTMLSelectElement;
 			this.nbOfPlayers = matchTypeSelect ? parseInt(matchTypeSelect.value) : 1;
 
 			this.removeIncompatibleOptions()
-			this.showPlayerUsernameInput(playerContainer);
-			this.showPaddleCustom(paddleColorsContainer);
 		};
 
 		update();
@@ -55,6 +50,11 @@ formElement: HTMLFormElement | null = null;
 
 	removeIncompatibleOptions()
 	{
+		const playerContainer = this.modalElem.querySelector('#players-container') as HTMLElement;
+		const customizePaddleContainer = this.modalElem.querySelector('#customize-paddle-container') as HTMLElement;
+		const paddleColorsContainer = this.modalElem.querySelector('#paddle-colors-container') as HTMLElement;
+		const customizeNameContainer = this.modalElem.querySelector('#customize-name-container') as HTMLElement;
+
 		if (this.matchLocation == "remote")
 		{
 			this.formElement?.querySelector("#match-type-ai")?.classList.add("hidden")
@@ -62,10 +62,13 @@ formElement: HTMLFormElement | null = null;
 			if (matchTypeSelect && matchTypeSelect.value === "1") {
 				matchTypeSelect.value = "2";
 			}
+			this.hideCustomOptions(customizeNameContainer, customizePaddleContainer);
 		}
 		else
 		{
 			this.formElement?.querySelector("#match-type-ai")?.classList.remove("hidden")
+			this.showPlayerUsernameInput(customizeNameContainer, playerContainer);
+			this.showPaddleCustom(customizePaddleContainer, paddleColorsContainer);
 		}
 
 	}
@@ -73,6 +76,7 @@ formElement: HTMLFormElement | null = null;
 	extractOptions(): IOptions {
 		const formData = new FormData(this.formElement!);
 
+		const matchLocation = formData.get('match-location') as string;
 		const players: string[] = [];
 		const colors: string[] = [];
 		for (let i = 1; i <= this.nbOfPlayers; i++) {
@@ -85,18 +89,20 @@ formElement: HTMLFormElement | null = null;
 		}
 
 		return {
-			matchLocation: formData.get('match-location') as string,
+			matchLocation: matchLocation,
 			level: parseInt(formData.get('level') as string),
 			nbOfPlayers: parseInt(formData.get('match-type') as string),
-			players: players,
+			players: matchLocation == 'remote' ? [players[0]] : players,
 			paddColors: colors,
 			ballColor: '#a2c2e8',
 			mapColor: "#210446ff"
 		};
 	}
 
-	showPlayerUsernameInput(playersContainer: HTMLElement): void
+	showPlayerUsernameInput(customizeNameContainer: HTMLElement,playersContainer: HTMLElement): void
 	{
+		customizeNameContainer.classList.remove('hidden');
+
 		const inputs = playersContainer.querySelectorAll('input[name^="player-"]') as NodeListOf<HTMLInputElement>;
 		inputs.forEach((input, idx) => {
 			if (idx < this.nbOfPlayers)
@@ -121,8 +127,10 @@ formElement: HTMLFormElement | null = null;
 		});
 	}
 
-	showPaddleCustom(paddleColorsContainer: HTMLElement): void
+	showPaddleCustom(customizePaddleContainer: HTMLElement, paddleColorsContainer: HTMLElement): void
 	{
+		customizePaddleContainer.classList.remove('hidden');
+
 		const colorInputs = paddleColorsContainer.querySelectorAll('input[type="color"]');
 		const labels = paddleColorsContainer.querySelectorAll('label');
 
@@ -138,5 +146,12 @@ formElement: HTMLFormElement | null = null;
 				if (labels[idx]) labels[idx].classList.add('hidden');
 			}
 		});
+	}
+
+	hideCustomOptions(customizeNameContainer: HTMLElement, customizePaddleContainer: HTMLElement)
+	{
+		customizeNameContainer.classList.add('hidden');
+		customizeNameContainer.classList.remove('flex');
+		customizePaddleContainer.classList.add('hidden');
 	}
 }
