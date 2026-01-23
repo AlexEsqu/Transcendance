@@ -226,7 +226,25 @@ async function getAllUsers(): Promise<BaseUser[]>
 			method: 'GET',
 			headers: {
 				'accept': 'application/json',
-				
+
+			}
+		}
+	);
+
+	const data = await response.json();
+	if (!response.ok)
+		throw new Error(data.message || data.error || 'Friend fetch Failed');
+	return data;
+}
+
+export async function getUser(id: number): Promise<BaseUser>
+{
+	const response = await fetch(`${apiDomainName}/users/${id}`,
+		{
+			method: 'GET',
+			headers: {
+				'accept': 'application/json',
+
 			}
 		}
 	);

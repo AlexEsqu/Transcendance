@@ -1,4 +1,8 @@
 import { isValidInputs, checkInputValidityOnUnfocus } from "./inputValidation";
+import type { IPlayer } from "../game/pongData";
+import type { BaseUser } from "../user/User";
+import { versusTemplate } from "../utils/templateLoader";
+import { getUser } from "../dashboard/socialSection";
 
 export abstract class Modal
 {
@@ -193,4 +197,42 @@ export class WaitingRoomModal extends Modal
 	{
 		//
 	}
+
+	async addPlayer(player: IPlayer): Promise<void>
+	{
+		const list = this.modalElem.querySelector('#waiting-room-players');
+		const id = player.id;
+		if (list && id)
+		{
+			const player = await getUser(id);
+			list.appendChild(this.createVersusUserElement(player));
+		}
+	}
+
+	removePlayers(player: IPlayer): void
+	{
+		const list = this.modalElem.querySelector('#waiting-room-players');
+		const id = player.id;
+		if (list && id)
+		{
+			list.remove();
+		}
+	}
+
+	createVersusUserElement(player: BaseUser): HTMLLIElement
+	{
+		const template = versusTemplate as HTMLTemplateElement;
+		const clone = template.content.cloneNode(true) as DocumentFragment;
+
+		const li = clone.querySelector('li') as HTMLLIElement;
+		const img = clone.querySelector('.versus-user-avatar-img') as HTMLImageElement;
+		const nameSpan = clone.querySelector('.versus-user-name') as HTMLElement;
+
+		img.src = player.avatar ?? "/assets/placeholder/avatarPlaceholder.png";
+		img.alt = `${player.username} avatar`;
+		nameSpan.textContent = player.username;
+		return li;
+	}
 }
+
+

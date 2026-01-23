@@ -26,7 +26,6 @@ function getPolicyPage(): string
 	return policyHtml;
 }
 
-
 async function onDashboardLoaded(): Promise<void>
 {
 	const user = userState.getUser();
