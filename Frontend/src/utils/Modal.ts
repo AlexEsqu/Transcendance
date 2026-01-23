@@ -178,3 +178,19 @@ export class EmailCheckModal extends Modal
 		});
 	}
 }
+
+import waitingRoomModalHtml from "../html/info/waitingRoomModal.html?raw";
+
+export class WaitingRoomModal extends Modal
+{
+	constructor()
+	{
+		super(waitingRoomModalHtml);
+		this.setupModal();
+	}
+
+	setupModal(): void
+	{
+		//
+	}
+}

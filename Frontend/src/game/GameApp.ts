@@ -5,6 +5,7 @@ import { IOptions, PlayerState } from '../game/pongData';
 import { Pong } from '../game/Pong';
 import { UserState } from '../user/UserState';
 import { RegisteredUser, User } from '../user/User';
+import { WaitingRoomModal } from '../utils/Modal';
 
 /************************************************************************************************************/
 
@@ -49,6 +50,7 @@ export class GameApp
 	goToWaitingRoom(): Promise<number>
 	{
 		return new Promise((resolve, reject) => {
+			const waitingRoomModal = new WaitingRoomModal();
 			const token: string | null = this.getUserToken();
 			if (!token) {
 				reject(new Error("Authentication token not found for the current user"));
@@ -70,6 +72,9 @@ export class GameApp
 				}
 
 				console.log("GAME-APP: connection with game-server");
+
+
+				waitingRoomModal.show();
 
 				//	On socket creation send a demand to the server to add (each) player(s) in a waiting room
 				const players = this.pong.scene.players;
@@ -104,6 +109,7 @@ export class GameApp
 					this.waitingSocket?.close();
 					this.waitingSocket = null;
 					//	We can leave waiting room
+					waitingRoomModal.close();
 					resolve(this.roomId);
 				}
 			};
@@ -112,11 +118,13 @@ export class GameApp
 				// console.error(error);
 				this.waitingSocket?.close();
 				this.waitingSocket = null;
+				waitingRoomModal.close();
 				reject(new Error("Authentication failed or websocket rejected from the game-server"));
 			};
 
 			this.waitingSocket.onclose = (event) => {
 				this.waitingSocket = null;
+				waitingRoomModal.close();
 				if (event.code === 1006)
 					reject(new Error("Authentication failed or websocket rejected from the game-server"));
 				else
@@ -131,7 +139,7 @@ export class GameApp
 		const token: string | null = this.getUserToken();
 		if (!token)
 			throw new Error("Authentication token not found for the current user");
-		
+
 		this.gamingSocket = new WebSocket(`wss://${window.location.host}${GAMING_ROOM_URL}?token=${token}`);
 		if (!this.gamingSocket)
 			throw new Error("'gamingSocket' not found");
@@ -274,9 +282,9 @@ export async function launchPongGame(options: IOptions): Promise<void>
 			app.closeSockets();
 			return ;
 		}
-		setTimeout(() => { 
+		setTimeout(() => {
 			try {
-				app.goToGamingRoom(); 
+				app.goToGamingRoom();
 			} catch (error) {
 				console.error(error);
 				setNotification(true, "Something went wrong while entering the game. Please try again");
