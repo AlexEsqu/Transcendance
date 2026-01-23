@@ -24,9 +24,9 @@ function getPlayers(inputs: string[], colors: string[], nbOfPlayers: number, mat
 		if (inputs[i] && colors[i]) {
 			let id;
 			if (matchLocation === 'local' && inputs[i] !== userState.getUser()?.getName())
-				id = 0;
+				id = -1;
 			else
-				id = userState.getUser()?.getId() ?? 0;
+				id = userState.getUser()?.getId() ?? -1;
 			players.push({ id: id, username: inputs[i], score: 0, color: colors[i] } );
 		}
 	}

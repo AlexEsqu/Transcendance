@@ -27,27 +27,6 @@ export class GameApp
 		document.addEventListener('pageLoaded', () => {this.handlePageChange()});
 	}
 
-	private getUserToken(): string | null
-	{
-		const userState: UserState = UserState.getInstance();
-
-		try {
-			userState.refreshUser();
-		} catch (error) {
-			console.error(error);
-			return null;
-		}
-
-		const user: User | null = userState.getUser();
-		if (user)
-		{
-			userState.refreshToken();
-			const token = user instanceof RegisteredUser ? user.accessToken : null;
-			return token;
-		}
-		return null;
-	}
-
 	goToWaitingRoom(): Promise<number>
 	{
 		return new Promise((resolve, reject) => {
