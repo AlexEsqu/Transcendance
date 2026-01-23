@@ -38,9 +38,10 @@ async function transformMatchData(backendMatches: BackendMatch[], userId: number
 
 			let loserName: string = '';
 			let loserAvatar: string = placeholderAvatar;
-			if (match.loser_id === 0) {
-				loserName = 'Guest or AI';
-			}
+			if (match.loser_id === 0)
+				loserName = 'AI';
+			else if (match.loser_id === -1)
+				loserName = 'Guest';
 			else {
 				const loserPlayer = await getUser(match.loser_id);
 				loserName = loserPlayer.username;
@@ -49,8 +50,10 @@ async function transformMatchData(backendMatches: BackendMatch[], userId: number
 
 			let winnerName: string = '';
 			let winnerAvatar: string = placeholderAvatar;
-			if (match.winner_id === 0)
-				winnerName = 'Guest or AI';
+			if (match.loser_id === 0)
+				loserName = 'AI';
+			else if (match.loser_id === -1)
+				loserName = 'Guest';
 			else {
 				const winnerPlayer = await getUser(match.winner_id);
 				winnerName = winnerPlayer.username;
