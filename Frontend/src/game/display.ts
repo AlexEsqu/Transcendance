@@ -39,9 +39,10 @@ function displayGameHelpMessage(matchLocation: string): void
 
 	if (matchLocation === 'local')
 	{
-		helpMsg.textContent = `Left Control : press W/S\n Right Control: press &#x2191;/U+02193`
+		helpMsg.innerHTML = `Left Controls : press W/S <br/> Right Controls: press ↑ / ↓`;
 	}
-
+	else 
+		helpMsg.textContent = `Controls: press ↑ / ↓`;
 
 	helpMsg.classList.remove('invisible');
 	helpMsg.classList.add('flex');
