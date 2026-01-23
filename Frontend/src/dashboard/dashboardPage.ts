@@ -2,7 +2,7 @@ import { userState, router } from "../app"
 import { showFriend, showUsers } from "./socialSection";
 import { RegisteredUser } from "../user/User";
 import type { Subscriber } from "../user/UserState";
-import { displayMatchHistory } from "./graphSection";
+import { displayMatchHistory, displayInfo } from "./graphSection";
 
 import dashboardHtml from "../html/dashboard.html?raw";
 import policyHtml from "../html/policy.html?raw";
@@ -39,6 +39,10 @@ async function onDashboardLoaded(): Promise<void>
 		showRegisteredUserOptions(user);
 		userState.subscribe(currentFriendsListener);
 		displayMatchHistory();
+	}
+	else
+	{
+		displayInfo("No user history is stored for guests");
 	}
 
 	userState.subscribe(currentUsersListener);

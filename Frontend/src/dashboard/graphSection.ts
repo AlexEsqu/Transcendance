@@ -4,7 +4,7 @@ import { getUser } from '../dashboard/socialSection';
 import 'chartjs-adapter-date-fns'; // for time scale parsing
 import { placeholderAvatar } from "../user/User"
 
-export { displayMatchHistory }
+export { displayMatchHistory, displayInfo }
 export type { MatchHistory, BackendMatch }
 
 interface MatchHistory {
