@@ -128,7 +128,6 @@ export class Pong
 
 		if (this.mainPlayerUsername !== rightPadd.player?.username && this.mainPlayerUsername !== leftPadd.player?.username)
 			return ;
-		console.log(`right ${rightPadd.player?.username} && left ${leftPadd.player?.username}`);
 
 		//	Code bellow is executed only in 'remote' case
 		let mainPlayerPadd: IPaddle;
