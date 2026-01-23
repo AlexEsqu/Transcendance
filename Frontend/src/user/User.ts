@@ -1,4 +1,4 @@
-export { User, RegisteredUser, GuestUser }
+export { User, RegisteredUser, GuestUser, placeholderAvatar }
 export type { BaseUser }
 
 const placeholderAvatar : string = "/assets/placeholder/avatarPlaceholder.png"

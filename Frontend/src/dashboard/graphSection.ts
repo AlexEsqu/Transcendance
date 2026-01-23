@@ -1,15 +1,17 @@
 import { userState } from "../app";
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
+import { getUser } from '../dashboard/socialSection';
 import 'chartjs-adapter-date-fns'; // for time scale parsing
+import { placeholderAvatar } from "../user/User"
 
 export { displayMatchHistory }
 export type { MatchHistory, BackendMatch }
-
 
 interface MatchHistory {
 	id: number;
 	date: string;
 	opponent: string;
+	opponentAvatar: string;
 	playerScore: number;
 	opponentScore: number;
 	result: 'win' | 'loss';
@@ -28,18 +30,44 @@ Chart.register(
 	...registerables
 );
 
-function transformMatchData(backendMatches: BackendMatch[], userId: number): MatchHistory[] {
-	return backendMatches.map(match => {
-		const isWinner = match.winner_id === userId;
-		return {
-			id: match.id,
-			date: match.date,
-			opponent: isWinner ? `User ${match.loser_id}` : `User ${match.winner_id}`,
-			playerScore: isWinner ? match.winner_score : match.loser_score,
-			opponentScore: isWinner ? match.loser_score : match.winner_score,
-			result: isWinner ? 'win' : 'loss'
-		};
-	});
+async function transformMatchData(backendMatches: BackendMatch[], userId: number): Promise<MatchHistory[]>
+{
+	return Promise.all(
+		backendMatches.map(async match => {
+			const isWinner = match.winner_id === userId;
+
+			let loserName: string = '';
+			let loserAvatar: string = placeholderAvatar;
+			if (match.loser_id === 0) {
+				loserName = 'Guest or AI';
+			}
+			else {
+				const loserPlayer = await getUser(match.loser_id);
+				loserName = loserPlayer.username;
+				loserAvatar = loserPlayer.avatar ?? placeholderAvatar;
+			}
+
+			let winnerName: string = '';
+			let winnerAvatar: string = placeholderAvatar;
+			if (match.winner_id === 0)
+				winnerName = 'Guest or AI';
+			else {
+				const winnerPlayer = await getUser(match.winner_id);
+				winnerName = winnerPlayer.username;
+				winnerAvatar = winnerPlayer.avatar ?? placeholderAvatar;
+			}
+
+			return {
+				id: match.id,
+				date: match.date,
+				opponent: isWinner ? loserName : winnerName,
+				opponentAvatar: isWinner ? loserAvatar : winnerAvatar,
+				playerScore: isWinner ? match.winner_score : match.loser_score,
+				opponentScore: isWinner ? match.loser_score : match.winner_score,
+				result: isWinner ? 'win' : 'loss'
+			};
+		})
+	);
 }
 
 async function displayMatchHistory(): Promise<void>
@@ -49,7 +77,7 @@ async function displayMatchHistory(): Promise<void>
 	try
 	{
 		const backendMatches = await userState.customize.fetchMatchHistory();
-		matches = transformMatchData(backendMatches, userState.getUser()?.getId() || -1);
+		matches = await transformMatchData(backendMatches, userState.getUser()?.getId() || -1);
 		if (matches.length < 1)
 			throw new Error("No history yet...")
 	}
@@ -142,14 +170,14 @@ function drawLineChart(canvas: HTMLCanvasElement, matches: MatchHistory[]): void
 
 	// build clustered points with dynamic spacing
 	const pointColors: string[] = [];
-	const dataPoints: { x: Date; y: number; opponent: string }[] = [];
+	const dataPoints: { x: Date; y: number; opponent: string, result: string }[] = [];
 	const perDayCount = new Map<string, number>();
 	const maxMatchesPerDay = Math.max(...matchesPerDay.values(), 1);
 
 	if (sortedMatches.length > 0) {
 		const firstDate = new Date(sortedMatches[0].date);
 		const startDate = new Date(firstDate.getFullYear(), firstDate.getMonth(), firstDate.getDate() - 2, 12, 0, 0, 0);
-		dataPoints.push({ x: startDate, y: 0, opponent: '' });
+		dataPoints.push({ x: startDate, y: 0, opponent: '', result: '' });
 		pointColors.push('transparent');
 	}
 
@@ -170,7 +198,7 @@ function drawLineChart(canvas: HTMLCanvasElement, matches: MatchHistory[]): void
 		const clustered = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12, idx * offsetMinutes, 0, 0);
 
 		cumulativeScore += match.result === 'win' ? 1 : -1;
-		dataPoints.push({ x: clustered, y: cumulativeScore, opponent: match.opponent });
+		dataPoints.push({ x: clustered, y: cumulativeScore, opponent: match.opponent, result: match.result });
 		pointColors.push(match.result === 'win' ? '#aee2e9ff' : '#e28812ff');
 	}
 
@@ -221,8 +249,8 @@ function drawLineChart(canvas: HTMLCanvasElement, matches: MatchHistory[]): void
 						},
 						label: (ctx) => {
 							const raw = ctx.raw as any;
-							return raw?.opponent ? `vs ${raw.opponent} • score ${ctx.parsed.y}` : `score ${ctx.parsed.y}`;
-						}
+							return raw?.opponent ? `${raw.result} vs ${raw.opponent} • score ${ctx.parsed.y}` : `score ${ctx.parsed.y}`;
+						},
 					}
 				}
 			},
