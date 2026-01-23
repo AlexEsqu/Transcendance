@@ -79,7 +79,7 @@ function prepareParamsFor42TokenExchange(req, reply) {
 	// reply.clearCookie("state");
 	const ft_state = req.query.state;
 	const code = req.query.code;
-	const redirectUri = `https://localhost:8443/api/users/auth/oauth/42/callback`;
+	const redirectUri = `${process.env.API_DOMAIN_NAME}/users/auth/oauth/42/callback`;
 	console.log("FT STATE", ft_state);
 	console.log("COOKIE STATE", cookieState);
 	if (cookieState != ft_state) {
