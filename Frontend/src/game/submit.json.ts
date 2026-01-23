@@ -7,6 +7,7 @@ export type { JSONInputsUpdate, JSONGameState, JSONRoomAccess, JSONRoomDemand }
  ***********************************************************************************************************/
 
 interface JSONRoomDemand {
+	secret: string;
 	id: number;
 	username: string;
 	color: string;
@@ -33,6 +34,7 @@ interface JSONGameState {
 };
 
 interface JSONInputsUpdate {
+	secret: string;
 	username: string;
 	roomId: number;
 	ready: boolean;

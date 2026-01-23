@@ -74,6 +74,7 @@ function fillRoomDemand(options: IOptions, player: IPlayer): JSONRoomDemand
 	}
 
 	const request: JSONRoomDemand = {
+		secret: import.meta.env.VITE_APP_SECRET_KEY ?? "",
 		id: player.id,
 		username: player.username,
 		color: player.color,

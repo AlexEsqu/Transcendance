@@ -26,6 +26,11 @@ function handleMessage(socket: WSWebSocket, message: Buffer,
 			socket.send(JSON.stringify(getJSONError("Bad request", 400)));
 			throw new Error("GAME-HANDLER: message received doesn't match with 'validateSchema' on '/room/game' route") ;
 		}
+		if (data.secret !== process.env.APP_SECRET_KEY) {
+			socket.send(JSON.stringify(getJSONError("Unauthorized", 401)));
+			console.log("GAME-WAIT-HANDLER: client is not authenticated");
+			return (undefined);
+		}
 
 		// console.log("GAME-HANDLER: handle received message from '/room/game' route : ", data);
 

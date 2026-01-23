@@ -25,6 +25,12 @@ function handleMessage(socket: WSWebSocket, message: Buffer,
 			console.log("GAME-WAIT-HANDLER: received a bad request from a client");
 			return ({ username: 'NaN', roomId: -1});
 		}
+		if (data.secret !== process.env.APP_SECRET_KEY) {
+			socket.send(JSON.stringify(getJSONError("Unauthorized", 401)));
+			console.log("GAME-WAIT-HANDLER: client is not authenticated");
+			return ({ username: 'NaN', roomId: -1});
+		}
+
 		console.log("GAME-WAIT-HANDLER: handle received message");
 
 		//	Add in game controller (manage waiting rooms and gaming rooms)
