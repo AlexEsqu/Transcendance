@@ -62,7 +62,7 @@ export class Room
 	
 	startGame(gameControl: GameControl): void
 	{
-		console.log(`GAME-ROOM: start game in roomID:${this.id} | matchType:${this.type} | location:${this.location} | level:${this.level} | players: `, this.players);
+		console.log(`GAME-ROOM: start game in roomID:${this.id} | matchType:${this.type} | location:${this.location} | level:${this.level} | nb players: ${this.players.size} `);
 		if (!this.gameLoopStarted && this.gameLoop)
 		{
 			this.gameLoop.runGameLoop(gameControl);

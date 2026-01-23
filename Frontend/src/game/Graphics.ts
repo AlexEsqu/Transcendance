@@ -105,7 +105,7 @@ function createCamera(scene: Scene, matchLocation: string): ArcRotateCamera | nu
 		'arCamera',
 		-(Math.PI / 2), // alpha
 		0, // beta
-		12, // radius
+		13, // radius
 		new Vector3(0.0, -1, 0.0), // target
 		scene
 	);
@@ -147,7 +147,9 @@ function openingAnimation(scene: IScene): void
 		scene.camera.animations = [];
 		scene.camera.animations.push(animation);
 		scene.id.beginAnimation(scene.camera, 0, 60, false);
-		scene.state = PlayerState.waiting;
+		setTimeout(() => {
+			scene.state = PlayerState.waiting;
+		}, 200);
 	}
 }
 
