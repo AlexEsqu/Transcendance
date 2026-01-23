@@ -58,6 +58,7 @@ export class GameApp
 					{
 						const demand: JSONRoomDemand = fillRoomDemand(options, player);
 						this.waitingSocket.send(JSON.stringify(demand));
+						waitingRoomModal.addPlayer(player);
 					}
 				}
 

@@ -202,7 +202,8 @@ export class WaitingRoomModal extends Modal
 	{
 		const list = this.modalElem.querySelector('#waiting-room-players');
 		const id = player.id;
-		if (list && id)
+		const el = document.getElementById(`versus-user-${id}`);
+		if (list && id && !el)
 		{
 			const player = await getUser(id);
 			list.appendChild(this.createVersusUserElement(player));
@@ -211,12 +212,10 @@ export class WaitingRoomModal extends Modal
 
 	removePlayers(player: IPlayer): void
 	{
-		const list = this.modalElem.querySelector('#waiting-room-players');
 		const id = player.id;
-		if (list && id)
-		{
-			list.remove();
-		}
+		const el = document.getElementById(`versus-user-${id}`);
+		if (el)
+			el.remove();
 	}
 
 	createVersusUserElement(player: BaseUser): HTMLLIElement
@@ -225,6 +224,7 @@ export class WaitingRoomModal extends Modal
 		const clone = template.content.cloneNode(true) as DocumentFragment;
 
 		const li = clone.querySelector('li') as HTMLLIElement;
+		li.id = `versus-user-${player.id}`;
 		const img = clone.querySelector('.versus-user-avatar-img') as HTMLImageElement;
 		const nameSpan = clone.querySelector('.versus-user-name') as HTMLElement;
 
