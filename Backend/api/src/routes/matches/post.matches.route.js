@@ -13,10 +13,10 @@ export function postMatches(server) {
 			if (winner_id == loser_id) {
 				return reply.code(400).send({ error: "Invalid winner_id and loser_id (users are the same)" });
 			}
-			if (!winner && (winner_id != 0 || winner_id != -1)) {
+			if (!winner && (winner_id !== 0 && winner_id !== -1)) {
 				return reply.code(400).send({ error: "Invalid winner_id (user not found)" });
 			}
-			if (!loser && (loser_id != 0 || loser_id != -1)) {
+			if (!loser && (loser_id !== 0 && loser_id !== -1)) {
 				return reply.code(400).send({ error: "Invalid loser_id (user not found)" });
 			}
 		},

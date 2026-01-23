@@ -35,7 +35,6 @@ function handleMessage(socket: WSWebSocket, message: Buffer,
 
 		//	Add in game controller (manage waiting rooms and gaming rooms)
 		const player = gameControl.generatePlayerId(socket, data);
-		console.log(player);
 		const roomId = gameControl.addPlayerInWaitingRoom(player, data.level) ?? -1;
 
 		return ({ username: player.username, roomId: roomId});
