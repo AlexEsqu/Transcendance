@@ -50,13 +50,14 @@ export class GameApp
 	goToWaitingRoom(): Promise<number>
 	{
 		return new Promise((resolve, reject) => {
-			const token: string | null = this.getUserToken();
-			if (!token) {
-				reject(new Error("Authentication token not found for the current user"));
-				return ;
-			}
+			// const token: string | null = this.getUserToken();
+			// if (!token) {
+			// 	reject(new Error("Authentication token not found for the current user"));
+			// 	return ;
+			// }
 
-			this.waitingSocket = new WebSocket(`wss://${window.location.host}${WAITING_ROOM_URL}?token=${token}`);
+			// this.waitingSocket = new WebSocket(`wss://${window.location.host}${WAITING_ROOM_URL}?token=${token}`);
+			this.waitingSocket = new WebSocket(`wss://${window.location.host}${WAITING_ROOM_URL}`);
 			if (!this.waitingSocket) {
 				reject(new Error("'waitingSocket' creation failed"));
 				return ;
@@ -128,11 +129,12 @@ export class GameApp
 
 	goToGamingRoom(): void
 	{
-		const token: string | null = this.getUserToken();
-		if (!token)
-			throw new Error("Authentication token not found for the current user");
+		// const token: string | null = this.getUserToken();
+		// if (!token)
+		// 	throw new Error("Authentication token not found for the current user");
 		
-		this.gamingSocket = new WebSocket(`wss://${window.location.host}${GAMING_ROOM_URL}?token=${token}`);
+		// this.gamingSocket = new WebSocket(`wss://${window.location.host}${GAMING_ROOM_URL}?token=${token}`);
+		this.gamingSocket = new WebSocket(`wss://${window.location.host}${GAMING_ROOM_URL}`);
 		if (!this.gamingSocket)
 			throw new Error("'gamingSocket' not found");
 

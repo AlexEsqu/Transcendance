@@ -1,10 +1,24 @@
-import { GAME_SIZE, IBall, IPaddle, IPlayer, MatchType, Info } from '../config/pongData'
+import { GAME_SIZE, IBall, IPaddle, IPlayer, MatchType, Info, IRobot } from '../config/pongData'
 
 /************************************************************************************************************/
 
-export { initBall, initPadd, initPlayers, initInfoByLevel }
+export { initBall, initPadd, initPlayers, initInfoByLevel, initRobot }
 
 /************************************************************************************************************/
+
+function initInfoByLevel(level: number, matchType: MatchType): Info
+{
+	const INFO: Info = {
+		MAX_SCORE: 7,
+		MAX_ROUNDS: matchType === MatchType.tournament ? matchType - 1 : 1,
+		BALL_START_SPEED: 3 + level,
+		BALL_MAX_SPEED: 10 + level,
+		PADD_SPEED: 15,
+		PADD_RESPONSIVENESS: -60,
+		BOT_PROBABILITY: 4 - level
+	};
+	return INFO;
+}
 
 function initBall(startSpeed: number): IBall
 {
@@ -43,17 +57,13 @@ function initPlayers(players: Map<string, IPlayer>): Array<IPlayer>
 	return playerTab;
 }
 
-
-function initInfoByLevel(level: number, matchType: MatchType): Info
+function initRobot(probability: number): IRobot
 {
-	const INFO: Info = {
-		MAX_SCORE: 3,
-		MAX_ROUNDS: matchType === MatchType.tournament ? matchType - 1 : 1,
-		BALL_START_SPEED: 3 + level,
-		BALL_MAX_SPEED: 10 + level,
-		PADD_SPEED: 15,
-		PADD_RESPONSIVENESS: -60,
-		BOT_PROBABILITY: 6 - level
+	const robot: IRobot = { 
+		lastViewRefresh: 0, 
+		currentMove: 'none', 
+		targetPosition: 0, 
+		successProba: probability
 	};
-	return INFO;
+	return robot;
 }

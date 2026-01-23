@@ -3,7 +3,7 @@ import { WebSocket as WSWebSocket } from 'ws';
 /************************************************************************************************************/
 
 export { GAME_SIZE, MatchType, GameLocation, State, GameSatus, GAMING_ROOM_URL, WAITING_ROOM_URL }
-export type { IBall, IPaddle, IPlayer, IRound, IResult, Info }
+export type { IBall, IPaddle, IPlayer, IRound, IResult, Info, IRobot }
 
 /************************************************************************************************************
  * 		Declare CONSTANT variables								 											*
@@ -48,6 +48,16 @@ enum GameSatus {
  * 		Declare interfaces																					*
  ***********************************************************************************************************/
 
+interface Info {
+	MAX_SCORE: number;
+	MAX_ROUNDS: number;
+	BALL_START_SPEED: number;
+	BALL_MAX_SPEED: number;
+	PADD_SPEED: number;
+	PADD_RESPONSIVENESS: number;
+	BOT_PROBABILITY: number;
+};
+
 interface IBall {
 	speed: number;
 	posistion: { x: number, z: number };
@@ -73,6 +83,13 @@ interface IPlayer {
 	color?: string;
 };
 
+interface IRobot {
+	lastViewRefresh: number;
+	currentMove: string;
+	targetPosition: number;
+	successProba: number;
+};
+
 interface IResult {
 	winner: IPlayer;
 	maxScore: number;
@@ -84,14 +101,4 @@ interface IRound {
 	results: Array<IResult> | null;
 	waitingPlayers: Array<IPlayer>;
 	nbOfRounds: number;
-};
-
-interface Info {
-	MAX_SCORE: number;
-	MAX_ROUNDS: number;
-	BALL_START_SPEED: number;
-	BALL_MAX_SPEED: number;
-	PADD_SPEED: number;
-	PADD_RESPONSIVENESS: number;
-	BOT_PROBABILITY: number;
 };
